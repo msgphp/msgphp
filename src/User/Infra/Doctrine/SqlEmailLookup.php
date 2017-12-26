@@ -28,11 +28,19 @@ final class SqlEmailLookup implements EmailLookupInterface
 
     public function exists(string $email): bool
     {
+        if (!$this->entityFieldMapping) {
+            return false;
+        }
+
         return (bool) $this->createQuery($this->entityFieldMapping, $email)->getScalarResult();
     }
 
     public function existsPrimary(string $email): bool
     {
+        if (!$this->primaryEntityFieldMapping) {
+            return false;
+        }
+
         return (bool) $this->createQuery($this->primaryEntityFieldMapping, $email)->getScalarResult();
     }
 
