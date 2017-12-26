@@ -25,7 +25,7 @@ final class SecurityUserChecker implements UserCheckerInterface
         $this->logger = $logger ?? new NullLogger();
     }
 
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(UserInterface $user): void
     {
         if (!$user instanceof SecurityUser) {
             return;
@@ -40,7 +40,7 @@ final class SecurityUserChecker implements UserCheckerInterface
         }
     }
 
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(UserInterface $user): void
     {
     }
 }

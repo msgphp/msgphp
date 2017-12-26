@@ -66,5 +66,6 @@ final class ServiceConfigHelper
     }
 
     private function __construct()
-    { }
+    {
+    }
 }

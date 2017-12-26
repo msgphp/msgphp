@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityUserProviderTest extends TestCase
 {
-    public function testLoadUserByUsername()
+    public function testLoadUserByUsername(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $repository = new UserRepository([$user], User::class);
@@ -29,14 +29,14 @@ final class SecurityUserProviderTest extends TestCase
         $this->assertSame($securityUser->getUsername(), $user->getEmail());
     }
 
-    public function testLoadUnknownUserByUsername()
+    public function testLoadUnknownUserByUsername(): void
     {
         $this->expectException(UsernameNotFoundException::class);
 
         $this->createProvider()->loadUserByUsername('foo@bar.baz');
     }
 
-    public function testRefreshUser()
+    public function testRefreshUser(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $repository = new UserRepository([$user], User::class);
@@ -46,7 +46,7 @@ final class SecurityUserProviderTest extends TestCase
         $this->assertNotSame($oldSecurityUser, $securityUser);
     }
 
-    public function testRefreshUserWithInvalidId()
+    public function testRefreshUserWithInvalidId(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
 
@@ -55,14 +55,14 @@ final class SecurityUserProviderTest extends TestCase
         $this->createProvider()->refreshUser(new SecurityUser($user));
     }
 
-    public function testRefreshUnknownUser()
+    public function testRefreshUnknownUser(): void
     {
         $this->expectException(UnsupportedUserException::class);
 
         $this->createProvider()->refreshUser($this->getMockBuilder(UserInterface::class)->getMock());
     }
 
-    public function testSupportsClass()
+    public function testSupportsClass(): void
     {
         $this->assertTrue($this->createProvider()->supportsClass(SecurityUser::class));
         $this->assertFalse($this->createProvider()->supportsClass(UserInterface::class));

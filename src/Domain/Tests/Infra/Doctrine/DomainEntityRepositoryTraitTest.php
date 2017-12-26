@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
 {
-    public function testWithNoData()
+    public function testWithNoData(): void
     {
         $repository = $this->createRepository();
 
@@ -51,7 +51,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doDelete($this->createEntity());
     }
 
-    public function testWithData()
+    public function testWithData(): void
     {
         $repository = $this->createRepository($users = [
             $foo1 = $this->createEntity(null, ['field' => null, 'field2' => true]),
@@ -110,7 +110,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertTrue($repository->doExistsByFields(['field' => 'VALUE', 'field2' => 'value']));
     }
 
-    public function testSaveAndDeleteNewEntiy()
+    public function testSaveAndDeleteNewEntiy(): void
     {
         $repository = $this->createRepository();
         $repository->doSave($entity = $this->createEntity());
@@ -123,7 +123,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertEquals([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder()->getQuery())));
     }
 
-    public function testSaveDuplicateEntity()
+    public function testSaveDuplicateEntity(): void
     {
         $repository = $this->createRepository();
         $repository->doSave($this->createEntity('1'));

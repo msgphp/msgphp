@@ -9,31 +9,31 @@ use PHPUnit\Framework\TestCase;
 
 final class DomainIdTest extends TestCase
 {
-    public function testCreateNewId()
+    public function testCreateNewId(): void
     {
         $this->assertNotSame((string) $this->getId(), (string) $this->getId());
         $this->assertNotSame($this->getId()->toString(), $this->getId()->toString());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('foo', (string) $this->getId('foo'));
         $this->assertSame('foo', $this->getId('foo')->toString());
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         $this->assertFalse($this->getId()->equals($this->getId()));
         $this->assertTrue($this->getId('foo')->equals($this->getId('foo')));
         $this->assertFalse($this->getId('foo')->equals($this->getId()));
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->assertTrue(($serialized = serialize($this->getId())) === serialize(unserialize($serialized)));
     }
 
-    public function testJsonSerialize()
+    public function testJsonSerialize(): void
     {
         $this->assertSame(json_encode('foo'), json_encode($this->getId('foo')));
     }

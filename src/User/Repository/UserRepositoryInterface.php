@@ -17,9 +17,13 @@ interface UserRepositoryInterface
      * @return EntityCollectionInterface|User[]
      */
     public function findAll(int $offset = null, int $limit = null): EntityCollectionInterface;
+
     public function find(UserIdInterface $id): User;
+
     public function findByEmail(string $email): User;
+
     public function findByPasswordResetToken(string $token): User;
+
     public function exists(UserIdInterface $id): bool;
 
     /**

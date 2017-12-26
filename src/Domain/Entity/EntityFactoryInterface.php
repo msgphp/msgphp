@@ -15,6 +15,8 @@ interface EntityFactoryInterface
      * @return object
      */
     public function create(string $entity, array $context = []);
+
     public function identify(string $entity, $id): DomainIdInterface;
+
     public function nextIdentity(string $entity): DomainIdInterface;
 }

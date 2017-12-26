@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityUserCheckerTest extends TestCase
 {
-    public function testPreAuth()
+    public function testPreAuth(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $checker = new SecurityUserChecker(new UserRepository([$user], User::class));
@@ -40,7 +40,7 @@ final class SecurityUserCheckerTest extends TestCase
         }
     }
 
-    public function testPreAuthWithUnknownUser()
+    public function testPreAuthWithUnknownUser(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
 
@@ -50,7 +50,7 @@ final class SecurityUserCheckerTest extends TestCase
             ->checkPreAuth(new SecurityUser($user));
     }
 
-    public function testPreAuthWithUnsupportedUser()
+    public function testPreAuthWithUnsupportedUser(): void
     {
         try {
             (new SecurityUserChecker(new UserRepository([], User::class)))

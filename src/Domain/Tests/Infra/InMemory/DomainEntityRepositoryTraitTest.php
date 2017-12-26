@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
 {
-    public function testWithNoData()
+    public function testWithNoData(): void
     {
         $repository = $this->createRepository();
 
@@ -41,7 +41,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doDelete($this->createEntity());
     }
 
-    public function testWithData()
+    public function testWithData(): void
     {
         $repository = $this->createRepository($users = [
             $foo1 = $this->createEntity(null, ['field' => null, 'FIELD' => true]),
@@ -100,7 +100,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertTrue($repository->doExistsByFields(['field' => 'VALUE', 'FIELD' => 'value']));
     }
 
-    public function testResultSetFilter()
+    public function testResultSetFilter(): void
     {
         $repository = $this->createRepository([
             $entityA = $this->createEntity('A'),
@@ -118,7 +118,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertSame([$entityB], iterator_to_array($repository->createResultSet(null, 1, $filter)));
     }
 
-    public function testSaveAndDeleteNewEntiy()
+    public function testSaveAndDeleteNewEntiy(): void
     {
         $repository = $this->createRepository();
         $repository->doSave($entity = $this->createEntity());
@@ -131,7 +131,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertSame([], iterator_to_array($repository->createResultSet()));
     }
 
-    public function testSaveDuplicateEntity()
+    public function testSaveDuplicateEntity(): void
     {
         $repository = $this->createRepository();
         $repository->doSave($this->createEntity('1'));
@@ -141,7 +141,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doSave($this->createEntity('1'));
     }
 
-    public function testCompositePrimaryFields()
+    public function testCompositePrimaryFields(): void
     {
         $entities = [
             $entityA1 = $this->createEntity('A', ['token' => '1']),

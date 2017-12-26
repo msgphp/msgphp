@@ -8,9 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMapping;
-use MsgPhp\User\Entity\PendingUser;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserSecondaryEmail;
 use MsgPhp\User\Infra\Validator\EmailLookupInterface;
 
 /**
@@ -31,12 +28,12 @@ final class SqlEmailLookup implements EmailLookupInterface
 
     public function exists(string $email): bool
     {
-        return !!$this->createQuery($this->entityFieldMapping, $email)->getScalarResult();
+        return (bool) $this->createQuery($this->entityFieldMapping, $email)->getScalarResult();
     }
 
     public function existsPrimary(string $email): bool
     {
-        return !!$this->createQuery($this->primaryEntityFieldMapping, $email)->getScalarResult();
+        return (bool) $this->createQuery($this->primaryEntityFieldMapping, $email)->getScalarResult();
     }
 
     private function createSql(string $entity, string $field): string

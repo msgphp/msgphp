@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
 
@@ -24,7 +24,7 @@ final class UserTest extends TestCase
         $this->assertNull($user->getPasswordRequestedAt());
     }
 
-    public function testChangeEmail()
+    public function testChangeEmail(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
@@ -35,7 +35,7 @@ final class UserTest extends TestCase
         $this->assertGreaterThanOrEqual($lastUpdatedAt, $user->getLastUpdatedAt());
     }
 
-    public function testChangePassword()
+    public function testChangePassword(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
@@ -46,14 +46,14 @@ final class UserTest extends TestCase
         $this->assertGreaterThanOrEqual($lastUpdatedAt, $user->getLastUpdatedAt());
     }
 
-    public function testRequestPassword()
+    public function testRequestPassword(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
 
         $user->requestPassword();
 
-        $this->assertTrue(is_string($user->getPasswordResetToken()));
+        $this->assertInternalType('string', $user->getPasswordResetToken());
         $this->assertGreaterThanOrEqual($lastUpdatedAt, $user->getLastUpdatedAt());
         $this->assertGreaterThanOrEqual($lastUpdatedAt, $user->getPasswordRequestedAt());
         $this->assertGreaterThanOrEqual($user->getPasswordRequestedAt(), $user->getLastUpdatedAt());
@@ -64,7 +64,7 @@ final class UserTest extends TestCase
         $this->assertNotSame($user->getPasswordResetToken(), $compareUser->getPasswordResetToken());
     }
 
-    public function testEnableDisable()
+    public function testEnableDisable(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();

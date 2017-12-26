@@ -54,7 +54,7 @@ trait DomainEntityRepositoryTrait
         $qb->select('1');
         $this->addFieldCriteria($qb, $fields);
 
-        return !!$qb->getQuery()->getScalarResult();
+        return (bool) $qb->getQuery()->getScalarResult();
     }
 
     private function doSave($entity): void

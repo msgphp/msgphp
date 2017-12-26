@@ -12,26 +12,26 @@ final class DomainIdTest extends TestCase
 {
     private const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
-    public function testCreateNewUuid()
+    public function testCreateNewUuid(): void
     {
         $this->assertNotSame((string) $this->getUuid(), (string) $this->getUuid());
         $this->assertNotSame($this->getUuid()->toString(), $this->getUuid()->toString());
     }
 
-    public function testInvalidUuid()
+    public function testInvalidUuid(): void
     {
         $this->expectException(InvalidUuidStringException::class);
 
         $this->getUuid('foo');
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame(self::NIL_UUID, (string) $this->getNilUuid());
         $this->assertSame(self::NIL_UUID, $this->getNilUuid()->toString());
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         $this->assertFalse($this->getUuid()->equals($this->getNilUuid()));
         $this->assertTrue($this->getNilUuid()->equals($this->getNilUuid()));
@@ -40,12 +40,12 @@ final class DomainIdTest extends TestCase
         $this->assertFalse($this->getUuid()->equals($this->getUuid()));
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->assertTrue(($serialized = serialize($this->getUuid())) === serialize(unserialize($serialized)));
     }
 
-    public function testJsonSerialize()
+    public function testJsonSerialize(): void
     {
         $this->assertSame(json_encode(self::NIL_UUID), json_encode($this->getNilUuid()));
     }

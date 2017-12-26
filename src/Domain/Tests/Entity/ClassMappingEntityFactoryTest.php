@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ClassMappingEntityFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $factory = new ClassMappingEntityFactory(['Foo' => TestEntity::class], []);
         $entity = $factory->create('Foo', ['arg_a' => 1, 'arg_b' => 'foo', 'bar' => 'baz']);
@@ -29,7 +29,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $this->assertNotSame($entity, $entityCi);
     }
 
-    public function testCreateWithUnknownEntity()
+    public function testCreateWithUnknownEntity(): void
     {
         $factory = new ClassMappingEntityFactory(['Foo' => TestEntity::class], []);
 
@@ -38,7 +38,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $factory->create('Bar');
     }
 
-    public function testIdentify()
+    public function testIdentify(): void
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
         $entityId = $factory->identify('Foo', '1');
@@ -47,7 +47,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $this->assertSame('1', $entityId->toString());
     }
 
-    public function testIdentifyWithUnknownEntity()
+    public function testIdentifyWithUnknownEntity(): void
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
 
@@ -56,7 +56,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $factory->identify('Bar', '1');
     }
 
-    public function testNextIdentity()
+    public function testNextIdentity(): void
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
         $entityId1 = $factory->nextIdentity('Foo');
@@ -67,7 +67,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $this->assertFalse($entityId1->equals($entityId2));
     }
 
-    public function testNextIdentityUnknownEntity()
+    public function testNextIdentityUnknownEntity(): void
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
 
@@ -76,7 +76,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $factory->nextIdentity('Bar');
     }
 
-    public function testNestedCreate()
+    public function testNestedCreate(): void
     {
         $factory = new ClassMappingEntityFactory(['Bar' => NestedTestEntity::class, 'Foo' => TestEntity::class, 'FooId' => DomainId::class], ['Foo' => 'FooId']);
 
@@ -98,7 +98,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $this->assertSame('456', $entity->id->toString());
     }
 
-    public function testNestedCreateWithoutContext()
+    public function testNestedCreateWithoutContext(): void
     {
         $factory = new ClassMappingEntityFactory(['Bar' => NestedTestEntity::class, 'Foo' => TestEntity::class, 'FooId' => DomainId::class], ['Foo' => 'FooId']);
 
@@ -107,7 +107,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $factory->create('Bar');
     }
 
-    public function testCreateWithNumericArgs()
+    public function testCreateWithNumericArgs(): void
     {
         $factory = new ClassMappingEntityFactory(['Foo' => TestEntity::class], []);
 
@@ -120,7 +120,8 @@ final class ClassMappingEntityFactoryTest extends TestCase
 
 class TestEntity
 {
-    public $a, $b;
+    public $a;
+    public $b;
 
     public function __construct($argA, $argB)
     {
@@ -131,7 +132,10 @@ class TestEntity
 
 class NestedTestEntity
 {
-    public $test, $self, $other, $id;
+    public $test;
+    public $self;
+    public $other;
+    public $id;
 
     public function __construct(TestEntity $test, ?self $self, ?TestEntity $other, DomainId $id)
     {

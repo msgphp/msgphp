@@ -10,5 +10,6 @@ namespace MsgPhp\User\Infra\Validator;
 interface EmailLookupInterface
 {
     public function exists(string $email): bool;
+
     public function existsPrimary(string $email): bool;
 }

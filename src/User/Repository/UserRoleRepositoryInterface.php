@@ -17,7 +17,9 @@ interface UserRoleRepositoryInterface
      * @return EntityCollectionInterface|UserRole[]
      */
     public function findAllByUserId(UserIdInterface $userId, int $offset = null, int $limit = null): EntityCollectionInterface;
+
     public function find(UserIdInterface $userId, string $role): UserRole;
+
     public function exists(UserIdInterface $userId, string $role): bool;
 
     /**

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class UserRoleTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
         $userRole = new UserRole($user, 'ROLE_USER');

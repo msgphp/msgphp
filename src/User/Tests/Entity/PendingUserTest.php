@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class PendingUserTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $user = new PendingUser('foo@bar.baz', 'secret');
 

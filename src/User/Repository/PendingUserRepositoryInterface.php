@@ -16,8 +16,11 @@ interface PendingUserRepositoryInterface
      * @return EntityCollectionInterface|PendingUser[]
      */
     public function findAll(int $offset = null, int $limit = null): EntityCollectionInterface;
+
     public function find(string $email): PendingUser;
+
     public function findByToken(string $token): PendingUser;
+
     public function exists(string $email): bool;
 
     /**

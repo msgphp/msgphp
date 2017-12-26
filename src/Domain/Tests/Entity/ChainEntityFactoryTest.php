@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ChainEntityFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
         $factory1->expects($this->any())
@@ -26,7 +26,7 @@ final class ChainEntityFactoryTest extends TestCase
         $this->assertSame($entity, $factory->create('some'));
     }
 
-    public function testCreateWithoutFactories()
+    public function testCreateWithoutFactories(): void
     {
         $factory = new ChainEntityFactory([]);
 
@@ -35,7 +35,7 @@ final class ChainEntityFactoryTest extends TestCase
         $factory->create('some');
     }
 
-    public function testCreateWithUnknownEntity()
+    public function testCreateWithUnknownEntity(): void
     {
         $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
         $factory1->expects($this->any())
@@ -48,7 +48,7 @@ final class ChainEntityFactoryTest extends TestCase
         $factory->create('some');
     }
 
-    public function testIdentify()
+    public function testIdentify(): void
     {
         $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
         $factory1->expects($this->any())

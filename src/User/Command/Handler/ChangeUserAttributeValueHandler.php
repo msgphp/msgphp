@@ -6,11 +6,8 @@ namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Entity\EntityFactoryInterface;
 use MsgPhp\Domain\EventBusInterface;
-use MsgPhp\Eav\Entity\AttributeValue;
 use MsgPhp\Eav\Repository\AttributeRepositoryInterface;
 use MsgPhp\User\Command\ChangeUserAttributeValueCommand;
-use MsgPhp\User\Entity\UserAttributeValue;
-use MsgPhp\User\Event\UserAttributeValueAddedEvent;
 use MsgPhp\User\Event\UserAttributeValueChangedEvent;
 use MsgPhp\User\Repository\{UserAttributeValueRepositoryInterface, UserRepositoryInterface};
 

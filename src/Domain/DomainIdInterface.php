@@ -10,6 +10,8 @@ namespace MsgPhp\Domain;
 interface DomainIdInterface extends \Serializable, \JsonSerializable
 {
     public function equals(self $id): bool;
+
     public function toString(): string;
+
     public function __toString(): string;
 }

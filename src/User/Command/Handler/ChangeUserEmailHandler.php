@@ -8,7 +8,6 @@ use MsgPhp\Domain\EventBusInterface;
 use MsgPhp\User\Command\ChangeUserEmailCommand;
 use MsgPhp\User\Event\UserEmailChangedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
-use MsgPhp\User\Repository\UserSecondaryEmailRepositoryInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

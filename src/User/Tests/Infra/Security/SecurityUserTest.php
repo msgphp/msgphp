@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityUserTest extends TestCase
 {
-    public function testCreateNewSecurityUser()
+    public function testCreateNewSecurityUser(): void
     {
         $user = new User(new UserId(), 'foo@bar.baz', 'secret');
         $securityUser = new SecurityUser($user);
@@ -23,7 +23,7 @@ final class SecurityUserTest extends TestCase
         $this->assertSame($user->getPassword(), $securityUser->getPassword());
     }
 
-    public function testIsEqualTo()
+    public function testIsEqualTo(): void
     {
         $user = new User(new UserId(), 'foo@bar.baz', 'secret');
         $securityUser = new SecurityUser($user);
@@ -36,7 +36,7 @@ final class SecurityUserTest extends TestCase
         $this->assertFalse($securityUser->isEqualTo($this->getMockBuilder(UserInterface::class)->getMock()));
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $user = new User(new UserId(), 'foo@bar.baz', 'secret');
 
