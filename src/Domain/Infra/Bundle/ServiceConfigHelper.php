@@ -21,6 +21,7 @@ final class ServiceConfigHelper
     {
         if (!$container->hasDefinition('msgphp.entity_factory')) {
             $container->register('msgphp.entity_factory', ChainEntityFactory::class)
+                ->setPublic(false)
                 ->setArgument('$factories', new TaggedIteratorArgument('msgphp.entity_factory'));
         }
 
@@ -29,6 +30,7 @@ final class ServiceConfigHelper
         }
 
         $container->register('msgphp.entity_factory.'.md5(uniqid()), ClassMappingEntityFactory::class)
+            ->setPublic(false)
             ->setArgument('$mapping', $mapping)
             ->setArgument('$idMapping', $idMapping)
             ->setArgument('$factory', new Reference('msgphp.entity_factory'))
@@ -37,32 +39,28 @@ final class ServiceConfigHelper
 
     public static function configureSimpleCommandBus(ContainerBuilder $container): void
     {
-        if ($container->has(CommandBusInterface::class)) {
-            return;
-        }
-
         if (!$container->has(DomainCommandBus::class)) {
             $container->register(DomainCommandBus::class)
                 ->setPublic(false)
                 ->addArgument(new Reference('command_bus'));
         }
 
-        $container->setAlias(CommandBusInterface::class, new Alias(DomainCommandBus::class, false));
+        if (!$container->has(CommandBusInterface::class)) {
+            $container->setAlias(CommandBusInterface::class, new Alias(DomainCommandBus::class, false));
+        }
     }
 
     public static function configureSimpleEventBus(ContainerBuilder $container): void
     {
-        if ($container->has(EventBusInterface::class)) {
-            return;
-        }
-
         if (!$container->has(DomainEventBus::class)) {
             $container->register(DomainEventBus::class)
                 ->setPublic(false)
                 ->addArgument(new Reference('event_bus'));
         }
 
-        $container->setAlias(EventBusInterface::class, new Alias(DomainEventBus::class, false));
+        if (!$container->has(EventBusInterface::class)) {
+            $container->setAlias(EventBusInterface::class, new Alias(DomainEventBus::class, false));
+        }
     }
 
     private function __construct()

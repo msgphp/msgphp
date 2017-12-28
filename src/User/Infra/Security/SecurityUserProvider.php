@@ -20,7 +20,7 @@ final class SecurityUserProvider implements UserProviderInterface
     private $repository;
     private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, UserRoleProviderInterface $roleProvider)
+    public function __construct(UserRepositoryInterface $repository, UserRoleProviderInterface $roleProvider = null)
     {
         $this->repository = $repository;
         $this->roleProvider = $roleProvider;
@@ -55,6 +55,6 @@ final class SecurityUserProvider implements UserProviderInterface
 
     public function create(User $user): SecurityUser
     {
-        return new SecurityUser($user, $this->roleProvider->getRoles($user));
+        return new SecurityUser($user, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
     }
 }
