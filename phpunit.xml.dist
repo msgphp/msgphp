@@ -15,14 +15,18 @@
     </php>
 
     <testsuites>
-        <testsuite name="msgphp/main">
+        <testsuite name="msgphp/msgphp">
             <directory>./src/*/Tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>src/</directory>
+            <directory>./src/</directory>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
 </phpunit>

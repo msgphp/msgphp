@@ -21,9 +21,9 @@
     },
     "require-dev": {
         "doctrine/orm": "^2.5",
-        "phpunit/phpunit": "^6.4",
         "ramsey/uuid": "^3.7",
-        "simple-bus/message-bus": "^3.0"
+        "simple-bus/message-bus": "^3.0",
+        "symfony/phpunit-bridge": "^3.4|^4.0"
     },
     "config": {
         "preferred-install": {
