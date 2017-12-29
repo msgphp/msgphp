@@ -14,15 +14,19 @@ matrix:
     - php: 7.1
       env:
         - DEPS=low
+        - CS=true
     - php: 7.1
       env:
         - DEPS=high
+        - CS=true
     - php: 7.2
       env:
         - DEPS=low
+        - CS=true
     - php: 7.2
       env:
         - DEPS=high
+        - CS=true
 
 allow_failures:
 - php:
@@ -38,9 +42,11 @@ install:
   - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
   - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
   - bin/phpunit install
+  - if [[ $CS = true ]] ; then composer install --working-dir=.travis ; fi
 
 script:
   - bin/phpunit --coverage-clover=coverage.xml
+  - if [[ $CS = true ]] ; then .travis/vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/ ; fi
 
 after_success:
   - .travis/codecov
