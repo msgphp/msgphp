@@ -1,0 +1,25 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-phpunit/strictRules.neon
+
+parameters:
+    ignoreErrors:
+        # see https://github.com/symfony/symfony/pull/25644
+        - '#Strict comparison using === between null and string will always evaluate to false#'
+
+        # TreeBuilder type hinting bug
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)#'
+
+        # Needs investigation
+        - '#Calling method implementsInterface\(\) on possibly null value of type ReflectionClass|null#'
+
+        # Needs investigation
+        - '#Access to an undefined property MsgPhp\\Domain\\DomainIdInterface::\$uuid#'
+
+    excludes_analyse:
+        - '*/vendor/*'
+
+        # Ignoring as PHPStan doesn't know $container is passed into the config file:
+        # - 'Undefined variable: $container'
+        - 'src/UserBundle/Resources/config/simplebus.php'

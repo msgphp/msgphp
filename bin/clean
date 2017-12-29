@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf .release/
+rm -rf .release/ .php_cs.cache composer.lock vendor/
 
 for DIR in $(find src/ -maxdepth 1 -mindepth 1 -type d) ; do
     pushd $DIR &> /dev/null

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Entity;
+namespace MsgPhp\Domain\Tests\Entity\Fields;
 
 use MsgPhp\Domain\Entity\Fields\LastUpdatedAtField;
 use PHPUnit\Framework\TestCase;

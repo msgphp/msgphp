@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+bin/composer update --no-suggest
+bin/phpunit install
+composer install --no-suggest

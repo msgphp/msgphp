@@ -15,23 +15,43 @@ Main development repository.
 - [`msgphp/eav-bundle`](https://github.com/msgphp/eav-bundle)
 - [`msgphp/user-bundle`](https://github.com/msgphp/user-bundle)
 
-## Testing
+## Contributing
 
-Tests can be run via the helper script in `bin/phpunit`
+### Setup environment
+
+Run the following command to setup your environment first:
+
+```bash
+bin/setup
+```
+
+### Testing
+
+Run tests for all components:
 
 ```bash
 bin/phpunit
 ```
 
-To first install dependencies:
+Run tests for a single component, e.g. `Domain`:
 
 ```bash
-bin/composer update
+cd src/Domain/
+vendor/bin/simple-phpunit
 ```
 
-Each of these scripts will iterate through the subtrees in `src/` and call the
-respective binary, passing all options, e.g.
+### Code style
+
+Analyze all components:
 
 ```bash
-bin/phpunit --coverage-text
+vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/
+```
+
+### Static analysis
+
+Analyze all components:
+
+```bash
+vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src/
 ```

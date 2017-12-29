@@ -23,6 +23,7 @@ matrix:
         - DEPS=high
         - CC=true
         - CS=true
+        - SA=true
     - php: 7.2
       env:
         - DEPS=low
@@ -44,12 +45,13 @@ install:
   - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
   - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
   - bin/phpunit install
-  - if [[ $CS = true ]] ; then composer install --working-dir=.travis ; fi
+  - if [[ $CS = true ]] || [[ $SA = true ]] ; then composer install ; fi
 
 script:
   - if [[ ! $CC  ]] ; then bin/phpunit $PHPUNIT_ARGS ; fi
   - if [[ $CC = true ]] ; then bin/phpunit --coverage-clover=coverage.xml $PHPUNIT_ARGS ; fi
-  - if [[ $CS = true ]] ; then .travis/vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/ ; fi
+  - if [[ $CS = true ]] ; then vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/ ; fi
+  - if [[ $SA = true ]] ; then vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src/ ; fi
 
 after_success:
   - if [[ $CC = true ]] ; then  .travis/codecov ; fi
