@@ -20,6 +20,7 @@
         "php": "^7.1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "^2.5.2",
         "doctrine/orm": "^2.5",
         "ramsey/uuid": "^3.7",
         "simple-bus/message-bus": "^3.0",

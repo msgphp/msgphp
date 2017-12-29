@@ -2,12 +2,49 @@ language: php
 
 php:
   - 7.1
+  - 7.2
+  - nightly
+
+env:
+  global:
+    - COMPOSER_ARGS="--prefer-dist --no-interaction --no-suggest"
+
+matrix:
+  include:
+    - php: 7.1
+      env:
+        - DEPS=low
+    - php: 7.1
+      env:
+        - DEPS=high
+    - php: 7.2
+      env:
+        - DEPS=low
+    - php: 7.2
+      env:
+        - DEPS=high
+
+allow_failures:
+- php:
+    - nightly
+
+fast_finish: true
 
 before_script:
-  - composer self-update
+  - travis_retry composer self-update
 
 install:
-  - composer update --no-progress --no-suggest --prefer-dist
+  - if [[ ! $DEPS  ]] ; then travis_retry bin/composer install $COMPOSER_ARGS ; fi
+  - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
+  - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
+  - bin/phpunit install
 
 script:
-  - vendor/bin/simple-phpunit
+  - bin/phpunit --coverage-clover=coverage.xml
+
+after_success:
+  - .travis/codecov
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files/
