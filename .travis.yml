@@ -8,25 +8,24 @@ php:
 env:
   global:
     - COMPOSER_ARGS="--prefer-dist --no-interaction --no-suggest"
+    - PHPUNIT_ARGS=""
 
 matrix:
   include:
     - php: 7.1
       env:
         - DEPS=low
-        - CS=true
     - php: 7.1
       env:
         - DEPS=high
+        - CC=true
         - CS=true
     - php: 7.2
       env:
         - DEPS=low
-        - CS=true
     - php: 7.2
       env:
         - DEPS=high
-        - CS=true
 
 allow_failures:
 - php:
@@ -45,11 +44,12 @@ install:
   - if [[ $CS = true ]] ; then composer install --working-dir=.travis ; fi
 
 script:
-  - bin/phpunit --coverage-clover=coverage.xml
+  - if [[ ! $CC  ]] ; then bin/phpunit $PHPUNIT_ARGS ; fi
+  - if [[ $CC = true ]] ; then bin/phpunit --coverage-clover=coverage.xml $PHPUNIT_ARGS ; fi
   - if [[ $CS = true ]] ; then .travis/vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/ ; fi
 
 after_success:
-  - .travis/codecov
+  - if [[ $CC = true ]] ; then  .travis/codecov ; fi
 
 cache:
   directories:
