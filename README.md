@@ -10,6 +10,11 @@ Main development repository.
 - [`msgphp/eav`](https://github.com/msgphp/eav)
 - [`msgphp/user`](https://github.com/msgphp/user)
 
+## Bundles
+
+- [`msgphp/eav-bundle`](https://github.com/msgphp/eav-bundle)
+- [`msgphp/user-bundle`](https://github.com/msgphp/user-bundle)
+
 ## Testing
 
 Tests can be run via the helper script in `bin/phpunit`
