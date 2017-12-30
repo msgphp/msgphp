@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ConfigHelper;
-use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
+use MsgPhp\User\Entity\{Credential, PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
 use MsgPhp\User\Infra\Uuid;
-use MsgPhp\User\{UserId, UserIdInterface};
+use MsgPhp\User\{CredentialInterface, UserId, UserIdInterface};
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -53,6 +53,10 @@ final class Configuration implements ConfigurationInterface
                         $value = array_fill_keys($availableIds, $value);
                     } else {
                         $value += array_fill_keys($availableIds, null);
+                    }
+
+                    if (!isset($value[CredentialInterface::class])) {
+                        $value[CredentialInterface::class] = Credential\Anonymous::class;
                     }
 
                     return $value;
