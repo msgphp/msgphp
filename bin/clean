@@ -4,6 +4,7 @@ rm -rf .release/
 
 for DIR in $(find src/ -maxdepth 1 -mindepth 1 -type d) ; do
     pushd $DIR &> /dev/null
+    echo -e "\e[34mCleaning up ${DIR}\e[0m"
     rm -rf composer.lock vendor/
     popd &> /dev/null
 done

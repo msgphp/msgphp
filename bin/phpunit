@@ -4,6 +4,7 @@ RETURN=0
 
 for DIR in $(find src/ -maxdepth 1 -mindepth 1 -type d) ; do
     pushd $DIR &> /dev/null
+    echo -e "\e[34mRunning PHPUnit in ${DIR}\e[0m"
     vendor/bin/simple-phpunit "$@"
     LAST=$? ; [[ ${LAST} -ne 0 ]] && RETURN=${LAST}
     popd &> /dev/null
