@@ -25,7 +25,7 @@ final class SecurityUserFactoryTest extends TestCase
         $this->assertFalse($this->createFactory('foo@bar.baz')->isAuthenticated());
         $this->assertFalse($this->createFactory('foo@bar.baz', ['ROLE_USER'])->isAuthenticated());
 
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
 
         $this->assertFalse($this->createFactory(new SecurityUser($user))->isAuthenticated());
         $this->assertTrue($this->createFactory(new SecurityUser($user), ['ROLE_USER'])->isAuthenticated());
@@ -33,7 +33,7 @@ final class SecurityUserFactoryTest extends TestCase
 
     public function testGetUserId(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $factory = $this->createFactory(new SecurityUser($user), ['ROLE_USER']);
 
         $this->assertSame($user->getId(), $factory->getUserId());
@@ -62,7 +62,7 @@ final class SecurityUserFactoryTest extends TestCase
 
     public function testGetUser(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $repository = new UserRepository([$user], User::class);
 
         $this->assertSame($user, $this->createFactory(new SecurityUser($user), ['ROLE_USER'], $repository)->getUser());
@@ -70,7 +70,7 @@ final class SecurityUserFactoryTest extends TestCase
 
     public function testGetUnknownUser(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
 
         $this->expectException(UsernameNotFoundException::class);
 

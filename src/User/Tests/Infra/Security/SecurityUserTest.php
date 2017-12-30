@@ -33,7 +33,7 @@ final class SecurityUserTest extends TestCase
         $this->assertFalse($securityUser->isEqualTo(new SecurityUser(new User($user->getId(), 'foo@bar.baz', 'other'))));
         $this->assertFalse($securityUser->isEqualTo(new SecurityUser(new User($user->getId(), 'other', 'secret'))));
         $this->assertFalse($securityUser->isEqualTo(new SecurityUser(new User(new UserId(), 'foo@bar.baz', 'secret'))));
-        $this->assertFalse($securityUser->isEqualTo($this->getMockBuilder(UserInterface::class)->getMock()));
+        $this->assertFalse($securityUser->isEqualTo($this->createMock(UserInterface::class)));
     }
 
     public function testSerialize(): void

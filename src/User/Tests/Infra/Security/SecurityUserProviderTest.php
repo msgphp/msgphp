@@ -19,7 +19,7 @@ final class SecurityUserProviderTest extends TestCase
 {
     public function testLoadUserByUsername(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $repository = new UserRepository([$user], User::class);
         $securityUser = $this->createProvider(['ROLE_USER'], $repository)->loadUserByUsername($user->getEmail());
 
@@ -38,7 +38,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUser(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $repository = new UserRepository([$user], User::class);
         $securityUser = $this->createProvider([], $repository)->refreshUser($oldSecurityUser = new SecurityUser($user));
 
@@ -48,7 +48,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithInvalidId(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
 
         $this->expectException(UsernameNotFoundException::class);
 
@@ -59,7 +59,7 @@ final class SecurityUserProviderTest extends TestCase
     {
         $this->expectException(UnsupportedUserException::class);
 
-        $this->createProvider()->refreshUser($this->getMockBuilder(UserInterface::class)->getMock());
+        $this->createProvider()->refreshUser($this->createMock(UserInterface::class));
     }
 
     public function testSupportsClass(): void

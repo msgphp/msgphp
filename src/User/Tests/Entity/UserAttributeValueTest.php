@@ -13,7 +13,7 @@ final class UserAttributeValueTest extends TestCase
     public function testCreate(): void
     {
         $now = new \DateTime();
-        $userAttributeValue = new UserAttributeValue($user = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock(), $attributeValue = $this->getMockBuilder(AttributeValue::class)->disableOriginalConstructor()->getMock());
+        $userAttributeValue = new UserAttributeValue($user = $this->createMock(User::class), $attributeValue = $this->createMock(AttributeValue::class));
 
         $this->assertSame($user, $userAttributeValue->getUser());
         $this->assertSame($attributeValue, $userAttributeValue->getAttributeValue());

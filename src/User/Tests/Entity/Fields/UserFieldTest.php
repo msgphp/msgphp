@@ -13,10 +13,10 @@ final class UserFieldTest extends TestCase
 {
     public function testField(): void
     {
-        $value = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock();
+        $value = $this->createMock(User::class);
         $value->expects($this->any())
             ->method('getId')
-            ->willReturn($this->getMockBuilder(UserIdInterface::class)->getMock());
+            ->willReturn($this->createMock(UserIdInterface::class));
 
         $object = $this->getObject($value);
 

@@ -13,11 +13,11 @@ final class ChainEntityFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
+        $factory1 = $this->createMock(EntityFactoryInterface::class);
         $factory1->expects($this->any())
             ->method('create')
             ->willThrowException(UnknownEntityException::create('some'));
-        $factory2 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
+        $factory2 = $this->createMock(EntityFactoryInterface::class);
         $factory2->expects($this->any())
             ->method('create')
             ->willReturn($entity = new \stdClass());
@@ -37,11 +37,11 @@ final class ChainEntityFactoryTest extends TestCase
 
     public function testIdentify(): void
     {
-        $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
+        $factory1 = $this->createMock(EntityFactoryInterface::class);
         $factory1->expects($this->any())
             ->method('identify')
             ->willThrowException(UnknownEntityException::create('some'));
-        $factory2 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
+        $factory2 = $this->createMock(EntityFactoryInterface::class);
         $factory2->expects($this->any())
             ->method('identify')
             ->willReturnCallback(function ($entity, $id) { return new DomainId($id); });

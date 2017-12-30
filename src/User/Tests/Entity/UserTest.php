@@ -13,7 +13,7 @@ final class UserTest extends TestCase
     public function testCreate(): void
     {
         $now = new \DateTime();
-        $user = new User($id = $this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($id = $this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
 
         $this->assertSame($id, $user->getId());
         $this->assertSame('foo@bar.baz', $user->getEmail());
@@ -26,7 +26,7 @@ final class UserTest extends TestCase
 
     public function testChangeEmail(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
 
         $user->changeEmail('other@bar.baz');
@@ -37,7 +37,7 @@ final class UserTest extends TestCase
 
     public function testChangePassword(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
 
         $user->changePassword('other');
@@ -48,7 +48,7 @@ final class UserTest extends TestCase
 
     public function testRequestPassword(): void
     {
-        $user = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $lastUpdatedAt = $user->getLastUpdatedAt();
 
         $user->requestPassword();
@@ -57,7 +57,7 @@ final class UserTest extends TestCase
         $this->assertGreaterThanOrEqual($lastUpdatedAt, $user->getLastUpdatedAt());
         $this->assertGreaterThanOrEqual($user->getPasswordRequestedAt(), $user->getLastUpdatedAt());
 
-        $compareUser = new User($this->getMockBuilder(UserIdInterface::class)->getMock(), 'foo@bar.baz', 'secret');
+        $compareUser = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
         $compareUser->requestPassword();
 
         $this->assertNotSame($compareUser->getPasswordResetToken(), $user->getPasswordResetToken());
