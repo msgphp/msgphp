@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\Domain\Entity\CreatedAtFieldTrait;
+use MsgPhp\Domain\Entity\Fields\CreatedAtField;
+use MsgPhp\User\Entity\Fields\UserField;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 class UserRole
 {
-    use CreatedAtFieldTrait;
-    use UserFieldTrait;
+    use CreatedAtField;
+    use UserField;
 
     private $role;
 

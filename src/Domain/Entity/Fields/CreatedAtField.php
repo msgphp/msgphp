@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Entity;
+namespace MsgPhp\Domain\Entity\Fields;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-trait CreatedAtFieldTrait
+trait CreatedAtField
 {
     private $createdAt;
 

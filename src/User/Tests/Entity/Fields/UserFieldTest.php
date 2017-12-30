@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Tests\Entity;
+namespace MsgPhp\User\Tests\Entity\Fields;
 
-use MsgPhp\User\Entity\{User, UserFieldTrait};
+use MsgPhp\User\Entity\Fields\UserField;
+use MsgPhp\User\Entity\User;
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 
-final class UserFieldTraitTest extends TestCase
+final class UserFieldTest extends TestCase
 {
     public function testField(): void
     {
@@ -26,7 +27,7 @@ final class UserFieldTraitTest extends TestCase
     private function getObject($value)
     {
         return new class($value) {
-            use UserFieldTrait;
+            use UserField;
 
             public function __construct($value)
             {

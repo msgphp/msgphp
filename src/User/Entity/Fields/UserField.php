@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Entity;
+namespace MsgPhp\User\Entity\Fields;
 
+use MsgPhp\User\Entity\User;
 use MsgPhp\User\UserIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-trait UserFieldTrait
+trait UserField
 {
     /** @var User */
     private $user;

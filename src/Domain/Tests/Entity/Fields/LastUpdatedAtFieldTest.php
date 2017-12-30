@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Entity;
 
-use MsgPhp\Domain\Entity\LastUpdatedAtFieldTrait;
+use MsgPhp\Domain\Entity\Fields\LastUpdatedAtField;
 use PHPUnit\Framework\TestCase;
 
-final class LastUpdatedAtFieldTraitTest extends TestCase
+final class LastUpdatedAtFieldTest extends TestCase
 {
     public function testField(): void
     {
@@ -19,7 +19,7 @@ final class LastUpdatedAtFieldTraitTest extends TestCase
     private function getObject($value)
     {
         return new class($value) {
-            use LastUpdatedAtFieldTrait;
+            use LastUpdatedAtField;
 
             public function __construct($value)
             {

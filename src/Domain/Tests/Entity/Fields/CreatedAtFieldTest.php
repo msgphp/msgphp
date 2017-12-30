@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Entity;
+namespace MsgPhp\Domain\Tests\Entity\Fields;
 
-use MsgPhp\Domain\Entity\CreatedAtFieldTrait;
+use MsgPhp\Domain\Entity\Fields\CreatedAtField;
 use PHPUnit\Framework\TestCase;
 
-final class CreatedAtFieldTraitTest extends TestCase
+final class CreatedAtFieldTest extends TestCase
 {
     public function testField(): void
     {
@@ -19,7 +19,7 @@ final class CreatedAtFieldTraitTest extends TestCase
     private function getObject($value)
     {
         return new class($value) {
-            use CreatedAtFieldTrait;
+            use CreatedAtField;
 
             public function __construct($value)
             {

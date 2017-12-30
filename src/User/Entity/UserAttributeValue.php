@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\Domain\Entity\CreatedAtFieldTrait;
-use MsgPhp\Eav\Entity\{AttributeValue, AttributeValueFieldTrait};
+use MsgPhp\Domain\Entity\Fields\CreatedAtField;
+use MsgPhp\Eav\Entity\AttributeValue;
+use MsgPhp\Eav\Entity\Fields\AttributeValueField;
+use MsgPhp\User\Entity\Fields\UserField;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 class UserAttributeValue
 {
-    use CreatedAtFieldTrait;
-    use UserFieldTrait;
-    use AttributeValueFieldTrait;
+    use CreatedAtField;
+    use UserField;
+    use AttributeValueField;
 
     public function __construct(User $user, AttributeValue $attributeValue)
     {

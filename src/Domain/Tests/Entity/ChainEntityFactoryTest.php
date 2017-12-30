@@ -35,19 +35,6 @@ final class ChainEntityFactoryTest extends TestCase
         $factory->create('some');
     }
 
-    public function testCreateWithUnknownEntity(): void
-    {
-        $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
-        $factory1->expects($this->any())
-            ->method('create')
-            ->willThrowException(UnknownEntityException::create('some'));
-        $factory = new ChainEntityFactory([$factory1]);
-
-        $this->expectException(UnknownEntityException::class);
-
-        $factory->create('some');
-    }
-
     public function testIdentify(): void
     {
         $factory1 = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
@@ -61,5 +48,14 @@ final class ChainEntityFactoryTest extends TestCase
         $factory = new ChainEntityFactory([$factory1, $factory2]);
 
         $this->assertSame('id', $factory->identify('some', 'id')->toString());
+    }
+
+    public function testIdentifyWithoutFactories(): void
+    {
+        $factory = new ChainEntityFactory([]);
+
+        $this->expectException(UnknownEntityException::class);
+
+        $factory->identify('some', 'id');
     }
 }
