@@ -45,7 +45,13 @@ vendor/bin/simple-phpunit
 Analyze all components:
 
 ```bash
-vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/
+bin/cs
+```
+
+Analyze a single component, e.g. `Domain`:
+
+```bash
+bin/cs src/Domain/
 ```
 
 ### Static analysis
@@ -53,5 +59,11 @@ vendor/bin/php-cs-fixer fix --dry-run --verbose --diff src/
 Analyze all components:
 
 ```bash
-vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src/
+bin/sa
+```
+
+Analyze a single component, e.g. `Domain`:
+
+```bash
+bin/sa src/Domain/
 ```
