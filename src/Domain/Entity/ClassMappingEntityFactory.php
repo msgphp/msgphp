@@ -9,13 +9,16 @@ use MsgPhp\Domain\Exception\UnknownEntityException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @fixme split into / decorate Domain\ConstructorResolvingDomainObjectFactory
  */
 final class ClassMappingEntityFactory implements EntityFactoryInterface
 {
+    private static $reflectionCache = [];
+
     private $mapping;
     private $idMapping;
     private $factory;
-    private static $reflectionCache = [];
 
     public function __construct(array $mapping, array $idMapping, EntityFactoryInterface $factory = null)
     {

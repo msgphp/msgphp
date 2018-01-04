@@ -25,13 +25,6 @@ final class EnabledFieldTest extends TestCase
         yield [false];
     }
 
-    public function testFieldLazy(): void
-    {
-        $object = $this->getObject(null);
-
-        $this->assertFalse($object->isEnabled());
-    }
-
     private function getObject($value)
     {
         return new class($value) {

@@ -9,15 +9,11 @@ namespace MsgPhp\Domain\Entity\Fields;
  */
 trait EnabledField
 {
+    /** @var bool */
     private $enabled;
 
     public function isEnabled(): bool
     {
-        return $this->enabled ?? ($this->enabled = static::isDefaultEnabled());
-    }
-
-    protected static function isDefaultEnabled(): bool
-    {
-        return false;
+        return $this->enabled;
     }
 }

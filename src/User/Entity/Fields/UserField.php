@@ -20,7 +20,7 @@ trait UserField
         return $this->user;
     }
 
-    public function getUserId(): UserIdInterface
+    final public function getUserId(): UserIdInterface
     {
         return $this->user->getId();
     }

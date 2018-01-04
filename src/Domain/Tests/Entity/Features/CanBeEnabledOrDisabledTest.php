@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Entity\Features;
 
-use MsgPhp\Domain\Entity\Features\AbstractEnabledDisabled;
+use MsgPhp\Domain\Entity\Features\CanBeEnabledOrDisabled;
 use PHPUnit\Framework\TestCase;
 
-final class AbstractEnabledDisabledTest extends TestCase
+final class CanBeEnabledOrDisabledTest extends TestCase
 {
     /**
      * @dataProvider provideStates
@@ -44,18 +44,11 @@ final class AbstractEnabledDisabledTest extends TestCase
     private function getObject($value)
     {
         return new class($value) {
-            use AbstractEnabledDisabled;
-
-            private static $defaultEnabled;
+            use CanBeEnabledOrDisabled;
 
             public function __construct($value)
             {
-                self::$defaultEnabled = $value;
-            }
-
-            protected static function isDefaultEnabled(): bool
-            {
-                return self::$defaultEnabled;
+                $this->enabled = $value;
             }
         };
     }
