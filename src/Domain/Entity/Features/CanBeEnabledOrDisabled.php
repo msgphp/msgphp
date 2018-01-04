@@ -14,14 +14,14 @@ trait CanBeEnabledOrDisabled
     use AbstractUpdated;
     use EnabledField;
 
-    final public function enable(): void
+    public function enable(): void
     {
         $this->enabled = true;
 
         $this->onUpdate();
     }
 
-    final public function disable(): void
+    public function disable(): void
     {
         $this->enabled = false;
 
