@@ -27,7 +27,7 @@ if [[ ! $(git branch --list ${BRANCH}) ]] ; then
 
     if [[ ! $BODY =~ \>\>\>200\s*$ ]] ; then
         echo "Error fetching pull request #${PR}..."
-        echo ${BODY}
+        echo "${BODY}"
         exit 1
     fi
 
@@ -57,14 +57,14 @@ EOF
     UPSTREAM_BRANCH=$(php -r "echo ${UPSTREAM_BRANCH}")
 
     echo "Adding pull request remote \"${UPSTREAM_SSH_URL}\"..."
-    git remote remove ${BRANCH} &> /dev/null
-    git remote add ${BRANCH} ${UPSTREAM_SSH_URL} --fetch --track ${UPSTREAM_BRANCH}
+    git remote remove "${BRANCH}" &> /dev/null
+    git remote add "${BRANCH}" "${UPSTREAM_SSH_URL}" --fetch --track "${UPSTREAM_BRANCH}"
     if [[ $? -eq 1 ]] ; then
-        git remote remove ${BRANCH}
+        git remote remove "${BRANCH}"
         echo "Pull request closed. Aborted."
         exit 1
     fi
-    git branch --set-upstream-to ${BRANCH}/${UPSTREAM_BRANCH}
+    git branch --set-upstream-to "${BRANCH}/${UPSTREAM_BRANCH}"
 fi
 
 if [[ ! -z $(git status --porcelain) ]] ; then
@@ -72,5 +72,5 @@ if [[ ! -z $(git status --porcelain) ]] ; then
     exit 1
 fi
 
-git checkout ${BRANCH}
+git checkout "${BRANCH}"
 git pull

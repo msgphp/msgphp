@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# taken from https://github.com/symfony/symfony/blob/master/.travis.yml
+# originally taken from https://github.com/symfony/symfony/blob/master/.travis.yml
 # Copyright (c) 2017 Fabien Potencier
 
 nanoseconds() {

@@ -2,47 +2,21 @@
 
 ## Testing
 
-Run tests for all components:
-
 ```bash
 bin/composer update
 bin/phpunit
 ```
 
-Run tests for a single component, e.g. `Domain`:
-
-```bash
-cd src/Domain/
-composer update
-vendor/bin/simple-phpunit
-```
-
 ## Code style
-
-Analyze all components:
 
 ```bash
 bin/cs
 ```
 
-Analyze a single component, e.g. `Domain`:
-
-```bash
-bin/cs src/Domain/
-```
-
 ## Static analysis
-
-Analyze all components:
 
 ```bash
 bin/sa
-```
-
-Analyze a single component, e.g. `Domain`:
-
-```bash
-bin/sa src/Domain/
 ```
 
 ## Helping others
@@ -54,3 +28,13 @@ bin/pr <pr-number>
 ```
 
 It will add a new git remote `github-pr-XXX` pointing to the author's SSH URL and checkout their branch locally using the same name.
+
+## Setup a project
+
+To setup a test project use:
+
+```bash
+bin/create-project
+```
+
+It will create a new Symfony skeleton application and ask you which bundles to install.

@@ -1,3 +1,16 @@
 #!/usr/bin/env bash
 
+if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_BRANCH = master ]] ) ; then
+    composer link -h &> /dev/null
+    if [[ $? != 0 ]] ; then
+        composer require --dev --no-progress --prefer-dist --no-interaction --no-suggest ro0nl/link
+    fi
+
+    for PACKAGE in $(find src/*/composer.json -type f) ; do
+        PACKAGE_DIR="$(dirname ${PACKAGE})"
+        echo -e "\e[34mLinking \"${PACKAGE_DIR}\"\e[0m"
+        composer link "${PACKAGE_DIR}"
+    done
+fi
+
 bin/each vendor/bin/simple-phpunit "${@}"

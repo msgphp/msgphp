@@ -4,7 +4,8 @@
         "wikimedia/composer-merge-plugin": "^1.4",
         "friendsofphp/php-cs-fixer": "^2.9",
         "phpstan/phpstan": "^0.9@dev",
-        "phpstan/phpstan-phpunit": "^0.9"
+        "phpstan/phpstan-phpunit": "^0.9",
+        "ro0nl/link": "^1.0"
     },
     "autoload-dev": {
         "psr-4": {
