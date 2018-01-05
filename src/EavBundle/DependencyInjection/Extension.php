@@ -49,9 +49,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             Attribute::class => AttributeIdInterface::class,
             AttributeValue::class => AttributeValueIdInterface::class,
         ]);
-
         ContainerHelper::configureDoctrine($container);
 
+        // persistence infra
         if (isset($bundles[DoctrineBundle::class])) {
             $this->prepareDoctrineBundle($config, $loader, $container);
         }
@@ -102,7 +102,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
-        // @fixme repos require doctrine/orm
+        if (!class_exists(DoctrineOrmVersion::class)) {
+            return;
+        }
+
         $loader->load('doctrine.php');
 
         $classMapping = $config['class_mapping'];

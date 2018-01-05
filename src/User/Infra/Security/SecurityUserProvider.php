@@ -29,7 +29,7 @@ final class SecurityUserProvider implements UserProviderInterface
     public function loadUserByUsername(/*string */$username): UserInterface
     {
         try {
-            return $this->create($this->repository->findByEmail($username));
+            return $this->fromUser($this->repository->findByEmail($username));
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
@@ -42,7 +42,7 @@ final class SecurityUserProvider implements UserProviderInterface
         }
 
         try {
-            return $this->create($this->repository->find($user->getId()));
+            return $this->fromUser($this->repository->find($user->getId()));
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
@@ -53,7 +53,7 @@ final class SecurityUserProvider implements UserProviderInterface
         return SecurityUser::class === $class;
     }
 
-    public function create(User $user): SecurityUser
+    private function fromUser(User $user): SecurityUser
     {
         return new SecurityUser($user, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
     }
