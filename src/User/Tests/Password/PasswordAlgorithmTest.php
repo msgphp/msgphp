@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Password;
 
+use MsgPhp\Domain\FromBaseDomainPackage;
 use MsgPhp\User\Password\{PasswordAlgorithm, PasswordSalt};
 use PHPUnit\Framework\TestCase;
 
@@ -11,6 +12,7 @@ final class PasswordAlgorithmTest extends TestCase
 {
     public function testCreate(): void
     {
+        dump(new FromBaseDomainPackage());
         $this->assertNonLegacyAlgorithm(\PASSWORD_DEFAULT, [], PasswordAlgorithm::create());
         $this->assertNonLegacyAlgorithm(-1, ['foo' => 'bar'], PasswordAlgorithm::create(-1, ['foo' => 'bar']));
     }
