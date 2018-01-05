@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
+use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\{ObjectFieldMappingListener, ObjectFieldMappingProviderInterface};
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -31,12 +32,9 @@ final class DoctrineObjectFieldMappingPass implements CompilerPassInterface
         $mapping = [];
         foreach ($this->findAndSortTaggedServices($this->tagName, $container) as $provider) {
             $definition = $container->findDefinition((string) $provider);
+            $reflection = ContainerHelper::getClassReflection($container, $class = $definition->getClass());
 
-            if (!($class = $definition->getClass()) || !($r = $container->getReflectionClass($class))) {
-                throw new InvalidArgumentException(sprintf('Service "%s" must have a valid class set.', $provider));
-            }
-
-            if (!$r->implementsInterface(ObjectFieldMappingProviderInterface::class)) {
+            if (!$reflection->implementsInterface(ObjectFieldMappingProviderInterface::class)) {
                 throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $provider, ObjectFieldMappingProviderInterface::class));
             }
 

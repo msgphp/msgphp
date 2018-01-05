@@ -6,7 +6,7 @@ if [[ $# > 1 ]] ; then
 fi
 
 DIR="${1:-.test-project/}"
-COMPONENTS=""
+COMPONENTS="symfony/var-dumper "
 BUNDLES=""
 
 for PACKAGE in $(find src/*/composer.json -type f) ; do
@@ -27,8 +27,6 @@ done
 
 composer create-project --prefer-dist symfony/skeleton "${DIR}"
 pushd ${DIR} &> /dev/null
-
-composer require --prefer-dist --no-suggest symfony/var-dumper
 
 echo -e "\e[34mInstalling components...\e[0m"
 composer require --prefer-dist --no-suggest "${COMPONENTS}"

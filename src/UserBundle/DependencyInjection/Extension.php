@@ -8,7 +8,6 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
-use MsgPhp\Domain\Infra\Doctrine\Mapping\EntityFields as BaseEntityFields;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
@@ -20,7 +19,7 @@ use MsgPhp\User\Infra\Doctrine\Type\UserIdType;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 use Ramsey\Uuid\Uuid;
-use SimpleBus\SymfonyBridge\{SimpleBusCommandBusBundle, SimpleBusEventBusBundle};
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -28,7 +27,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Application;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -65,9 +63,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             User::class => UserIdInterface::class,
         ]);
 
-        if (isset($bundles[DoctrineBundle::class])) {
-            ContainerHelper::configureDoctrineObjectFieldMapping($container, BaseEntityFields::class);
+        ContainerHelper::configureDoctrine($container);
+        ContainerHelper::configureSimpleBus($container);
 
+        if (isset($bundles[DoctrineBundle::class])) {
             $this->prepareDoctrineBundle($config, $loader, $container);
         }
 
@@ -77,13 +76,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }
 
         if (isset($bundles[SimpleBusCommandBusBundle::class])) {
-            ContainerHelper::configureSimpleCommandBus($container);
-
             $this->prepareSimpleBusCommandBusBundle($config, $loader, $container);
-        }
-
-        if (isset($bundles[SimpleBusEventBusBundle::class])) {
-            ContainerHelper::configureSimpleEventBus($container);
         }
 
         if (isset($bundles[FrameworkBundle::class])) {

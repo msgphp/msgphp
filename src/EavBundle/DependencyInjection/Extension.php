@@ -7,7 +7,6 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
-use MsgPhp\Domain\Infra\Doctrine\Mapping\EntityFields as BaseEntityFields;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
 use MsgPhp\Eav\Entity\{Attribute, AttributeValue};
@@ -51,9 +50,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             AttributeValue::class => AttributeValueIdInterface::class,
         ]);
 
-        if (isset($bundles[DoctrineBundle::class])) {
-            ContainerHelper::configureDoctrineObjectFieldMapping($container, BaseEntityFields::class);
+        ContainerHelper::configureDoctrine($container);
 
+        if (isset($bundles[DoctrineBundle::class])) {
             $this->prepareDoctrineBundle($config, $loader, $container);
         }
     }
