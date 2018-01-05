@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\EavBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\EntityFields as BaseEntityFields;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
@@ -64,20 +65,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $classMapping = $config['class_mapping'];
 
         if (isset($bundles[DoctrineBundle::class])) {
-            $container->prependExtensionConfig('doctrine', [
-                'orm' => [
-                    'resolve_target_entities' => $classMapping,
-                    'mappings' => [
-                        'msgphp_eav' => [
-                            'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
-                            'type' => 'xml',
-                            'prefix' => 'MsgPhp\\Eav\\Entity',
-                            'is_bundle' => false,
-                        ],
-                    ],
-                ],
-            ]);
-
             if (class_exists(Uuid::class)) {
                 $types = [];
                 if (is_subclass_of($classMapping[AttributeIdInterface::class], DomainId::class)) {
@@ -94,6 +81,24 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                         ],
                     ]);
                 }
+            }
+
+            if (class_exists(DoctrineOrmVersion::class)) {
+                $container->prependExtensionConfig('doctrine', [
+                    'orm' => [
+                        'resolve_target_entities' => $classMapping,
+                        'mappings' => [
+                            'msgphp_eav' => [
+                                // @fixme load per available entities (/mapping, /mapping-eav) etc.
+                                // fixes `composer req orm` without eav-bundle
+                                'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
+                                'type' => 'xml',
+                                'prefix' => 'MsgPhp\\Eav\\Entity',
+                                'is_bundle' => false,
+                            ],
+                        ],
+                    ],
+                ]);
             }
         }
     }

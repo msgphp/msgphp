@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
-use Doctrine\ORM\Events as DoctrineEvents;
+use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\{CommandBusInterface, EventBusInterface};
 use MsgPhp\Domain\Entity\{ChainEntityFactory, ClassMappingEntityFactory, EntityFactoryInterface};
 use MsgPhp\Domain\Infra\Doctrine\Mapping\ObjectFieldMappingListener;
@@ -73,10 +73,14 @@ final class ContainerHelper
 
     public static function configureDoctrineObjectFieldMapping(ContainerBuilder $container, string $class): void
     {
+        if (!class_exists(DoctrineOrmEvents::class)) {
+            return;
+        }
+
         if (!$container->has(ObjectFieldMappingListener::class)) {
             $container->register(ObjectFieldMappingListener::class)
                 ->setPublic(false)
-                ->addTag('doctrine.event_listener', ['event' => DoctrineEvents::loadClassMetadata]);
+                ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
         }
 
         if (!$container->has($class)) {
