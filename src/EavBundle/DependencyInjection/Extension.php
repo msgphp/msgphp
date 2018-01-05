@@ -105,6 +105,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
+        // @fixme repos require doctrine/orm
         $loader->load('doctrine.php');
 
         $classMapping = $config['class_mapping'];

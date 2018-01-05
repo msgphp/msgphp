@@ -144,7 +144,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $classMapping = $config['class_mapping'];
 
         if (interface_exists(ValidatorInterface::class)) {
-            $loader->load('validator.php'); // @fi
+            $loader->load('validator.php');
         }
 
         if (class_exists(Application::class) && $container->has(CommandBusInterface::class)) {
@@ -208,6 +208,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $container->removeDefinition(ConfirmPendingUserHandler::class);
             $container->removeDefinition(CreatePendingUserHandler::class);
         }
+
+        // @fixme remove UserAttributeValue handlers conditionally
 
         if (!isset($classMapping[UserRole::class])) {
             $container->removeDefinition(AddUserRoleHandler::class);
