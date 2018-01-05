@@ -28,6 +28,8 @@ done
 composer create-project --prefer-dist symfony/skeleton "${DIR}"
 pushd ${DIR} &> /dev/null
 
+composer require --prefer-dist --no-suggest symfony/var-dumper
+
 echo -e "\e[34mInstalling components...\e[0m"
 composer require --prefer-dist --no-suggest "${COMPONENTS}"
 

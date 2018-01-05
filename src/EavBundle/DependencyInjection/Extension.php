@@ -89,8 +89,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                         'resolve_target_entities' => $classMapping,
                         'mappings' => [
                             'msgphp_eav' => [
-                                // @fixme load per available entities (/mapping, /mapping-eav) etc.
-                                // fixes `composer req orm` without eav-bundle
                                 'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
                                 'type' => 'xml',
                                 'prefix' => 'MsgPhp\\Eav\\Entity',

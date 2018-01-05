@@ -10,13 +10,13 @@ use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\EntityFields as BaseEntityFields;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
-use MsgPhp\User\Command\Handler\{AddUserRoleHandler, AddUserSecondaryEmailHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
+use MsgPhp\EavBundle\MsgPhpEavBundle;
+use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
 use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
 use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, CreatePendingUserCommand, DeleteUserRoleCommand};
 use MsgPhp\User\Infra\Doctrine\Repository\{PendingUserRepository, UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
 use MsgPhp\User\Infra\Doctrine\SqlEmailLookup;
 use MsgPhp\User\Infra\Doctrine\Type\UserIdType;
-use MsgPhp\User\Password\{PasswordHashing, PasswordHashingInterface};
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 use Ramsey\Uuid\Uuid;
@@ -102,7 +102,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
-        $bundles = array_flip($container->getParameter('kernel.bundles'));
+        $bundles = ContainerHelper::getBundles($container);
         $classMapping = $config['class_mapping'];
 
         if (isset($bundles[DoctrineBundle::class])) {
@@ -135,6 +135,21 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                         ],
                     ],
                 ]);
+
+                if (isset($bundles[MsgPhpEavBundle::class])) {
+                    $container->prependExtensionConfig('doctrine', [
+                        'orm' => [
+                            'mappings' => [
+                                'msgphp_user' => [
+                                    'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping-eav',
+                                    'type' => 'xml',
+                                    'prefix' => 'MsgPhp\\User\\Entity',
+                                    'is_bundle' => false,
+                                ],
+                            ],
+                        ],
+                    ]);
+                }
             }
         }
     }
@@ -209,7 +224,11 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $container->removeDefinition(CreatePendingUserHandler::class);
         }
 
-        // @fixme remove UserAttributeValue handlers conditionally
+        if (!isset($classMapping[UserAttributeValue::class])) {
+            $container->removeDefinition(AddUserAttributeValueHandler::class);
+            $container->removeDefinition(ChangeUserAttributeValueHandler::class);
+            $container->removeDefinition(DeleteUserAttributeValueHandler::class);
+        }
 
         if (!isset($classMapping[UserRole::class])) {
             $container->removeDefinition(AddUserRoleHandler::class);
