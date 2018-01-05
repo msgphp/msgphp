@@ -62,6 +62,10 @@ trait DomainEntityRepositoryTrait
                 $knownValue = $this->getEntityField($entity, $field);
                 if ($knownValue instanceof DomainIdInterface && $value instanceof DomainIdInterface && $knownValue->equals($value)) {
                     continue;
+                } elseif ($knownValue instanceof DomainIdInterface) {
+                    //$knownValue = $knownValue->toString();
+                } elseif ($value instanceof DomainIdInterface) {
+                    //$value = $value->toString();
                 }
 
                 if ($value !== $knownValue) {

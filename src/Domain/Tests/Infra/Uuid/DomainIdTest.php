@@ -14,35 +14,45 @@ final class DomainIdTest extends TestCase
 
     public function testCreateNewUuid(): void
     {
-        $this->assertNotSame((string) $this->getUuid(), (string) $this->getUuid());
-        $this->assertNotSame($this->getUuid()->toString(), $this->getUuid()->toString());
+        $this->assertNotSame((string) new DomainId(), (string) new DomainId());
+        $this->assertNotSame((new DomainId())->toString(), (new DomainId())->toString());
     }
 
     public function testInvalidUuid(): void
     {
         $this->expectException(InvalidUuidStringException::class);
 
-        $this->getUuid('foo');
+        new DomainId('foo');
     }
 
-    public function testToString(): void
+    public function testIsKnown(): bool
     {
-        $this->assertSame(self::NIL_UUID, (string) $this->getNilUuid());
-        $this->assertSame(self::NIL_UUID, $this->getNilUuid()->toString());
+        $this->assertTrue((new DomainId())->isKnown());
+        $this->assertTrue((new DomainId(self::NIL_UUID))->isKnown());
     }
 
     public function testEquals(): void
     {
-        $this->assertFalse($this->getUuid()->equals($this->getNilUuid()));
-        $this->assertTrue($this->getNilUuid()->equals($this->getNilUuid()));
-        $this->assertFalse($this->getNilUuid()->equals($this->getUuid()));
-        $this->assertTrue($this->getNilUuid()->equals($this->getNilUuid()));
-        $this->assertFalse($this->getUuid()->equals($this->getUuid()));
+        $this->assertTrue(($id = new DomainId())->equals($id));
+        $this->assertTrue((new DomainId(self::NIL_UUID))->equals(new DomainId(self::NIL_UUID)));
+        $this->assertFalse((new DomainId())->equals(new DomainId()));
+        $this->assertFalse((new DomainId())->equals(new OtherDomainId()));
+        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new DomainId()));
+        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new OtherDomainId()));
+        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new OtherDomainId(self::NIL_UUID)));
+    }
+
+    public function testToString(): void
+    {
+        $this->assertSame(self::NIL_UUID, (new DomainId(self::NIL_UUID))->toString());
+        $this->assertSame(self::NIL_UUID, (string) new DomainId(self::NIL_UUID));
+        $this->assertNotSame((new DomainId())->toString(), (new DomainId())->toString());
+        $this->assertNotSame((string) new DomainId(), (string) new DomainId());
     }
 
     public function testSerialize(): void
     {
-        $this->assertTrue(($serialized = serialize($this->getUuid())) === serialize(unserialize($serialized)));
+        $this->assertTrue(($serialized = serialize(new DomainId())) === serialize(unserialize($serialized)));
     }
 
     public function testJsonSerialize(): void
@@ -50,13 +60,12 @@ final class DomainIdTest extends TestCase
         $this->assertSame(json_encode(self::NIL_UUID), json_encode($this->getNilUuid()));
     }
 
-    private function getUuid(string $uuid = null): DomainId
-    {
-        return new DomainId($uuid);
-    }
-
     private function getNilUuid(): DomainId
     {
-        return $this->getUuid(self::NIL_UUID);
+        return new DomainId(self::NIL_UUID);
     }
+}
+
+class OtherDomainId extends DomainId
+{
 }

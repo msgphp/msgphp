@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Entity;
 
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Entity\ClassMappingEntityFactory;
 use MsgPhp\Domain\Exception\UnknownEntityException;
-use MsgPhp\Domain\Infra\InMemory\DomainId;
 use PHPUnit\Framework\TestCase;
 
 final class ClassMappingEntityFactoryTest extends TestCase

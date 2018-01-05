@@ -14,9 +14,14 @@ class DomainId implements DomainIdInterface
 {
     private $uuid;
 
-    public function __construct(string $uuid = null)
+    final public function __construct(string $uuid = null)
     {
         $this->uuid = null === $uuid ? Uuid::uuid4() : Uuid::fromString($uuid);
+    }
+
+    final public function isKnown(): bool
+    {
+        return true;
     }
 
     final public function equals(DomainIdInterface $id): bool
@@ -39,12 +44,12 @@ class DomainId implements DomainIdInterface
         return serialize($this->uuid);
     }
 
-    final public function unserialize(/*string */$serialized): void
+    final public function unserialize($serialized): void
     {
         $this->uuid = unserialize($serialized);
     }
 
-    final public function jsonSerialize()
+    final public function jsonSerialize(): string
     {
         return $this->uuid->jsonSerialize();
     }

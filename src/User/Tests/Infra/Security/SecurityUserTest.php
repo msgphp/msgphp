@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\Domain\Infra\InMemory\DomainId;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\UserIdInterface;

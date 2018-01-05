@@ -14,10 +14,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\Domain\Infra\InMemory\DomainId;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
@@ -232,10 +232,12 @@ class TestEntity
      * @Doctrine\ORM\Mapping\Column(type="domain_id")
      */
     public $id;
+
     /**
      * @Doctrine\ORM\Mapping\Column(nullable=true)
      */
     public $field;
+
     /**
      * @Doctrine\ORM\Mapping\Column(nullable=true)
      */

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\InMemory;
 
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\InMemory\DomainEntityRepositoryTrait;
-use MsgPhp\Domain\Infra\InMemory\DomainId;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
@@ -22,7 +22,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertSame([], iterator_to_array($repository->doFindAll(0, 1)));
 
         try {
-            $repository->doFind($this->createDomainId());
+            $repository->doFind(new DomainId());
             $this->fail();
         } catch (EntityNotFoundException $e) {
             $this->assertTrue(true);
@@ -35,7 +35,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $this->assertTrue(true);
         }
 
-        $this->assertFalse($repository->doExists($this->createDomainId()));
+        $this->assertFalse($repository->doExists(new DomainId()));
         $this->assertFalse($repository->doExistsByFields(['field' => null]));
 
         $repository->doDelete($this->createEntity());
@@ -92,7 +92,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $this->assertTrue(true);
         }
 
-        $this->assertFalse($repository->doExists($this->createDomainId()));
+        $this->assertFalse($repository->doExists(new DomainId()));
         $this->assertFalse($repository->doExistsByFields(['field' => 'other']));
         $this->assertFalse($repository->doExistsByFields(['field' => 'other', 'FIELD' => 'VALUE']));
         $this->assertTrue($repository->doExists($foo2->id));
@@ -172,17 +172,12 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     private function createEntity(string $id = null, array $fields = []): \stdClass
     {
         $entity = new \stdClass();
-        $entity->id = $this->createDomainId($id);
+        $entity->id = new DomainId($id);
 
         foreach ($fields as $field => $value) {
             $entity->$field = $value;
         }
 
         return $entity;
-    }
-
-    private function createDomainId(string $id = null): DomainId
-    {
-        return new DomainId($id);
     }
 }
