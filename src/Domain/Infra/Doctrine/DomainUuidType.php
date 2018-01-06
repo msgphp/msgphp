@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
+use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
 use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Doctrine\DBAL\Types\{ConversionException, Type};
@@ -11,6 +12,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @todo support both UUID+default infra (i.e. auto generated integers)
  */
 class DomainUuidType extends Type
 {
@@ -24,37 +27,36 @@ class DomainUuidType extends Type
         return $platform->getGuidTypeDeclarationSQL($fieldDeclaration);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    final public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
         }
 
-        if (!is_string($value)) {
-            throw ConversionException::conversionFailed($value, $this->getName());
-        }
-
-        try {
-            return $this->convertToDomainId($value);
-        } catch (InvalidUuidStringException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName());
-        }
-    }
-
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
-        if (null === $value || is_string($value)) {
-            return $value;
-        }
-
         if ($value instanceof DomainId) {
-            return $value->toString();
+            return $value->isKnown() ? $value->toString() : null;
         }
 
         throw ConversionException::conversionFailed($value, $this->getName());
     }
 
-    protected function convertToDomainId(string $value): DomainId
+    final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            try {
+                return $this->convertToDomainId($value);
+            } catch (InvalidUuidStringException $e) {
+            }
+        }
+
+        throw ConversionException::conversionFailed($value, $this->getName());
+    }
+
+    protected function convertToDomainId(string $value): DomainIdInterface
     {
         return new DomainId($value);
     }

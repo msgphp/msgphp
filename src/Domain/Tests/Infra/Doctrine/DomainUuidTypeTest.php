@@ -33,8 +33,13 @@ final class DomainUuidTypeTest extends TestCase
         $type = DomainUuidType::getType('uuid');
 
         $this->assertNull($type->convertToPHPValue(null, $this->platform));
-        $this->assertInstanceOf(DomainId::class, $type->convertToPHPValue(self::NIL_UUID, $this->platform));
-        $this->assertSame(self::NIL_UUID, $type->convertToPHPValue(self::NIL_UUID, $this->platform)->toString());
+
+        $id = $type->convertToPHPValue(self::NIL_UUID, $this->platform);
+        if (null === $id) {
+            $this->fail();
+        } else {
+            $this->assertSame(self::NIL_UUID, $id->toString());
+        }
     }
 
     public function testConvertToPHPValueWithInvalidType(): void
@@ -63,7 +68,6 @@ final class DomainUuidTypeTest extends TestCase
         $type = DomainUuidType::getType('uuid');
 
         $this->assertNull($type->convertToDatabaseValue(null, $this->platform));
-        $this->assertSame(self::NIL_UUID, $type->convertToDatabaseValue(self::NIL_UUID, $this->platform));
         $this->assertSame(self::NIL_UUID, $type->convertToDatabaseValue(new DomainId(self::NIL_UUID), $this->platform));
     }
 
@@ -74,6 +78,6 @@ final class DomainUuidTypeTest extends TestCase
 
         $this->expectException(ConversionException::class);
 
-        $type->convertToDatabaseValue(123, $this->platform);
+        $type->convertToDatabaseValue(self::NIL_UUID, $this->platform);
     }
 }

@@ -25,7 +25,7 @@ final class DomainIdTest extends TestCase
         new DomainId('foo');
     }
 
-    public function testIsKnown(): bool
+    public function testIsKnown(): void
     {
         $this->assertTrue((new DomainId())->isKnown());
         $this->assertTrue((new DomainId(self::NIL_UUID))->isKnown());

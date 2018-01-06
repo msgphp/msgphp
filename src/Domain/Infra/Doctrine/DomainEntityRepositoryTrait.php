@@ -9,7 +9,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\{DomainCollectionInterface, DomainIdInterface};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
 /**
@@ -19,11 +19,42 @@ trait DomainEntityRepositoryTrait
 {
     private $em;
     private $class;
+    private $numIdFields;
 
     public function __construct(EntityManagerInterface $em, string $class)
     {
         $this->em = $em;
         $this->class = $class;
+        $this->numIdFields = count($this->idFields);
+    }
+
+    private function isValidEntityId(array $ids): bool
+    {
+        if (count($ids) !== $this->numIdFields) {
+            return false;
+        }
+
+        $metadataFactory = $this->em->getMetadataFactory();
+
+        return count(array_filter($ids, function ($id) use ($metadataFactory): bool {
+            if ($id instanceof DomainIdInterface) {
+                return $id->isKnown();
+            }
+
+            if (is_object($id)) {
+                $class = get_class($id);
+
+                foreach (($metadata = $metadataFactory->getMetadataFor($this->class))->getIdentifierFieldNames() as $idFieldName) {
+                    if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
+                        return true;
+                    }
+                }
+
+                return method_exists($id, '__toString');
+            }
+
+            return is_scalar($id);
+        })) === $this->numIdFields;
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -40,11 +71,19 @@ trait DomainEntityRepositoryTrait
 
     private function doFind($id, ...$idN)
     {
-        return $this->doFindByFields(array_combine($this->idFields, func_get_args()));
+        if (!$this->isValidEntityId($ids = func_get_args())) {
+            throw EntityNotFoundException::createForFields($this->class, $ids);
+        }
+
+        return $this->doFindByFields(array_combine($this->idFields, $ids));
     }
 
     private function doFindByFields(array $fields)
     {
+        if (!$fields) {
+            throw new \LogicException('No fields provided.');
+        }
+
         $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
         $qb->setFirstResult(0);
         $qb->setMaxResults(1);
@@ -58,11 +97,19 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id, ...$idN): bool
     {
-        return $this->doExistsByFields(array_combine($this->idFields, func_get_args()));
+        if (!$this->isValidEntityId($ids = func_get_args())) {
+            return false;
+        }
+
+        return $this->doExistsByFields(array_combine($this->idFields, $ids));
     }
 
     private function doExistsByFields(array $fields): bool
     {
+        if (!$fields) {
+            throw new \LogicException('No fields provided.');
+        }
+
         $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
         $qb->select('1');
         $qb->setFirstResult(0);
@@ -78,7 +125,7 @@ trait DomainEntityRepositoryTrait
     {
         $this->em->persist($entity);
 
-        $entityId = $this->em->getUnitOfWork()->getEntityIdentifier($entity);
+        $entityId = ($uow = $this->em->getUnitOfWork())->isInIdentityMap($entity) ? $uow->getEntityIdentifier($entity) : [];
 
         try {
             $this->em->flush();
@@ -120,20 +167,34 @@ trait DomainEntityRepositoryTrait
 
     private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false): void
     {
+        if (!$fields) {
+            return;
+        }
+
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
+        $metadataFactory = $this->em->getMetadataFactory();
 
         foreach ($fields as $field => $value) {
+            if ($value instanceof DomainIdInterface && !$value->isKnown()) {
+                $value = null;
+            }
+
             if (null === $value) {
                 $where->add($expr->isNull($this->alias.'.'.$field));
             } elseif (true === $value) {
                 $where->add($expr->eq($this->alias.'.'.$field, 'TRUE'));
             } elseif (false === $value) {
                 $where->add($expr->eq($this->alias.'.'.$field, 'FALSE'));
-            } elseif (is_array($value)) {
+            } elseif (is_array($haystack = $value)) {
+                // @todo test
+                foreach ($haystack as &$value) {
+                    $value = $value instanceof DomainIdInterface ? ($value->isKnown() ? $value->toString() : null) : $value;
+                }
+                unset($value);
                 $where->add($expr->in($this->alias.'.'.$field, ':'.($param = uniqid($field))));
-                $qb->setParameter($param, $value);
-            } elseif ($this->em->getMetadataFactory()->getMetadataFor($this->class)->hasAssociation($field)) {
+                $qb->setParameter($param, $haystack);
+            } elseif ($metadataFactory->getMetadataFor($this->class)->hasAssociation($field)) {
                 $where->add($expr->eq('IDENTITY('.$this->alias.'.'.$field.')', ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
             } else {

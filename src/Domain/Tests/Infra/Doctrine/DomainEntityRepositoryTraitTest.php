@@ -7,239 +7,328 @@ namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Exception\DuplicateEntityException;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\{DomainId, DomainIdInterface};
+use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
+use MsgPhp\Domain\Tests\Fixtures\Entities;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
 {
-    public function testWithNoData(): void
+    /** @var EntityManager|null */
+    private static $em;
+
+    public static function setUpBeforeClass(): void
     {
-        $repository = $this->createRepository();
+        AnnotationRegistry::registerLoader('class_exists');
+        Type::addType('domain_id', DomainIdType::class);
 
-        $this->assertSame([], iterator_to_array($repository->doFindAll()));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(0, 1)));
+        $config = new Configuration();
+        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), dirname(dirname(__DIR__)).'/Fixtures/Entities'));
+        $config->setProxyDir(\sys_get_temp_dir().'/msgphp_'.md5(microtime()));
+        $config->setProxyNamespace(__NAMESPACE__);
 
-        try {
-            $repository->doFind($this->createDomainId());
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->assertTrue(true);
-        }
-
-        try {
-            $repository->doFindByFields(['field' => 'value', 'field2' => true]);
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->assertTrue(true);
-        }
-
-        $this->assertFalse($repository->doExists($this->createDomainId()));
-        $this->assertFalse($repository->doExistsByFields(['field' => null]));
-
-        $repository->doDelete($this->createEntity());
+        self::$em = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);
     }
 
-    public function testWithData(): void
+    public static function tearDownAfterClass(): void
     {
-        $repository = $this->createRepository($users = [
-            $foo1 = $this->createEntity(null, ['field' => null, 'field2' => true]),
-            $foo2 = $this->createEntity(null, ['field' => 'value', 'field2' => 'VALUE']),
-            $foo3 = $this->createEntity(null, ['field' => 'VALUE', 'field2' => 'value']),
-        ]);
-
-        $this->assertEquals($users, iterator_to_array($repository->doFindAll()));
-        $this->assertEquals([$foo2, $foo3], iterator_to_array($repository->doFindAll(1)));
-        $this->assertEquals([$foo2], iterator_to_array($repository->doFindAll(1, 1)));
-        $this->assertEquals([$foo1, $foo2], iterator_to_array($repository->doFindAll(0, 2)));
-
-        try {
-            $this->assertEquals($foo2, $repository->doFind($foo2->id));
-        } catch (EntityNotFoundException $e) {
-            $this->fail($e->getMessage());
+        if (null === self::$em) {
+            return;
         }
 
-        try {
-            $this->assertEquals($foo1, $repository->doFindByFields(['field' => null]));
-        } catch (EntityNotFoundException $e) {
-            $this->fail($e->getMessage());
+        if (null !== ($proxyDir = self::$em->getConfiguration()->getProxyDir()) && is_dir($proxyDir)) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($proxyDir, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+                @($file->isDir() ? 'rmdir' : 'unlink')($file->getRealPath());
+            }
+
+            @rmdir($proxyDir);
         }
 
-        try {
-            $this->assertEquals($foo2, $repository->doFindByFields(['field2' => 'VALUE']));
-        } catch (EntityNotFoundException $e) {
-            $this->fail($e->getMessage());
-        }
-
-        try {
-            $this->assertEquals($foo3, $repository->doFindByFields(['field' => 'VALUE']));
-        } catch (EntityNotFoundException $e) {
-            $this->fail($e->getMessage());
-        }
-
-        try {
-            $repository->doFindByFields(['field' => 'VALUE', 'field2' => 'VALUE']);
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->assertTrue(true);
-        }
-
-        try {
-            $repository->doFindByFields(['field' => 'value', 'field2' => true]);
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->assertTrue(true);
-        }
-
-        $this->assertFalse($repository->doExists($this->createDomainId()));
-        $this->assertFalse($repository->doExistsByFields(['field' => 'other']));
-        $this->assertFalse($repository->doExistsByFields(['field' => 'other', 'field2' => 'VALUE']));
-        $this->assertTrue($repository->doExists($foo2->id));
-        $this->assertTrue($repository->doExistsByFields(['field' => 'value']));
-        $this->assertTrue($repository->doExistsByFields(['field' => 'VALUE', 'field2' => 'value']));
+        self::$em = null;
     }
 
-    public function testSaveAndDeleteNewEntiy(): void
+    protected function setUp(): void
     {
-        $repository = $this->createRepository();
-        $repository->doSave($entity = $this->createEntity());
+        if (null === self::$em) {
+            throw new \LogicException('No entity manager set.');
+        }
 
-        $this->assertEquals([$entity], iterator_to_array($repository->doFindAll()));
-        $this->assertEquals($entity, $repository->doFind($entity->id));
+        if (!self::$em->isOpen()) {
+            self::$em = self::$em::create(self::$em->getConnection(), self::$em->getConfiguration(), self::$em->getEventManager());
+        }
 
-        $repository->doDelete($entity);
-
-        $this->assertEquals([], iterator_to_array($repository->doFindAll()));
+        $schema = new SchemaTool(self::$em);
+        $schema->dropDatabase();
+        $schema->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
     }
 
-    public function testSaveDuplicateEntity(): void
+    protected function tearDown(): void
     {
-        $repository = $this->createRepository();
-        $repository->doSave($this->createEntity('1'));
+        if (null === self::$em) {
+            throw new \LogicException('No entity manager set.');
+        }
+
+        self::$em->clear();
+    }
+
+    /**
+     * @dataProvider provideEntities
+     */
+    public function testFind(string $class, Entities\BaseTestEntity $entity, array $ids): void
+    {
+        $repository = self::createRepository($class);
+
+        try {
+            $repository->doFind(...$ids);
+
+            $this->fail();
+        } catch (EntityNotFoundException $e) {
+            $this->addToAssertionCount(1);
+        }
+
+        $this->loadEntities($entity);
+
+        $this->assertSame($entity, $repository->doFind(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+    }
+
+    /**
+     * @dataProvider provideEntityFields
+     */
+    public function testFindByFields(string $class, array $fields): void
+    {
+        $repository = self::createRepository($class);
+
+        try {
+            $repository->doFindByFields($fields);
+
+            $this->fail();
+        } catch (\Throwable $e) {
+            if ((!$fields && $e instanceof \LogicException) || ($fields && $e instanceof EntityNotFoundException)) {
+                $this->addToAssertionCount(1);
+            } else {
+                throw $e;
+            }
+        }
+
+        $entity = $class::create($fields);
+        $this->loadEntities($entity);
+
+        $this->assertSame($entity, $repository->doFindByFields($fields));
+    }
+
+    /**
+     * @dataProvider provideEntities
+     */
+    public function testExists(string $class, Entities\BaseTestEntity $entity, array $ids): void
+    {
+        $repository = self::createRepository($class);
+
+        $this->assertFalse($repository->doExists(...$ids));
+
+        $this->loadEntities($entity);
+
+        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+    }
+
+    /**
+     * @dataProvider provideEntityFields
+     */
+    public function testExistsByFields(string $class, array $fields): void
+    {
+        $repository = self::createRepository($class);
+
+        $this->assertFalse($repository->doExistsByFields($fields));
+
+        $this->loadEntities($entity = $class::create($fields));
+
+        $this->assertTrue($repository->doExistsByFields($fields));
+    }
+
+    /**
+     * @dataProvider provideEntities
+     */
+    public function testSave(string $class, Entities\BaseTestEntity $entity, array $ids): void
+    {
+        $repository = self::createRepository($class);
+
+        $this->assertFalse($repository->doExists(...$ids));
+
+        $repository->doSave($entity);
+
+        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+    }
+
+    public function testSaveThrowsOnDuplicate(): void
+    {
+        $repository = self::createRepository(Entities\TestPrimitiveEntity::class);
+
+        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
 
         $this->expectException(DuplicateEntityException::class);
 
-        $repository->doSave($this->createEntity('1'));
+        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
     }
 
-    private function createRepository(array $entities = [])
+    /**
+     * @dataProvider provideEntities
+     */
+    public function testDelete(string $class, Entities\BaseTestEntity $entity): void
     {
-        $em = $this->createEntityManager($entities);
+        $repository = self::createRepository($class);
 
-        return new class($em, TestEntity::class) {
+        $repository->doSave($entity);
+
+        $this->assertTrue($repository->doExists(...$ids = Entities\BaseTestEntity::getPrimaryIds($entity)));
+
+        $repository->doDelete($entity);
+
+        $this->assertFalse($repository->doExists(...$ids));
+    }
+
+    public function provideEntityTypes(): iterable
+    {
+        yield [Entities\TestEntity::class];
+        yield [Entities\TestPrimitiveEntity::class];
+        yield [Entities\TestCompositeEntity::class];
+        yield [Entities\TestDerivedEntity::class];
+        yield [Entities\TestDerivedCompositeEntity::class];
+    }
+
+    public function provideEntities(): iterable
+    {
+        foreach ($this->provideEntityTypes() as $class) {
+            $class = $class[0];
+            foreach ($class::createEntities() as $entity) {
+                $ids = Entities\BaseTestEntity::getPrimaryIds($entity, $primitiveIds);
+
+                yield [$class, $entity,  $ids, $primitiveIds];
+            }
+        }
+    }
+
+    public function provideEntityFields(): iterable
+    {
+        foreach ($this->provideEntityTypes() as $class) {
+            $class = $class[0];
+
+            foreach ($class::getFields() as $fields) {
+                yield [$class, $fields];
+            }
+        }
+    }
+
+    private static function createRepository(string $class)
+    {
+        $em = self::$em;
+        $idFields = is_subclass_of($class, Entities\BaseTestEntity::class) ? $class::getIdFields() : ['id'];
+
+        return new class($em, $class, $idFields) {
             use DomainEntityRepositoryTrait {
-                doFindAll as public;
+                doFindAll as public; // @todo
+                doFindAllByFields as public; // @todo
                 doFind as public;
                 doFindByFields as public;
                 doExists as public;
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
+                __construct as private __parentConstruct;
             }
 
-            private $alias = 'test_entity';
-            private $idFields = ['id'];
+            private $alias = 'root';
+            private $idFields;
+
+            public function __construct(EntityManagerInterface $em, string $class, array $idFields)
+            {
+                $this->idFields = $idFields;
+
+                $this->__parentConstruct($em, $class);
+            }
         };
     }
 
-    private function createEntityManager(array $entities): EntityManagerInterface
+    private static function persist(Entities\BaseTestEntity $entity): void
     {
-        AnnotationRegistry::registerLoader('class_exists');
-        if (Type::hasType('domain_id')) {
-            Type::overrideType('domain_id', DomainIdType::class);
-        } else {
-            Type::addType('domain_id', DomainIdType::class);
+        if (null === self::$em) {
+            throw new \LogicException('No entity manager set.');
         }
 
-        $config = new Configuration();
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), __DIR__));
-        $config->setProxyDir(\sys_get_temp_dir());
-        $config->setProxyNamespace(__NAMESPACE__);
+        self::$em->persist($entity);
+    }
 
-        $em = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);
+    private static function flushEntities(iterable $entities): void
+    {
+        if (null === self::$em) {
+            throw new \LogicException('No entity manager set.');
+        }
 
-        $schema = new SchemaTool($em);
-        $schema->dropDatabase();
-        $schema->createSchema($em->getMetadataFactory()->getAllMetadata());
+        foreach ($entities as $entity) {
+            self::persist($entity);
+        }
 
-        if ($entities) {
-            foreach ($entities as $entity) {
-                $em->persist($entity);
+        self::$em->flush();
+    }
+
+    private function loadEntities(Entities\BaseTestEntity ...$context): void
+    {
+        $entities = [];
+        foreach (func_get_args() as $entity) {
+            Entities\BaseTestEntity::getPrimaryIds($entity, $primitiveIds);
+            $entities[serialize($primitiveIds)] = $entity;
+        }
+
+        foreach ($this->provideEntities() as $entity) {
+            if (!isset($entities[$primitiveIds = serialize($entity[3])])) {
+                $entities[$primitiveIds] = $entity[1];
             }
-
-            $em->flush();
         }
 
-        $em->getUnitOfWork()->clear();
-
-        return $em;
-    }
-
-    private function createEntity(string $id = null, array $fields = []): TestEntity
-    {
-        $entity = new TestEntity();
-        $entity->id = $this->createDomainId($id);
-
-        foreach ($fields as $field => $value) {
-            $entity->$field = $value;
-        }
-
-        return $entity;
-    }
-
-    private function createDomainId(string $id = null): DomainId
-    {
-        return new DomainId($id);
+        self::flushEntities($entities);
     }
 }
 
-class DomainIdType extends StringType
+/**
+ * @fixme should be core doctrine infra
+ */
+class DomainIdType extends IntegerType
 {
     public function getName()
     {
         return 'domain_id';
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    final public function convertToDatabaseValue($value, AbstractPlatform $platform): ?int
     {
-        return (string) $value;
+        if (null === $value) {
+            return null;
+        }
+
+        if ($value instanceof DomainIdInterface) {
+            return $value->isKnown() ? (int) $value->toString() : null;
+        }
+
+        throw ConversionException::conversionFailed($value, $this->getName());
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
     {
-        return new DomainId($value);
+        if (null === $value) {
+            return null;
+        }
+
+        if (is_scalar($value)) {
+            return new DomainId((string) $value);
+        }
+
+        throw ConversionException::conversionFailed($value, $this->getName());
     }
-}
-
-/**
- * @Doctrine\ORM\Mapping\Entity()
- */
-class TestEntity
-{
-    /**
-     * @Doctrine\ORM\Mapping\Id()
-     * @Doctrine\ORM\Mapping\Column(type="domain_id")
-     */
-    public $id;
-
-    /**
-     * @Doctrine\ORM\Mapping\Column(nullable=true)
-     */
-    public $field;
-
-    /**
-     * @Doctrine\ORM\Mapping\Column(nullable=true)
-     */
-    public $field2;
 }
