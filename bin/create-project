@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ $# > 1 ]] ; then
-    echo "Usage: $0 <working-directory>"
+if [[ $# -gt 1 ]] ; then
+    echo "Usage: $0 [<working-directory>]"
     exit 1
 fi
 
@@ -31,7 +31,7 @@ if [[ $? -ne 0 ]] ; then
     exit $?
 fi
 
-pushd ${DIR} &> /dev/null
+pushd "${DIR}" &> /dev/null
 
 echo -e "\e[34mInstalling components...\e[0m"
 composer require --prefer-dist --no-suggest ${COMPONENTS}
@@ -46,3 +46,14 @@ if [[ ! -z $BUNDLES ]] ; then
 fi
 
 popd &> /dev/null
+
+echo -en "\e[34mLink dependencies? [yN]\e[0m "
+read answer
+if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
+    composer link -h &> /dev/null
+    if [[ $? != 0 ]] ; then
+        composer require --dev --no-progress --prefer-dist --no-interaction --no-suggest ro0nl/link
+    fi
+
+    composer link "${DIR}"
+fi

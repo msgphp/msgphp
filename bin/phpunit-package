@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 1 ]] ; then
+    echo "Usage: $0 <package-name/dir> [<arguments>]"
+    exit 1
+fi
+
+if [[ -d $1 ]] ; then
+    PACKAGE_DIR="$1"
+else
+    PACKAGE_DIR="src/$(echo $1 | sed -r 's/(^|-)(\w)/\U\2/g')"
+fi
+shift;
+
+BIN="vendor/bin/simple-phpunit"
+CMD="${BIN} ${@}"
+
+if [[ ! -f "${PACKAGE_DIR}/phpunit.xml.dist" ]] ; then
+    echo "No valid package found in \"${PACKAGE_DIR}\""
+    exit 1
+fi
+
+if [[ ! -f "${PACKAGE_DIR}/${BIN}" ]] ; then
+    composer update --no-progress --prefer-dist --no-interaction --no-suggest --working-dir="${PACKAGE_DIR}"
+fi
+
+if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_BRANCH = master ]] ) ; then
+    composer link -h &> /dev/null
+    if [[ $? != 0 ]] ; then
+        composer require --dev --no-progress --prefer-dist --no-interaction --no-suggest ro0nl/link
+    fi
+
+    echo -e "\e[34mLinking package\e[0m"
+    composer link "${PACKAGE_DIR}"
+fi
+
+pushd "${PACKAGE_DIR}" &> /dev/null
+
+echo -e "\e[34mTesting package\e[0m"
+${CMD}
+
+popd &> /dev/null

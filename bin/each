@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $# < 1 ]] ; then
+if [[ $# -lt 1 ]] ; then
     echo "Usage: $0 <cmd>"
     exit 1
 fi
@@ -10,7 +10,7 @@ RETURN=0
 
 for PACKAGE in $(find src/*/composer.json -type f) ; do
     DIR=$(dirname ${PACKAGE})
-    pushd ${DIR} &> /dev/null
+    pushd "${DIR}" &> /dev/null
     LABEL="Running in \"${DIR}\""
     if [[ $TRAVIS = true ]] ; then
         tfold "${LABEL}" "${CMD}"

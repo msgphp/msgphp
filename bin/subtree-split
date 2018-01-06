@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-if [[ $# > 1 ]] ; then
-    echo "Usage: $0 <working-directory>"
+if [[ $# -gt 1 ]] ; then
+    echo "Usage: $0 [<working-directory>]"
     exit 1
 fi
 
 DIR="${1:-.subtree-split/}"
-mkdir -p ${DIR}
-pushd ${DIR} &> /dev/null
+mkdir -p "${DIR}"
+pushd "${DIR}" &> /dev/null
 
 echo -e "\e[34mSetup tooling...\e[0m"
 if [[ ! -d bin/.git ]] ; then

@@ -3,20 +3,31 @@
 ## Testing
 
 ```bash
-bin/composer update
+# all packages
 bin/phpunit
+
+# single package
+bin/phpunit user-bundle
 ```
 
 ## Code style
 
 ```bash
+# all packages
 bin/cs
+
+# single package
+bin/cs user-bundle
 ```
 
 ## Static analysis
 
 ```bash
+# all packages
 bin/sa
+
+# single package
+bin/sa user-bundle
 ```
 
 ## Helping others

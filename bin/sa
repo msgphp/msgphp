@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
+if [[ $# -eq 0 ]] ; then
+    DIR="src/"
+elif [[ -d $1 ]] ; then
+    DIR="$1"
+    shift;
+else
+    DIR="src/$(echo $1 | sed -r 's/(^|-)(\w)/\U\2/g')"
+    shift;
+fi
+
 BIN="vendor/bin/phpstan"
-CMD="${BIN} analyse --configuration phpstan.neon --level max ${@:-src/}"
+CMD="${BIN} analyse --configuration phpstan.neon --level max ${@} ${DIR}"
 
 if [[ ! -f $BIN ]] ; then
     composer update --no-progress --prefer-dist --no-interaction --no-suggest
