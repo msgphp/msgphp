@@ -13,6 +13,7 @@ echo -e "\e[34mSetup tooling...\e[0m"
 if [[ ! -d bin/.git ]] ; then
     echo "Cloning..."
     git clone --quiet git@github.com:msgphp/git-subtree-sync.git bin
+    [[ $? -ne 0 ]] && echo "Failed!" && exit 1
 fi
 
 git -C bin pull
@@ -23,6 +24,7 @@ if [[ ! -d main/.git ]] ; then
     mkdir main subtrees
     echo "Cloning..."
     git clone --quiet git@github.com:msgphp/msgphp.git main
+    [[ $? -ne 0 ]] && echo "Failed!" && exit 1
 fi
 
 git -C main fetch --tags

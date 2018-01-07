@@ -15,6 +15,7 @@ CMD="${BIN} fix --dry-run --verbose --diff ${@} ${DIR}"
 
 if [[ ! -f $BIN ]] ; then
     composer update --no-progress --prefer-dist --no-interaction --no-suggest
+    [[ $? -ne 0 ]] && exit 1
 fi
 
 ${CMD}
