@@ -69,6 +69,63 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         self::$em->clear();
     }
 
+    public function testFindAll(): void
+    {
+        $repository = self::createRepository(Entities\TestPrimitiveEntity::class);
+        $entities = [
+            $entity1 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('1')]),
+            $entity2 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('2')]),
+            $entity3 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('3')]),
+        ];
+
+        $this->assertSame([], iterator_to_array($repository->doFindAll()));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 0)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(0, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(10, 10)));
+
+        self::flushEntities($entities);
+
+        $this->assertSame($entities, iterator_to_array($repository->doFindAll()));
+        $this->assertSame([$entity2, $entity3], iterator_to_array($repository->doFindAll(1)));
+        $this->assertSame([$entity2], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertSame([$entity2,  $entity3], iterator_to_array($repository->doFindAll(1, 0)));
+        $this->assertSame($entities, iterator_to_array($repository->doFindAll(0, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(10, 10)));
+        $this->assertSame([$entity1, $entity2], iterator_to_array($repository->doFindAll(0, 2)));
+    }
+
+    public function testFindAllByFields(): void
+    {
+        $repository = self::createRepository(Entities\TestPrimitiveEntity::class);
+        $entities = [
+            $entity1 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('1')]),
+            $entity2 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('2')]),
+            $entity3 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('3')]),
+        ];
+
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => 1])));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId()], 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('2'), new DomainId('3')]], 1, 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('1'), new DomainId('3')]], 0, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('3')], 0, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('2')], 10, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('1')], 0, 2)));
+
+        self::flushEntities($entities);
+
+        $this->assertSame([$entity1], iterator_to_array($repository->doFindAllByFields(['id' => 1])));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId()], 1)));
+        $this->assertSame([$entity3], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('2'), new DomainId('3')]], 1, 1)));
+        $this->assertSame([$entity2], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0)));
+        $this->assertSame([$entity1, $entity3], iterator_to_array($repository->doFindAllByFields(['id' => [new DomainId('1'), new DomainId('3')]], 0, 10)));
+        $this->assertSame([$entity3], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('3')], 0, 10)));
+        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('2')], 10, 10)));
+        $this->assertSame([$entity1], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('1')], 0, 2)));
+    }
+
     /**
      * @dataProvider provideEntities
      */
@@ -305,8 +362,8 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
         return new class($em, $class, $idFields) {
             use DomainEntityRepositoryTrait {
-                doFindAll as public; // @todo
-                doFindAllByFields as public; // @todo
+                doFindAll as public;
+                doFindAllByFields as public;
                 doFind as public;
                 doFindByFields as public;
                 doExists as public;

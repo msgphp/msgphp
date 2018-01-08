@@ -136,7 +136,7 @@ trait DomainEntityRepositoryTrait
         return $qb;
     }
 
-    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false): void
+    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false, string $alias = null): void
     {
         if (!$fields) {
             return;
@@ -144,6 +144,7 @@ trait DomainEntityRepositoryTrait
 
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
+        $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
         $metadataFactory = $this->em->getMetadataFactory();
 
         foreach ($fields as $field => $value) {
@@ -151,25 +152,24 @@ trait DomainEntityRepositoryTrait
                 $value = null;
             }
 
+            $fieldAlias = $alias.'.'.$field;
+
             if (null === $value) {
-                $where->add($expr->isNull($this->alias.'.'.$field));
+                $where->add($expr->isNull($fieldAlias));
             } elseif (true === $value) {
-                $where->add($expr->eq($this->alias.'.'.$field, 'TRUE'));
+                $where->add($expr->eq($fieldAlias, 'TRUE'));
             } elseif (false === $value) {
-                $where->add($expr->eq($this->alias.'.'.$field, 'FALSE'));
-            } elseif (is_array($haystack = $value)) {
-                // @todo test
-                foreach ($haystack as &$value) {
-                    $value = $value instanceof DomainIdInterface ? ($value->isEmpty() ? null : $value->toString()) : $value;
-                }
-                unset($value);
-                $where->add($expr->in($this->alias.'.'.$field, ':'.($param = uniqid($field))));
-                $qb->setParameter($param, $haystack);
+                $where->add($expr->eq($fieldAlias, 'FALSE'));
+            } elseif (is_array($value)) {
+                $where->add($expr->in($fieldAlias, ':'.($param = uniqid($field))));
+                $qb->setParameter($param, array_map(function ($value) {
+                    return $value instanceof DomainIdInterface ? ($value->isEmpty() ? null : $value->toString()) : $value;
+                }, $value));
             } elseif ($metadataFactory->getMetadataFor($this->class)->hasAssociation($field)) {
-                $where->add($expr->eq('IDENTITY('.$this->alias.'.'.$field.')', ':'.($param = uniqid($field))));
+                $where->add($expr->eq('IDENTITY('.$fieldAlias.')', ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
             } else {
-                $where->add($expr->eq($this->alias.'.'.$field, ':'.($param = uniqid($field))));
+                $where->add($expr->eq($fieldAlias, ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
             }
         }
