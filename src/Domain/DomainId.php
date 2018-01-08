@@ -13,31 +13,27 @@ class DomainId implements DomainIdInterface
 
     final public function __construct(string $id = null)
     {
-        $this->id = $id;
+        $this->id = $id ?? '';
     }
 
     final public function isKnown(): bool
     {
-        return null !== $this->id;
+        return '' !== $this->id;
     }
 
     final public function equals(DomainIdInterface $id): bool
     {
-        return null !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false;
+        return '' !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false;
     }
 
     final public function toString(): string
     {
-        if (null === $this->id) {
-            throw new \LogicException('An unknown domain ID cannot be casted to string.');
-        }
-
         return $this->id;
     }
 
     final public function __toString(): string
     {
-        return $this->toString();
+        return $this->id;
     }
 
     final public function serialize(): string
@@ -52,6 +48,6 @@ class DomainId implements DomainIdInterface
 
     final public function jsonSerialize(): ?string
     {
-        return $this->id;
+        return '' === $this->id ? null : $this->id;
     }
 }

@@ -9,12 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 final class DomainIdTest extends TestCase
 {
-    public function testIsKnown(): void
+    /**
+     * @dataProvider provideIds
+     */
+    public function testIsKnown(DomainId $id, bool $known): void
     {
-        $this->assertTrue((new DomainId(''))->isKnown());
-        $this->assertTrue((new DomainId('foo'))->isKnown());
-        $this->assertFalse((new DomainId())->isKnown());
-        $this->assertFalse((new DomainId(null))->isKnown());
+        if ($known) {
+            $this->assertTrue($id->isKnown());
+        } else {
+            $this->assertFalse($id->isKnown());
+        }
     }
 
     public function testEquals(): void
@@ -32,17 +36,10 @@ final class DomainIdTest extends TestCase
 
     public function testToString(): void
     {
-        $this->assertSame('foo', (string) new DomainId('foo'));
+        $this->assertSame('', (new DomainId())->toString());
+        $this->assertSame('', (string) new DomainId(''));
         $this->assertSame('foo', (new DomainId('foo'))->toString());
-    }
-
-    public function testToStringWithUnknownId(): void
-    {
-        $id = new DomainId();
-
-        $this->expectException(\LogicException::class);
-
-        $id->toString();
+        $this->assertSame('foo', (string) new DomainId('foo'));
     }
 
     /**
@@ -61,12 +58,18 @@ final class DomainIdTest extends TestCase
         $this->assertEquals($id, new DomainId(json_decode(json_encode($id))));
     }
 
+    public function testJsonSerializeCastsUnknownIdToNull(): void
+    {
+        $this->assertNull(json_decode(json_encode(new DomainId())));
+    }
+
     public function provideIds(): iterable
     {
-        yield [new DomainId()];
-        yield [new DomainId(null)];
-        yield [new DomainId('')];
-        yield [new DomainId('foo')];
+        yield [new DomainId(), false];
+        yield [new DomainId(''), false];
+        yield [new DomainId(' '), true];
+        yield [new DomainId('0'), true];
+        yield [new DomainId('foo'), true];
     }
 }
 

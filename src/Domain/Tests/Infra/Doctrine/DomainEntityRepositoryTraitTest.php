@@ -111,18 +111,23 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $repository->doFindByFields($fields);
 
             $this->fail();
-        } catch (\Throwable $e) {
-            if ((!$fields && $e instanceof \LogicException) || ($fields && $e instanceof EntityNotFoundException)) {
-                $this->addToAssertionCount(1);
-            } else {
-                throw $e;
-            }
+        } catch (EntityNotFoundException $e) {
+            $this->addToAssertionCount(1);
         }
 
         $entity = $class::create($fields);
         $this->loadEntities($entity);
 
         $this->assertSame($entity, $repository->doFindByFields($fields));
+    }
+
+    public function testFindByFieldsWithNoFields(): void
+    {
+        $repository = self::createRepository(Entities\TestEntity::class);
+
+        $this->expectException(\LogicException::class);
+
+        $repository->doExistsByFields([]);
     }
 
     /**
@@ -153,6 +158,27 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertTrue($repository->doExistsByFields($fields));
     }
 
+    public function testExistsByFieldsWithNoFields(): void
+    {
+        $repository = self::createRepository(Entities\TestEntity::class);
+
+        $this->expectException(\LogicException::class);
+
+        $repository->doExistsByFields([]);
+    }
+
+    public function testExistsByFieldsWithUnknownDomainId(): void
+    {
+        $repository = self::createRepository(Entities\TestDerivedEntity::class);
+        $entity = Entities\TestEntity::create([
+            'id' => new DomainId(),
+            'intField' => -1,
+            'boolField' => true,
+        ]);
+
+        $this->assertFalse($repository->doExistsByFields(['entity' => $entity]));
+    }
+
     /**
      * @dataProvider provideEntities
      */
@@ -165,6 +191,11 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doSave($entity);
 
         $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+    }
+
+    public function testSaveUpdates(): void
+    {
+        // @todo
     }
 
     public function testSaveThrowsOnDuplicate(): void
@@ -185,7 +216,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = self::createRepository($class);
 
-        $repository->doSave($entity);
+        self::flushEntities([$entity]);
 
         $this->assertTrue($repository->doExists(...$ids = Entities\BaseTestEntity::getPrimaryIds($entity)));
 

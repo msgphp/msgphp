@@ -9,7 +9,7 @@ namespace MsgPhp\Domain;
  */
 interface DomainIdInterface extends \Serializable, \JsonSerializable
 {
-    public function isKnown(): bool;
+    public function isKnown(): bool; // @fixme isUnknown?
 
     public function equals(self $id): bool;
 
