@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MsgPhp\Domain\DomainCollectionInterface;
 
@@ -29,9 +30,9 @@ final class DomainCollection implements DomainCollectionInterface
         return $this->collection->isEmpty();
     }
 
-    public function contains($entity): bool
+    public function contains($element): bool
     {
-        return $this->collection->contains($entity);
+        return $this->collection->contains($element);
     }
 
     public function first()
@@ -47,6 +48,11 @@ final class DomainCollection implements DomainCollectionInterface
     public function filter(callable $filter): DomainCollectionInterface
     {
         return new self($this->collection->filter($filter));
+    }
+
+    public function slice(int $offset, int $limit = 0): DomainCollectionInterface
+    {
+        return new self(new ArrayCollection($this->collection->slice($offset, $limit ?: null)));
     }
 
     public function map(callable $mapper): array

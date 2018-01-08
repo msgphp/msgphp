@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\InMemory;
 
+use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
@@ -20,6 +21,33 @@ trait DomainEntityRepositoryTrait
     {
         $this->memory = $memory;
         $this->class = $class;
+    }
+
+    private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    {
+        return $this->createResultSet($this->memory, $offset, $limit);
+    }
+
+    private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    {
+        $entities = [];
+        foreach ($this->memory as $entity) {
+            // @todo duplicated in doFindByFields
+            foreach ($fields as $field => $value) {
+                $knownValue = $this->getEntityField($entity, $field);
+                if ($knownValue instanceof DomainIdInterface && $value instanceof DomainIdInterface && $knownValue->equals($value)) {
+                    continue;
+                }
+
+                if ($value !== $knownValue) {
+                    continue 2;
+                }
+            }
+
+            $entities[] = $entity;
+        }
+
+        return $this->createResultSet($entities, $offset, $limit);
     }
 
     private function doFind($id, ...$idN)
@@ -63,6 +91,9 @@ trait DomainEntityRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     */
     private function doSave($entity): void
     {
         if (!in_array($entity, $this->memory, true)) {
@@ -74,6 +105,9 @@ trait DomainEntityRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     */
     private function doDelete($entity): void
     {
         foreach ($this->memory as $i => $knownEntity) {
@@ -85,6 +119,22 @@ trait DomainEntityRepositoryTrait
         }
     }
 
+    private function createResultSet(iterable $results, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    {
+        if ($results instanceof \Traversable) {
+            $results = iterator_to_array($results);
+        }
+
+        if ($offset || $limit) {
+            $results = array_slice($results, $offset, $limit ?: null);
+        }
+
+        return new DomainCollection($results);
+    }
+
+    /**
+     * @param object $entity
+     */
     private function getEntityId($entity): array
     {
         $id = [];
@@ -96,7 +146,10 @@ trait DomainEntityRepositoryTrait
         return $id;
     }
 
-    private function getEntityField($entity, $field)
+    /**
+     * @param object $entity
+     */
+    private function getEntityField($entity, string $field)
     {
         if (method_exists($entity, $method = 'get'.ucfirst($field))) {
             return $entity->$method();
@@ -111,16 +164,5 @@ trait DomainEntityRepositoryTrait
         }
 
         throw new \UnexpectedValueException(sprintf('Unknown field name "%s" for entity "%s"', $field, get_class($entity)));
-    }
-
-    private function createResultSet(int $offset = null, int $limit = null, callable $filter = null): DomainCollection
-    {
-        $memory = null == $filter ? $this->memory : array_values(array_filter($this->memory, $filter));
-
-        if (null !== $offset || null !== $limit) {
-            $memory = array_slice($memory, $offset ?? 0, $limit);
-        }
-
-        return new DomainCollection($memory);
     }
 }

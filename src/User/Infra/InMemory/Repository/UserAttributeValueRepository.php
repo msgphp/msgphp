@@ -23,41 +23,45 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByAttributeId(AttributeIdInterface $attributeId, int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAllByAttributeId(AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit, function (UserAttributeValue $userAttributeValue) use ($attributeId) {
+        $entities = $this->doFindAll()->filter(function (UserAttributeValue $userAttributeValue) use ($attributeId): bool {
             return $userAttributeValue->getAttributeId()->equals($attributeId);
         });
+
+        return $this->createResultSet($entities, $offset, $limit);
     }
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByAttributeIdAndValue(AttributeIdInterface $attributeId, $value, int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAllByAttributeIdAndValue(AttributeIdInterface $attributeId, $value, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit, function (UserAttributeValue $userAttributeValue) use ($attributeId, $value) {
+        $entities = $this->doFindAll()->filter(function (UserAttributeValue $userAttributeValue) use ($attributeId, $value): bool {
             return $userAttributeValue->getAttributeId()->equals($attributeId) && $value === $userAttributeValue->getValue();
         });
+
+        return $this->createResultSet($entities, $offset, $limit);
     }
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit, function (UserAttributeValue $userAttributeValue) use ($userId) {
-            return $userAttributeValue->getUserId()->equals($userId);
-        });
+        return $this->doFindAllByFields(['userId' => $userId], $offset, $limit);
     }
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit, function (UserAttributeValue $userAttributeValue) use ($userId, $attributeId) {
+        $entities = $this->doFindAll()->filter(function (UserAttributeValue $userAttributeValue) use ($userId, $attributeId): bool {
             return $userAttributeValue->getUserId()->equals($userId) && $userAttributeValue->getAttributeId()->equals($attributeId);
         });
+
+        return $this->createResultSet($entities, $offset, $limit);
     }
 
     public function find(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): UserAttributeValue

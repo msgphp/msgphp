@@ -51,6 +51,18 @@ final class DomainEntityCollectionTest extends TestCase
         $this->assertSame([0, 2], array_keys($result));
     }
 
+    public function testSlice(): void
+    {
+        $collection = new DomainCollection(new ArrayCollection([1, 2, 3]));
+
+        $this->assertSame([2, 3], array_values($result = iterator_to_array($collection->slice(1))));
+        $this->assertSame([1, 2], array_keys($result));
+        $this->assertSame([2], array_values($result = iterator_to_array($collection->slice(1, 1))));
+        $this->assertSame([1], array_keys($result));
+        $this->assertSame([1, 2], array_values($result = iterator_to_array($collection->slice(0, 2))));
+        $this->assertSame([0, 1], array_keys($result));
+    }
+
     public function testMap(): void
     {
         $collection = new DomainCollection(new ArrayCollection([1, 2, 3]));

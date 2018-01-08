@@ -16,10 +16,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = $this->createRepository();
 
-        $this->assertSame([], iterator_to_array($repository->createResultSet()));
-        $this->assertSame([], iterator_to_array($repository->createResultSet(1)));
-        $this->assertSame([], iterator_to_array($repository->createResultSet(1, 1)));
-        $this->assertSame([], iterator_to_array($repository->createResultSet(null, 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll()));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(0, 1)));
 
         try {
             $repository->doFind($this->createDomainId());
@@ -49,10 +49,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $foo3 = $this->createEntity(null, ['field' => 'VALUE', 'FIELD' => 'value']),
         ]);
 
-        $this->assertSame($users, iterator_to_array($repository->createResultSet()));
-        $this->assertSame([$foo2, $foo3], iterator_to_array($repository->createResultSet(1)));
-        $this->assertSame([$foo2], iterator_to_array($repository->createResultSet(1, 1)));
-        $this->assertSame([$foo1, $foo2], iterator_to_array($repository->createResultSet(null, 2)));
+        $this->assertSame($users, iterator_to_array($repository->doFindAll()));
+        $this->assertSame([$foo2, $foo3], iterator_to_array($repository->doFindAll(1)));
+        $this->assertSame([$foo2], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertSame([$foo1, $foo2], iterator_to_array($repository->doFindAll(0, 2)));
 
         try {
             $this->assertSame($foo2, $repository->doFind($foo2->id));
@@ -100,35 +100,17 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertTrue($repository->doExistsByFields(['field' => 'VALUE', 'FIELD' => 'value']));
     }
 
-    public function testResultSetFilter(): void
-    {
-        $repository = $this->createRepository([
-            $entityA = $this->createEntity('A'),
-            $entityB = $this->createEntity('B'),
-            $entityC = $this->createEntity('C'),
-            $entityD = $this->createEntity('D'),
-        ]);
-        $filter = function (\stdClass $entity) {
-            return $entity->id->equals($this->createDomainId('B')) || $entity->id->equals($this->createDomainId('D'));
-        };
-
-        $this->assertSame([$entityB, $entityD], iterator_to_array($repository->createResultSet(null, null, $filter)));
-        $this->assertSame([], iterator_to_array($repository->createResultSet(2, null, $filter)));
-        $this->assertSame([$entityD], iterator_to_array($repository->createResultSet(1, 1, $filter)));
-        $this->assertSame([$entityB], iterator_to_array($repository->createResultSet(null, 1, $filter)));
-    }
-
     public function testSaveAndDeleteNewEntiy(): void
     {
         $repository = $this->createRepository();
         $repository->doSave($entity = $this->createEntity());
 
-        $this->assertSame([$entity], iterator_to_array($repository->createResultSet()));
+        $this->assertSame([$entity], iterator_to_array($repository->doFindAll()));
         $this->assertSame($entity, $repository->doFind($entity->id));
 
         $repository->doDelete($entity);
 
-        $this->assertSame([], iterator_to_array($repository->createResultSet()));
+        $this->assertSame([], iterator_to_array($repository->doFindAll()));
     }
 
     public function testSaveDuplicateEntity(): void
@@ -174,13 +156,13 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         return new class($entities, \stdClass::class) {
             use DomainEntityRepositoryTrait {
+                doFindAll as public;
                 doFind as public;
                 doFindByFields as public;
                 doExists as public;
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
-                createResultSet as public;
             }
 
             private $idFields = ['id'];

@@ -20,22 +20,22 @@ interface UserAttributeValueRepositoryInterface
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByAttributeId(AttributeIdInterface $attributeId, int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAllByAttributeId(AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByAttributeIdAndValue(AttributeIdInterface $attributeId, $value, int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAllByAttributeIdAndValue(AttributeIdInterface $attributeId, $value, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */
-    public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     public function find(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): UserAttributeValue;
 

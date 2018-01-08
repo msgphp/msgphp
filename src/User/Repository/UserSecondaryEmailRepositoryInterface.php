@@ -16,7 +16,7 @@ interface UserSecondaryEmailRepositoryInterface
     /**
      * @return DomainCollectionInterface|UserSecondaryEmail[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     public function find(UserIdInterface $userId, string $email): UserSecondaryEmail;
 

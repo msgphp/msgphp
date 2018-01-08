@@ -16,7 +16,7 @@ interface UserRepositoryInterface
     /**
      * @return DomainCollectionInterface|User[]
      */
-    public function findAll(int $offset = null, int $limit = null): DomainCollectionInterface;
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     public function find(UserIdInterface $id): User;
 

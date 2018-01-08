@@ -21,9 +21,9 @@ final class PendingUserRepository implements PendingUserRepositoryInterface
     /**
      * @return DomainCollectionInterface|PendingUser[]
      */
-    public function findAll(int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit);
+        return $this->doFindAll($offset, $limit);
     }
 
     public function find(string $email): PendingUser

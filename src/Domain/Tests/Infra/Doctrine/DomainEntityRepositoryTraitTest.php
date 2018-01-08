@@ -26,10 +26,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = $this->createRepository();
 
-        $this->assertSame([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder()->getQuery())));
-        $this->assertSame([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(1)->getQuery())));
-        $this->assertSame([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(1, 1)->getQuery())));
-        $this->assertSame([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(null, 1)->getQuery())));
+        $this->assertSame([], iterator_to_array($repository->doFindAll()));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertSame([], iterator_to_array($repository->doFindAll(0, 1)));
 
         try {
             $repository->doFind($this->createDomainId());
@@ -59,10 +59,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $foo3 = $this->createEntity(null, ['field' => 'VALUE', 'field2' => 'value']),
         ]);
 
-        $this->assertEquals($users, iterator_to_array($repository->createResultSet($repository->createQueryBuilder()->getQuery())));
-        $this->assertEquals([$foo2, $foo3], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(1)->getQuery())));
-        $this->assertEquals([$foo2], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(1, 1)->getQuery())));
-        $this->assertEquals([$foo1, $foo2], iterator_to_array($repository->createResultSet($repository->createQueryBuilder(null, 2)->getQuery())));
+        $this->assertEquals($users, iterator_to_array($repository->doFindAll()));
+        $this->assertEquals([$foo2, $foo3], iterator_to_array($repository->doFindAll(1)));
+        $this->assertEquals([$foo2], iterator_to_array($repository->doFindAll(1, 1)));
+        $this->assertEquals([$foo1, $foo2], iterator_to_array($repository->doFindAll(0, 2)));
 
         try {
             $this->assertEquals($foo2, $repository->doFind($foo2->id));
@@ -115,12 +115,12 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository = $this->createRepository();
         $repository->doSave($entity = $this->createEntity());
 
-        $this->assertEquals([$entity], iterator_to_array($repository->createResultSet($repository->createQueryBuilder()->getQuery())));
+        $this->assertEquals([$entity], iterator_to_array($repository->doFindAll()));
         $this->assertEquals($entity, $repository->doFind($entity->id));
 
         $repository->doDelete($entity);
 
-        $this->assertEquals([], iterator_to_array($repository->createResultSet($repository->createQueryBuilder()->getQuery())));
+        $this->assertEquals([], iterator_to_array($repository->doFindAll()));
     }
 
     public function testSaveDuplicateEntity(): void
@@ -139,14 +139,13 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
         return new class($em, TestEntity::class) {
             use DomainEntityRepositoryTrait {
+                doFindAll as public;
                 doFind as public;
                 doFindByFields as public;
                 doExists as public;
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
-                createResultSet as public;
-                createQueryBuilder as public;
             }
 
             private $alias = 'test_entity';

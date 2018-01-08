@@ -9,8 +9,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\Exception\DuplicateEntityException;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -26,6 +26,18 @@ trait DomainEntityRepositoryTrait
         $this->class = $class;
     }
 
+    private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    {
+        return $this->createResultSet($this->createQueryBuilder()->getQuery(), $offset, $limit);
+    }
+
+    private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    {
+        $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
+
+        return $this->createResultSet($qb->getQuery(), $offset, $limit);
+    }
+
     private function doFind($id, ...$idN)
     {
         return $this->doFindByFields(array_combine($this->idFields, func_get_args()));
@@ -33,8 +45,9 @@ trait DomainEntityRepositoryTrait
 
     private function doFindByFields(array $fields)
     {
-        $qb = $this->createQueryBuilder(null, 1);
-        $this->addFieldCriteria($qb, $fields);
+        $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
+        $qb->setFirstResult(0);
+        $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
             throw EntityNotFoundException::createForFields($this->class, $fields);
@@ -50,13 +63,17 @@ trait DomainEntityRepositoryTrait
 
     private function doExistsByFields(array $fields): bool
     {
-        $qb = $this->createQueryBuilder(null, 1);
+        $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
         $qb->select('1');
-        $this->addFieldCriteria($qb, $fields);
+        $qb->setFirstResult(0);
+        $qb->setMaxResults(1);
 
         return (bool) $qb->getQuery()->getScalarResult();
     }
 
+    /**
+     * @param object $entity
+     */
     private function doSave($entity): void
     {
         $this->em->persist($entity);
@@ -70,35 +87,38 @@ trait DomainEntityRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     */
     private function doDelete($entity): void
     {
         $this->em->remove($entity);
         $this->em->flush();
     }
 
-    private function createResultSet(Query $query): DomainCollection
+    private function createResultSet(Query $query, int $offset = null, int $limit = null): DomainCollectionInterface
     {
-        return new DomainCollection(new ArrayCollection($query->getResult()));
-    }
-
-    private function createQueryBuilder(int $offset = null, int $limit = null): QueryBuilder
-    {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select($this->alias);
-        $qb->from($this->class, $this->alias);
-
-        if (null !== $offset) {
-            $qb->setFirstResult($offset);
+        if (null !== $offset || !$query->getFirstResult()) {
+            $query->setFirstResult($offset ?? 0);
         }
 
         if (null !== $limit) {
-            $qb->setMaxResults($limit);
+            $query->setMaxResults(0 === $limit ? null : $limit);
         }
+
+        return new DomainCollection(new ArrayCollection($query->getResult()));
+    }
+
+    private function createQueryBuilder(string $alias = null): QueryBuilder
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select($this->alias);
+        $qb->from($this->class, $alias ?? $this->alias);
 
         return $qb;
     }
 
-    private function addFieldCriteria(QueryBuilder $qb, array $fields, $or = false): void
+    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false): void
     {
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();

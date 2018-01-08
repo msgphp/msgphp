@@ -22,11 +22,9 @@ final class UserSecondaryEmailRepository implements UserSecondaryEmailRepository
     /**
      * @return DomainCollectionInterface|UserSecondaryEmail[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = null, int $limit = null): DomainCollectionInterface
+    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($offset, $limit, function (UserSecondaryEmail $userSecondaryEmail) use ($userId) {
-            return $userSecondaryEmail->getUserId()->equals($userId);
-        });
+        return $this->doFindAllByFields(['userId' => $userId], $offset, $limit);
     }
 
     public function find(UserIdInterface $userId, string $email): UserSecondaryEmail
