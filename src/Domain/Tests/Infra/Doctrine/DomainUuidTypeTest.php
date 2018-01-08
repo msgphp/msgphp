@@ -33,13 +33,8 @@ final class DomainUuidTypeTest extends TestCase
         $type = DomainUuidType::getType('uuid');
 
         $this->assertNull($type->convertToPHPValue(null, $this->platform));
-
-        $id = $type->convertToPHPValue(self::NIL_UUID, $this->platform);
-        if (null === $id) {
-            $this->fail();
-        } else {
-            $this->assertSame(self::NIL_UUID, $id->toString());
-        }
+        $this->assertInstanceOf(DomainId::class, $id = $type->convertToPHPValue(self::NIL_UUID, $this->platform));
+        $this->assertSame(self::NIL_UUID, (string) $id);
     }
 
     public function testConvertToPHPValueWithInvalidType(): void

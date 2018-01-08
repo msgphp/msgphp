@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
 {
-    /** @var EntityManager|null */
+    /** @var EntityManager */
     private static $em;
 
     public static function setUpBeforeClass(): void
@@ -41,10 +41,6 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        if (null === self::$em) {
-            return;
-        }
-
         if (null !== ($proxyDir = self::$em->getConfiguration()->getProxyDir()) && is_dir($proxyDir)) {
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($proxyDir, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
                 @($file->isDir() ? 'rmdir' : 'unlink')($file->getRealPath());
@@ -53,29 +49,22 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             @rmdir($proxyDir);
         }
 
+        self::$em->close();
         self::$em = null;
     }
 
     protected function setUp(): void
     {
-        if (null === self::$em) {
-            throw new \LogicException('No entity manager set.');
-        }
-
         if (!self::$em->isOpen()) {
             self::$em = self::$em::create(self::$em->getConnection(), self::$em->getConfiguration(), self::$em->getEventManager());
         }
 
-        $schema = new SchemaTool(self::$em);
-        $schema->dropDatabase();
-        $schema->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
+        (new SchemaTool(self::$em))->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
     }
 
     protected function tearDown(): void
     {
-        if (null === self::$em) {
-            throw new \LogicException('No entity manager set.');
-        }
+        (new SchemaTool(self::$em))->dropDatabase();
 
         self::$em->clear();
     }
@@ -218,7 +207,36 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
     public function testSaveUpdates(): void
     {
-        // @todo
+        $repository = self::createRepository(Entities\TestEntity::class);
+        $entity = Entities\TestEntity::create([
+            'intField' => 1,
+            'floatField' => -1.23,
+            'boolField' => false,
+        ]);
+
+        $repository->doSave($entity);
+
+        $this->assertInstanceOf(DomainIdInterface::class, $entity->id);
+        $this->assertFalse($entity->id->isEmpty());
+        $this->assertNull($entity->strField);
+        $this->assertSame(1, $entity->intField);
+        $this->assertSame(-1.23, $entity->floatField);
+        $this->assertFalse($entity->boolField);
+
+        $entity->strField = 'foo';
+        $entity->floatField = null;
+        $entity->boolField = true;
+
+        $repository->doSave($entity);
+
+        self::$em->clear();
+
+        $this->assertNotSame($entity, $entity = $repository->doFind($entity->id->toString()));
+        $this->assertInstanceOf(Entities\TestEntity::class, $entity);
+        $this->assertSame('foo', $entity->strField);
+        $this->assertSame(1, $entity->intField);
+        $this->assertNull($entity->floatField);
+        $this->assertTrue($entity->boolField);
     }
 
     public function testSaveThrowsOnDuplicate(): void
@@ -310,23 +328,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         };
     }
 
-    private static function persist(Entities\BaseTestEntity $entity): void
-    {
-        if (null === self::$em) {
-            throw new \LogicException('No entity manager set.');
-        }
-
-        self::$em->persist($entity);
-    }
-
     private static function flushEntities(iterable $entities): void
     {
-        if (null === self::$em) {
-            throw new \LogicException('No entity manager set.');
-        }
-
         foreach ($entities as $entity) {
-            self::persist($entity);
+            self::$em->persist($entity);
         }
 
         self::$em->flush();
