@@ -19,9 +19,9 @@ class DomainId implements DomainIdInterface
         $this->uuid = null === $uuid ? Uuid::uuid4() : Uuid::fromString($uuid);
     }
 
-    final public function isKnown(): bool
+    final public function isEmpty(): bool
     {
-        return true;
+        return false;
     }
 
     final public function equals(DomainIdInterface $id): bool

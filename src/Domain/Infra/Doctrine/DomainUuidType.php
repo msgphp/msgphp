@@ -34,7 +34,7 @@ class DomainUuidType extends Type
         }
 
         if ($value instanceof DomainId) {
-            return $value->isKnown() ? $value->toString() : null;
+            return $value->toString();
         }
 
         throw ConversionException::conversionFailed($value, $this->getName());

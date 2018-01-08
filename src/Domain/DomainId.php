@@ -16,9 +16,9 @@ class DomainId implements DomainIdInterface
         $this->id = $id ?? '';
     }
 
-    final public function isKnown(): bool
+    final public function isEmpty(): bool
     {
-        return '' !== $this->id;
+        return '' === $this->id;
     }
 
     final public function equals(DomainIdInterface $id): bool

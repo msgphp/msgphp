@@ -8,8 +8,12 @@ use MsgPhp\Domain\DomainIdInterface;
 
 abstract class BaseTestEntity
 {
+    /**
+     * @return $this
+     */
     final public static function create(array $fields = []): self
     {
+        /** @var $this $entity */
         $entity = new static();
 
         foreach ($fields as $field => $value) {
@@ -27,7 +31,7 @@ abstract class BaseTestEntity
             $ids[] = $entity->$field;
 
             if ($entity->$field instanceof  DomainIdInterface) {
-                $primitives[] = ($entity->$field->isKnown() ? $entity->$field->toString() : null);
+                $primitives[] = $entity->$field->isEmpty() ? null : $entity->$field->toString();
             } elseif ($entity->$field instanceof self) {
                 self::getPrimaryIds($entity->$field, $nestedPrimitives);
 

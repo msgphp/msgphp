@@ -12,12 +12,12 @@ final class DomainIdTest extends TestCase
     /**
      * @dataProvider provideIds
      */
-    public function testIsKnown(DomainId $id, bool $known): void
+    public function testIsEmpty(DomainId $id, bool $isEmpty): void
     {
-        if ($known) {
-            $this->assertTrue($id->isKnown());
+        if ($isEmpty) {
+            $this->assertTrue($id->isEmpty());
         } else {
-            $this->assertFalse($id->isKnown());
+            $this->assertFalse($id->isEmpty());
         }
     }
 
@@ -65,11 +65,11 @@ final class DomainIdTest extends TestCase
 
     public function provideIds(): iterable
     {
-        yield [new DomainId(), false];
-        yield [new DomainId(''), false];
-        yield [new DomainId(' '), true];
-        yield [new DomainId('0'), true];
-        yield [new DomainId('foo'), true];
+        yield [new DomainId(), true];
+        yield [new DomainId(''), true];
+        yield [new DomainId(' '), false];
+        yield [new DomainId('0'), false];
+        yield [new DomainId('foo'), false];
     }
 }
 

@@ -28,35 +28,6 @@ trait DomainEntityRepositoryTrait
         $this->numIdFields = count($this->idFields);
     }
 
-    private function isValidEntityId(array $ids): bool
-    {
-        if (count($ids) !== $this->numIdFields) {
-            return false;
-        }
-
-        $metadataFactory = $this->em->getMetadataFactory();
-
-        return count(array_filter($ids, function ($id) use ($metadataFactory): bool {
-            if ($id instanceof DomainIdInterface) {
-                return $id->isKnown();
-            }
-
-            if (is_object($id)) {
-                $class = get_class($id);
-
-                foreach (($metadata = $metadataFactory->getMetadataFor($this->class))->getIdentifierFieldNames() as $idFieldName) {
-                    if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
-                        return true;
-                    }
-                }
-
-                return method_exists($id, '__toString');
-            }
-
-            return is_scalar($id);
-        })) === $this->numIdFields;
-    }
-
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         return $this->createResultSet($this->createQueryBuilder()->getQuery(), $offset, $limit);
@@ -176,7 +147,7 @@ trait DomainEntityRepositoryTrait
         $metadataFactory = $this->em->getMetadataFactory();
 
         foreach ($fields as $field => $value) {
-            if ($value instanceof DomainIdInterface && !$value->isKnown()) {
+            if ($value instanceof DomainIdInterface && $value->isEmpty()) {
                 $value = null;
             }
 
@@ -189,7 +160,7 @@ trait DomainEntityRepositoryTrait
             } elseif (is_array($haystack = $value)) {
                 // @todo test
                 foreach ($haystack as &$value) {
-                    $value = $value instanceof DomainIdInterface ? ($value->isKnown() ? $value->toString() : null) : $value;
+                    $value = $value instanceof DomainIdInterface ? ($value->isEmpty() ? null : $value->toString()) : $value;
                 }
                 unset($value);
                 $where->add($expr->in($this->alias.'.'.$field, ':'.($param = uniqid($field))));
@@ -204,5 +175,34 @@ trait DomainEntityRepositoryTrait
         }
 
         $qb->andWhere($where);
+    }
+
+    private function isValidEntityId(array $ids): bool
+    {
+        if (count($ids) !== $this->numIdFields) {
+            return false;
+        }
+
+        $metadataFactory = $this->em->getMetadataFactory();
+
+        return count(array_filter($ids, function ($id) use ($metadataFactory): bool {
+            if ($id instanceof DomainIdInterface) {
+                return !$id->isEmpty();
+            }
+
+            if (is_object($id)) {
+                $class = get_class($id);
+
+                foreach (($metadata = $metadataFactory->getMetadataFor($this->class))->getIdentifierFieldNames() as $idFieldName) {
+                    if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
+                        return true;
+                    }
+                }
+
+                return method_exists($id, '__toString');
+            }
+
+            return is_scalar($id);
+        })) === $this->numIdFields;
     }
 }

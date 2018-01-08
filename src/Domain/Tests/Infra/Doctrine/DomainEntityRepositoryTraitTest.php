@@ -130,6 +130,29 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doExistsByFields([]);
     }
 
+    public function testFindByFieldsWithPrimaryId(): void
+    {
+        $repository = self::createRepository(Entities\TestDerivedEntity::class);
+        $entity = Entities\TestEntity::create([
+            'id' => new DomainId(),
+            'intField' => -1,
+            'boolField' => true,
+        ]);
+        $entity2 = Entities\TestEntity::create([
+            'id' => new DomainId(),
+            'intField' => -1,
+            'boolField' => true,
+        ]);
+
+        $this->assertTrue($entity->id->isEmpty());
+
+        self::flushEntities([$entity, $entity2, $derivingEntity = Entities\TestDerivedEntity::create(['entity' => $entity])]);
+
+        $this->assertFalse($entity->id->isEmpty());
+
+        $this->assertEquals($derivingEntity, $repository->doFindByFields(['entity' => $entity->id]));
+    }
+
     /**
      * @dataProvider provideEntities
      */
@@ -167,7 +190,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $repository->doExistsByFields([]);
     }
 
-    public function testExistsByFieldsWithUnknownDomainId(): void
+    public function testExistsByFieldsWithEmptyDomainId(): void
     {
         $repository = self::createRepository(Entities\TestDerivedEntity::class);
         $entity = Entities\TestEntity::create([
@@ -344,16 +367,16 @@ class DomainIdType extends IntegerType
         }
 
         if ($value instanceof DomainIdInterface) {
-            return $value->isKnown() ? (int) $value->toString() : null;
+            return $value->isEmpty() ? null : (int) $value->toString();
         }
 
         throw ConversionException::conversionFailed($value, $this->getName());
     }
 
-    final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
+    final public function convertToPHPValue($value, AbstractPlatform $platform): DomainIdInterface
     {
         if (null === $value) {
-            return null;
+            return new DomainId();
         }
 
         if (is_scalar($value)) {

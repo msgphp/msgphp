@@ -25,10 +25,10 @@ final class DomainIdTest extends TestCase
         new DomainId('foo');
     }
 
-    public function testIsKnown(): void
+    public function testIsEmpty(): void
     {
-        $this->assertTrue((new DomainId())->isKnown());
-        $this->assertTrue((new DomainId(self::NIL_UUID))->isKnown());
+        $this->assertFalse((new DomainId())->isEmpty());
+        $this->assertFalse((new DomainId(self::NIL_UUID))->isEmpty());
     }
 
     public function testEquals(): void
