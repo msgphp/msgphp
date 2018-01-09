@@ -13,27 +13,27 @@ class DomainId implements DomainIdInterface
 
     final public function __construct(string $id = null)
     {
-        $this->id = $id ?? '';
+        $this->id = $id;
     }
 
     final public function isEmpty(): bool
     {
-        return '' === $this->id;
+        return null === $this->id;
     }
 
     final public function equals(DomainIdInterface $id): bool
     {
-        return '' !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false;
+        return null !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false;
     }
 
     final public function toString(): string
     {
-        return $this->id;
+        return $this->id ?? '';
     }
 
     final public function __toString(): string
     {
-        return $this->id;
+        return $this->id ?? '';
     }
 
     final public function serialize(): string
@@ -48,6 +48,6 @@ class DomainId implements DomainIdInterface
 
     final public function jsonSerialize(): ?string
     {
-        return '' === $this->id ? null : $this->id;
+        return $this->id;
     }
 }

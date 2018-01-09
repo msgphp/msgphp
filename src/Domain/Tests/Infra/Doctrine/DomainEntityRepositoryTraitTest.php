@@ -124,6 +124,10 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertSame([$entity3], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('3')], 0, 10)));
         $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('2')], 10, 10)));
         $this->assertSame([$entity1], iterator_to_array($repository->doFindAllByFields(['id' => new DomainId('1')], 0, 2)));
+
+        $this->expectException(\LogicException::class);
+
+        $repository->doFindAllByFields([]);
     }
 
     /**
@@ -143,7 +147,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
         $this->loadEntities($entity);
 
-        $this->assertSame($entity, $repository->doFind(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+        $this->assertEquals($entity, $repository->doFind(...Entities\BaseTestEntity::getPrimaryIds($entity)));
     }
 
     /**
@@ -164,7 +168,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $entity = $class::create($fields);
         $this->loadEntities($entity);
 
-        $this->assertSame($entity, $repository->doFindByFields($fields));
+        $this->assertEquals($entity, $repository->doFindByFields($fields));
     }
 
     public function testFindByFieldsWithNoFields(): void
@@ -180,23 +184,24 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = self::createRepository(Entities\TestDerivedEntity::class);
         $entity = Entities\TestEntity::create([
-            'id' => new DomainId(),
             'intField' => -1,
             'boolField' => true,
         ]);
         $entity2 = Entities\TestEntity::create([
-            'id' => new DomainId(),
             'intField' => -1,
             'boolField' => true,
         ]);
 
-        $this->assertTrue($entity->id->isEmpty());
+        // https://github.com/doctrine/doctrine2/issues/4584
+        $entity->identify(new DomainId('IRRELEVANT'));
 
-        self::flushEntities([$entity, $entity2, $derivingEntity = Entities\TestDerivedEntity::create(['entity' => $entity])]);
+        $this->assertTrue($entity2->getId()->isEmpty());
 
-        $this->assertFalse($entity->id->isEmpty());
+        self::flushEntities([$derivingEntity = Entities\TestDerivedEntity::create(['entity' => $entity]), $entity2]);
 
-        $this->assertEquals($derivingEntity, $repository->doFindByFields(['entity' => $entity->id]));
+        $this->assertNotSame('IRRELEVANT', $entity->getId()->toString());
+
+        $this->assertEquals($derivingEntity, $repository->doFindByFields(['entity' => $entity->getId()]));
     }
 
     /**
@@ -240,7 +245,6 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = self::createRepository(Entities\TestDerivedEntity::class);
         $entity = Entities\TestEntity::create([
-            'id' => new DomainId(),
             'intField' => -1,
             'boolField' => true,
         ]);
@@ -273,8 +277,8 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
         $repository->doSave($entity);
 
-        $this->assertInstanceOf(DomainIdInterface::class, $entity->id);
-        $this->assertFalse($entity->id->isEmpty());
+        $this->assertInstanceOf(DomainIdInterface::class, $entity->getId());
+        $this->assertFalse($entity->getId()->isEmpty());
         $this->assertNull($entity->strField);
         $this->assertSame(1, $entity->intField);
         $this->assertSame(-1.23, $entity->floatField);
@@ -288,7 +292,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
         self::$em->clear();
 
-        $this->assertNotSame($entity, $entity = $repository->doFind($entity->id->toString()));
+        $this->assertNotSame($entity, $entity = $repository->doFind($entity->getId()->toString()));
         $this->assertInstanceOf(Entities\TestEntity::class, $entity);
         $this->assertSame('foo', $entity->strField);
         $this->assertSame(1, $entity->intField);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\{DomainId, DomainIdInterface};
 
 /**
  * @Doctrine\ORM\Mapping\Entity()
@@ -12,12 +12,12 @@ use MsgPhp\Domain\DomainIdInterface;
 class TestEntity extends BaseTestEntity
 {
     /**
-     * @var DomainIdInterface
+     * @var DomainIdInterface|null
      * @Doctrine\ORM\Mapping\Id()
      * @Doctrine\ORM\Mapping\GeneratedValue()
      * @Doctrine\ORM\Mapping\Column(type="domain_id")
      */
-    public $id;
+    private $id;
 
     /**
      * @var string|null
@@ -56,5 +56,15 @@ class TestEntity extends BaseTestEntity
             'floatField' => [null, .0, -1.23],
             'boolField' => [true, false],
         ];
+    }
+
+    final public function identify(DomainIdInterface $id): void
+    {
+        $this->id = $id;
+    }
+
+    final public function getId(): DomainIdInterface
+    {
+        return $this->id ?? new DomainId();
     }
 }

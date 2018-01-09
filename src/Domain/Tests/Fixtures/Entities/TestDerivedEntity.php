@@ -14,7 +14,7 @@ class TestDerivedEntity extends BaseTestEntity
     /**
      * @var TestEntity
      * @Doctrine\ORM\Mapping\Id()
-     * @Doctrine\ORM\Mapping\OneToOne(targetEntity="TestEntity", cascade={"persist"})
+     * @Doctrine\ORM\Mapping\OneToOne(targetEntity="TestEntity", cascade={"all"})
      */
     public $entity;
 
@@ -25,8 +25,16 @@ class TestDerivedEntity extends BaseTestEntity
 
     public static function getFieldValues(): array
     {
+        static $entity;
+        if (null === $entity) {
+            $entity = TestEntity::create(['intField' => 0, 'boolField' => true]);
+
+            // https://github.com/doctrine/doctrine2/issues/4584
+            $entity->identify(new DomainId('IRRELEVANT'));
+        }
+
         return [
-            'entity' => [TestEntity::create(['id' => new DomainId('1'), 'intField' => 0, 'boolField' => true])],
+            'entity' => [$entity],
         ];
     }
 }

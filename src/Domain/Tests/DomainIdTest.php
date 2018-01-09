@@ -24,7 +24,8 @@ final class DomainIdTest extends TestCase
     public function testEquals(): void
     {
         $this->assertTrue(($id = new DomainId('foo'))->equals($id));
-        $this->assertTrue((new DomainId('foo'))->equals(new DomainId('foo')));
+        $this->assertTrue((new DomainId(''))->equals(new DomainId('')));
+        $this->assertTrue((new DomainId(' '))->equals(new DomainId(' ')));
         $this->assertFalse((new DomainId())->equals(new DomainId()));
         $this->assertFalse((new DomainId())->equals(new OtherDomainId()));
         $this->assertFalse((new DomainId('foo'))->equals(new DomainId()));
@@ -37,8 +38,9 @@ final class DomainIdTest extends TestCase
     public function testToString(): void
     {
         $this->assertSame('', (new DomainId())->toString());
+        $this->assertSame('', (string) new DomainId(null));
         $this->assertSame('', (string) new DomainId(''));
-        $this->assertSame('foo', (new DomainId('foo'))->toString());
+        $this->assertSame(' ', (new DomainId(' '))->toString());
         $this->assertSame('foo', (string) new DomainId('foo'));
     }
 
@@ -66,7 +68,8 @@ final class DomainIdTest extends TestCase
     public function provideIds(): iterable
     {
         yield [new DomainId(), true];
-        yield [new DomainId(''), true];
+        yield [new DomainId(null), true];
+        yield [new DomainId(''), false];
         yield [new DomainId(' '), false];
         yield [new DomainId('0'), false];
         yield [new DomainId('foo'), false];

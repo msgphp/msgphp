@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Doctrine;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
@@ -17,6 +18,8 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
+    private static $metadata;
+
     private $em;
     private $class;
     private $numIdFields;
@@ -25,7 +28,7 @@ trait DomainEntityRepositoryTrait
     {
         $this->em = $em;
         $this->class = $class;
-        $this->numIdFields = count($this->idFields);
+        $this->numIdFields = count($this->idFields); // @todo test if $idFields equals $em->getMetadataFactory()->getMetadataFor($class)->getIdentifierFieldNames()
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -35,6 +38,10 @@ trait DomainEntityRepositoryTrait
 
     private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
+        if (!$fields) {
+            throw new \LogicException('No fields provided.');
+        }
+
         $this->addFieldCriteria($qb = $this->createQueryBuilder(), $fields);
 
         return $this->createResultSet($qb->getQuery(), $offset, $limit);
@@ -145,14 +152,10 @@ trait DomainEntityRepositoryTrait
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
         $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
-        $metadataFactory = $this->em->getMetadataFactory();
 
         foreach ($fields as $field => $value) {
-            if ($value instanceof DomainIdInterface && $value->isEmpty()) {
-                $value = null;
-            }
-
             $fieldAlias = $alias.'.'.$field;
+            $value = $this->normalizeEntityId($value);
 
             if (null === $value) {
                 $where->add($expr->isNull($fieldAlias));
@@ -162,10 +165,8 @@ trait DomainEntityRepositoryTrait
                 $where->add($expr->eq($fieldAlias, 'FALSE'));
             } elseif (is_array($value)) {
                 $where->add($expr->in($fieldAlias, ':'.($param = uniqid($field))));
-                $qb->setParameter($param, array_map(function ($value) {
-                    return $value instanceof DomainIdInterface ? ($value->isEmpty() ? null : $value->toString()) : $value;
-                }, $value));
-            } elseif ($metadataFactory->getMetadataFor($this->class)->hasAssociation($field)) {
+                $qb->setParameter($param, $value);
+            } elseif ($this->getMetadata()->hasAssociation($field)) {
                 $where->add($expr->eq('IDENTITY('.$fieldAlias.')', ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
             } else {
@@ -183,33 +184,47 @@ trait DomainEntityRepositoryTrait
             return false;
         }
 
-        $metadata = $this->em->getMetadataFactory()->getMetadataFor($this->class);
-        $idFieldNames = $metadata->getIdentifierFieldNames();
-
         foreach ($ids as $id) {
-            if ($id instanceof DomainIdInterface) {
-                if ($id->isEmpty()) {
-                    return false;
-                }
-
-                continue;
-            }
-
-            if (is_object($id)) {
-                $class = get_class($id);
-
-                foreach ($idFieldNames as $idFieldName) {
-                    if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
-                        continue 2;
-                    }
-                }
-
-                if (!method_exists($id, '__toString')) {
-                    return false;
-                }
+            if (null === $this->normalizeEntityId($id)) {
+                return false;
             }
         }
 
         return true;
+    }
+
+    private function normalizeEntityId($id)
+    {
+        if ($id instanceof DomainIdInterface) {
+            return $id->isEmpty() ? null : $id;
+        }
+
+        if (is_object($id)) {
+            $class = get_class($id);
+            $metadata = $this->getMetadata();
+
+            foreach ($metadata->getIdentifierFieldNames() as $idFieldName) {
+                if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
+                    return $this->getMetadata($class)->getIdentifierValues($id) ? $id : null;
+                }
+            }
+        }
+
+        if (is_array($id)) {
+            return array_map(function ($id) {
+                return $this->normalizeEntityId($id);
+            }, $id);
+        }
+
+        return $id;
+    }
+
+    private function getMetadata(string $class = null): ClassMetadata
+    {
+        if (isset(self::$metadata[$hash = spl_object_hash($this->em)."\0".($class = $class ?? $this->class)])) {
+            return self::$metadata[$hash];
+        }
+
+        return self::$metadata[$hash] = $this->em->getClassMetadata($class);
     }
 }
