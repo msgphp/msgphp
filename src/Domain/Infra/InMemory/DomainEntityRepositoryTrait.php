@@ -53,6 +53,9 @@ trait DomainEntityRepositoryTrait
         return $this->createResultSet($entities);
     }
 
+    /**
+     * @return object
+     */
     private function doFind($id, ...$idN)
     {
         $identity = $this->toIdentity(...$ids = func_get_args());
@@ -64,6 +67,9 @@ trait DomainEntityRepositoryTrait
         return $this->doFindByFields($identity);
     }
 
+    /**
+     * @return object
+     */
     private function doFindByFields(array $fields)
     {
         if ($entity = $this->doFindAllByFields($fields)->first()) {
@@ -108,8 +114,6 @@ trait DomainEntityRepositoryTrait
             return;
         }
 
-        // @todo generate in memory ids from sequence
-
         if ($this->doExists(...$ids = array_values($this->identityMap->getIdentity($entity)))) {
             throw DuplicateEntityException::createForId(get_class($entity), ...$ids);
         }
@@ -144,8 +148,8 @@ trait DomainEntityRepositoryTrait
     private function matchesFields($entity, array $fields): bool
     {
         foreach ($fields as $field => $value) {
-            $value = $this->normalizeIdentifier($value);
-            $knownValue = $this->normalizeIdentifier($this->accessor->getValue($entity, $field));
+            $value = $this->normalizeIdentifier($value, true);
+            $knownValue = $this->normalizeIdentifier($this->accessor->getValue($entity, $field), true);
             if ($knownValue instanceof DomainIdInterface) {
                 $knownValue = $knownValue->isEmpty() ? null : $knownValue->toString();
             }
@@ -153,9 +157,11 @@ trait DomainEntityRepositoryTrait
                 $value = $value->isEmpty() ? null : $value->toString();
             }
 
-            // @todo match entity value against domain id/primitive value and vice versa
+            if (is_array($value)) {
+                if (!in_array($knownValue, $value)) {
+                    return false;
+                }
 
-            if ($value === $knownValue) {
                 continue;
             }
 
@@ -163,7 +169,7 @@ trait DomainEntityRepositoryTrait
                 return false;
             }
 
-            if ((string) $value === (string) $knownValue) {
+            if ($value == $knownValue) {
                 continue;
             }
 

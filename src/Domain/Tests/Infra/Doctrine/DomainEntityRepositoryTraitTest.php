@@ -15,12 +15,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
 use MsgPhp\Domain\{DomainId, DomainIdInterface};
-use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\Domain\Tests\Fixtures\Entities;
-use PHPUnit\Framework\TestCase;
+use MsgPhp\Domain\Tests\AbstractDomainEntityRepositoryTraitTest;
+use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
 
-final class DomainEntityRepositoryTraitTest extends TestCase
+final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityRepositoryTraitTest
 {
     /** @var EntityManager */
     private static $em;
@@ -68,309 +67,37 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         self::$em->clear();
     }
 
-    public function testFindAll(): void
+    protected function equalsEntity($expected, $actual)
     {
-        $repository = self::createRepository(Entities\TestPrimitiveEntity::class);
-        $entities = [
-            $entity1 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('1')]),
-            $entity2 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('2')]),
-            $entity3 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('3')]),
-        ];
-
-        $this->assertSame([], iterator_to_array($repository->doFindAll()));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(1, 0)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(0, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(10, 10)));
-
-        self::flushEntities($entities);
-
-        $this->assertSame($entities, iterator_to_array($repository->doFindAll()));
-        $this->assertSame([$entity2, $entity3], iterator_to_array($repository->doFindAll(1)));
-        $this->assertSame([$entity2], iterator_to_array($repository->doFindAll(1, 1)));
-        $this->assertSame([$entity2,  $entity3], iterator_to_array($repository->doFindAll(1, 0)));
-        $this->assertSame($entities, iterator_to_array($repository->doFindAll(0, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAll(10, 10)));
-        $this->assertSame([$entity1, $entity2], iterator_to_array($repository->doFindAll(0, 2)));
-    }
-
-    public function testFindAllByFields(): void
-    {
-        $repository = self::createRepository(Entities\TestCompositeEntity::class);
-        $entities = [
-            $entity1 = Entities\TestCompositeEntity::create(['idA' => new DomainId('1'), 'idB' => 'foo']),
-            $entity2 = Entities\TestCompositeEntity::create(['idA' => new DomainId('2'), 'idB' => 'foo']),
-            $entity3 = Entities\TestCompositeEntity::create(['idA' => new DomainId('3'), 'idB' => 'bar']),
-        ];
-
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => 1])));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => '2'])));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => new DomainId()], 1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => [null, 'foo', new DomainId('2'), new DomainId('3')]], 1, 1)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => [new DomainId('1'), new DomainId('3')]], 0, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idB' => 'foo'], 0, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idB' => 'bar'], 10, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idB' => 'foo'], 0, 2)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idB' => 'foo'])));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo'])));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo'], 1)));
-
-        self::flushEntities($entities);
-
-        $this->assertSame([$entity1], iterator_to_array($repository->doFindAllByFields(['idA' => 1])));
-        $this->assertSame([$entity2], iterator_to_array($repository->doFindAllByFields(['idA' => '2'])));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => new DomainId()], 1)));
-        $this->assertSame([$entity3], iterator_to_array($repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('3')]], 1, 1)));
-        $this->assertSame([$entity2], iterator_to_array($repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0)));
-        $this->assertSame([$entity1, $entity3], iterator_to_array($repository->doFindAllByFields(['idA' => [new DomainId('1'), new DomainId('3')]], 0, 10)));
-        $this->assertSame([$entity3], iterator_to_array($repository->doFindAllByFields(['idA' => new DomainId('3')], 0, 10)));
-        $this->assertSame([], iterator_to_array($repository->doFindAllByFields(['idA' => new DomainId('2')], 10, 10)));
-        $this->assertSame([$entity1], iterator_to_array($repository->doFindAllByFields(['idA' => new DomainId('1')], 0, 2)));
-        $this->assertSame([$entity1, $entity2], iterator_to_array($repository->doFindAllByFields(['idB' => 'foo'])));
-        $this->assertSame([$entity1, $entity2], iterator_to_array($repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo'])));
-        $this->assertSame([$entity2], iterator_to_array($repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo'], 1)));
-
-        $this->expectException(\LogicException::class);
-
-        $repository->doFindAllByFields([]);
-    }
-
-    /**
-     * @dataProvider provideEntities
-     */
-    public function testFind(string $class, Entities\BaseTestEntity $entity, array $ids): void
-    {
-        $repository = self::createRepository($class);
-
-        try {
-            $repository->doFind(...$ids);
-
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->addToAssertionCount(1);
-        }
-
-        $this->loadEntities($entity);
-
-        $this->assertEquals($entity, $repository->doFind(...Entities\BaseTestEntity::getPrimaryIds($entity)));
-    }
-
-    /**
-     * @dataProvider provideEntityFields
-     */
-    public function testFindByFields(string $class, array $fields): void
-    {
-        $repository = self::createRepository($class);
-
-        try {
-            $repository->doFindByFields($fields);
-
-            $this->fail();
-        } catch (EntityNotFoundException $e) {
-            $this->addToAssertionCount(1);
-        }
-
-        $entity = $class::create($fields);
-        $this->loadEntities($entity);
-
-        $this->assertEquals($entity, $repository->doFindByFields($fields));
-    }
-
-    public function testFindByFieldsWithNoFields(): void
-    {
-        $repository = self::createRepository(Entities\TestEntity::class);
-
-        $this->expectException(\LogicException::class);
-
-        $repository->doExistsByFields([]);
-    }
-
-    public function testFindByFieldsWithPrimaryId(): void
-    {
-        $repository = self::createRepository(Entities\TestDerivedEntity::class);
-        $entity = Entities\TestEntity::create([
-            'intField' => -1,
-            'boolField' => true,
-        ]);
-        $entity2 = Entities\TestEntity::create([
-            'intField' => -1,
-            'boolField' => true,
-        ]);
-
-        // https://github.com/doctrine/doctrine2/issues/4584
-        $entity->identify(new DomainId('IRRELEVANT'));
-
-        $this->assertTrue($entity2->getId()->isEmpty());
-
-        self::flushEntities([$derivingEntity = Entities\TestDerivedEntity::create(['entity' => $entity]), $entity2]);
-
-        $this->assertNotSame('IRRELEVANT', $entity->getId()->toString());
-
-        $this->assertEquals($derivingEntity, $repository->doFindByFields(['entity' => $entity->getId()]));
-    }
-
-    /**
-     * @dataProvider provideEntities
-     */
-    public function testExists(string $class, Entities\BaseTestEntity $entity, array $ids): void
-    {
-        $repository = self::createRepository($class);
-
-        $this->assertFalse($repository->doExists(...$ids));
-
-        $this->loadEntities($entity);
-
-        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
-    }
-
-    /**
-     * @dataProvider provideEntityFields
-     */
-    public function testExistsByFields(string $class, array $fields): void
-    {
-        $repository = self::createRepository($class);
-
-        $this->assertFalse($repository->doExistsByFields($fields));
-
-        $this->loadEntities($entity = $class::create($fields));
-
-        $this->assertTrue($repository->doExistsByFields($fields));
-    }
-
-    public function testExistsByFieldsWithNoFields(): void
-    {
-        $repository = self::createRepository(Entities\TestEntity::class);
-
-        $this->expectException(\LogicException::class);
-
-        $repository->doExistsByFields([]);
-    }
-
-    public function testExistsByFieldsWithEmptyDomainId(): void
-    {
-        $repository = self::createRepository(Entities\TestDerivedEntity::class);
-        $entity = Entities\TestEntity::create([
-            'intField' => -1,
-            'boolField' => true,
-        ]);
-
-        $this->assertFalse($repository->doExistsByFields(['entity' => $entity]));
-    }
-
-    /**
-     * @dataProvider provideEntities
-     */
-    public function testSave(string $class, Entities\BaseTestEntity $entity, array $ids): void
-    {
-        $repository = self::createRepository($class);
-
-        $this->assertFalse($repository->doExists(...$ids));
-
-        $repository->doSave($entity);
-
-        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
-    }
-
-    public function testSaveUpdates(): void
-    {
-        $repository = self::createRepository(Entities\TestEntity::class);
-        $entity = Entities\TestEntity::create([
-            'intField' => 1,
-            'floatField' => -1.23,
-            'boolField' => false,
-        ]);
-
-        $repository->doSave($entity);
-
-        $this->assertInstanceOf(DomainIdInterface::class, $entity->getId());
-        $this->assertFalse($entity->getId()->isEmpty());
-        $this->assertNull($entity->strField);
-        $this->assertSame(1, $entity->intField);
-        $this->assertSame(-1.23, $entity->floatField);
-        $this->assertFalse($entity->boolField);
-
-        $entity->strField = 'foo';
-        $entity->floatField = null;
-        $entity->boolField = true;
-
-        $repository->doSave($entity);
-
-        self::$em->clear();
-
-        $this->assertNotSame($entity, $entity = $repository->doFind($entity->getId()->toString()));
-        $this->assertInstanceOf(Entities\TestEntity::class, $entity);
-        $this->assertSame('foo', $entity->strField);
-        $this->assertSame(1, $entity->intField);
-        $this->assertNull($entity->floatField);
-        $this->assertTrue($entity->boolField);
-    }
-
-    public function testSaveThrowsOnDuplicate(): void
-    {
-        $repository = self::createRepository(Entities\TestPrimitiveEntity::class);
-
-        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
-
-        $this->expectException(DuplicateEntityException::class);
-
-        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
-    }
-
-    /**
-     * @dataProvider provideEntities
-     */
-    public function testDelete(string $class, Entities\BaseTestEntity $entity): void
-    {
-        $repository = self::createRepository($class);
-
-        self::flushEntities([$entity]);
-
-        $this->assertTrue($repository->doExists(...$ids = Entities\BaseTestEntity::getPrimaryIds($entity)));
-
-        $repository->doDelete($entity);
-
-        $this->assertFalse($repository->doExists(...$ids));
-    }
-
-    public function provideEntityTypes(): iterable
-    {
-        yield [Entities\TestEntity::class];
-        yield [Entities\TestPrimitiveEntity::class];
-        yield [Entities\TestCompositeEntity::class];
-        yield [Entities\TestDerivedEntity::class];
-        yield [Entities\TestDerivedCompositeEntity::class];
-    }
-
-    public function provideEntities(): iterable
-    {
-        foreach ($this->provideEntityTypes() as $class) {
-            $class = $class[0];
-            foreach ($class::createEntities() as $entity) {
-                $ids = Entities\BaseTestEntity::getPrimaryIds($entity, $primitiveIds);
-
-                yield [$class, $entity,  $ids, $primitiveIds];
+        $equals = true;
+        foreach (($r = (new \ReflectionObject($expected)))->getProperties() as $property) {
+            $property->setAccessible(true);
+            $expectedValue = $property->getValue($expected);
+            $actualValue = $property->getValue($actual);
+
+            if (is_object($expectedValue) && is_object($actualValue)) {
+                if (!$this->equalsEntity($expectedValue, $actualValue)) {
+                    $equals = false;
+                    break;
+                }
+
+                continue;
+            }
+
+            if ($expectedValue !== $actualValue) {
+                $equals = false;
+                break;
             }
         }
+
+        return $equals;
     }
 
-    public function provideEntityFields(): iterable
-    {
-        foreach ($this->provideEntityTypes() as $class) {
-            $class = $class[0];
-
-            foreach ($class::getFields() as $fields) {
-                yield [$class, $fields];
-            }
-        }
-    }
-
-    private static function createRepository(string $class)
+    protected static function createRepository(string $class): DomainEntityRepositoryTraitInterface
     {
         $em = self::$em;
 
-        return new class($class, $em) {
+        return new class($class, $em) implements DomainEntityRepositoryTraitInterface {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
                 doFindAllByFields as public;
@@ -386,30 +113,13 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         };
     }
 
-    private static function flushEntities(iterable $entities): void
+    protected static function flushEntities(iterable $entities): void
     {
         foreach ($entities as $entity) {
             self::$em->persist($entity);
         }
 
         self::$em->flush();
-    }
-
-    private function loadEntities(Entities\BaseTestEntity ...$context): void
-    {
-        $entities = [];
-        foreach (func_get_args() as $entity) {
-            Entities\BaseTestEntity::getPrimaryIds($entity, $primitiveIds);
-            $entities[serialize($primitiveIds)] = $entity;
-        }
-
-        foreach ($this->provideEntities() as $entity) {
-            if (!isset($entities[$primitiveIds = serialize($entity[3])])) {
-                $entities[$primitiveIds] = $entity[1];
-            }
-        }
-
-        self::flushEntities($entities);
     }
 }
 

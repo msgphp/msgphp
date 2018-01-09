@@ -36,6 +36,7 @@ composer require --prefer-dist --no-suggest ${COMPONENTS}
 
 if [[ ! -z $BUNDLES ]] ; then
     echo -e "\e[34mInstalling bundles...\e[0m"
+    composer config extra.symfony.allow-contrib true
     composer require --prefer-dist --no-suggest ${BUNDLES}
     [[ $? -ne 0 ]] && exit 1
 fi

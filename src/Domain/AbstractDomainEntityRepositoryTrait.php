@@ -20,7 +20,7 @@ trait AbstractDomainEntityRepositoryTrait
         $this->identityMap = $identityMap;
     }
 
-    private function normalizeIdentifier($id)
+    private function normalizeIdentifier($id, bool $normalizeObjectIdentifier = false)
     {
         if ($id instanceof DomainIdInterface) {
             return $id->isEmpty() ? null : $id;
@@ -28,7 +28,19 @@ trait AbstractDomainEntityRepositoryTrait
 
         if (is_object($id)) {
             try {
-                return $this->identityMap->getIdentity($id) ? $id : null;
+                if (!$identity = $this->identityMap->getIdentity($id)) {
+                    return null;
+                }
+
+                if (!$normalizeObjectIdentifier) {
+                    return $id;
+                }
+
+                $id = array_map(function ($id) {
+                    return $this->normalizeIdentifier($id, true);
+                }, $identity);
+
+                return 1 === count($id) ? reset($id) : $id;
             } catch (InvalidEntityClassException $e) {
                 return $id;
             }

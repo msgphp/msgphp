@@ -44,6 +44,9 @@ trait DomainEntityRepositoryTrait
         return $this->createResultSet($qb->getQuery(), $offset, $limit);
     }
 
+    /**
+     * @return object
+     */
     private function doFind($id, ...$idN)
     {
         $identity = $this->toIdentity(...$ids = func_get_args());
@@ -55,6 +58,9 @@ trait DomainEntityRepositoryTrait
         return $this->doFindByFields($identity);
     }
 
+    /**
+     * @return object
+     */
     private function doFindByFields(array $fields)
     {
         if (!$fields) {
