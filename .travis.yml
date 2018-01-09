@@ -39,6 +39,7 @@ fast_finish: true
 
 before_script:
   - if [[ $CC != true ]] ; then phpenv config-rm xdebug.ini || true ; fi
+  - if [[ $CS = true ]] ; then mkdir -p var/cache ; fi
   - travis_retry composer self-update
 
 before_install:
@@ -64,3 +65,4 @@ after_success:
 cache:
   directories:
     - $HOME/.composer/cache/files/
+    - var/

@@ -1,6 +1,7 @@
 /.env
 /.subtree-split
 /.test-project
+/var
 .php_cs.cache
 composer.lock
 composer.phar

@@ -3,6 +3,7 @@
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
+$cacheDir = __DIR__ . '/var/cache';
 $rules = [
     '@PSR2' => true,
     '@Symfony' => true,
@@ -15,9 +16,14 @@ $rules = [
     'single_import_per_statement' => false,
 ];
 
+if (!is_dir($cacheDir)) {
+    mkdir($cacheDir, 0770, true);
+}
+
 return Config::create()
-    ->setRules($rules)
-    ->setFinder(Finder::create()->in(__DIR__))
     ->setUsingCache(true)
+    ->setCacheFile($cacheDir . '/php_cs.cache')
+    ->setRules($rules)
     ->setRiskyAllowed(true)
+    ->setFinder(Finder::create()->in(__DIR__))
 ;
