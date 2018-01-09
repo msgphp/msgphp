@@ -183,26 +183,33 @@ trait DomainEntityRepositoryTrait
             return false;
         }
 
-        $metadataFactory = $this->em->getMetadataFactory();
+        $metadata = $this->em->getMetadataFactory()->getMetadataFor($this->class);
+        $idFieldNames = $metadata->getIdentifierFieldNames();
 
-        return count(array_filter($ids, function ($id) use ($metadataFactory): bool {
+        foreach ($ids as $id) {
             if ($id instanceof DomainIdInterface) {
-                return !$id->isEmpty();
+                if ($id->isEmpty()) {
+                    return false;
+                }
+
+                continue;
             }
 
             if (is_object($id)) {
                 $class = get_class($id);
 
-                foreach (($metadata = $metadataFactory->getMetadataFor($this->class))->getIdentifierFieldNames() as $idFieldName) {
+                foreach ($idFieldNames as $idFieldName) {
                     if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
-                        return true;
+                        continue 2;
                     }
                 }
 
-                return method_exists($id, '__toString');
+                if (!method_exists($id, '__toString')) {
+                    return false;
+                }
             }
+        }
 
-            return is_scalar($id);
-        })) === $this->numIdFields;
+        return true;
     }
 }
