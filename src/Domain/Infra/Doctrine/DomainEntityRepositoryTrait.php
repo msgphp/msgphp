@@ -28,7 +28,7 @@ trait DomainEntityRepositoryTrait
     {
         $this->em = $em;
         $this->class = $class;
-        $this->idFields = $this->em->getClassMetadata($this->class)->getIdentifierFieldNames();
+        $this->idFields = $this->getMetadata()->getIdentifierFieldNames();
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface

@@ -8,6 +8,7 @@ use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\InMemory\DomainEntityRepositoryTrait;
+use MsgPhp\Domain\Infra\InMemory\GlobalObjectMemory;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
@@ -168,13 +169,16 @@ final class DomainEntityRepositoryTraitTest extends TestCase
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
-                clearMemory as public;
+                __construct as private __parentConstruct;
             }
 
             private $idFields = ['id'];
-        };
 
-        $repository->clearMemory();
+            public function __construct(string $class)
+            {
+                $this->__parentConstruct($class, new GlobalObjectMemory());
+            }
+        };
 
         foreach ($entities as $entity) {
             $repository->doSave($entity);
