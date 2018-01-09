@@ -18,7 +18,6 @@ final class UserRepository implements UserRepositoryInterface
     use DomainEntityRepositoryTrait;
 
     private $alias = 'user';
-    private $idFields = ['id'];
 
     /**
      * @return DomainCollectionInterface|User[]

@@ -6,9 +6,7 @@ namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\InMemory\Repository\UserRepository;
-use MsgPhp\User\Infra\Security\SecurityUser;
-use MsgPhp\User\Infra\Security\SecurityUserProvider;
-use MsgPhp\User\Infra\Security\UserRoleProviderInterface;
+use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRoleProviderInterface};
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -20,7 +18,8 @@ final class SecurityUserProviderTest extends TestCase
     public function testLoadUserByUsername(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository([$user], User::class);
+        $repository = new UserRepository(User::class);
+        $repository->save($user);
         $securityUser = $this->createProvider(['ROLE_USER'], $repository)->loadUserByUsername($user->getEmail());
 
         $this->assertInstanceOf(SecurityUser::class, $securityUser);
@@ -33,13 +32,14 @@ final class SecurityUserProviderTest extends TestCase
     {
         $this->expectException(UsernameNotFoundException::class);
 
-        $this->createProvider()->loadUserByUsername('foo@bar.baz');
+        $this->createProvider()->loadUserByUsername('baz@bar.foo');
     }
 
     public function testRefreshUser(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository([$user], User::class);
+        $repository = new UserRepository(User::class);
+        $repository->save($user);
         $securityUser = $this->createProvider([], $repository)->refreshUser($oldSecurityUser = new SecurityUser($user));
 
         $this->assertEquals($oldSecurityUser, $securityUser);
@@ -70,7 +70,7 @@ final class SecurityUserProviderTest extends TestCase
 
     private function createProvider(array $roles = [], UserRepository $repository = null): SecurityUserProvider
     {
-        return new SecurityUserProvider($repository ?? new UserRepository([], User::class), new class($roles) implements UserRoleProviderInterface {
+        return new SecurityUserProvider($repository ?? new UserRepository(User::class), new class($roles) implements UserRoleProviderInterface {
             private $roles;
 
             public function __construct(array $roles)

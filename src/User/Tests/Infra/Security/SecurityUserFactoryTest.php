@@ -6,8 +6,7 @@ namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\InMemory\Repository\UserRepository;
-use MsgPhp\User\Infra\Security\SecurityUser;
-use MsgPhp\User\Infra\Security\SecurityUserFactory;
+use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserFactory};
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -63,7 +62,8 @@ final class SecurityUserFactoryTest extends TestCase
     public function testGetUser(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository([$user], User::class);
+        $repository = new UserRepository(User::class);
+        $repository->save($user);
 
         $this->assertSame($user, $this->createFactory(new SecurityUser($user), ['ROLE_USER'], $repository)->getUser());
     }
@@ -85,6 +85,6 @@ final class SecurityUserFactoryTest extends TestCase
             $storage->setToken(new UsernamePasswordToken($securityUser, '', 'provider_key', $roles));
         }
 
-        return new SecurityUserFactory($storage, $repository ?? new UserRepository([], User::class));
+        return new SecurityUserFactory($storage, $repository ?? new UserRepository(User::class));
     }
 }

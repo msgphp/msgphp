@@ -130,14 +130,19 @@ final class DomainEntityRepositoryTraitTest extends TestCase
             $entityA2 = $this->createEntity('A', ['token' => '2']),
             $entityB1 = $this->createEntity('B', ['token' => '1']),
         ];
-        $repository = new class($entities, \stdClass::class) {
+        $repository = new class(\stdClass::class) {
             use DomainEntityRepositoryTrait {
                 doFind as public;
                 doExists as public;
+                doSave as public;
             }
 
             private $idFields = ['id', 'token'];
         };
+
+        foreach ($entities as $entity) {
+            $repository->doSave($entity);
+        }
 
         $this->assertTrue($repository->doExists($entityA1->id, '1'));
         $this->assertFalse($repository->doExists($entityA1->id, 'other'));
@@ -154,7 +159,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
 
     private function createRepository(array $entities = [])
     {
-        return new class($entities, \stdClass::class) {
+        $repository = new class(\stdClass::class) {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
                 doFind as public;
@@ -163,10 +168,19 @@ final class DomainEntityRepositoryTraitTest extends TestCase
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
+                clearMemory as public;
             }
 
             private $idFields = ['id'];
         };
+
+        $repository->clearMemory();
+
+        foreach ($entities as $entity) {
+            $repository->doSave($entity);
+        }
+
+        return $repository;
     }
 
     private function createEntity(string $id = null, array $fields = []): \stdClass

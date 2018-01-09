@@ -18,7 +18,6 @@ final class UserRoleRepository implements UserRoleRepositoryInterface
     use DomainEntityRepositoryTrait;
 
     private $alias = 'user_role';
-    private $idFields = ['user', 'role'];
 
     /**
      * @return DomainCollectionInterface|UserRole[]

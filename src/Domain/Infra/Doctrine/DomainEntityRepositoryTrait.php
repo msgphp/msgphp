@@ -22,13 +22,13 @@ trait DomainEntityRepositoryTrait
 
     private $em;
     private $class;
-    private $numIdFields;
+    private $idFields;
 
     public function __construct(EntityManagerInterface $em, string $class)
     {
         $this->em = $em;
         $this->class = $class;
-        $this->numIdFields = count($this->idFields); // @todo test if $idFields equals $em->getMetadataFactory()->getMetadataFor($class)->getIdentifierFieldNames()
+        $this->idFields = $this->em->getClassMetadata($this->class)->getIdentifierFieldNames();
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -180,7 +180,7 @@ trait DomainEntityRepositoryTrait
 
     private function isValidEntityId(array $ids): bool
     {
-        if (count($ids) !== $this->numIdFields) {
+        if (count($ids) !== count($this->idFields)) {
             return false;
         }
 
