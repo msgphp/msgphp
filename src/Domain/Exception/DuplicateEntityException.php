@@ -9,8 +9,13 @@ namespace MsgPhp\Domain\Exception;
  */
 final class DuplicateEntityException extends \RuntimeException implements DomainExceptionInterface
 {
-    public static function createForId(string $entity, $id): self
+    public static function createForId(string $entity, $id, ...$idN): self
     {
-        return new self(sprintf('Entity "%s" with primary key %s cannot be duplicated.', $entity, json_encode($id)));
+        if ($idN) {
+            $id = func_get_args();
+            array_shift($id);
+        }
+
+        return new self(sprintf('Entity "%s" with identifier %s cannot be duplicated.', $entity, json_encode($id)));
     }
 }

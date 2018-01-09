@@ -15,6 +15,8 @@ trait DomainEntityRepositoryTrait
     private $class;
     private $memory;
 
+    // @todo in memory id sequence generator
+
     public function __construct(string $class, GlobalObjectMemory $memory = null)
     {
         $this->class = $class;
@@ -28,50 +30,44 @@ trait DomainEntityRepositoryTrait
 
     private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
+        if (!$fields) {
+            throw new \LogicException('No fields provided.');
+        }
+
+        $i = -1;
         $entities = [];
         foreach ($this->memory->all($this->class) as $entity) {
-            // @todo duplicated in doFindByFields
-            foreach ($fields as $field => $value) {
-                $knownValue = $this->getEntityField($entity, $field);
-                if ($knownValue instanceof DomainIdInterface && $value instanceof DomainIdInterface && $knownValue->equals($value)) {
-                    continue;
-                }
+            if (!$this->matchesFields($entity, $fields) || ++$i < $offset) {
+                continue;
+            }
 
-                if ($value !== $knownValue) {
-                    continue 2;
-                }
+            if ($limit && $i >= ($offset + $limit)) {
+                break;
             }
 
             $entities[] = $entity;
         }
 
-        return $this->createResultSet($entities, $offset, $limit);
+        return $this->createResultSet($entities);
     }
 
     private function doFind($id, ...$idN)
     {
-        return $this->doFindByFields(array_combine($this->idFields, func_get_args()));
+        if (!$this->isValidEntityId($ids = func_get_args())) {
+            throw EntityNotFoundException::createForId($this->class, ...$ids);
+        }
+
+        return $this->doFindByFields(array_combine($this->idFields, $ids));
     }
 
     private function doFindByFields(array $fields)
     {
-        foreach ($this->memory->all($this->class) as $entity) {
-            foreach ($fields as $field => $value) {
-                $knownValue = $this->getEntityField($entity, $field);
-                if ($knownValue instanceof DomainIdInterface && $value instanceof DomainIdInterface && $knownValue->equals($value)) {
-                    continue;
-                } elseif ($knownValue instanceof DomainIdInterface) {
-                    //$knownValue = $knownValue->toString();
-                } elseif ($value instanceof DomainIdInterface) {
-                    //$value = $value->toString();
-                }
-
-                if ($value !== $knownValue) {
-                    continue 2;
-                }
-            }
-
+        if ($entity = $this->doFindAllByFields($fields)->first()) {
             return $entity;
+        }
+
+        if (count($fields) === count($this->idFields) && [] === array_diff(array_keys($fields), $this->idFields)) {
+            throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
         }
 
         throw EntityNotFoundException::createForFields($this->class, $fields);
@@ -79,7 +75,11 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id, ...$idN): bool
     {
-        return $this->doExistsByFields(array_combine($this->idFields, func_get_args()));
+        if (!$this->isValidEntityId($ids = func_get_args())) {
+            return false;
+        }
+
+        return $this->doExistsByFields(array_combine($this->idFields, $ids));
     }
 
     private function doExistsByFields(array $fields): bool
@@ -98,8 +98,8 @@ trait DomainEntityRepositoryTrait
      */
     private function doSave($entity): void
     {
-        if (!$this->memory->contains($entity) && $this->doExists(...$id = $this->getEntityId($entity))) {
-            throw DuplicateEntityException::createForId(get_class($entity), $id);
+        if (!$this->memory->contains($entity) && $this->doExists(...$ids = $this->getEntityId($entity))) {
+            throw DuplicateEntityException::createForId(get_class($entity), ...$ids);
         }
 
         $this->memory->persist($entity);
@@ -126,15 +126,36 @@ trait DomainEntityRepositoryTrait
         return new DomainCollection($entities);
     }
 
-    /**
-     * @param object $entity
-     */
-    private function getEntityId($entity): array
+    private function isValidEntityId(array $ids): bool
     {
-        $id = [];
+        if (count($ids) !== count($this->idFields)) {
+            return false;
+        }
 
-        foreach ($this->idFields as $field) {
-            $id[] = $this->getEntityField($entity, $field);
+        foreach ($ids as $id) {
+            if (null === $this->normalizeEntityId($id)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function normalizeEntityId($id)
+    {
+        if ($id instanceof DomainIdInterface) {
+            return $id->isEmpty() ? null : $id;
+        }
+
+        if (is_object($id)) {
+            // @todo currently unsupported
+            return $id;
+        }
+
+        if (is_array($id)) {
+            return array_map(function ($id) {
+                return $this->normalizeEntityId($id);
+            }, $id);
         }
 
         return $id;
@@ -143,7 +164,54 @@ trait DomainEntityRepositoryTrait
     /**
      * @param object $entity
      */
-    private function getEntityField($entity, string $field)
+    private function matchesFields($entity, array $fields): bool
+    {
+        foreach ($fields as $field => $value) {
+            $value = $this->normalizeEntityId($value);
+            $knownValue = $this->normalizeEntityId(self::getEntityField($entity, $field));
+            if ($knownValue instanceof DomainIdInterface) {
+                $knownValue = $knownValue->isEmpty() ? null : $knownValue->toString();
+            }
+            if ($value instanceof DomainIdInterface) {
+                $value = $value->isEmpty() ? null : $value->toString();
+            }
+
+            if ($value === $knownValue) {
+                continue;
+            }
+
+            if (null === $value xor null === $knownValue) {
+                return false;
+            }
+
+            if ((string) $value === (string) $knownValue) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param object $entity
+     */
+    private function getEntityId($entity): array
+    {
+        $id = [];
+
+        foreach ($this->idFields as $field) {
+            $id[] = self::getEntityField($entity, $field);
+        }
+
+        return $id;
+    }
+
+    /**
+     * @param object $entity
+     */
+    private static function getEntityField($entity, string $field)
     {
         if (method_exists($entity, $method = 'get'.ucfirst($field))) {
             return $entity->$method();

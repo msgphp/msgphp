@@ -54,6 +54,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
         $this->assertSame([$foo1, $foo2], iterator_to_array($repository->doFindAll(0, 2)));
 
         try {
+            $foo2->id = 1;
             $this->assertSame($foo2, $repository->doFind($foo2->id));
         } catch (EntityNotFoundException $e) {
             $this->fail($e->getMessage());
@@ -103,6 +104,7 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = $this->createRepository();
         $repository->doSave($entity = $this->createEntity());
+        $entity->id = 1;
 
         $this->assertSame([$entity], iterator_to_array($repository->doFindAll()));
         $this->assertSame($entity, $repository->doFind($entity->id));

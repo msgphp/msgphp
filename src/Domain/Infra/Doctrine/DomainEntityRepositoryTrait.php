@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Doctrine;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
@@ -18,8 +17,6 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
-    private static $metadata;
-
     private $em;
     private $class;
     private $idFields;
@@ -28,7 +25,7 @@ trait DomainEntityRepositoryTrait
     {
         $this->em = $em;
         $this->class = $class;
-        $this->idFields = $this->getMetadata()->getIdentifierFieldNames();
+        $this->idFields = $this->em->getClassMetadata($this->class)->getIdentifierFieldNames();
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -50,7 +47,7 @@ trait DomainEntityRepositoryTrait
     private function doFind($id, ...$idN)
     {
         if (!$this->isValidEntityId($ids = func_get_args())) {
-            throw EntityNotFoundException::createForFields($this->class, $ids);
+            throw EntityNotFoundException::createForId($this->class, ...$ids);
         }
 
         return $this->doFindByFields(array_combine($this->idFields, $ids));
@@ -67,6 +64,10 @@ trait DomainEntityRepositoryTrait
         $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
+            if (count($fields) === count($this->idFields) && array() === array_diff(array_keys($fields), $this->idFields)) {
+                throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
+            }
+
             throw EntityNotFoundException::createForFields($this->class, $fields);
         }
 
@@ -103,12 +104,10 @@ trait DomainEntityRepositoryTrait
     {
         $this->em->persist($entity);
 
-        $entityId = ($uow = $this->em->getUnitOfWork())->isInIdentityMap($entity) ? $uow->getEntityIdentifier($entity) : [];
-
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(get_class($entity), array_values($entityId));
+            throw DuplicateEntityException::createForId(get_class($entity), ...array_values($this->em->getClassMetadata($this->class)->getIdentifierValues($entity)));
         }
     }
 
@@ -152,6 +151,7 @@ trait DomainEntityRepositoryTrait
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
         $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
+        $metadata = $this->em->getClassMetadata($this->class);
 
         foreach ($fields as $field => $value) {
             $fieldAlias = $alias.'.'.$field;
@@ -166,7 +166,7 @@ trait DomainEntityRepositoryTrait
             } elseif (is_array($value)) {
                 $where->add($expr->in($fieldAlias, ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
-            } elseif ($this->getMetadata()->hasAssociation($field)) {
+            } elseif ($metadata->hasAssociation($field)) {
                 $where->add($expr->eq('IDENTITY('.$fieldAlias.')', ':'.($param = uniqid($field))));
                 $qb->setParameter($param, $value);
             } else {
@@ -201,13 +201,15 @@ trait DomainEntityRepositoryTrait
 
         if (is_object($id)) {
             $class = get_class($id);
-            $metadata = $this->getMetadata();
+            $metadata = $this->em->getClassMetadata($this->class);
 
             foreach ($metadata->getIdentifierFieldNames() as $idFieldName) {
                 if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
-                    return $this->getMetadata($class)->getIdentifierValues($id) ? $id : null;
+                    return $this->em->getClassMetadata($class)->getIdentifierValues($id) ? $id : null;
                 }
             }
+
+            return $id;
         }
 
         if (is_array($id)) {
@@ -217,14 +219,5 @@ trait DomainEntityRepositoryTrait
         }
 
         return $id;
-    }
-
-    private function getMetadata(string $class = null): ClassMetadata
-    {
-        if (isset(self::$metadata[$hash = spl_object_hash($this->em)."\0".($class = $class ?? $this->class)])) {
-            return self::$metadata[$hash];
-        }
-
-        return self::$metadata[$hash] = $this->em->getClassMetadata($class);
     }
 }
