@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Entity;
 
 use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\Domain\Exception\UnknownEntityException;
+use MsgPhp\Domain\Exception\InvalidEntityClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -30,7 +30,7 @@ final class ClassMappingEntityFactory implements EntityFactoryInterface
     public function create(string $entity, array $context = [])
     {
         if (!isset($this->mapping[$lcEntity = ltrim(strtolower($entity), '\\')])) {
-            throw new UnknownEntityException($entity);
+            throw InvalidEntityClassException::create($entity);
         }
 
         $class = $this->mapping[$lcEntity];
@@ -41,7 +41,7 @@ final class ClassMappingEntityFactory implements EntityFactoryInterface
     public function identify(string $entity, $id): DomainIdInterface
     {
         if (!isset($this->idMapping[$lcEntity = ltrim(strtolower($entity), '\\')])) {
-            throw new UnknownEntityException($entity);
+            throw InvalidEntityClassException::create($entity);
         }
 
         return $this->create($this->idMapping[$lcEntity], [$id]);
@@ -50,7 +50,7 @@ final class ClassMappingEntityFactory implements EntityFactoryInterface
     public function nextIdentity(string $entity): DomainIdInterface
     {
         if (!isset($this->idMapping[$lcEntity = ltrim(strtolower($entity), '\\')])) {
-            throw new UnknownEntityException($entity);
+            throw InvalidEntityClassException::create($entity);
         }
 
         return $this->create($this->idMapping[$lcEntity]);
@@ -102,7 +102,7 @@ final class ClassMappingEntityFactory implements EntityFactoryInterface
                     $arguments[] = ($this->factory ?? $this)->create($type, (array) $value);
 
                     continue;
-                } catch (UnknownEntityException $e) {
+                } catch (InvalidEntityClassException $e) {
                 }
             }
 

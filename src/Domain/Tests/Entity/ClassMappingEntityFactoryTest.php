@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Tests\Entity;
 
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Entity\ClassMappingEntityFactory;
-use MsgPhp\Domain\Exception\UnknownEntityException;
+use MsgPhp\Domain\Exception\InvalidEntityClassException;
 use PHPUnit\Framework\TestCase;
 
 final class ClassMappingEntityFactoryTest extends TestCase
@@ -33,7 +33,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
     {
         $factory = new ClassMappingEntityFactory(['Foo' => TestEntity::class], []);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->create('Bar');
     }
@@ -64,7 +64,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->identify('Bar', '1');
     }
@@ -84,7 +84,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
     {
         $factory = new ClassMappingEntityFactory(['FooId' => DomainId::class], ['Foo' => 'FooId']);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->nextIdentity('Bar');
     }

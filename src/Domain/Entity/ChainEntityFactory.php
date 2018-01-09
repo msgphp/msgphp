@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Entity;
 
 use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\Domain\Exception\UnknownEntityException;
+use MsgPhp\Domain\Exception\InvalidEntityClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -29,11 +29,11 @@ final class ChainEntityFactory implements EntityFactoryInterface
         foreach ($this->factories as $factory) {
             try {
                 return $factory->create($entity, $context);
-            } catch (UnknownEntityException $e) {
+            } catch (InvalidEntityClassException $e) {
             }
         }
 
-        throw UnknownEntityException::create($entity);
+        throw InvalidEntityClassException::create($entity);
     }
 
     public function identify(string $entity, $id): DomainIdInterface
@@ -41,11 +41,11 @@ final class ChainEntityFactory implements EntityFactoryInterface
         foreach ($this->factories as $factory) {
             try {
                 return $factory->identify($entity, $id);
-            } catch (UnknownEntityException $e) {
+            } catch (InvalidEntityClassException $e) {
             }
         }
 
-        throw UnknownEntityException::create($entity);
+        throw InvalidEntityClassException::create($entity);
     }
 
     public function nextIdentity(string $entity): DomainIdInterface
@@ -53,10 +53,10 @@ final class ChainEntityFactory implements EntityFactoryInterface
         foreach ($this->factories as $factory) {
             try {
                 return $factory->nextIdentity($entity);
-            } catch (UnknownEntityException $e) {
+            } catch (InvalidEntityClassException $e) {
             }
         }
 
-        throw UnknownEntityException::create($entity);
+        throw InvalidEntityClassException::create($entity);
     }
 }

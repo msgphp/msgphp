@@ -14,13 +14,15 @@ trait DomainEntityRepositoryTrait
 {
     private $class;
     private $memory;
+    private $accessor;
 
     // @todo in memory id sequence generator
 
-    public function __construct(string $class, GlobalObjectMemory $memory = null)
+    public function __construct(string $class, GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)
     {
         $this->class = $class;
         $this->memory = $memory ?? GlobalObjectMemory::createDefault();
+        $this->accessor = $accessor ?? new ObjectFieldAccessor();
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -168,7 +170,7 @@ trait DomainEntityRepositoryTrait
     {
         foreach ($fields as $field => $value) {
             $value = $this->normalizeEntityId($value);
-            $knownValue = $this->normalizeEntityId(self::getEntityField($entity, $field));
+            $knownValue = $this->normalizeEntityId($this->accessor->getValue($entity, $field));
             if ($knownValue instanceof DomainIdInterface) {
                 $knownValue = $knownValue->isEmpty() ? null : $knownValue->toString();
             }
@@ -202,29 +204,9 @@ trait DomainEntityRepositoryTrait
         $id = [];
 
         foreach ($this->idFields as $field) {
-            $id[] = self::getEntityField($entity, $field);
+            $id[] = $this->accessor->getValue($entity, $field);
         }
 
         return $id;
-    }
-
-    /**
-     * @param object $entity
-     */
-    private static function getEntityField($entity, string $field)
-    {
-        if (method_exists($entity, $method = 'get'.ucfirst($field))) {
-            return $entity->$method();
-        }
-
-        if (method_exists($entity, $field)) {
-            return $entity->$field();
-        }
-
-        if (property_exists($entity, $field)) {
-            return $entity->$field;
-        }
-
-        throw new \UnexpectedValueException(sprintf('Unknown field name "%s" for entity "%s"', $field, get_class($entity)));
     }
 }

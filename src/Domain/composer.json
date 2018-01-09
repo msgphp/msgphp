@@ -28,6 +28,7 @@
         "symfony/dependency-injection": "^3.4|^4.0",
         "symfony/config": "^3.4|^4.0",
         "symfony/phpunit-bridge": "^3.4|^4.0",
+        "symfony/property-access": "^3.4|^4.0",
         "symfony/var-dumper": "^3.4|^4.0"
     },
     "config": {

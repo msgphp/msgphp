@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Tests\Entity;
 
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Entity\{ChainEntityFactory, EntityFactoryInterface};
-use MsgPhp\Domain\Exception\UnknownEntityException;
+use MsgPhp\Domain\Exception\InvalidEntityClassException;
 use PHPUnit\Framework\TestCase;
 
 final class ChainEntityFactoryTest extends TestCase
@@ -16,7 +16,7 @@ final class ChainEntityFactoryTest extends TestCase
         $factory1 = $this->createMock(EntityFactoryInterface::class);
         $factory1->expects($this->any())
             ->method('create')
-            ->willThrowException(UnknownEntityException::create('some'));
+            ->willThrowException(InvalidEntityClassException::create('some'));
         $factory2 = $this->createMock(EntityFactoryInterface::class);
         $factory2->expects($this->any())
             ->method('create')
@@ -30,7 +30,7 @@ final class ChainEntityFactoryTest extends TestCase
     {
         $factory = new ChainEntityFactory([]);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->create('some');
     }
@@ -40,7 +40,7 @@ final class ChainEntityFactoryTest extends TestCase
         $factory1 = $this->createMock(EntityFactoryInterface::class);
         $factory1->expects($this->any())
             ->method('identify')
-            ->willThrowException(UnknownEntityException::create('some'));
+            ->willThrowException(InvalidEntityClassException::create('some'));
         $factory2 = $this->createMock(EntityFactoryInterface::class);
         $factory2->expects($this->any())
             ->method('identify')
@@ -54,7 +54,7 @@ final class ChainEntityFactoryTest extends TestCase
     {
         $factory = new ChainEntityFactory([]);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->identify('some', 'id');
     }
@@ -64,7 +64,7 @@ final class ChainEntityFactoryTest extends TestCase
         $factory1 = $this->createMock(EntityFactoryInterface::class);
         $factory1->expects($this->any())
             ->method('nextIdentity')
-            ->willThrowException(UnknownEntityException::create('some'));
+            ->willThrowException(InvalidEntityClassException::create('some'));
         $factory2 = $this->createMock(EntityFactoryInterface::class);
         $factory2->expects($this->any())
             ->method('nextIdentity')
@@ -78,7 +78,7 @@ final class ChainEntityFactoryTest extends TestCase
     {
         $factory = new ChainEntityFactory([]);
 
-        $this->expectException(UnknownEntityException::class);
+        $this->expectException(InvalidEntityClassException::class);
 
         $factory->nextIdentity('some');
     }
