@@ -6,9 +6,7 @@ namespace MsgPhp\Domain\Tests\Infra\InMemory;
 
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
-use MsgPhp\Domain\Infra\InMemory\{
-    DomainEntityRepositoryTrait, DomainIdentityMap, GlobalObjectMemory
-};
+use MsgPhp\Domain\Infra\InMemory\{DomainEntityRepositoryTrait, DomainIdentityMap, GlobalObjectMemory};
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase

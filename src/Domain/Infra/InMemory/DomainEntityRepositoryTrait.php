@@ -153,6 +153,8 @@ trait DomainEntityRepositoryTrait
                 $value = $value->isEmpty() ? null : $value->toString();
             }
 
+            // @todo match entity value against domain id/primitive value and vice versa
+
             if ($value === $knownValue) {
                 continue;
             }

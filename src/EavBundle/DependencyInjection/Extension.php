@@ -45,6 +45,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $bundles = ContainerHelper::getBundles($container);
         $classMapping = $config['class_mapping'];
 
+        ContainerHelper::configureIdentityMap($container, $classMapping, [
+            Attribute::class => 'id',
+            AttributeValue::class => 'id',
+        ]);
         ContainerHelper::configureEntityFactory($container, $classMapping, [
             Attribute::class => AttributeIdInterface::class,
             AttributeValue::class => AttributeValueIdInterface::class,
