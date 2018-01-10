@@ -17,5 +17,5 @@ interface DomainIdentityMapInterface
     /**
      * @param object $entity
      */
-    public function getIdentifierValues($entity): array;
+    public function getIdentity($entity): array;
 }

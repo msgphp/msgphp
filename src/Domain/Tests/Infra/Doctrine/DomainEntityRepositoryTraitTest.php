@@ -12,7 +12,6 @@ use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
 use MsgPhp\Domain\{DomainId, DomainIdInterface};
@@ -370,9 +369,8 @@ final class DomainEntityRepositoryTraitTest extends TestCase
     private static function createRepository(string $class)
     {
         $em = self::$em;
-        $idFields = is_subclass_of($class, Entities\BaseTestEntity::class) ? $class::getIdFields() : ['id'];
 
-        return new class($em, $class, $idFields) {
+        return new class($class, $em) {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
                 doFindAllByFields as public;
@@ -382,18 +380,9 @@ final class DomainEntityRepositoryTraitTest extends TestCase
                 doExistsByFields as public;
                 doSave as public;
                 doDelete as public;
-                __construct as private __parentConstruct;
             }
 
             private $alias = 'root';
-            private $idFields;
-
-            public function __construct(EntityManagerInterface $em, string $class, array $idFields)
-            {
-                $this->idFields = $idFields;
-
-                $this->__parentConstruct($em, $class);
-            }
         };
     }
 

@@ -30,12 +30,12 @@ final class DomainIdentityMap implements DomainIdentityMapInterface
         return (array) $this->mapping[$class];
     }
 
-    public function getIdentifierValues($entity): array
+    public function getIdentity($entity): array
     {
         $ids = [];
 
         foreach ($this->getIdentifierFieldNames(get_class($entity)) as $field) {
-            $ids[] = $this->accessor->getValue($entity, $field);
+            $ids[$field] = $this->accessor->getValue($entity, $field);
         }
 
         return $ids;

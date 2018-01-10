@@ -9,7 +9,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdInterface};
+use MsgPhp\Domain\{AbstractDomainEntityRepositoryTrait, DomainCollectionInterface};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
 /**
@@ -17,15 +17,15 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
-    private $em;
-    private $class;
-    private $idFields;
+    use AbstractDomainEntityRepositoryTrait;
 
-    public function __construct(EntityManagerInterface $em, string $class)
+    private $em;
+
+    public function __construct(string $class, EntityManagerInterface $em)
     {
-        $this->em = $em;
         $this->class = $class;
-        $this->idFields = $this->em->getClassMetadata($this->class)->getIdentifierFieldNames();
+        $this->em = $em;
+        $this->identityMap = new DomainIdentityMap($this->em);
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -46,11 +46,13 @@ trait DomainEntityRepositoryTrait
 
     private function doFind($id, ...$idN)
     {
-        if (!$this->isValidEntityId($ids = func_get_args())) {
+        $identity = $this->toIdentity(...$ids = func_get_args());
+
+        if (null === $identity) {
             throw EntityNotFoundException::createForId($this->class, ...$ids);
         }
 
-        return $this->doFindByFields(array_combine($this->idFields, $ids));
+        return $this->doFindByFields($identity);
     }
 
     private function doFindByFields(array $fields)
@@ -64,7 +66,7 @@ trait DomainEntityRepositoryTrait
         $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
-            if (count($fields) === count($this->idFields) && array() === array_diff(array_keys($fields), $this->idFields)) {
+            if ($this->isIdentity($fields)) {
                 throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
             }
 
@@ -76,11 +78,13 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id, ...$idN): bool
     {
-        if (!$this->isValidEntityId($ids = func_get_args())) {
+        $identity = $this->toIdentity(...func_get_args());
+
+        if (null === $identity) {
             return false;
         }
 
-        return $this->doExistsByFields(array_combine($this->idFields, $ids));
+        return $this->doExistsByFields($identity);
     }
 
     private function doExistsByFields(array $fields): bool
@@ -155,7 +159,7 @@ trait DomainEntityRepositoryTrait
 
         foreach ($fields as $field => $value) {
             $fieldAlias = $alias.'.'.$field;
-            $value = $this->normalizeEntityId($value);
+            $value = $this->normalizeIdentifier($value);
 
             if (null === $value) {
                 $where->add($expr->isNull($fieldAlias));
@@ -176,48 +180,5 @@ trait DomainEntityRepositoryTrait
         }
 
         $qb->andWhere($where);
-    }
-
-    private function isValidEntityId(array $ids): bool
-    {
-        if (count($ids) !== count($this->idFields)) {
-            return false;
-        }
-
-        foreach ($ids as $id) {
-            if (null === $this->normalizeEntityId($id)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function normalizeEntityId($id)
-    {
-        if ($id instanceof DomainIdInterface) {
-            return $id->isEmpty() ? null : $id;
-        }
-
-        if (is_object($id)) {
-            $class = get_class($id);
-            $metadata = $this->em->getClassMetadata($this->class);
-
-            foreach ($metadata->getIdentifierFieldNames() as $idFieldName) {
-                if ($class === $metadata->getAssociationTargetClass($idFieldName)) {
-                    return $this->em->getClassMetadata($class)->getIdentifierValues($id) ? $id : null;
-                }
-            }
-
-            return $id;
-        }
-
-        if (is_array($id)) {
-            return array_map(function ($id) {
-                return $this->normalizeEntityId($id);
-            }, $id);
-        }
-
-        return $id;
     }
 }

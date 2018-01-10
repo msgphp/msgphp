@@ -19,7 +19,7 @@ final class DomainIdentityMapTest extends TestCase
         $this->assertSame(['c', 'd'], $map->getIdentifierFieldNames('baz'));
     }
 
-    public function testGetIdentifierFieldNamesWithInvalidEntityClass(): void
+    public function testGetIdentifierFieldNamesWithInvalidgetIdentityClass(): void
     {
         $map = new DomainIdentityMap([]);
 
@@ -28,7 +28,7 @@ final class DomainIdentityMapTest extends TestCase
         $map->getIdentifierFieldNames('foo');
     }
 
-    public function testGetIdentifierValues(): void
+    public function testGetIdentity(): void
     {
         $map = new DomainIdentityMap([\stdClass::class => ['b', 'c']]);
         $object = new \stdClass();
@@ -36,15 +36,15 @@ final class DomainIdentityMapTest extends TestCase
         $object->b = 2;
         $object->c = 3;
 
-        $this->assertSame([2, 3], $map->getIdentifierValues($object));
+        $this->assertSame(['b' => 2, 'c' => 3], $map->getIdentity($object));
     }
 
-    public function testGetIdentifierValuesWithInvalidEntityClass(): void
+    public function testGetIdentityWithInvalidClass(): void
     {
         $map = new DomainIdentityMap([]);
 
         $this->expectException(InvalidEntityClassException::class);
 
-        $map->getIdentifierValues(new \stdClass());
+        $map->getIdentity(new \stdClass());
     }
 }

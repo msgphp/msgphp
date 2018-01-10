@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\Domain\Infra\InMemory\GlobalObjectMemory;
+use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, GlobalObjectMemory};
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\InMemory\Repository\UserRepository;
 use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserFactory};
@@ -63,7 +63,7 @@ final class SecurityUserFactoryTest extends TestCase
     public function testGetUser(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository(User::class, new GlobalObjectMemory());
+        $repository = new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory());
         $repository->save($user);
 
         $this->assertSame($user, $this->createFactory(new SecurityUser($user), ['ROLE_USER'], $repository)->getUser());
@@ -86,6 +86,6 @@ final class SecurityUserFactoryTest extends TestCase
             $storage->setToken(new UsernamePasswordToken($securityUser, '', 'provider_key', $roles));
         }
 
-        return new SecurityUserFactory($storage, $repository ?? new UserRepository(User::class, new GlobalObjectMemory()));
+        return new SecurityUserFactory($storage, $repository ?? new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory()));
     }
 }

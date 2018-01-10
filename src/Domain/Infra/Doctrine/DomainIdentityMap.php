@@ -26,7 +26,7 @@ final class DomainIdentityMap implements DomainIdentityMapInterface
         return $this->getMetadata($class)->getIdentifierFieldNames();
     }
 
-    public function getIdentifierValues($entity): array
+    public function getIdentity($entity): array
     {
         return $this->getMetadata(get_class($entity))->getIdentifierValues($entity);
     }

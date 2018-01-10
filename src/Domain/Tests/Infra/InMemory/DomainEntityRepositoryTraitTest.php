@@ -6,7 +6,9 @@ namespace MsgPhp\Domain\Tests\Infra\InMemory;
 
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
-use MsgPhp\Domain\Infra\InMemory\{DomainEntityRepositoryTrait, GlobalObjectMemory};
+use MsgPhp\Domain\Infra\InMemory\{
+    DomainEntityRepositoryTrait, DomainIdentityMap, GlobalObjectMemory
+};
 use PHPUnit\Framework\TestCase;
 
 final class DomainEntityRepositoryTraitTest extends TestCase
@@ -136,9 +138,13 @@ final class DomainEntityRepositoryTraitTest extends TestCase
                 doFind as public;
                 doExists as public;
                 doSave as public;
+                __construct as private __parentConstruct;
             }
 
-            private $idFields = ['id', 'token'];
+            public function __construct($class)
+            {
+                $this->__parentConstruct($class, new DomainIdentityMap([$class => ['id', 'token']]), new GlobalObjectMemory());
+            }
         };
 
         foreach ($entities as $entity) {
@@ -172,11 +178,9 @@ final class DomainEntityRepositoryTraitTest extends TestCase
                 __construct as private __parentConstruct;
             }
 
-            private $idFields = ['id'];
-
-            public function __construct(string $class)
+            public function __construct($class)
             {
-                $this->__parentConstruct($class, new GlobalObjectMemory());
+                $this->__parentConstruct($class, new DomainIdentityMap([$class => 'id']), new GlobalObjectMemory());
             }
         };
 

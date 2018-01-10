@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\Domain\Infra\InMemory\GlobalObjectMemory;
+use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, GlobalObjectMemory};
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\InMemory\Repository\UserRepository;
 use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRoleProviderInterface};
@@ -19,7 +19,7 @@ final class SecurityUserProviderTest extends TestCase
     public function testLoadUserByUsername(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository(User::class, new GlobalObjectMemory());
+        $repository = new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory());
         $repository->save($user);
         $securityUser = $this->createProvider(['ROLE_USER'], $repository)->loadUserByUsername($user->getEmail());
 
@@ -39,7 +39,7 @@ final class SecurityUserProviderTest extends TestCase
     public function testRefreshUser(): void
     {
         $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository(User::class, new GlobalObjectMemory());
+        $repository = new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory());
         $repository->save($user);
         $securityUser = $this->createProvider([], $repository)->refreshUser($oldSecurityUser = new SecurityUser($user));
 
@@ -71,7 +71,7 @@ final class SecurityUserProviderTest extends TestCase
 
     private function createProvider(array $roles = [], UserRepository $repository = null): SecurityUserProvider
     {
-        return new SecurityUserProvider($repository ?? new UserRepository(User::class, new GlobalObjectMemory()), new class($roles) implements UserRoleProviderInterface {
+        return new SecurityUserProvider($repository ?? new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory()), new class($roles) implements UserRoleProviderInterface {
             private $roles;
 
             public function __construct(array $roles)
