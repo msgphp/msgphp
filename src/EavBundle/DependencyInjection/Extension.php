@@ -6,13 +6,11 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
-use MsgPhp\Domain\Infra\Uuid\DomainId;
+use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
-use MsgPhp\Eav\Entity\{Attribute, AttributeValue};
+use MsgPhp\Eav\Entity\Attribute;
 use MsgPhp\Eav\Infra\Doctrine\Repository\AttributeRepository;
 use MsgPhp\Eav\Infra\Doctrine\Type\{AttributeIdType, AttributeValueIdType};
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -42,18 +40,15 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
-        $bundles = ContainerHelper::getBundles($container);
-        $classMapping = $config['class_mapping'];
 
-        ContainerHelper::configureIdentityMap($container, $classMapping, [
-            Attribute::class => 'id',
-            AttributeValue::class => 'id',
-        ]);
-        ContainerHelper::configureEntityFactory($container, $classMapping, [
-            Attribute::class => AttributeIdInterface::class,
-            AttributeValue::class => AttributeValueIdInterface::class,
-        ]);
+        ConfigHelper::resolveResolveDataTypeMapping($container, $config['data_type_mapping']);
+        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAP, $config['data_type_mapping'], $config['class_mapping']);
+
+        ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
+        ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
         ContainerHelper::configureDoctrine($container);
+
+        $bundles = ContainerHelper::getBundles($container);
 
         // persistence infra
         if (isset($bundles[DoctrineBundle::class])) {
@@ -64,28 +59,19 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
+
+        ConfigHelper::resolveResolveDataTypeMapping($container, $config['data_type_mapping']);
+        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAP, $config['data_type_mapping'], $config['class_mapping']);
+
+        ContainerHelper::configureDoctrineTypes($container, $config['data_type_mapping'], $config['class_mapping'], [
+            AttributeIdInterface::class => AttributeIdType::class,
+            AttributeValueIdInterface::class => AttributeValueIdType::class,
+        ]);
+
         $bundles = ContainerHelper::getBundles($container);
         $classMapping = $config['class_mapping'];
 
         if (isset($bundles[DoctrineBundle::class])) {
-            if (class_exists(Uuid::class)) {
-                $types = [];
-                if (is_subclass_of($classMapping[AttributeIdInterface::class], DomainId::class)) {
-                    $types[AttributeIdType::NAME] = AttributeIdType::class;
-                }
-                if (is_subclass_of($classMapping[AttributeValueIdInterface::class], DomainId::class)) {
-                    $types[AttributeValueIdType::NAME] = AttributeValueIdType::class;
-                }
-
-                if ($types) {
-                    $container->prependExtensionConfig('doctrine', [
-                        'dbal' => [
-                            'types' => $types,
-                        ],
-                    ]);
-                }
-            }
-
             if (class_exists(DoctrineOrmVersion::class)) {
                 $container->prependExtensionConfig('doctrine', [
                     'orm' => [

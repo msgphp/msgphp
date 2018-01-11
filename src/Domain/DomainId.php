@@ -11,6 +11,15 @@ class DomainId implements DomainIdInterface
 {
     private $id;
 
+    final public static function fromValue($value): DomainIdInterface
+    {
+        if (null !== $value && !is_string($value)) {
+            $value = (string) $value;
+        }
+
+        return new static($value);
+    }
+
     final public function __construct(string $id = null)
     {
         $this->id = $id;
@@ -23,7 +32,7 @@ class DomainId implements DomainIdInterface
 
     final public function equals(DomainIdInterface $id): bool
     {
-        return null !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false;
+        return $id === $this ? true : (null !== $this->id && $id instanceof self && static::class === get_class($id) ? $this->id === $id->id : false);
     }
 
     final public function toString(): string

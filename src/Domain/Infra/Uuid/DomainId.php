@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\Uuid;
 
 use MsgPhp\Domain\DomainIdInterface;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -14,9 +15,18 @@ class DomainId implements DomainIdInterface
 {
     private $uuid;
 
-    final public function __construct(string $uuid = null)
+    final public static function fromValue($value): DomainIdInterface
     {
-        $this->uuid = null === $uuid ? Uuid::uuid4() : Uuid::fromString($uuid);
+        if (null !== $value && !$value instanceof UuidInterface) {
+            $value = Uuid::fromString((string) $value);
+        }
+
+        return new static($value);
+    }
+
+    final public function __construct(UuidInterface $uuid = null)
+    {
+        $this->uuid = $uuid ?? Uuid::uuid4();
     }
 
     final public function isEmpty(): bool
@@ -26,7 +36,7 @@ class DomainId implements DomainIdInterface
 
     final public function equals(DomainIdInterface $id): bool
     {
-        return $id instanceof self && static::class === get_class($id) ? $this->uuid->equals($id->uuid) : false;
+        return $id === $this ? true : ($id instanceof self && static::class === get_class($id) ? $this->uuid->equals($id->uuid) : false);
     }
 
     final public function toString(): string

@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityMapInterface;
 use MsgPhp\Domain\Entity\{ChainEntityFactory, ClassMappingEntityFactory, EntityFactoryInterface};
 use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMap as DoctrineDomainIdentityMap;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\{EntityFields, ObjectFieldMappingListener};
-use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, GlobalObjectMemory};
+use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};
 use MsgPhp\Domain\Infra\SimpleBus\{DomainCommandBus, DomainEventBus};
+use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\{SimpleBusCommandBusBundle, SimpleBusEventBusBundle};
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -68,11 +70,6 @@ final class ContainerHelper
 
     public static function configureIdentityMap(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
-        if (!$container->has('msgphp.entity_field_accessor')) {
-            $container->register('msgphp.entity_field_accessor', GlobalObjectMemory::class)
-                ->setPublic(false);
-        }
-
         foreach ($identityMapping as $class => $mapping) {
             if (isset($classMapping[$class])) {
                 $identityMapping[$classMapping[$class]] = $mapping;
@@ -80,6 +77,11 @@ final class ContainerHelper
         }
 
         if (!$container->hasDefinition('msgphp.identity_map')) {
+            if (!$container->has('msgphp.entity_field_accessor')) {
+                $container->register('msgphp.entity_field_accessor', ObjectFieldAccessor::class)
+                    ->setPublic(false);
+            }
+
             $container->register('msgphp.identity_map', DomainIdentityMap::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', $identityMapping)
@@ -142,6 +144,56 @@ final class ContainerHelper
                         ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
                 }
             }
+        }
+    }
+
+    public static function configureDoctrineTypes(ContainerBuilder $container, array $dataTypeMapping, array $classMapping, array $typeMapping): void
+    {
+        if (!self::hasBundle($container, DoctrineBundle::class)) {
+            return;
+        }
+
+        $types = $mappingTypes = $typeConfig = [];
+        $uuidMapping = [
+            'uuid' => DoctrineUuid\UuidType::class,
+            'uuid_binary' => DoctrineUuid\UuidBinaryType::class,
+            'uuid_binary_ordered_time' => DoctrineUuid\UuidBinaryOrderedTimeType::class,
+        ];
+
+        foreach ($typeMapping as $class => $type) {
+            $dataType = $dataTypeMapping[$class] ?? DoctrineType::INTEGER;
+
+            if (isset($uuidMapping[$dataType])) {
+                if (!class_exists($uuidClass = $uuidMapping[$dataType])) {
+                    throw new \LogicException(sprintf('Data type "%s" for identifier "%s" requires "ramsey/uuid-doctrine".', $dataType, $class));
+                }
+
+                $types[$uuidClass::NAME] = $uuidClass;
+
+                if (DoctrineUuid\UuidBinaryType::class === $uuidClass || DoctrineUuid\UuidBinaryOrderedTimeType::class === $uuidClass) {
+                    $mappingTypes[$dataType] = 'binary';
+                }
+            }
+
+            if (!defined($type.'::NAME')) {
+                throw new \LogicException(sprintf('Type class "%s" for identifier "%s" requires a "NAME" constant.', $type, $class));
+            }
+
+            $types[$type::NAME] = $type;
+            $typeConfig[$type] = ['class' => $classMapping[$class] ?? $class, 'data_type' => $dataType];
+        }
+
+        $config = $types ? ['types' => $types] : [];
+        if ($mappingTypes) {
+            $config['mapping_types'] = $mappingTypes;
+        }
+
+        if ($config) {
+            $container->prependExtensionConfig('doctrine', [
+                'dbal' => $config,
+            ]);
+
+            $container->setParameter('msgphp.doctrine.type_config', $typeConfig);
         }
     }
 

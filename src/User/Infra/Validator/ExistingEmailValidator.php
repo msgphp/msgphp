@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Validator;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 

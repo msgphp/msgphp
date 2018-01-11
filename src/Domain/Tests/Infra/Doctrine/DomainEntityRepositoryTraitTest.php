@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\IntegerType;
@@ -26,8 +25,11 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
 
     public static function setUpBeforeClass(): void
     {
-        AnnotationRegistry::registerLoader('class_exists');
-        Type::addType('domain_id', DomainIdType::class);
+        if (Type::hasType('domain_id')) {
+            Type::overrideType('domain_id', TestDomainIdType::class);
+        } else {
+            Type::addType('domain_id', TestDomainIdType::class);
+        }
 
         $config = new Configuration();
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), dirname(dirname(__DIR__)).'/Fixtures/Entities'));
@@ -123,10 +125,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
     }
 }
 
-/**
- * @fixme should be core doctrine infra
- */
-class DomainIdType extends IntegerType
+class TestDomainIdType extends IntegerType
 {
     public function getName()
     {

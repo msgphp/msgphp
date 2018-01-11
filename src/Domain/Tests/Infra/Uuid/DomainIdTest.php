@@ -4,68 +4,46 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\Uuid;
 
+use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Uuid\DomainId;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Exception\InvalidUuidStringException;
+use MsgPhp\Domain\Tests\AbstractDomainIdTest;
+use Ramsey\Uuid\Uuid;
 
-final class DomainIdTest extends TestCase
+final class DomainIdTest extends AbstractDomainIdTest
 {
-    private const NIL_UUID = '00000000-0000-0000-0000-000000000000';
-
-    public function testCreateNewUuid(): void
+    public function testRandomUuid(): void
     {
-        $this->assertNotSame((string) new DomainId(), (string) new DomainId());
         $this->assertNotSame((new DomainId())->toString(), (new DomainId())->toString());
     }
 
-    public function testInvalidUuid(): void
+    public function provideEmptyIds(): iterable
     {
-        $this->expectException(InvalidUuidStringException::class);
-
-        new DomainId('foo');
+        return new \EmptyIterator();
     }
 
-    public function testIsEmpty(): void
+    public function provideNonEmptyIds(): iterable
     {
-        $this->assertFalse((new DomainId())->isEmpty());
-        $this->assertFalse((new DomainId(self::NIL_UUID))->isEmpty());
+        $uuid = '00000000-0000-0000-0000-000000000000';
+
+        yield [$id = new DomainId(), $id->toString()];
+        yield [new DomainId(Uuid::fromString($uuid)), $uuid];
+        yield [new DomainId($value = Uuid::fromString($uuid)), $value];
+        yield [DomainId::fromValue(new class($uuid) {
+            public function __toString(): string
+            {
+                return '00000000-0000-0000-0000-000000000000';
+            }
+        }), $uuid];
     }
 
-    public function testEquals(): void
+    protected static function duplicateDomainId(DomainIdInterface $id, bool $otherType = false): DomainIdInterface
     {
-        $this->assertTrue(($id = new DomainId())->equals($id));
-        $this->assertTrue((new DomainId(self::NIL_UUID))->equals(new DomainId(self::NIL_UUID)));
-        $this->assertFalse((new DomainId())->equals(new DomainId()));
-        $this->assertFalse((new DomainId())->equals(new OtherDomainId()));
-        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new DomainId()));
-        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new OtherDomainId()));
-        $this->assertFalse((new DomainId(self::NIL_UUID))->equals(new OtherDomainId(self::NIL_UUID)));
-    }
+        $class = $otherType ? OtherTestDomainId::class : DomainId::class;
 
-    public function testToString(): void
-    {
-        $this->assertSame(self::NIL_UUID, (new DomainId(self::NIL_UUID))->toString());
-        $this->assertSame(self::NIL_UUID, (string) new DomainId(self::NIL_UUID));
-        $this->assertNotSame((new DomainId())->toString(), (new DomainId())->toString());
-        $this->assertNotSame((string) new DomainId(), (string) new DomainId());
-    }
-
-    public function testSerialize(): void
-    {
-        $this->assertTrue(($serialized = serialize(new DomainId())) === serialize(unserialize($serialized)));
-    }
-
-    public function testJsonSerialize(): void
-    {
-        $this->assertSame(json_encode(self::NIL_UUID), json_encode($this->getNilUuid()));
-    }
-
-    private function getNilUuid(): DomainId
-    {
-        return new DomainId(self::NIL_UUID);
+        return $id->isEmpty() ? new $class() : new $class(Uuid::fromString($id->toString()));
     }
 }
 
-class OtherDomainId extends DomainId
+class OtherTestDomainId extends DomainId
 {
 }

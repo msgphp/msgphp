@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-rm -rf .php_cs.cache composer.lock vendor/
+rm -rf composer.lock var/ vendor/
 bin/each rm -rf composer.lock vendor/
