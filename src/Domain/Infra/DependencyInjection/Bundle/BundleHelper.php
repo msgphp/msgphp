@@ -19,9 +19,9 @@ final class BundleHelper
             return;
         }
 
-        foreach ($container->getParameter('msgphp.doctrine.type_config') as $type => $config) {
-            $type::setClass($config['class']);
-            $type::setDataType($config['data_type']);
+        foreach ($container->getParameter('msgphp.doctrine.type_config') as $config) {
+            $config['type']::setClass($config['class']);
+            $config['type']::setDataType($config['data_type']);
         }
     }
 

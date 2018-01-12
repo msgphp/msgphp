@@ -57,7 +57,7 @@ final class Configuration implements ConfigurationInterface
 
                     return $value;
                 })
-                    ->addDefaultChildrenIfNoneSet($availableIds)
+                ->addDefaultChildrenIfNoneSet($availableIds)
             );
 
         return $treeBuilder;

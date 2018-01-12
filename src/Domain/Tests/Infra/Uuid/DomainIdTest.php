@@ -28,7 +28,7 @@ final class DomainIdTest extends AbstractDomainIdTest
         yield [$id = new DomainId(), $id->toString()];
         yield [new DomainId(Uuid::fromString($uuid)), $uuid];
         yield [new DomainId($value = Uuid::fromString($uuid)), $value];
-        yield [DomainId::fromValue(new class($uuid) {
+        yield [DomainId::fromValue(new class() {
             public function __toString(): string
             {
                 return '00000000-0000-0000-0000-000000000000';

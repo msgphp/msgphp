@@ -69,10 +69,12 @@ final class DomainIdTypeTest extends TestCase
 
     public function testGetSQLDeclaration(): void
     {
-        OtherTestDomainIdType::setDataType('string');
+        OtherTestDomainIdType::setDataType(Type::STRING);
 
         $this->assertSame('native_integer_type', $this->type->getSQLDeclaration([], $this->platform));
+        $this->assertSame(Type::INTEGER, DomainIdType::getDataType());
         $this->assertSame('native_string_type', $this->otherType->getSQLDeclaration([], $this->platform));
+        $this->assertSame(Type::STRING, OtherTestDomainIdType::getDataType());
     }
 
     public function testConvertToDatabaseValue(): void

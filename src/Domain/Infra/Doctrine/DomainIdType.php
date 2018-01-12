@@ -33,9 +33,25 @@ class DomainIdType extends Type
     /**
      * @internal
      */
+    final public static function getClass(): string
+    {
+        return self::$mapping[static::class]['class'] ?? DomainId::class;
+    }
+
+    /**
+     * @internal
+     */
     final public static function setDataType(string $dataType): void
     {
         self::$mapping[static::class]['data_type'] = $dataType;
+    }
+
+    /**
+     * @internal
+     */
+    final public static function getDataType(): string
+    {
+        return self::$mapping[static::class]['data_type'] ?? Type::INTEGER;
     }
 
     /**
@@ -53,7 +69,7 @@ class DomainIdType extends Type
 
     final public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
-        return static::getDataType()->getSQLDeclaration($fieldDeclaration, $platform);
+        return static::getInnerType()->getSQLDeclaration($fieldDeclaration, $platform);
     }
 
     final public function convertToDatabaseValue($value, AbstractPlatform $platform)
@@ -64,7 +80,7 @@ class DomainIdType extends Type
 
         if ($value instanceof DomainIdInterface) {
             try {
-                return static::getDataType()->convertToDatabaseValue($value->isEmpty() ? null : $value->toString(), $platform);
+                return static::getInnerType()->convertToDatabaseValue($value->isEmpty() ? null : $value->toString(), $platform);
             } catch (ConversionException $e) {
             }
         }
@@ -75,7 +91,7 @@ class DomainIdType extends Type
     final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
     {
         try {
-            $value = static::getDataType()->convertToPHPValue($value, $platform);
+            $value = static::getInnerType()->convertToPHPValue($value, $platform);
         } catch (ConversionException $e) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }
@@ -87,13 +103,8 @@ class DomainIdType extends Type
         return static::getClass()::fromValue($value);
     }
 
-    final protected static function getClass(): string
+    final protected static function getInnerType(): Type
     {
-        return self::$mapping[static::class]['class'] ?? DomainId::class;
-    }
-
-    final protected static function getDataType(): Type
-    {
-        return self::getType(self::$mapping[static::class]['data_type'] ?? Type::INTEGER);
+        return self::getType(static::getDataType());
     }
 }

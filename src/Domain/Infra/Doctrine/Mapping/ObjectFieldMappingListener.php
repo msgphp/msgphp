@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine\Mapping;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
@@ -14,24 +15,53 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 final class ObjectFieldMappingListener
 {
+    private $typeConfig;
     private $mapping;
 
-    public function __construct(array $mapping)
+    public function __construct(array $typeConfig, array $mapping)
     {
+        $this->typeConfig = $typeConfig;
         $this->mapping = $mapping;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        $this->processClass($event->getClassMetadata());
+        if (!$this->mapping && !$this->typeConfig) {
+            return;
+        }
+
+        $metadata = $event->getClassMetadata();
+
+        if ($this->typeConfig) {
+            $this->processClassIdentifiers($metadata);
+        }
+
+        if ($this->mapping) {
+            $this->processClassFields($metadata);
+        }
     }
 
-    private function processClass(ClassMetadataInfo $metadata, \ReflectionClass $class = null): void
+    private function processClassIdentifiers(ClassMetadataInfo $metadata): void
+    {
+        if ($metadata->usesIdGenerator()) {
+            return;
+        }
+
+        foreach ($metadata->getIdentifierFieldNames() as $field) {
+            if (!isset($this->typeConfig[$type = $metadata->getTypeOfField($field)]) || !in_array($this->typeConfig[$type]['data_type'], [Type::INTEGER, Type::BIGINT], true)) {
+                continue;
+            }
+
+            $metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
+        }
+    }
+
+    private function processClassFields(ClassMetadataInfo $metadata, \ReflectionClass $class = null): void
     {
         $class = $class ?? $metadata->getReflectionClass();
 
         foreach ($class->getTraits() as $trait) {
-            $this->processClass($metadata, $trait);
+            $this->processClassFields($metadata, $trait);
         }
 
         if (isset($this->mapping[$name = $class->getName()])) {

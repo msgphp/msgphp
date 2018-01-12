@@ -132,6 +132,8 @@ final class ContainerHelper
             if (!$container->has(ObjectFieldMappingListener::class)) {
                 $container->register(ObjectFieldMappingListener::class)
                     ->setPublic(false)
+                    ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
+                    ->setArgument('$mapping', [])
                     ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
             }
 
@@ -170,7 +172,7 @@ final class ContainerHelper
 
                 $types[$uuidClass::NAME] = $uuidClass;
 
-                if (DoctrineUuid\UuidBinaryType::class === $uuidClass || DoctrineUuid\UuidBinaryOrderedTimeType::class === $uuidClass) {
+                if ('uuid_binary' === $dataType || 'uuid_binary_ordered_time' === $dataType) {
                     $mappingTypes[$dataType] = 'binary';
                 }
             }
@@ -180,7 +182,7 @@ final class ContainerHelper
             }
 
             $types[$type::NAME] = $type;
-            $typeConfig[$type] = ['class' => $classMapping[$class] ?? $class, 'data_type' => $dataType];
+            $typeConfig[$type::NAME] = ['class' => $classMapping[$class] ?? $class, 'type' => $type, 'data_type' => $dataType];
         }
 
         $config = $types ? ['types' => $types] : [];

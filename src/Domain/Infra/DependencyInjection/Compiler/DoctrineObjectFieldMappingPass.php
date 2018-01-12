@@ -39,11 +39,13 @@ final class DoctrineObjectFieldMappingPass implements CompilerPassInterface
             $mapping = array_replace_recursive($mapping, $class::getObjectFieldMapping());
         }
 
-        if ($mapping) {
+        $definition = $container->findDefinition(ObjectFieldMappingListener::class);
+
+        if (!$mapping && !$container->getParameterBag()->resolveValue($definition->getArgument('$typeConfig'))) {
+            $container->removeDefinition(ObjectFieldMappingListener::class);
+        } else {
             $container->findDefinition(ObjectFieldMappingListener::class)
                 ->setArgument('$mapping', $mapping);
-        } else {
-            $container->removeDefinition(ObjectFieldMappingListener::class);
         }
     }
 }
