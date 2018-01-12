@@ -7,8 +7,6 @@
         <id name="user" association-key="true" />
         <id name="role" />
 
-        <field name="createdAt" type="datetime" />
-
         <many-to-one field="user" target-entity="MsgPhp\User\Entity\User">
             <join-column on-delete="CASCADE" />
         </many-to-one>

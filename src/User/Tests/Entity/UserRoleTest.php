@@ -11,11 +11,9 @@ final class UserRoleTest extends TestCase
 {
     public function testCreate(): void
     {
-        $now = new \DateTime();
         $userRole = new UserRole($user = $this->createMock(User::class), 'ROLE_USER');
 
         $this->assertSame($user, $userRole->getUser());
         $this->assertSame('ROLE_USER', $userRole->getRole());
-        $this->assertGreaterThanOrEqual($now, $userRole->getCreatedAt());
     }
 }

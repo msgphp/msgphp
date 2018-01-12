@@ -8,7 +8,6 @@
 
         <field name="token" unique="true" />
         <field name="password" />
-        <field name="createdAt" type="datetime" />
     </mapped-superclass>
 
 </doctrine-mapping>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\Domain\Entity\Fields\CreatedAtField;
 use MsgPhp\Eav\Entity\AttributeValue;
 use MsgPhp\Eav\Entity\Fields\AttributeValueField;
 use MsgPhp\User\Entity\Fields\UserField;
@@ -14,7 +13,6 @@ use MsgPhp\User\Entity\Fields\UserField;
  */
 class UserAttributeValue
 {
-    use CreatedAtField;
     use UserField;
     use AttributeValueField;
 
@@ -22,6 +20,5 @@ class UserAttributeValue
     {
         $this->user = $user;
         $this->attributeValue = $attributeValue;
-        $this->createdAt = new \DateTimeImmutable();
     }
 }

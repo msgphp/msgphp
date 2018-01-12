@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\Domain\Entity\Fields\CreatedAtField;
 use MsgPhp\User\Entity\Fields\UserField;
 
 /**
@@ -12,7 +11,6 @@ use MsgPhp\User\Entity\Fields\UserField;
  */
 class UserSecondaryEmail
 {
-    use CreatedAtField;
     use UserField;
 
     private $user;
@@ -26,7 +24,6 @@ class UserSecondaryEmail
         $this->user = $user;
         $this->email = $email;
         $this->token = bin2hex(random_bytes(32));
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getEmail(): string

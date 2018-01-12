@@ -14,7 +14,6 @@
         <field name="token" nullable="true" unique="true" />
         <field name="pendingPrimary" type="boolean" />
         <field name="confirmedAt" type="datetime" nullable="true" />
-        <field name="createdAt" type="datetime" />
 
         <many-to-one field="user" target-entity="MsgPhp\User\Entity\User">
             <join-column on-delete="CASCADE" />

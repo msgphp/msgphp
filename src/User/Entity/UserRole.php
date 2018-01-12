@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\Domain\Entity\Fields\CreatedAtField;
 use MsgPhp\User\Entity\Fields\UserField;
 
 /**
@@ -12,7 +11,6 @@ use MsgPhp\User\Entity\Fields\UserField;
  */
 class UserRole
 {
-    use CreatedAtField;
     use UserField;
 
     private $role;
@@ -21,7 +19,6 @@ class UserRole
     {
         $this->user = $user;
         $this->role = $role;
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getRole(): string

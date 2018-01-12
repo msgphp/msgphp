@@ -7,8 +7,6 @@
         <id name="user" association-key="true" />
         <id name="attributeValue" association-key="true" />
 
-        <field name="createdAt" type="datetime" />
-
         <one-to-one field="attributeValue" target-entity="MsgPhp\Eav\Entity\AttributeValue">
             <cascade><cascade-persist/></cascade>
             <join-column on-delete="CASCADE" unique="true" />

@@ -11,7 +11,6 @@ final class UserSecondaryEmailTest extends TestCase
 {
     public function testCreate(): void
     {
-        $now = new \DateTime();
         $userEmail = new UserSecondaryEmail($user = $this->createMock(User::class), 'foo@bar.baz');
 
         $this->assertSame($user, $userEmail->getUser());
@@ -20,7 +19,6 @@ final class UserSecondaryEmailTest extends TestCase
         $this->assertNotSame((new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz'))->getToken(), $userEmail->getToken());
         $this->assertFalse($userEmail->isPendingPrimary());
         $this->assertNull($userEmail->getConfirmedAt());
-        $this->assertGreaterThanOrEqual($now, $userEmail->getCreatedAt());
     }
 
     public function testConfirm(): void

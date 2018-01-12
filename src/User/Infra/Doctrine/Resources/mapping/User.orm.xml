@@ -14,8 +14,6 @@
         <field name="password" />
         <field name="passwordResetToken" nullable="true" />
         <field name="passwordRequestedAt" type="datetime" nullable="true" />
-        <field name="createdAt" type="datetime" />
-        <field name="lastUpdatedAt" type="datetime" />
     </mapped-superclass>
 
 </doctrine-mapping>
