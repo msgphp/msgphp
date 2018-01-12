@@ -23,6 +23,11 @@ composer require msgphp/user
 
 - [Building a new Symfony User Bundle](https://medium.com/@ro0NL/building-a-new-symfony-user-bundle-b4fe5a9d9d80)
 
+## Documentation
+
+- Read the [main documentation](https://msgphp.github.io/docs)
+- Try the Symfony [demo application](https://github.com/msgphp/symfony-demo-app)
+
 ## Contributing
 
 This repository is **READ ONLY**. Issues and pull requests should be submitted in the [main development repository](https://github.com/msgphp/msgphp).

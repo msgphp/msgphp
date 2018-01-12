@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 1 ]] ; then
+    echo "Usage: $0 [<working-directory>]"
+    exit 1
+fi
+
+SHA=$(git rev-parse --abbrev-ref --short --verify HEAD)
+DIR="${1:-var/docs}"
+mkdir -p "${DIR}"
+
+rm -rf "${DIR}/build/"
+bin/docs build -d "${DIR}/build/"
+
+pushd "${DIR}" &> /dev/null
+
+echo -e "\e[34mSynchronizing source...\e[0m"
+if [[ ! -d src/.git ]] ; then
+    echo "Cloning..."
+    git clone --quiet git@github.com:msgphp/msgphp.github.io.git src
+    [[ $? -ne 0 ]] && echo "Failed!" && exit 1
+fi
+
+git -C src fetch --tags
+git -C src pull
+
+TARGET="src/docs"
+if [[ $SHA != master ]] ; then
+    TARGET="${TARGET}-${SHA}"
+fi
+
+mkdir -p "${TARGET}"
+mv build "${TARGET}"
+
+echo -en "\e[34mPush \"${SHA}\"? [yN]\e[0m "
+read answer
+if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
+    git -C src add --all
+    git -C src commit -m "Update docs for \"${SHA}\""
+    git -C src push
+fi
+
+popd &> /dev/null

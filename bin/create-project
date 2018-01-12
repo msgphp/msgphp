@@ -5,7 +5,7 @@ if [[ $# -gt 1 ]] ; then
     exit 1
 fi
 
-DIR="${1:-.test-project/}"
+DIR="${1:-var/test-project/}"
 COMPONENTS="symfony/var-dumper "
 BUNDLES=""
 

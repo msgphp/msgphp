@@ -5,7 +5,7 @@ if [[ $# -gt 1 ]] ; then
     exit 1
 fi
 
-DIR="${1:-.subtree-split/}"
+DIR="${1:-var/subtree-split/}"
 mkdir -p "${DIR}"
 pushd "${DIR}" &> /dev/null
 

@@ -1,0 +1,17 @@
+site_name: MsgPHP Documentation
+site_description: Message based domain layers. Shipped with industry standard infrastructure.
+repo_url: https://github.com/msgphp/msgphp
+edit_uri: blob/master/docs/
+site_dir: var/docs/build/
+
+theme:
+    name: 'material'
+markdown_extensions:
+    - codehilite
+
+pages:
+- Home: index.md
+- Domain-driven-design:
+    - Identifiers: ddd/identifiers.md
+    - Collections: ddd/collections.md
+    - Object factories: ddd/object_factories.md
