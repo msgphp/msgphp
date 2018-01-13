@@ -9,6 +9,7 @@ use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
 use MsgPhp\Eav\Entity\Attribute;
+use MsgPhp\Eav\Infra\Doctrine\EntityFieldsMapping;
 use MsgPhp\Eav\Infra\Doctrine\Repository\AttributeRepository;
 use MsgPhp\Eav\Infra\Doctrine\Type\{AttributeIdType, AttributeValueIdType};
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -46,7 +47,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
-        ContainerHelper::configureDoctrine($container);
+        ContainerHelper::configureDoctrine($container, [EntityFieldsMapping::class]);
 
         $bundles = ContainerHelper::getBundles($container);
 

@@ -9,8 +9,8 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityMapInterface;
 use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, ConstructorResolvingObjectFactory, EntityFactory, EntityFactoryInterface};
-use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMap as DoctrineDomainIdentityMap;
-use MsgPhp\Domain\Infra\Doctrine\Mapping\{EntityFields, ObjectFieldMappingListener};
+use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMap as DoctrineDomainIdentityMap, EntityFieldsMapping};
+use MsgPhp\Domain\Infra\Doctrine\Mapping\ObjectFieldMappingListener;
 use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};
 use MsgPhp\Domain\Infra\SimpleBus\{DomainCommandBus, DomainEventBus};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
@@ -149,7 +149,7 @@ final class ContainerHelper
                     ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
             }
 
-            array_unshift($ormObjectFieldMappings, EntityFields::class);
+            array_unshift($ormObjectFieldMappings, EntityFieldsMapping::class);
 
             foreach ($ormObjectFieldMappings as $class) {
                 if (!$container->has($class)) {
