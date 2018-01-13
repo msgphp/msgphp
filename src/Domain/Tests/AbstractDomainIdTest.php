@@ -34,7 +34,7 @@ abstract class AbstractDomainIdTest extends TestCase
     /**
      * @dataProvider provideNonEmptyIds
      */
-    public function testNonEmptyId(DomainIdInterface $id, $value): void
+    public function testNonEmptyId(DomainIdInterface $id, $expected): void
     {
         $class = get_class($id);
 
@@ -42,11 +42,11 @@ abstract class AbstractDomainIdTest extends TestCase
         $this->assertTrue($id->equals($id));
         $this->assertTrue($id->equals(static::duplicateDomainId($id)));
         $this->assertFalse($id->equals(static::duplicateDomainId($id, true)));
-        $this->assertSame((string) $value, $id->toString());
-        $this->assertSame((string) $value, (string) $id);
+        $this->assertSame((string) $expected, $id->toString());
+        $this->assertSame((string) $expected, (string) $id);
         $this->assertEquals($id, unserialize(serialize($id)));
         $this->assertEquals($id, $class::fromValue(json_decode(json_encode($id))));
-        $this->assertSame(json_encode($value), json_encode($id));
+        $this->assertSame(json_encode($expected), json_encode($id));
     }
 
     abstract public function provideEmptyIds(): iterable;

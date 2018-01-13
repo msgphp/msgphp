@@ -15,6 +15,15 @@ final class DomainCollection implements DomainCollectionInterface
 {
     private $collection;
 
+    public static function fromValue(?iterable $value): DomainCollectionInterface
+    {
+        if ($value instanceof Collection) {
+            return new self($value);
+        }
+
+        return new self(new ArrayCollection($value instanceof \Traversable ? iterator_to_array($value) : $value ?? []));
+    }
+
     public function __construct(Collection $collection)
     {
         $this->collection = $collection;

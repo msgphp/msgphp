@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\InMemory;
 
-use MsgPhp\Domain\{AbstractDomainEntityRepositoryTrait, DomainCollectionInterface, DomainIdentityMapInterface, DomainIdInterface};
+use MsgPhp\Domain\{AbstractDomainEntityRepositoryTrait, DomainCollection, DomainCollectionInterface, DomainIdentityMapInterface, DomainIdInterface};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
 /**
@@ -131,11 +131,11 @@ trait DomainEntityRepositoryTrait
 
     private function createResultSet(iterable $entities, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        if ($entities instanceof \Traversable) {
-            $entities = iterator_to_array($entities);
-        }
-
         if ($offset || $limit) {
+            if ($entities instanceof \Traversable) {
+                $entities = iterator_to_array($entities);
+            }
+
             $entities = array_slice($entities, $offset, $limit ?: null);
         }
 

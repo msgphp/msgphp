@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use MsgPhp\Domain\{AbstractDomainEntityRepositoryTrait, DomainCollectionInterface};
+use MsgPhp\Domain\Factory\DomainCollectionFactory;
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
 /**
@@ -140,7 +140,7 @@ trait DomainEntityRepositoryTrait
             $query->setMaxResults(0 === $limit ? null : $limit);
         }
 
-        return new DomainCollection(new ArrayCollection($query->getResult()));
+        return DomainCollectionFactory::create($query->getResult());
     }
 
     private function createQueryBuilder(string $alias = null): QueryBuilder

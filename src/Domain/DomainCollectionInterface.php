@@ -9,6 +9,11 @@ namespace MsgPhp\Domain;
  */
 interface DomainCollectionInterface extends \Countable, \IteratorAggregate
 {
+    /**
+     * @return $this
+     */
+    public static function fromValue(?iterable $value): self;
+
     public function isEmpty(): bool;
 
     public function contains($element): bool;
