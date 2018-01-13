@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\{DomainIdInterface, DomainObjectFactoryInterface};
+use MsgPhp\Domain\DomainIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
