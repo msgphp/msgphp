@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Entity;
+namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Entity\ClassMappingEntityFactory;
+use MsgPhp\Domain\Factory\ClassMappingEntityFactory;
 use MsgPhp\Domain\Exception\InvalidEntityClassException;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +46,7 @@ final class ClassMappingEntityFactoryTest extends TestCase
         $this->assertInstanceOf(KnownTestEntity::class, $factory->create('Foo', ['unknown' => 'foo']));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Entity\\\UnknownTestEntity or null, integer given\b/', preg_quote(KnownTestEntity::class)));
+        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\UnknownTestEntity or null, integer given\b/', preg_quote(KnownTestEntity::class)));
 
         $factory->create('Foo', [123]);
     }

@@ -5,8 +5,8 @@ includes:
 
 parameters:
     ignoreErrors:
-        - '#Constructor of class MsgPhp\\Domain\\Tests\\Entity\\KnownTestEntity has an unused parameter \$arg.#'
-        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Entity\\KnownTestEntity::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Entity\\UnknownTestEntity.#'
+        - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestEntity has an unused parameter \$arg.#'
+        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestEntity::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestEntity.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\DomainEntityRepositoryTraitTest::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
 

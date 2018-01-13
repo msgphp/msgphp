@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Entity\EntityFactoryInterface;
 use MsgPhp\Domain\EventBusInterface;
+use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\Eav\Entity\AttributeValue;
 use MsgPhp\Eav\Repository\AttributeRepositoryInterface;
 use MsgPhp\User\Command\AddUserAttributeValueCommand;

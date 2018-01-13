@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Entity;
+namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Entity\{ChainEntityFactory, EntityFactoryInterface};
+use MsgPhp\Domain\Factory\{ChainEntityFactory, EntityFactoryInterface};
 use MsgPhp\Domain\Exception\InvalidEntityClassException;
 use PHPUnit\Framework\TestCase;
 

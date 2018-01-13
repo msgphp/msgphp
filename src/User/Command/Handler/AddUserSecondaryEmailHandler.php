@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Entity\EntityFactoryInterface;
 use MsgPhp\Domain\EventBusInterface;
+use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\User\Command\AddUserSecondaryEmailCommand;
 use MsgPhp\User\Entity\UserSecondaryEmail;
 use MsgPhp\User\Event\UserSecondaryEmailAddedEvent;
