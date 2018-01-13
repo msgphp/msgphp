@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityMapInterface;
-use MsgPhp\Domain\Factory\{ChainEntityFactory, ClassMappingEntityFactory, EntityFactoryInterface}; // @fixme
+use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, ConstructorResolvingObjectFactory, EntityFactory, EntityFactoryInterface};
 use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMap as DoctrineDomainIdentityMap;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\{EntityFields, ObjectFieldMappingListener};
 use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};
@@ -16,7 +16,6 @@ use MsgPhp\Domain\Infra\SimpleBus\{DomainCommandBus, DomainEventBus};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\{SimpleBusCommandBusBundle, SimpleBusEventBusBundle};
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -90,28 +89,39 @@ final class ContainerHelper
             $container->setAlias(DomainIdentityMapInterface::class, new Alias('msgphp.identity_map', true));
         } else {
             ($definition = $container->getDefinition('msgphp.identity_map'))
-                ->setArgument('$mapping', array_replace($definition->getArgument('$mapping'), $identityMapping));
+                ->setArgument('$mapping', $identityMapping + $definition->getArgument('$mapping'));
         }
     }
 
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
-        if (!$container->has('msgphp.entity_factory')) {
-            $container->register('msgphp.entity_factory', ChainEntityFactory::class)
+        if (!$container->hasDefinition('msgphp.entity_factory')) {
+            if (!$container->has('msgphp.entity_factory.default')) {
+                $container->register('msgphp.entity_factory.default', ConstructorResolvingObjectFactory::class)
+                    ->setPublic(false)
+                    ->addMethodCall('setNestedFactory', [new Reference('msgphp.entity_factory')]);
+            }
+
+            $container->register('msgphp.entity_factory.mapping', ClassMappingObjectFactory::class)
                 ->setPublic(false)
-                ->setArgument('$factories', new TaggedIteratorArgument('msgphp.entity_factory'));
+                ->setArgument('$mapping', $classMapping)
+                ->setArgument('$factory', new Reference('msgphp.entity_factory.default'));
+
+            $container->register('msgphp.entity_factory', EntityFactory::class)
+                ->setPublic(true)
+                ->setArgument('$identifierMapping', $idClassMapping)
+                ->setArgument('$factory', new Reference('msgphp.entity_factory.mapping'));
+        } else {
+            ($definition = $container->getDefinition('msgphp.entity_factory'))
+                ->setArgument('$identifierMapping', $idClassMapping + $definition->getArgument('$identifierMapping'));
+
+            ($definition = $container->getDefinition('msgphp.entity_factory.mapping'))
+                ->setArgument('$mapping', $classMapping + $definition->getArgument('$mapping'));
         }
 
         if (!$container->has(EntityFactoryInterface::class)) {
             $container->setAlias(EntityFactoryInterface::class, new Alias('msgphp.entity_factory', true));
         }
-
-        $container->register('msgphp.entity_factory.'.md5(uniqid()), ClassMappingEntityFactory::class)
-            ->setPublic(false)
-            ->setArgument('$mapping', $classMapping)
-            ->setArgument('$idMapping', $idClassMapping)
-            ->setArgument('$factory', new Reference('msgphp.entity_factory'))
-            ->addTag('msgphp.entity_factory', ['priority' => -100]);
     }
 
     public static function configureDoctrine(ContainerBuilder $container, array $ormObjectFieldMappings = []): void

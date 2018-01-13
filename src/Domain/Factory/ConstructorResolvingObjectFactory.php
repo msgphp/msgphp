@@ -15,7 +15,7 @@ final class ConstructorResolvingObjectFactory implements DomainObjectFactoryInte
 
     private $factory;
 
-    public function __construct(DomainObjectFactoryInterface $factory = null)
+    public function setNestedFactory(?DomainObjectFactoryInterface $factory): void
     {
         $this->factory = $factory;
     }

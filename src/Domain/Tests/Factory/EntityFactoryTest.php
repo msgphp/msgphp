@@ -36,7 +36,7 @@ final class EntityFactoryTest extends TestCase
                 return $o;
             });
 
-        $this->factory = new EntityFactory($innerFactory);
+        $this->factory = new EntityFactory(['alias_id' => 'id'], $innerFactory);
     }
 
     public function testCreate(): void
@@ -48,6 +48,7 @@ final class EntityFactoryTest extends TestCase
     public function testIdentify(): void
     {
         $this->assertSame('1', $this->factory->identify('id', '1')->toString());
+        $this->assertSame('1', $this->factory->identify('alias_id', '1')->toString());
 
         $this->expectException(InvalidClassException::class);
 
@@ -57,6 +58,7 @@ final class EntityFactoryTest extends TestCase
     public function testNextIdentity(): void
     {
         $this->assertSame('new', $this->factory->nextIdentity('id')->toString());
+        $this->assertSame('new', $this->factory->nextIdentity('alias_id')->toString());
 
         $this->expectException(InvalidClassException::class);
 

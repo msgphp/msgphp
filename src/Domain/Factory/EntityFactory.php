@@ -12,10 +12,12 @@ use MsgPhp\Domain\Exception\InvalidClassException;
  */
 final class EntityFactory implements EntityFactoryInterface
 {
+    private $identifierMapping;
     private $factory;
 
-    public function __construct(DomainObjectFactoryInterface $factory)
+    public function __construct(array $identifierMapping, DomainObjectFactoryInterface $factory)
     {
+        $this->identifierMapping = $identifierMapping;
         $this->factory = $factory;
     }
 
@@ -26,7 +28,7 @@ final class EntityFactory implements EntityFactoryInterface
 
     public function identify(string $class, $id): DomainIdInterface
     {
-        $object = $this->factory->create($class, [$id]);
+        $object = $this->factory->create($this->identifierMapping[$class] ?? $class, [$id]);
 
         if (!$object instanceof DomainIdInterface) {
             throw InvalidClassException::create($class);
@@ -37,7 +39,7 @@ final class EntityFactory implements EntityFactoryInterface
 
     public function nextIdentity(string $class): DomainIdInterface
     {
-        $object = $this->factory->create($class);
+        $object = $this->factory->create($this->identifierMapping[$class] ?? $class);
 
         if (!$object instanceof DomainIdInterface) {
             throw InvalidClassException::create($class);
