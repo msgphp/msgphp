@@ -20,9 +20,8 @@ final class ChainObjectFactoryTest extends TestCase
         $factory2->expects($this->any())
             ->method('create')
             ->willReturn($object = new \stdClass());
-        $factory = new ChainObjectFactory([$factory1, $factory2]);
 
-        $this->assertSame($object, $factory->create('some'));
+        $this->assertSame($object, (new ChainObjectFactory([$factory1, $factory2]))->create('some'));
     }
 
     public function testCreateWithoutFactories(): void
