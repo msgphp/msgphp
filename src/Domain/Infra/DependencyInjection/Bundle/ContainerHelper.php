@@ -75,12 +75,12 @@ final class ContainerHelper
             }
         }
 
-        if (!$container->hasDefinition('msgphp.identity_map')) {
-            if (!$container->has('msgphp.entity_field_accessor')) {
-                $container->register('msgphp.entity_field_accessor', ObjectFieldAccessor::class)
-                    ->setPublic(false);
-            }
+        if (!$container->has('msgphp.entity_field_accessor')) {
+            $container->register('msgphp.entity_field_accessor', ObjectFieldAccessor::class)
+                ->setPublic(false);
+        }
 
+        if (!$container->hasDefinition('msgphp.identity_map')) {
             $container->register('msgphp.identity_map', DomainIdentityMap::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', $identityMapping)
@@ -95,18 +95,23 @@ final class ContainerHelper
 
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
-        if (!$container->hasDefinition('msgphp.entity_factory')) {
-            if (!$container->has('msgphp.entity_factory.default')) {
-                $container->register('msgphp.entity_factory.default', ConstructorResolvingObjectFactory::class)
-                    ->setPublic(false)
-                    ->addMethodCall('setNestedFactory', [new Reference('msgphp.entity_factory')]);
-            }
+        if (!$container->has('msgphp.entity_factory.default')) {
+            $container->register('msgphp.entity_factory.default', ConstructorResolvingObjectFactory::class)
+                ->setPublic(false)
+                ->addMethodCall('setNestedFactory', [new Reference('msgphp.entity_factory')]);
+        }
 
+        if (!$container->hasDefinition('msgphp.entity_factory.mapping')) {
             $container->register('msgphp.entity_factory.mapping', ClassMappingObjectFactory::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', $classMapping)
                 ->setArgument('$factory', new Reference('msgphp.entity_factory.default'));
+        } else {
+            ($definition = $container->getDefinition('msgphp.entity_factory.mapping'))
+                ->setArgument('$mapping', $classMapping + $definition->getArgument('$mapping'));
+        }
 
+        if (!$container->hasDefinition('msgphp.entity_factory')) {
             $container->register('msgphp.entity_factory', EntityFactory::class)
                 ->setPublic(true)
                 ->setArgument('$identifierMapping', $idClassMapping)
@@ -114,9 +119,6 @@ final class ContainerHelper
         } else {
             ($definition = $container->getDefinition('msgphp.entity_factory'))
                 ->setArgument('$identifierMapping', $idClassMapping + $definition->getArgument('$identifierMapping'));
-
-            ($definition = $container->getDefinition('msgphp.entity_factory.mapping'))
-                ->setArgument('$mapping', $classMapping + $definition->getArgument('$mapping'));
         }
 
         if (!$container->has(EntityFactoryInterface::class)) {

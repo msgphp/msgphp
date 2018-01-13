@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\InMemory;
 
-use MsgPhp\Domain\Exception\InvalidEntityClassException;
+use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Infra\InMemory\DomainIdentityMap;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +23,7 @@ final class DomainIdentityMapTest extends TestCase
     {
         $map = new DomainIdentityMap([]);
 
-        $this->expectException(InvalidEntityClassException::class);
+        $this->expectException(InvalidClassException::class);
 
         $map->getIdentifierFieldNames('foo');
     }
@@ -43,7 +43,7 @@ final class DomainIdentityMapTest extends TestCase
     {
         $map = new DomainIdentityMap([]);
 
-        $this->expectException(InvalidEntityClassException::class);
+        $this->expectException(InvalidClassException::class);
 
         $map->getIdentity(new \stdClass());
     }

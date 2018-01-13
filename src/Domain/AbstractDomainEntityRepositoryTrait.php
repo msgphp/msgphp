@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain;
 
-use MsgPhp\Domain\Exception\InvalidEntityClassException;
+use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -41,7 +41,7 @@ trait AbstractDomainEntityRepositoryTrait
                 }, $identity);
 
                 return 1 === count($id) ? reset($id) : $id;
-            } catch (InvalidEntityClassException $e) {
+            } catch (InvalidClassException $e) {
                 return $id;
             }
         }

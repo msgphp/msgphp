@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Infra\Doctrine;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\DomainIdentityMapInterface;
-use MsgPhp\Domain\Exception\InvalidEntityClassException;
+use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -37,6 +37,6 @@ final class DomainIdentityMap implements DomainIdentityMapInterface
             return $factory->getMetadataFor($class);
         }
 
-        throw InvalidEntityClassException::create($class);
+        throw InvalidClassException::create($class);
     }
 }

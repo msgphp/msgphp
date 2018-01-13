@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\Exception\InvalidEntityClassException;
+use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMap;
 use PHPUnit\Framework\TestCase;
 
@@ -56,7 +56,7 @@ final class DomainIdentityMapTest extends TestCase
     {
         $map = new DomainIdentityMap($this->em);
 
-        $this->expectException(InvalidEntityClassException::class);
+        $this->expectException(InvalidClassException::class);
 
         $map->getIdentifierFieldNames('foo');
     }
@@ -70,7 +70,7 @@ final class DomainIdentityMapTest extends TestCase
     {
         $map = new DomainIdentityMap($this->em);
 
-        $this->expectException(InvalidEntityClassException::class);
+        $this->expectException(InvalidClassException::class);
 
         $map->getIdentity(new class() {
         });

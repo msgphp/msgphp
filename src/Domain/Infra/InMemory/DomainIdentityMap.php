@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\InMemory;
 
 use MsgPhp\Domain\DomainIdentityMapInterface;
-use MsgPhp\Domain\Exception\InvalidEntityClassException;
+use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -24,7 +24,7 @@ final class DomainIdentityMap implements DomainIdentityMapInterface
     public function getIdentifierFieldNames(string $class): array
     {
         if (!isset($this->mapping[$class])) {
-            throw InvalidEntityClassException::create($class);
+            throw InvalidClassException::create($class);
         }
 
         return (array) $this->mapping[$class];
