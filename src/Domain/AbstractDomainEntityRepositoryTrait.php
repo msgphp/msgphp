@@ -64,7 +64,7 @@ trait AbstractDomainEntityRepositoryTrait
         return array_combine($this->identityMap->getIdentifierFieldNames($this->class), $ids);
     }
 
-    public function isIdentity(array $fields): bool
+    private function isIdentity(array $fields): bool
     {
         $idFields = $this->identityMap->getIdentifierFieldNames($this->class);
 

@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityMapInterface;
-use MsgPhp\Domain\Factory\{ChainEntityFactory, ClassMappingEntityFactory, EntityFactoryInterface};
+use MsgPhp\Domain\Factory\{ChainEntityFactory, ClassMappingEntityFactory, EntityFactoryInterface}; // @fixme
 use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMap as DoctrineDomainIdentityMap;
 use MsgPhp\Domain\Infra\Doctrine\Mapping\{EntityFields, ObjectFieldMappingListener};
 use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};

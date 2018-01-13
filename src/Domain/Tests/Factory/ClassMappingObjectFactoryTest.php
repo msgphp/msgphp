@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
-use MsgPhp\Domain\Factory\ClassMappingObjectFactory;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, DomainObjectFactoryInterface};
 use PHPUnit\Framework\TestCase;
 
 final class ClassMappingObjectFactoryTest extends TestCase
