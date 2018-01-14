@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
+use MsgPhp\User\Entity\Credential\Anonymous;
+use MsgPhp\User\Entity\Features\AnonymousCredential;
 use MsgPhp\User\UserIdInterface;
 
 /**
@@ -11,29 +13,18 @@ use MsgPhp\User\UserIdInterface;
  */
 class User
 {
-    private $id;
-    private $email;
-    private $password;
+    use AnonymousCredential;
 
-    public function __construct(UserIdInterface $id, string $email, string $password)
+    private $id;
+
+    public function __construct(UserIdInterface $id)
     {
         $this->id = $id;
-        $this->email = $email;
-        $this->password = $password;
+        $this->credential = new Anonymous();
     }
 
     public function getId(): UserIdInterface
     {
         return $this->id;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
     }
 }

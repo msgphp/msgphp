@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\Mapping\ObjectFieldMappingProviderInterface;
-use MsgPhp\User\Entity\{Fields, User};
+use MsgPhp\User\Entity\{Features, Fields, User};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -17,6 +17,9 @@ final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
     public static function getObjectFieldMapping(): array
     {
         return [
+            Features\ResettablePassword::class => [
+                // @todo
+            ],
             Fields\UserField::class => [
                 'user' => [
                     'type' => self::TYPE_MANY_TO_ONE,
