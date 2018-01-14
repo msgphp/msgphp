@@ -19,11 +19,11 @@ class UserSecondaryEmail
     private $pendingPrimary = false;
     private $confirmedAt;
 
-    public function __construct(User $user, string $email)
+    public function __construct(User $user, string $email, string $token = null)
     {
         $this->user = $user;
         $this->email = $email;
-        $this->token = bin2hex(random_bytes(32));
+        $this->token = $token ?? bin2hex(random_bytes(32));
     }
 
     public function getEmail(): string

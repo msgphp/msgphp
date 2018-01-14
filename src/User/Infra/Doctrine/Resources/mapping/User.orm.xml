@@ -6,6 +6,7 @@
     <mapped-superclass name="MsgPhp\User\Entity\User">
         <id name="id" type="msgphp_user_id" />
 
+        <!-- @todo resolve class in listener from User::getCredential() return type -->
         <embedded name="credential" class="MsgPhp\User\CredentialInterface" />
     </mapped-superclass>
 

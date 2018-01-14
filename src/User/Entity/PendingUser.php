@@ -6,23 +6,20 @@ namespace MsgPhp\User\Entity;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @todo figure out purpose; could be a User feature trait / reuse credential features
  */
 class PendingUser
 {
-    private $token;
     private $email;
     private $password;
+    private $token;
 
-    public function __construct(string $email, string $password)
+    public function __construct(string $email, string $password, string $token = null)
     {
-        $this->token = bin2hex(random_bytes(32));
         $this->email = $email;
         $this->password = $password;
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
+        $this->token = $token ?? bin2hex(random_bytes(32));
     }
 
     public function getEmail(): string
@@ -33,5 +30,10 @@ class PendingUser
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 }
