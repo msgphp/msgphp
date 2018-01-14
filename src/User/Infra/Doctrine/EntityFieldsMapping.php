@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Doctrine;
 
-use MsgPhp\Domain\Infra\Doctrine\Mapping\ObjectFieldMappingProviderInterface;
+use MsgPhp\Domain\Infra\Doctrine\ObjectFieldMappingProviderInterface;
 use MsgPhp\User\Entity\{Features, Fields, User};
 
 /**

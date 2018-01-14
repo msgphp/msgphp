@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Doctrine\Mapping;
+namespace MsgPhp\Domain\Infra\Doctrine\Event;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
@@ -31,6 +31,10 @@ final class ObjectFieldMappingListener
         }
 
         $metadata = $event->getClassMetadata();
+
+        if (\MsgPhp\User\Entity\User::class === $metadata->getName()) {
+            $metadata->embeddedClasses['credential']['class'] = \MsgPhp\User\Entity\Credential\NicknameSaltedPassword::class;
+        }
 
         if ($this->typeConfig) {
             $this->processClassIdentifiers($metadata);
@@ -71,14 +75,6 @@ final class ObjectFieldMappingListener
 
     private function processFieldMapping(ClassMetadataInfo $metadata, array $fields): void
     {
-        $methods = [
-            ObjectFieldMappingProviderInterface::TYPE_EMBEDDED => 'mapEmbedded',
-            ObjectFieldMappingProviderInterface::TYPE_MANY_TO_MANY => 'mapManyToMany',
-            ObjectFieldMappingProviderInterface::TYPE_MANY_TO_ONE => 'mapManyToOne',
-            ObjectFieldMappingProviderInterface::TYPE_ONE_TO_MANY => 'mapOneToMany',
-            ObjectFieldMappingProviderInterface::TYPE_ONE_TO_ONE => 'mapOneToOne',
-        ];
-
         foreach ($fields as $field => $mapping) {
             if ($metadata->hasField($field) || $metadata->hasAssociation($field)) {
                 continue;
@@ -86,12 +82,11 @@ final class ObjectFieldMappingListener
 
             $mapping = ['fieldName' => $field] + $mapping;
 
-            if (!isset($mapping['type']) || !isset($methods[$mapping['type']])) {
-                $metadata->mapField($mapping);
-            } else {
-                $method = $methods[$mapping['type']];
+            if (isset($mapping['type']) && method_exists($metadata, $method = 'map'.ucfirst($mapping['type']))) {
                 unset($mapping['type']);
                 $metadata->$method($mapping);
+            } else {
+                $metadata->mapField($mapping);
             }
         }
     }

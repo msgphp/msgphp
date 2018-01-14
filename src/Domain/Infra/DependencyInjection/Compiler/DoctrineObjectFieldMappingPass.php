@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use MsgPhp\Domain\Infra\Doctrine\Mapping\{ObjectFieldMappingListener, ObjectFieldMappingProviderInterface};
+use MsgPhp\Domain\Infra\Doctrine\Event\ObjectFieldMappingListener;
+use MsgPhp\Domain\Infra\Doctrine\ObjectFieldMappingProviderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

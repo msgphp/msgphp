@@ -44,7 +44,13 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder->root(Extension::ALIAS)
             ->append(
                 ConfigHelper::createClassMappingNode('class_mapping', $requiredEntities, function (array $value) use ($availableIds): array {
-                    return $value + array_fill_keys($availableIds, null);
+                    $value = $value + array_fill_keys($availableIds, null);
+
+                    if (!isset($value[CredentialInterface::class])) {
+                        $value[CredentialInterface::class] = Credential\Anonymous::class;
+                    }
+
+                    return $value;
                 })
             )
             ->append(
@@ -53,10 +59,6 @@ final class Configuration implements ConfigurationInterface
                         $value = array_fill_keys($availableIds, $value);
                     } else {
                         $value += array_fill_keys($availableIds, null);
-                    }
-
-                    if (!isset($value[CredentialInterface::class])) {
-                        $value[CredentialInterface::class] = Credential\Anonymous::class;
                     }
 
                     return $value;

@@ -9,8 +9,7 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityMapInterface;
 use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, ConstructorResolvingObjectFactory, EntityFactory, EntityFactoryInterface};
-use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMap as DoctrineDomainIdentityMap, EntityFieldsMapping};
-use MsgPhp\Domain\Infra\Doctrine\Mapping\ObjectFieldMappingListener;
+use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMap as DoctrineDomainIdentityMap, EntityFieldsMapping, Event as DoctrineEvent};
 use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};
 use MsgPhp\Domain\Infra\SimpleBus\{DomainCommandBus, DomainEventBus};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
@@ -141,8 +140,8 @@ final class ContainerHelper
         }
 
         if (class_exists(DoctrineOrmEvents::class)) {
-            if (!$container->has(ObjectFieldMappingListener::class)) {
-                $container->register(ObjectFieldMappingListener::class)
+            if (!$container->has(DoctrineEvent\ObjectFieldMappingListener::class)) {
+                $container->register(DoctrineEvent\ObjectFieldMappingListener::class)
                     ->setPublic(false)
                     ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
                     ->setArgument('$mapping', [])
