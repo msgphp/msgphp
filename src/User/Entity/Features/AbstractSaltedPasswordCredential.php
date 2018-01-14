@@ -28,5 +28,6 @@ trait AbstractSaltedPasswordCredential
         $this->credential = $this->credential->withPasswordSalt($passwordSalt);
 
         $this->onUpdate();
+        $this->onPasswordUpdate();
     }
 }

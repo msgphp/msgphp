@@ -36,16 +36,4 @@ class User
     {
         return $this->password;
     }
-
-    public function changeEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function changePassword(string $password): void
-    {
-        $this->password = $password;
-        $this->passwordResetToken = null;
-        $this->passwordRequestedAt = null;
-    }
 }

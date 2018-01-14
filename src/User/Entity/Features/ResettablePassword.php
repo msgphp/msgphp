@@ -36,4 +36,10 @@ trait ResettablePassword
 
         $this->onUpdate();
     }
+
+    private function onPasswordUpdate(): void
+    {
+        $this->passwordResetToken = null;
+        $this->passwordRequestedAt = null;
+    }
 }
