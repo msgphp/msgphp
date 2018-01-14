@@ -29,7 +29,5 @@ trait TokenCredential
     public function changeToken(string $token): void
     {
         $this->credential = $this->credential->withToken($token);
-
-        $this->onUpdate();
     }
 }

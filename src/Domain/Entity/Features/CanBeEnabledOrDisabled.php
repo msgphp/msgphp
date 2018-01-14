@@ -11,20 +11,15 @@ use MsgPhp\Domain\Entity\Fields\EnabledField;
  */
 trait CanBeEnabledOrDisabled
 {
-    use AbstractUpdated;
     use EnabledField;
 
     public function enable(): void
     {
         $this->enabled = true;
-
-        $this->onUpdate();
     }
 
     public function disable(): void
     {
         $this->enabled = false;
-
-        $this->onUpdate();
     }
 }

@@ -9,36 +9,26 @@ use PHPUnit\Framework\TestCase;
 
 final class CanBeEnabledOrDisabledTest extends TestCase
 {
-    /**
-     * @dataProvider provideStates
-     */
-    public function testObject(bool $state): void
+    public function testEnable(): void
     {
-        $object = $this->getObject($state);
+        $object = $this->getObject(false);
 
-        $this->assertSame($state, $object->isEnabled());
+        $this->assertFalse($object->isEnabled());
 
-        if ($state) {
-            $object->disable();
-        } else {
-            $object->enable();
-        }
+        $object->enable();
 
-        $this->assertSame(!$state, $object->isEnabled());
-
-        if ($state) {
-            $object->enable();
-        } else {
-            $object->disable();
-        }
-
-        $this->assertSame($state, $object->isEnabled());
+        $this->assertTrue($object->isEnabled());
     }
 
-    public function provideStates(): iterable
+    public function testDisable(): void
     {
-        yield [true];
-        yield [false];
+        $object = $this->getObject(true);
+
+        $this->assertTrue($object->isEnabled());
+
+        $object->enable();
+
+        $this->assertFalse($object->isEnabled());
     }
 
     private function getObject($value)

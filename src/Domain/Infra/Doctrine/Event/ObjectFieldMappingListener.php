@@ -32,10 +32,6 @@ final class ObjectFieldMappingListener
 
         $metadata = $event->getClassMetadata();
 
-        if (\MsgPhp\User\Entity\User::class === $metadata->getName()) {
-            $metadata->embeddedClasses['credential']['class'] = \MsgPhp\User\Entity\Credential\NicknameSaltedPassword::class;
-        }
-
         if ($this->typeConfig) {
             $this->processClassIdentifiers($metadata);
         }

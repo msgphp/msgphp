@@ -26,8 +26,5 @@ trait AbstractSaltedPasswordCredential
     public function changePasswordSalt(string $passwordSalt): void
     {
         $this->credential = $this->credential->withPasswordSalt($passwordSalt);
-
-        $this->onUpdate();
-        $this->onPasswordUpdate();
     }
 }

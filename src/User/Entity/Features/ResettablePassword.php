@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity\Features;
 
-use MsgPhp\Domain\Entity\Features\AbstractUpdated;
-
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 trait ResettablePassword
 {
-    use AbstractUpdated;
-
     /** @var string|null */
     private $passwordResetToken;
 
@@ -33,13 +29,5 @@ trait ResettablePassword
     {
         $this->passwordResetToken = $token ?? bin2hex(random_bytes(32));
         $this->passwordRequestedAt = new \DateTimeImmutable();
-
-        $this->onUpdate();
-    }
-
-    private function onPasswordUpdate(): void
-    {
-        $this->passwordResetToken = null;
-        $this->passwordRequestedAt = null;
     }
 }

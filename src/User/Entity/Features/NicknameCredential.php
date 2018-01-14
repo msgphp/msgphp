@@ -29,7 +29,5 @@ trait NicknameCredential
     public function changeNickname(string $nickname): void
     {
         $this->credential = $this->credential->withNickname($nickname);
-
-        $this->onUpdate();
     }
 }

@@ -29,7 +29,5 @@ trait EmailCredential
     public function changeEmail(string $email): void
     {
         $this->credential = $this->credential->withEmail($email);
-
-        $this->onUpdate();
     }
 }

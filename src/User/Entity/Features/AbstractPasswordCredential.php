@@ -26,12 +26,5 @@ trait AbstractPasswordCredential
     public function changePassword(string $password): void
     {
         $this->credential = $this->credential->withPassword($password);
-
-        $this->onUpdate();
-        $this->onPasswordUpdate();
-    }
-
-    private function onPasswordUpdate(): void
-    {
     }
 }
