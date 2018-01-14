@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\ORM\Version as DoctrineOrmVersion;
+use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
@@ -13,6 +13,7 @@ use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandle
 use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
 use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, CreatePendingUserCommand, DeleteUserRoleCommand};
 use MsgPhp\User\Infra\Doctrine\{EntityFieldsMapping, SqlEmailLookup};
+use MsgPhp\User\Infra\Doctrine\Event as DoctrineEvent;
 use MsgPhp\User\Infra\Doctrine\Repository\{PendingUserRepository, UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
 use MsgPhp\User\Infra\Doctrine\Type\UserIdType;
 use MsgPhp\User\Infra\Validator\{EmailLookupInterface, ExistingEmailValidator, UniqueEmailValidator};
@@ -105,7 +106,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $classMapping = $config['class_mapping'];
 
         if (isset($bundles[DoctrineBundle::class])) {
-            if (class_exists(DoctrineOrmVersion::class)) {
+            if (class_exists(DoctrineOrmEvents::class)) {
                 $container->prependExtensionConfig('doctrine', [
                     'orm' => [
                         'resolve_target_entities' => $classMapping,
@@ -140,13 +141,17 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
-        if (!class_exists(DoctrineOrmVersion::class)) {
+        if (!class_exists(DoctrineOrmEvents::class)) {
             return;
         }
 
         $loader->load('doctrine.php');
 
         $classMapping = $config['class_mapping'];
+
+        $container->register(DoctrineEvent\ResolveUserCredentialListener::class)
+            ->setArgument('$targetClass', $classMapping[User::class])
+            ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
 
         foreach ([
             PendingUserRepository::class => $classMapping[PendingUser::class] ?? null,

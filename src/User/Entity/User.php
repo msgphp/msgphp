@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
+use MsgPhp\User\{CredentialInterface, UserIdInterface};
 use MsgPhp\User\Entity\Credential\Anonymous;
-use MsgPhp\User\Entity\Features\AnonymousCredential;
-use MsgPhp\User\UserIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 class User
 {
-    use AnonymousCredential;
-
     private $id;
+    private $credential;
 
     public function __construct(UserIdInterface $id)
     {
@@ -26,5 +24,13 @@ class User
     public function getId(): UserIdInterface
     {
         return $this->id;
+    }
+
+    /**
+     * @return CredentialInterface
+     */
+    public function getCredential()
+    {
+        return $this->credential;
     }
 }
