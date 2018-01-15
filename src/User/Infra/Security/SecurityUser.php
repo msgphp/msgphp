@@ -6,7 +6,6 @@ namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Password\PasswordProtectedInterface;
-use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -37,7 +36,7 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function getUsername(): string
     {
-        return $this->email;
+        return $this->id;
     }
 
     public function getRoles(): array
@@ -57,6 +56,8 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function eraseCredentials(): void
     {
+        $this->password = '';
+        $this->passwordSalt = null;
     }
 
     public function isEqualTo(UserInterface $user)
