@@ -1,6 +1,6 @@
-# MsgPhp
+# Message driven PHP
 
-Main development repository.
+MsgPHP is a project that aims to provide (common) message based domain layers for your application.
 
 [![Build Status](https://travis-ci.org/msgphp/msgphp.svg?branch=master)](https://travis-ci.org/msgphp/msgphp) [![codecov](https://codecov.io/gh/msgphp/msgphp/branch/master/graph/badge.svg)](https://codecov.io/gh/msgphp/msgphp)
 

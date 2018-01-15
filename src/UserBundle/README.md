@@ -2,22 +2,20 @@
 
 A new Symfony bundle for basic user management.
 
-## Features
-
-- Symfony 3.4 / 4.0 ready
-- E-mail / password based authentication
-- User registration / E-mail confirmation
-- Forgot password / Reset password / Change password
-- Primary / secondary e-mails
-- Disabled / enabled users
-- User roles
-- User attribute values
-
 ## Installation
 
 ```bash
 composer require msgphp/user-bundle
 ```
+
+## Features
+
+- Symfony 3.4 / 4.0 ready
+- Credential independent (supports e-mail, nickname, etc.)
+- Disabled / enabled users
+- User roles
+- User attribute values
+- User secondary e-mails
 
 ## Blog posts
 

@@ -8,6 +8,10 @@ A Symfony bundle for basic EAV management.
 composer require msgphp/eav-bundle
 ```
 
+## Features
+
+- Symfony 3.4 / 4.0 ready
+
 ## Configuration
 
 ```php
