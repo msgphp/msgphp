@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp;
 
 use MsgPhp\User\Password\PasswordHashingInterface;
-use MsgPhp\User\Infra\Security\{PasswordHashing, SecurityUser, SecurityUserFactory, SecurityUserProvider};
+use MsgPhp\User\Infra\Security\{PasswordHashing, SecurityUser, SecurityUserFactory, SecurityUserProvider, UserValueResolver};
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface as SymfonyPasswordEncoderInterface;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\{inline, ref};
@@ -26,5 +26,6 @@ return function (ContainerConfigurator $container): void {
 
         ->set(SecurityUserFactory::class)
         ->set(SecurityUserProvider::class)
+        ->set(UserValueResolver::class)
     ;
 };

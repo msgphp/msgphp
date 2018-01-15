@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @todo remove
  */
 final class SecurityUserFactory
 {
