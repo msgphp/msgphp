@@ -129,16 +129,6 @@ $messageBus->handle(new DeleteUserCommand($user->getId()));
 - Requires `DoctrineBundle` and `doctrine/orm`, or a `MsgPhp\User\Repository\UserRepositoryInterface` service/alias
 - With `SimpleBusEventBusBundle` corresponding domain events are dispatched
 
-### With `TwigBundle`
-
-Twig extensions from `MsgPhp\User\Infra\Twig\*` are registered as a service.
-
-```twig
-{% if app.user %} {# the security user: `MsgPhp\User\Infra\Security\SecurityUser` #}
-    <p>Hello {{ msgphp_current_user().email }}</p> {# the domain user: `App\Entity\User` #}
-{% endif %}
-```
-
 ## Contributing
 
 This repository is **READ ONLY**. Issues and pull requests should be submitted in the

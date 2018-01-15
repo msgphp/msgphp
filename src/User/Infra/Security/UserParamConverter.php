@@ -18,11 +18,9 @@ final class UserParamConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        if ($request->attributes->has($param = $configuration->getName())) {
-            return false;
+        if (!$request->attributes->has($param = $configuration->getName())) {
+            $request->attributes->set($param, $this->toUser());
         }
-
-        $request->attributes->set($param, $this->toUser());
 
         return true;
     }

@@ -28,7 +28,6 @@
         "simple-bus/symfony-bridge": "^4.1|^5.0",
         "symfony/framework-bundle": "^3.4|^4.0",
         "symfony/security-bundle": "^3.4|^4.0",
-        "symfony/twig-bundle": "^3.4|^4.0",
         "symfony/phpunit-bridge": "^3.4|^4.0",
         "symfony/validator": "^3.4|^4.0",
         "symfony/var-dumper": "^3.4|^4.0"
