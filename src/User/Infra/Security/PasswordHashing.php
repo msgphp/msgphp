@@ -31,6 +31,6 @@ final class PasswordHashing implements PasswordHashingInterface
 
     private static function getSalt(PasswordAlgorithm $algorithm = null): string
     {
-        return null === $algorithm || null === $algorithm->salt ? bin2hex(random_bytes(16)) : $algorithm->salt->token;
+        return null === $algorithm || null === $algorithm->salt || empty($algorithm->salt->token) ? '' : $algorithm->salt->token;
     }
 }
