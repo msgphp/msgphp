@@ -26,7 +26,7 @@ final class CanBeEnabledOrDisabledTest extends TestCase
 
         $this->assertTrue($object->isEnabled());
 
-        $object->enable();
+        $object->disable();
 
         $this->assertFalse($object->isEnabled());
     }
