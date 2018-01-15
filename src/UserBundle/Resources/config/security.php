@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace MsgPhp;
 
 use MsgPhp\User\Password\PasswordHashingInterface;
-use MsgPhp\User\Infra\Security\{PasswordHashing, SecurityUser, SecurityUserProvider, UserValueResolver};
+use MsgPhp\User\Infra\Security\{PasswordHashing, SecurityUser, SecurityUserProvider, UserParamConverter, UserValueResolver};
+use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface as SymfonyPasswordEncoderInterface;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\{inline, ref};
 
 return function (ContainerConfigurator $container): void {
-    $container->services()
+    $services = $container->services()
         ->defaults()
             ->autowire()
             ->private()
@@ -27,4 +28,9 @@ return function (ContainerConfigurator $container): void {
         ->set(SecurityUserProvider::class)
         ->set(UserValueResolver::class)
     ;
+
+    if (class_exists(ParamConverterInterface::class)) {
+        $services->set(UserParamConverter::class)
+            ->tag('request.param_converter', ['priority' => 100]);
+    }
 };

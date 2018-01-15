@@ -30,7 +30,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        if (User::class !== $argument->getType()) {
+        if (User::class !== ($type = $argument->getType()) || !is_subclass_of($type, User::class)) {
             return false;
         }
 
