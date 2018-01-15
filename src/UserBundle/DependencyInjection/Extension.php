@@ -22,7 +22,6 @@ use MsgPhp\User\UserIdInterface;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
-use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -84,10 +83,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         if (isset($bundles[SecurityBundle::class])) {
             $loader->load('security.php');
-        }
-
-        if (isset($bundles[TwigBundle::class])) {
-            $loader->load('twig.php');
         }
     }
 
