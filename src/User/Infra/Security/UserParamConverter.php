@@ -14,21 +14,25 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class UserParamConverter implements ParamConverterInterface
 {
+    use TokenStorageAwareTrait;
+
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        // @todo implement
+        if ($request->attributes->has($param = $configuration->getName())) {
+            return false;
+        }
+
+        $request->attributes->set($param, $this->toUser());
+
+        return true;
     }
 
     public function supports(ParamConverter $configuration): bool
     {
-        if (null === ($class = $configuration->getClass()) || !($options = $configuration->getOptions())) {
+        if (User::class !== ($class = $configuration->getClass()) || !is_subclass_of($class, User::class) || !($options = $configuration->getOptions()) || empty($options['current']) || !$this->isUserOrUnknownToken()) {
             return false;
         }
 
-        if (User::class !== $class || !is_subclass_of($class, User::class)) {
-            return false;
-        }
-
-        return (bool) $options['current'] ?? false;
+        return $configuration->isOptional() || $this->isUserToken();
     }
 }
