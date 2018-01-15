@@ -5,13 +5,16 @@ includes:
 
 parameters:
     ignoreErrors:
-        - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg.#'
-        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject.#'
+        - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'
+        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject\.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\DomainEntityRepositoryTraitTest::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
 
         # see https://github.com/symfony/symfony/pull/25644
         - '#Strict comparison using === between null and string will always evaluate to false#'
+
+        # see https://github.com/sebastianbergmann/phpunit/pull/2963
+        - '#Parameter \#1 \$originalClassName of method PHPUnit\\Framework\\TestCase::createMock\(\) expects string, array<int, string> given\.#'
 
         # fluent mixed interface usage in src/*Bundle/DependencyInjection/Configuration.php
         - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::append\(\)\.#'

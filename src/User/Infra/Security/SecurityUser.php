@@ -28,8 +28,9 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
         if ($credential instanceof PasswordProtectedInterface) {
             $this->password = $credential->getPassword();
 
-            if (null !== $salt = $credential->createPasswordAlgorithm()->salt) {
-                $this->passwordSalt = $salt->token;
+            $algorithm = $credential->createPasswordAlgorithm();
+            if (null !== $algorithm->salt) {
+                $this->passwordSalt = $algorithm->salt->token;
             }
         }
     }
@@ -62,7 +63,7 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function isEqualTo(UserInterface $user)
     {
-        return $this->id === $user->getUsername();
+        return $user instanceof self && $this->id === $user->getUsername();
     }
 
     public function serialize(): string

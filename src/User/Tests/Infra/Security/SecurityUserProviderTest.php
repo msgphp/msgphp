@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, GlobalObjectMemory};
+use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\User\Entity\User;
-use MsgPhp\User\Infra\InMemory\Repository\UserRepository;
-use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRoleProviderInterface};
+use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRolesProviderInterface};
+use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -18,71 +19,116 @@ final class SecurityUserProviderTest extends TestCase
 {
     public function testLoadUserByUsername(): void
     {
-        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory());
-        $repository->save($user);
-        $securityUser = $this->createProvider(['ROLE_USER'], $repository)->loadUserByUsername($user->getEmail());
+        $user = (new SecurityUserProvider($this->createRepository($this->createUser('id')), $this->createFactory()))->loadUserByUsername('id');
 
-        $this->assertInstanceOf(SecurityUser::class, $securityUser);
-        $this->assertSame($securityUser->getRoles(), ['ROLE_USER']);
-        $this->assertSame($securityUser->getPassword(), $user->getPassword());
-        $this->assertSame($securityUser->getUsername(), $user->getEmail());
+        $this->assertSame('id', $user->getUsername());
+        $this->assertSame([], $user->getRoles());
+        $this->assertSame('', $user->getPassword());
+        $this->assertNull($user->getSalt());
     }
 
-    public function testLoadUnknownUserByUsername(): void
+    public function testLoadUserByUsernameWithRoles(): void
     {
+        $roleProvider = $this->createMock(UserRolesProviderInterface::class);
+        $roleProvider->expects($this->any())
+            ->method('getRoles')
+            ->willReturn(['ROLE_FOO']);
+        $user = (new SecurityUserProvider($this->createRepository($this->createUser('id')), $this->createFactory(), $roleProvider))->loadUserByUsername('id');
+
+        $this->assertSame('id', $user->getUsername());
+        $this->assertSame(['ROLE_FOO'], $user->getRoles());
+        $this->assertSame('', $user->getPassword());
+        $this->assertNull($user->getSalt());
+    }
+
+    public function testLoadUserByUsernameWithUnknownUsername(): void
+    {
+        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+
         $this->expectException(UsernameNotFoundException::class);
 
-        $this->createProvider()->loadUserByUsername('foo@bar.baz');
+        $provider->loadUserByUsername('id');
     }
 
     public function testRefreshUser(): void
     {
-        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
-        $repository = new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory());
-        $repository->save($user);
-        $securityUser = $this->createProvider([], $repository)->refreshUser($oldSecurityUser = new SecurityUser($user));
+        $provider = new SecurityUserProvider($this->createRepository($this->createUser('id')), $this->createFactory());
+        $user = $provider->refreshUser($originUser = $provider->loadUserByUsername('id'));
 
-        $this->assertEquals($oldSecurityUser, $securityUser);
-        $this->assertNotSame($oldSecurityUser, $securityUser);
+        $this->assertEquals($originUser, $user);
+        $this->assertNotSame($originUser, $user);
     }
 
-    public function testRefreshUserWithInvalidId(): void
+    public function testRefreshUserWithUnknownUser(): void
     {
-        $user = new User($this->createMock(UserIdInterface::class), 'foo@bar.baz', 'secret');
+        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
 
         $this->expectException(UsernameNotFoundException::class);
 
-        $this->createProvider()->refreshUser(new SecurityUser($user));
+        $provider->refreshUser(new SecurityUser($this->createUser('unknown')));
     }
 
-    public function testRefreshUnknownUser(): void
+    public function testRefreshUserWithUnsupportedUser(): void
     {
+        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+
         $this->expectException(UnsupportedUserException::class);
 
-        $this->createProvider()->refreshUser($this->createMock(UserInterface::class));
+        $provider->refreshUser($this->createMock(UserInterface::class));
     }
 
     public function testSupportsClass(): void
     {
-        $this->assertTrue($this->createProvider()->supportsClass(SecurityUser::class));
-        $this->assertFalse($this->createProvider()->supportsClass(UserInterface::class));
+        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+
+        $this->assertTrue($provider->supportsClass(SecurityUser::class));
+        $this->assertFalse($provider->supportsClass(UserInterface::class));
     }
 
-    private function createProvider(array $roles = [], UserRepository $repository = null): SecurityUserProvider
+    private function createFactory(): EntityFactoryInterface
     {
-        return new SecurityUserProvider($repository ?? new UserRepository(User::class, new DomainIdentityMap([User::class => 'id']), new GlobalObjectMemory()), new class($roles) implements UserRoleProviderInterface {
-            private $roles;
+        $factory = $this->createMock(EntityFactoryInterface::class);
+        $factory->expects($this->any())
+            ->method('identify')
+            ->willReturnCallback(function ($class, $id) {
+                $userId = $this->createMock(UserIdInterface::class);
+                $userId->expects($this->any())
+                    ->method('toString')
+                    ->willReturn($id);
 
-            public function __construct(array $roles)
-            {
-                $this->roles = $roles;
-            }
+                return $userId;
+            });
 
-            public function getRoles(User $user): array
-            {
-                return $this->roles;
-            }
-        });
+        return $factory;
+    }
+
+    private function createRepository(User $user = null): UserRepositoryInterface
+    {
+        $repository = $this->createMock(UserRepositoryInterface::class);
+        $repository->expects($this->any())
+            ->method('find')
+            ->willReturnCallback(function (UserIdInterface $id) use ($user) {
+                if (null === $user || $id->toString() !== $user->getId()->toString()) {
+                    throw EntityNotFoundException::createForId(User::class, $id->toString());
+                }
+
+                return $user;
+            });
+
+        return $repository;
+    }
+
+    private function createUser(string $id): User
+    {
+        $userId = $this->createMock(UserIdInterface::class);
+        $userId->expects($this->any())
+            ->method('toString')
+            ->willReturn($id);
+        $user = $this->createMock(User::class);
+        $user->expects($this->any())
+            ->method('getId')
+            ->willReturn($userId);
+
+        return $user;
     }
 }

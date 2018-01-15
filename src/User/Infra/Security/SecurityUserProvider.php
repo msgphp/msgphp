@@ -19,9 +19,10 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 final class SecurityUserProvider implements UserProviderInterface
 {
     private $repository;
+    private $factory;
     private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, EntityFactoryInterface $factory, UserRoleProviderInterface $roleProvider = null)
+    public function __construct(UserRepositoryInterface $repository, EntityFactoryInterface $factory, UserRolesProviderInterface $roleProvider = null)
     {
         $this->repository = $repository;
         $this->factory = $factory;
