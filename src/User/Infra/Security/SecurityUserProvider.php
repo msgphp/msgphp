@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -20,16 +21,17 @@ final class SecurityUserProvider implements UserProviderInterface
     private $repository;
     private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, UserRoleProviderInterface $roleProvider = null)
+    public function __construct(UserRepositoryInterface $repository, EntityFactoryInterface $factory, UserRoleProviderInterface $roleProvider = null)
     {
         $this->repository = $repository;
+        $this->factory = $factory;
         $this->roleProvider = $roleProvider;
     }
 
-    public function loadUserByUsername(/*string */$username): UserInterface
+    public function loadUserByUsername($username): UserInterface
     {
         try {
-            return $this->fromUser($this->repository->findByEmail($username));
+            return $this->createUser($username);
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
@@ -42,19 +44,21 @@ final class SecurityUserProvider implements UserProviderInterface
         }
 
         try {
-            return $this->fromUser($this->repository->find($user->getId()));
+            return $this->createUser($user->getUsername());
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
     }
 
-    public function supportsClass(/*string */$class): bool
+    public function supportsClass($class): bool
     {
         return SecurityUser::class === $class;
     }
 
-    private function fromUser(User $user): SecurityUser
+    private function createUser(string $id): SecurityUser
     {
+        $user = $this->repository->find($this->factory->identify(User::class, $id));
+
         return new SecurityUser($user, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
     }
 }
