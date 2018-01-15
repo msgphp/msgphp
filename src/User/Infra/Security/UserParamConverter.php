@@ -16,15 +16,19 @@ final class UserParamConverter implements ParamConverterInterface
 {
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        // @todo implement; detect doctrine conversion, on fail pass here to let UserValueResolver pick it up
+        // @todo implement
     }
 
     public function supports(ParamConverter $configuration): bool
     {
-        if (null === $class = $configuration->getClass()) {
+        if (null === ($class = $configuration->getClass()) || !($options = $configuration->getOptions())) {
             return false;
         }
 
-        return User::class === $class || is_subclass_of($class, User::class);
+        if (User::class !== $class || !is_subclass_of($class, User::class)) {
+            return false;
+        }
+
+        return (bool) $options['current'] ?? false;
     }
 }
