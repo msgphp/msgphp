@@ -12,11 +12,6 @@ trait NicknameAsUsername
     /** @var string */
     private $nickname;
 
-    public static function getUsernameField(): string
-    {
-        return 'nickname';
-    }
-
     public function getNickname(): string
     {
         return $this->nickname;

@@ -30,11 +30,6 @@ final class UserRepository implements UserRepositoryInterface
         return $this->doFind($id);
     }
 
-    public function findByEmail(string $email): User
-    {
-        return $this->doFindByFields(['email' => $email]);
-    }
-
     public function exists(UserIdInterface $id): bool
     {
         return $this->doExists($id);

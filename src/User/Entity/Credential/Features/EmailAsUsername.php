@@ -12,11 +12,6 @@ trait EmailAsUsername
     /** @var string */
     private $email;
 
-    public static function getUsernameField(): string
-    {
-        return 'email';
-    }
-
     public function getEmail(): string
     {
         return $this->email;

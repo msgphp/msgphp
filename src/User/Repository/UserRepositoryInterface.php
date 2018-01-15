@@ -20,9 +20,6 @@ interface UserRepositoryInterface
 
     public function find(UserIdInterface $id): User;
 
-    // @todo findByCredential(CredentialInterface $credentia): User;
-    public function findByEmail(string $email): User;
-
     public function exists(UserIdInterface $id): bool;
 
     public function save(User $user): void;

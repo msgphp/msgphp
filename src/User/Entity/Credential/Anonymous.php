@@ -11,11 +11,6 @@ use MsgPhp\User\CredentialInterface;
  */
 final class Anonymous implements CredentialInterface
 {
-    public static function getUsernameField(): string
-    {
-        return 'username';
-    }
-
     public function getUsername(): string
     {
         throw new \LogicException('An anonymous credential has no username.');

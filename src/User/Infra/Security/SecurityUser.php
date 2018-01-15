@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\User\Entity\User;
+use MsgPhp\User\Password\PasswordProtectedInterface;
 use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -15,21 +16,28 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class SecurityUser implements UserInterface, EquatableInterface, \Serializable
 {
     private $id;
-    private $email;
-    private $password;
     private $roles;
+    private $password;
+    private $passwordSalt;
 
     public function __construct(User $user, array $roles = [])
     {
-        $this->id = $user->getId();
-        $this->email = $user->getEmail();
-        $this->password = $user->getPassword();
+        $this->id = $user->getId()->toString();
         $this->roles = $roles;
+
+        $credential = $user->getCredential();
+        if ($credential instanceof PasswordProtectedInterface) {
+            $this->password = $credential->getPassword();
+
+            if (null !== $salt = $credential->createPasswordAlgorithm()->salt) {
+                $this->passwordSalt = $salt->token;
+            }
+        }
     }
 
-    public function getId(): UserIdInterface
+    public function getUsername(): string
     {
-        return $this->id;
+        return $this->email;
     }
 
     public function getRoles(): array
@@ -39,17 +47,12 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function getPassword(): string
     {
-        return $this->password;
+        return $this->password ?? '';
     }
 
     public function getSalt(): ?string
     {
-        return null;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->email;
+        return $this->passwordSalt;
     }
 
     public function eraseCredentials(): void
@@ -58,20 +61,16 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function isEqualTo(UserInterface $user)
     {
-        return $user instanceof self
-            && $this->getId()->equals($user->getId())
-            && $this->getRoles() === $user->getRoles()
-            && $this->getPassword() === $user->getPassword()
-            && $this->getUsername() === $user->getUsername();
+        return $this->id === $user->getUsername();
     }
 
     public function serialize(): string
     {
-        return serialize([$this->id, $this->email, $this->password, $this->roles]);
+        return serialize([$this->id, $this->roles, $this->password, $this->passwordSalt]);
     }
 
-    public function unserialize(/*string */$serialized): void
+    public function unserialize($serialized): void
     {
-        list($this->id, $this->email, $this->password, $this->roles) = unserialize($serialized);
+        list($this->id, $this->roles, $this->password, $this->passwordSalt) = unserialize($serialized);
     }
 }
