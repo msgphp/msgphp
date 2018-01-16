@@ -7,6 +7,7 @@ namespace MsgPhp\User\Infra\Security;
 use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -27,14 +28,9 @@ trait TokenStorageAwareTrait
         $this->factory = $factory;
     }
 
-    private function isUserToken(): bool
+    private function isUser(): bool
     {
         return null !== ($token = $this->tokenStorage->getToken()) && $token->getUser() instanceof SecurityUser;
-    }
-
-    private function isUserOrUnknownToken(): bool
-    {
-        return null === ($token = $this->tokenStorage->getToken()) || $token->getUser() instanceof SecurityUser;
     }
 
     private function toUser(): ?User

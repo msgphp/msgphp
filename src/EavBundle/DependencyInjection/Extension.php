@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\EavBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
 use MsgPhp\Eav\Entity\Attribute;
@@ -47,7 +46,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
-        ContainerHelper::configureDoctrine($container, [EntityFieldsMapping::class]);
+        ContainerHelper::configureDoctrineOrm($container, self::getDoctrineMappingFiles($container), [EntityFieldsMapping::class]);
 
         $bundles = ContainerHelper::getBundles($container);
 
@@ -68,30 +67,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             AttributeIdInterface::class => AttributeIdType::class,
             AttributeValueIdInterface::class => AttributeValueIdType::class,
         ]);
-
-        $bundles = ContainerHelper::getBundles($container);
-        $classMapping = $config['class_mapping'];
-
-        if (isset($bundles[DoctrineBundle::class]) && class_exists(DoctrineOrmVersion::class)) {
-            $container->prependExtensionConfig('doctrine', [
-                'orm' => [
-                    'resolve_target_entities' => $classMapping,
-                    'mappings' => [
-                        'msgphp_eav' => [
-                            'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
-                            'type' => 'xml',
-                            'prefix' => 'MsgPhp\\Eav\\Entity',
-                            'is_bundle' => false,
-                        ],
-                    ],
-                ],
-            ]);
-        }
+        ContainerHelper::configureDoctrineMapping($container, $config['class_mapping']);
     }
 
     private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
-        if (!class_exists(DoctrineOrmVersion::class)) {
+        if (!ContainerHelper::isDoctrineOrmEnabled($container)) {
             return;
         }
 
@@ -108,5 +89,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 $container->getDefinition($repository)->setArgument('$class', $class);
             }
         }
+    }
+
+    private static function getDoctrineMappingFiles(ContainerBuilder $container): array
+    {
+        return glob(dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName()).'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml');
     }
 }

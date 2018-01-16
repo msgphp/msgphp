@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <mapped-superclass name="MsgPhp\User\Entity\Eav\UserAttributeValue">
+    <mapped-superclass name="MsgPhp\User\Entity\UserAttributeValue">
         <id name="user" association-key="true" />
         <id name="attributeValue" association-key="true" />
 

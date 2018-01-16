@@ -6,20 +6,14 @@ namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use Doctrine\ORM\Events as DoctrineOrmEvents;
-use MsgPhp\Domain\DomainIdentityMapInterface;
-use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, ConstructorResolvingObjectFactory, EntityFactory, EntityFactoryInterface};
-use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMap as DoctrineDomainIdentityMap, EntityFieldsMapping, Event as DoctrineEvent};
-use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMap, ObjectFieldAccessor};
-use MsgPhp\Domain\Infra\SimpleBus\{DomainCommandBus, DomainEventBus};
+use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
-use SimpleBus\SymfonyBridge\{SimpleBusCommandBusBundle, SimpleBusEventBusBundle};
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -28,15 +22,14 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class ContainerHelper
 {
-    public static function getBundles(ContainerBuilder $container): array
-    {
-        // @todo remove eventually
-        return array_flip($container->getParameter('kernel.bundles'));
-    }
-
-    public static function hasBundle(ContainerBuilder $container, string $class): bool
+    public static function hasBundle(Container $container, string $class): bool
     {
         return in_array($class, $container->getParameter('kernel.bundles'), true);
+    }
+
+    public static function getBundles(Container $container): array
+    {
+        return array_flip($container->getParameter('kernel.bundles'));
     }
 
     public static function getClassReflector(ContainerBuilder $container): \Closure
@@ -74,89 +67,40 @@ final class ContainerHelper
             }
         }
 
-        if (!$container->has('msgphp.entity_field_accessor')) {
-            $container->register('msgphp.entity_field_accessor', ObjectFieldAccessor::class)
-                ->setPublic(false);
-        }
+        $identiyMap = $container->hasParameter($param = 'msgphp.domain.identity_map') ? $container->getParameter($param) : [];
+        $identiyMap[] = $identityMapping;
 
-        if (!$container->hasDefinition('msgphp.identity_map')) {
-            $container->register('msgphp.identity_map', DomainIdentityMap::class)
-                ->setPublic(false)
-                ->setArgument('$mapping', $identityMapping)
-                ->setArgument('$accessor', new Reference('msgphp.entity_field_accessor'));
-
-            $container->setAlias(DomainIdentityMapInterface::class, new Alias('msgphp.identity_map', true));
-        } else {
-            ($definition = $container->getDefinition('msgphp.identity_map'))
-                ->setArgument('$mapping', $identityMapping + $definition->getArgument('$mapping'));
-        }
+        $container->setParameter($param, $identiyMap);
     }
 
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
-        if (!$container->has('msgphp.entity_factory.default')) {
-            $container->register('msgphp.entity_factory.default', ConstructorResolvingObjectFactory::class)
-                ->setPublic(false)
-                ->addMethodCall('setNestedFactory', [new Reference('msgphp.entity_factory')]);
-        }
+        $classMap = $container->hasParameter($param = 'msgphp.domain.class_map') ? $container->getParameter($param) : [];
+        $classMap[] = $classMapping;
 
-        if (!$container->hasDefinition('msgphp.entity_factory.mapping')) {
-            $container->register('msgphp.entity_factory.mapping', ClassMappingObjectFactory::class)
-                ->setPublic(false)
-                ->setArgument('$mapping', $classMapping)
-                ->setArgument('$factory', new Reference('msgphp.entity_factory.default'));
-        } else {
-            ($definition = $container->getDefinition('msgphp.entity_factory.mapping'))
-                ->setArgument('$mapping', $classMapping + $definition->getArgument('$mapping'));
-        }
+        $container->setParameter($param, $classMap);
 
-        if (!$container->hasDefinition('msgphp.entity_factory')) {
-            $container->register('msgphp.entity_factory', EntityFactory::class)
-                ->setPublic(true)
-                ->setArgument('$identifierMapping', $idClassMapping)
-                ->setArgument('$factory', new Reference('msgphp.entity_factory.mapping'));
-        } else {
-            ($definition = $container->getDefinition('msgphp.entity_factory'))
-                ->setArgument('$identifierMapping', $idClassMapping + $definition->getArgument('$identifierMapping'));
-        }
+        $idClassMap = $container->hasParameter($param = 'msgphp.domain.id_class_map') ? $container->getParameter($param) : [];
+        $idClassMap[] = $idClassMapping;
 
-        if (!$container->has(EntityFactoryInterface::class)) {
-            $container->setAlias(EntityFactoryInterface::class, new Alias('msgphp.entity_factory', true));
-        }
+        $container->setParameter($param, $idClassMap);
     }
 
-    public static function configureDoctrine(ContainerBuilder $container, array $ormObjectFieldMappings = []): void
+    public static function configureDoctrineOrm(ContainerBuilder $container, array $mappingFiles, array $ormObjectFieldMappings = []): void
     {
-        if (!self::hasBundle($container, DoctrineBundle::class)) {
+        if (!self::isDoctrineOrmEnabled($container)) {
             return;
         }
 
-        if (!$container->has('msgphp.identity_map.doctrine')) {
-            $container->register('msgphp.identity_map.doctrine', DoctrineDomainIdentityMap::class)
+        $mappingFileList = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
+        $mappingFileList[] = $mappingFiles;
+
+        $container->setParameter($param, $mappingFileList);
+
+        foreach ($ormObjectFieldMappings as $class) {
+            $container->register($class)
                 ->setPublic(false)
-                ->setAutowired(true);
-
-            $container->setAlias('msgphp.identity_map', new Alias('msgphp.identity_map.doctrine', false));
-        }
-
-        if (class_exists(DoctrineOrmEvents::class)) {
-            if (!$container->has(DoctrineEvent\ObjectFieldMappingListener::class)) {
-                $container->register(DoctrineEvent\ObjectFieldMappingListener::class)
-                    ->setPublic(false)
-                    ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
-                    ->setArgument('$mapping', [])
-                    ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
-            }
-
-            array_unshift($ormObjectFieldMappings, EntityFieldsMapping::class);
-
-            foreach ($ormObjectFieldMappings as $class) {
-                if (!$container->has($class)) {
-                    $container->register($class)
-                        ->setPublic(false)
-                        ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
-                }
-            }
+                ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
         }
     }
 
@@ -206,48 +150,40 @@ final class ContainerHelper
                 'dbal' => $config,
             ]);
 
-            if ($container->hasParameter('msgphp.doctrine.type_config')) {
-                $typeConfig += $container->getParameter('msgphp.doctrine.type_config');
+            if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
+                $typeConfig += $container->getParameter($param);
             }
 
-            $container->setParameter('msgphp.doctrine.type_config', $typeConfig);
+            $container->setParameter($param, $typeConfig);
         }
     }
 
-    public static function configureSimpleBus(ContainerBuilder $container, string $type = null): void
+    public static function configureDoctrineMapping(ContainerBuilder $container, array $classMapping): void
     {
-        $buses = [
-            'command_bus' => [SimpleBusCommandBusBundle::class, DomainCommandBus::class],
-            'event_bus' => [SimpleBusEventBusBundle::class, DomainEventBus::class],
-        ];
-
-        if (null === $type) {
-            foreach (array_keys($buses) as $type) {
-                self::configureSimpleBus($container, $type);
-            }
-
+        if (!self::isDoctrineOrmEnabled($container)) {
             return;
         }
 
-        if (!isset($buses[$type])) {
-            throw new InvalidArgumentException(sprintf('Invalid message bus type "%s".', $type));
-        }
+        (new Filesystem())->mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/%msgphp.doctrine.mapping_cache_dirname%'));
 
-        list($bundle, $class) = $buses[$type];
+        $container->prependExtensionConfig('doctrine', [
+            'orm' => [
+                'resolve_target_entities' => $classMapping,
+                'mappings' => [
+                    'msgphp' => [
+                        'dir' => $mappingDir,
+                        'type' => 'xml',
+                        'prefix' => 'MsgPhp',
+                        'is_bundle' => false,
+                    ],
+                ],
+            ],
+        ]);
+    }
 
-        if (!self::hasBundle($container, $bundle) || $container->has($class)) {
-            return;
-        }
-
-        $container->register($class)
-            ->setPublic(false)
-            ->addArgument(new Reference($type));
-
-        foreach (self::getClassReflection($container, $class)->getInterfaceNames() as $interface) {
-            if (!$container->has($interface)) {
-                $container->setAlias($interface, new Alias($class, true));
-            }
-        }
+    public static function isDoctrineOrmEnabled(Container $container): bool
+    {
+        return self::hasBundle($container, DoctrineBundle::class) && class_exists(DoctrineOrmVersion::class);
     }
 
     private function __construct()

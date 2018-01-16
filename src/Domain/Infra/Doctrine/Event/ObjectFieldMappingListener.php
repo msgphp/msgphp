@@ -10,8 +10,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @internal
  */
 final class ObjectFieldMappingListener
 {

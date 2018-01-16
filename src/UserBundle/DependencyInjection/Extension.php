@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
-use MsgPhp\User\Entity\{PendingUser, User, UserRole, UserSecondaryEmail};
-use MsgPhp\User\Entity\Eav\UserAttributeValue;
+use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
 use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, CreatePendingUserCommand, DeleteUserRoleCommand};
 use MsgPhp\User\Infra\Doctrine\{EntityFieldsMapping, SqlEmailLookup};
 use MsgPhp\User\Infra\Doctrine\Repository\{PendingUserRepository, UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
@@ -61,8 +59,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
-        ContainerHelper::configureDoctrine($container, [EntityFieldsMapping::class]);
-        ContainerHelper::configureSimpleBus($container);
+        ContainerHelper::configureDoctrineOrm($container, self::getDoctrineMappingFiles($container), [EntityFieldsMapping::class]);
 
         $bundles = ContainerHelper::getBundles($container);
 
@@ -96,45 +93,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ContainerHelper::configureDoctrineTypes($container, $config['data_type_mapping'], $config['class_mapping'], [
             UserIdInterface::class => UserIdType::class,
         ]);
-
-        $bundles = ContainerHelper::getBundles($container);
-        $classMapping = $config['class_mapping'];
-
-        if (isset($bundles[DoctrineBundle::class]) && class_exists(DoctrineOrmEvents::class)) {
-            $container->prependExtensionConfig('doctrine', [
-                'orm' => [
-                    'resolve_target_entities' => $classMapping,
-                    'mappings' => [
-                        'msgphp_user' => [
-                            'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping',
-                            'type' => 'xml',
-                            'prefix' => 'MsgPhp\\User\\Entity',
-                            'is_bundle' => false,
-                        ],
-                    ],
-                ],
-            ]);
-
-            if (isset($bundles[MsgPhpEavBundle::class])) {
-                $container->prependExtensionConfig('doctrine', [
-                    'orm' => [
-                        'mappings' => [
-                            'msgphp_user_eav' => [
-                                'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping-eav',
-                                'type' => 'xml',
-                                'prefix' => 'MsgPhp\\User\\Entity\\Eav',
-                                'is_bundle' => false,
-                            ],
-                        ],
-                    ],
-                ]);
-            }
-        }
+        ContainerHelper::configureDoctrineMapping($container, $config['class_mapping']);
     }
 
     private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
-        if (!class_exists(DoctrineOrmEvents::class)) {
+        if (!ContainerHelper::isDoctrineOrmEnabled($container)) {
             return;
         }
 
@@ -236,5 +200,18 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 $container->removeDefinition(UniqueEmailValidator::class);
             }
         }
+    }
+
+    private static function getDoctrineMappingFiles(ContainerBuilder $container): array
+    {
+        $files = glob(($baseDir = dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Infra/Doctrine/Resources/dist-mapping').'/*.orm.xml');
+
+        if (!ContainerHelper::hasBundle($container, MsgPhpEavBundle::class)) {
+            $files = array_flip($files);
+            unset($files[$baseDir.'/User.Entity.UserAttributeValue.orm.xml']);
+            $files = array_values(array_flip($files));
+        }
+
+        return $files;
     }
 }

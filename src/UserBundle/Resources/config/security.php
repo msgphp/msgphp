@@ -27,9 +27,10 @@ return function (ContainerConfigurator $container): void {
 
         ->set(SecurityUserProvider::class)
         ->set(UserValueResolver::class)
+            ->tag('controller.argument_value_resolver')
     ;
 
-    if (class_exists(ParamConverterInterface::class)) {
+    if (interface_exists(ParamConverterInterface::class)) {
         $services->set(UserParamConverter::class)
             ->tag('request.param_converter', ['priority' => 100]);
     }

@@ -18,11 +18,11 @@ final class UserValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        if (User::class !== ($type = $argument->getType()) || !is_subclass_of($type, User::class) || !$this->isUserOrUnknownToken()) {
-            return false;
+        if (User::class === ($type = $argument->getType()) || is_subclass_of($type, User::class)) {
+            return $argument->isNullable() || $this->isUser();
         }
 
-        return $argument->isNullable() || $this->isUserToken();
+        return false;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator

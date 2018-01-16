@@ -27,10 +27,12 @@ final class UserParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration): bool
     {
-        if (User::class !== ($class = $configuration->getClass()) || !is_subclass_of($class, User::class) || !($options = $configuration->getOptions()) || empty($options['current']) || !$this->isUserOrUnknownToken()) {
-            return false;
+        if (User::class == ($class = $configuration->getClass()) || is_subclass_of($class, User::class)) {
+            $options = $configuration->getOptions();
+
+            return !empty($options['current']) && ($configuration->isOptional() || $this->isUser());
         }
 
-        return $configuration->isOptional() || $this->isUserToken();
+        return false;
     }
 }
