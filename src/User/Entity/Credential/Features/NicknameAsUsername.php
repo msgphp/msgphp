@@ -21,4 +21,6 @@ trait NicknameAsUsername
     {
         return $this->nickname;
     }
+
+    abstract public function withNickname(string $nickname): self;
 }

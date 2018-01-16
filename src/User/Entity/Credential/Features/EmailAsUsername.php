@@ -21,4 +21,6 @@ trait EmailAsUsername
     {
         return $this->email;
     }
+
+    abstract public function withEmail(string $email): self;
 }
