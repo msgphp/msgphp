@@ -37,7 +37,15 @@ final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
 
         return $credentials + [
             Features\ResettablePassword::class => [
-                // @todo
+                'passwordResetToken' => [
+                    'type' => 'string',
+                    'unique' => true,
+                    'nullable' => true,
+                ],
+                'passwordRequestedAt' => [
+                    'type' => 'datetime',
+                    'nullable' => true,
+                ],
             ],
             Fields\UserField::class => [
                 'user' => [

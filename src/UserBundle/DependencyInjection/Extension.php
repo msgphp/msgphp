@@ -8,14 +8,14 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
-use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
-use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
-use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, CreatePendingUserCommand, DeleteUserRoleCommand};
+use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmUserSecondaryEmailHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
+use MsgPhp\User\Entity\{User, UserAttributeValue, UserRole, UserSecondaryEmail};
+use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, DeleteUserRoleCommand};
 use MsgPhp\User\Infra\Doctrine\{EntityFieldsMapping, SqlEmailLookup};
-use MsgPhp\User\Infra\Doctrine\Repository\{PendingUserRepository, UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
+use MsgPhp\User\Infra\Doctrine\Repository\{UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
 use MsgPhp\User\Infra\Doctrine\Type\UserIdType;
 use MsgPhp\User\Infra\Validator\{EmailLookupInterface, ExistingEmailValidator, UniqueEmailValidator};
-use MsgPhp\User\Repository\{PendingUserRepositoryInterface, UserAttributeValueRepositoryInterface, UserRepositoryInterface, UserRoleRepositoryInterface, UserSecondaryEmailRepositoryInterface};
+use MsgPhp\User\Repository\{UserAttributeValueRepositoryInterface, UserRepositoryInterface, UserRoleRepositoryInterface, UserSecondaryEmailRepositoryInterface};
 use MsgPhp\User\UserIdInterface;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -107,7 +107,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $classMapping = $config['class_mapping'];
 
         foreach ([
-            PendingUserRepository::class => $classMapping[PendingUser::class] ?? null,
             UserRepository::class => $classMapping[User::class],
             UserAttributeValueRepository::class => $classMapping[UserAttributeValue::class] ?? null,
             UserRoleRepository::class => $classMapping[UserRole::class] ?? null,
@@ -128,10 +127,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $entityEmailFieldMapping[$classMapping[UserSecondaryEmail::class]] = 'email';
         }
 
-        if (isset($classMapping[PendingUser::class])) {
-            $entityEmailFieldMapping[$classMapping[PendingUser::class]] = 'email';
-        }
-
         $container->getDefinition(SqlEmailLookup::class)
             ->setArgument('$entityFieldMapping', $entityEmailFieldMapping)
             ->setArgument('$primaryEntityFieldMapping', $primaryEntityEmailFieldMapping);
@@ -146,11 +141,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $loader->load('simplebus.php');
 
         $classMapping = $config['class_mapping'];
-
-        if (!isset($classMapping[PendingUser::class]) || !$container->has(PendingUserRepositoryInterface::class)) {
-            $container->removeDefinition(ConfirmPendingUserHandler::class);
-            $container->removeDefinition(CreatePendingUserHandler::class);
-        }
 
         if (!isset($classMapping[UserAttributeValue::class]) || !$container->has(UserAttributeValueRepositoryInterface::class)) {
             $container->removeDefinition(AddUserAttributeValueHandler::class);
@@ -180,10 +170,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         // @todo register default EmailLookupInterface from repository implems
         if (class_exists(Application::class) && $container->has(CommandBusInterface::class) && $container->has(UserRepositoryInterface::class) && $container->has(EmailLookupInterface::class)) {
             $loader->load('console.php');
-
-            if (!isset($classMapping[PendingUser::class])) {
-                $container->removeDefinition(CreatePendingUserCommand::class);
-            }
 
             if (!isset($classMapping[UserRole::class])) {
                 $container->removeDefinition(AddUserRoleCommand::class);

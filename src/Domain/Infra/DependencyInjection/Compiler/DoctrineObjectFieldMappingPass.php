@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\Doctrine\EntityFieldsMapping;
 use MsgPhp\Domain\Infra\Doctrine\Event\ObjectFieldMappingListener;
@@ -47,13 +46,12 @@ final class DoctrineObjectFieldMappingPass implements CompilerPassInterface
         }
 
         if (!$mapping) {
+            $container->removeDefinition(ObjectFieldMappingListener::class);
+
             return;
         }
 
-        $container->register(ObjectFieldMappingListener::class, ObjectFieldMappingListener::class)
-            ->setPublic(false)
-            ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
-            ->setArgument('$mapping', $mapping)
-            ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
+        $container->getDefinition(ObjectFieldMappingListener::class)
+            ->setArgument('$mapping', $mapping);
     }
 }

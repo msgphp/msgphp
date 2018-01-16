@@ -9,7 +9,7 @@ use MsgPhp\Domain\Entity\Fields\EnabledField;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-trait CanBeEnabledOrDisabled
+trait CanBeEnabled
 {
     use EnabledField;
 

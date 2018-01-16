@@ -5,14 +5,14 @@
 
     <mapped-superclass name="MsgPhp\User\Entity\UserSecondaryEmail">
         <unique-constraints>
-            <unique-constraint columns="email" name="email_idx" />
+            <unique-constraint columns="email" name="email_unique" />
         </unique-constraints>
 
         <id name="user" association-key="true" />
         <id name="email" />
 
-        <field name="token" nullable="true" unique="true" />
         <field name="pendingPrimary" type="boolean" />
+        <field name="confirmationToken" unique="true" nullable="true" />
         <field name="confirmedAt" type="datetime" nullable="true" />
 
         <many-to-one field="user" target-entity="MsgPhp\User\Entity\User">

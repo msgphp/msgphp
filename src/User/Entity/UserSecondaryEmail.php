@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
+use MsgPhp\Domain\Entity\Features\CanBeConfirmed;
 use MsgPhp\User\Entity\Fields\UserField;
 
 /**
@@ -12,17 +13,16 @@ use MsgPhp\User\Entity\Fields\UserField;
 class UserSecondaryEmail
 {
     use UserField;
+    use CanBeConfirmed;
 
     private $email;
-    private $token;
     private $pendingPrimary = false;
-    private $confirmedAt;
 
     public function __construct(User $user, string $email, string $token = null)
     {
         $this->user = $user;
         $this->email = $email;
-        $this->token = $token ?? bin2hex(random_bytes(32));
+        $this->confirmationToken = $token ?? bin2hex(random_bytes(32));
     }
 
     public function getEmail(): string
@@ -30,25 +30,9 @@ class UserSecondaryEmail
         return $this->email;
     }
 
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
     public function isPendingPrimary(): bool
     {
         return $this->pendingPrimary;
-    }
-
-    public function getConfirmedAt(): ?\DateTimeInterface
-    {
-        return $this->confirmedAt;
-    }
-
-    public function confirm(): void
-    {
-        $this->token = null;
-        $this->confirmedAt = new \DateTimeImmutable();
     }
 
     public function markPendingPrimary(bool $flag = true): void

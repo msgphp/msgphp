@@ -24,7 +24,7 @@ interface UserSecondaryEmailRepositoryInterface
 
     public function findByEmail(string $email): UserSecondaryEmail;
 
-    public function findByToken(string $token): UserSecondaryEmail;
+    public function findByConfirmationToken(string $token): UserSecondaryEmail;
 
     public function exists(UserIdInterface $userId, string $email): bool;
 

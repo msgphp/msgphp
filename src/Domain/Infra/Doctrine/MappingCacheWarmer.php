@@ -9,6 +9,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class MappingCacheWarmer implements CacheWarmerInterface
 {

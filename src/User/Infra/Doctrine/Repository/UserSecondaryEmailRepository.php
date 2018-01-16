@@ -42,9 +42,9 @@ final class UserSecondaryEmailRepository implements UserSecondaryEmailRepository
         return $this->doFindByFields(['email' => $email]);
     }
 
-    public function findByToken(string $token): UserSecondaryEmail
+    public function findByConfirmationToken(string $token): UserSecondaryEmail
     {
-        return $this->doFindByFields(['token' => $token]);
+        return $this->doFindByFields(['confirmationToken' => $token]);
     }
 
     public function exists(UserIdInterface $userId, string $email): bool

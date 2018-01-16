@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
+use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\Infra\DependencyInjection\Compiler;
+use MsgPhp\Domain\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -20,9 +22,14 @@ final class BundleHelper
         ContainerHelper::addCompilerPassOnce($container, Compiler\ResolveDomainPass::class);
 
         if (ContainerHelper::isDoctrineOrmEnabled($container)) {
+            ContainerHelper::addCompilerPassOnce($container, Compiler\DoctrineObjectFieldMappingPass::class);
+
             $container->setParameter('msgphp.doctrine.mapping_cache_dirname', 'msgphp/doctrine-mapping');
 
-            ContainerHelper::addCompilerPassOnce($container, Compiler\DoctrineObjectFieldMappingPass::class);
+            $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
+                ->setPublic(false)
+                ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
+                ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
         }
     }
 

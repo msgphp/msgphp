@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Entity\Features;
 
-use MsgPhp\Domain\Entity\Features\CanBeEnabledOrDisabled;
+use MsgPhp\Domain\Entity\Features\CanBeEnabled;
 use PHPUnit\Framework\TestCase;
 
-final class CanBeEnabledOrDisabledTest extends TestCase
+final class CanBeEnabledTest extends TestCase
 {
     public function testEnable(): void
     {
@@ -34,7 +34,7 @@ final class CanBeEnabledOrDisabledTest extends TestCase
     private function getObject($value)
     {
         return new class($value) {
-            use CanBeEnabledOrDisabled;
+            use CanBeEnabled;
 
             public function __construct($value)
             {

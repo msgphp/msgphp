@@ -15,19 +15,10 @@ final class UserSecondaryEmailTest extends TestCase
 
         $this->assertSame($user, $userEmail->getUser());
         $this->assertSame('foo@bar.baz', $userEmail->getEmail());
-        $this->assertNotNull($userEmail->getToken());
-        $this->assertNotSame((new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz'))->getToken(), $userEmail->getToken());
+        $this->assertNotNull($userEmail->getConfirmationToken());
+        $this->assertNotSame((new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz'))->getConfirmationToken(), $userEmail->getConfirmationToken());
         $this->assertFalse($userEmail->isPendingPrimary());
         $this->assertNull($userEmail->getConfirmedAt());
-    }
-
-    public function testConfirm(): void
-    {
-        $userEmail = new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz');
-        $userEmail->confirm();
-
-        $this->assertNull($userEmail->getToken());
-        $this->assertInstanceOf(\DateTimeInterface::class, $userEmail->getConfirmedAt());
     }
 
     public function testMarkPendingPrimary(): void

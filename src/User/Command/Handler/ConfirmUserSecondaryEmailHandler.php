@@ -27,7 +27,7 @@ final class ConfirmUserSecondaryEmailHandler
 
     public function handle(ConfirmUserSecondaryEmailCommand $command): void
     {
-        $userSecondaryEmail = $this->repository->findByToken($command->token);
+        $userSecondaryEmail = $this->repository->findByConfirmationToken($command->token);
 
         if (null === $userSecondaryEmail->getConfirmedAt()) {
             $userSecondaryEmail->confirm();

@@ -9,31 +9,28 @@ use PHPUnit\Framework\TestCase;
 
 final class EnabledFieldTest extends TestCase
 {
-    /**
-     * @dataProvider provideStates
-     */
-    public function testField(bool $state): void
+    public function testField(): void
     {
-        $object = $this->getObject($state);
-
-        $this->assertSame($state, $object->isEnabled());
+        $this->assertFalse($this->getObject()->isEnabled());
+        $this->assertTrue($this->getObject(true)->isEnabled());
+        $this->assertFalse($this->getObject(false)->isEnabled());
     }
 
-    public function provideStates(): iterable
+    private function getObject($value = null)
     {
-        yield [true];
-        yield [false];
-    }
+        if (func_num_args()) {
+            return new class($value) {
+                use EnabledField;
 
-    private function getObject($value)
-    {
-        return new class($value) {
+                public function __construct($value)
+                {
+                    $this->enabled = $value;
+                }
+            };
+        }
+
+        return new class() {
             use EnabledField;
-
-            public function __construct($value)
-            {
-                $this->enabled = $value;
-            }
         };
     }
 }

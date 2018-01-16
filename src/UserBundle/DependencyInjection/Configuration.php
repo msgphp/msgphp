@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ConfigHelper;
-use MsgPhp\User\Entity\{Credential, PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
+use MsgPhp\User\Entity\{Credential, User, UserAttributeValue, UserRole, UserSecondaryEmail};
 use MsgPhp\User\Infra\Uuid;
 use MsgPhp\User\{CredentialInterface, UserId, UserIdInterface};
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const IDENTITY_MAP = [
-        PendingUser::class => 'email',
         UserAttributeValue::class => ['user', 'attributeValue'],
         User::class => 'id',
         UserRole::class => ['user', 'role'],
