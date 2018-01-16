@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\ObjectFieldMappingProviderInterface;
-use MsgPhp\User\Entity\{Features, Fields, User};
+use MsgPhp\User\Entity\{Credential, Features, Fields, User};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -14,9 +14,28 @@ use MsgPhp\User\Entity\{Features, Fields, User};
  */
 final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
 {
+    private const CREDENTIALS = [
+        Features\EmailCredential::class => Credential\Email::class,
+        Features\EmailPasswordCredential::class => Credential\EmailPassword::class,
+        Features\EmailSaltedPasswordCredential::class => Credential\EmailSaltedPassword::class,
+        Features\NicknameCredential::class => Credential\Nickname::class,
+        Features\NicknamePasswordCredential::class => Credential\NicknamePassword::class,
+        Features\NicknameSaltedPasswordCredential::class => Credential\NicknameSaltedPassword::class,
+    ];
+
     public static function getObjectFieldMapping(): array
     {
-        return [
+        $credentials = self::CREDENTIALS;
+        array_walk($credentials, function (string &$credential): void {
+            $credential = ['credential' => [
+                'type' => self::TYPE_EMBEDDED,
+                'class' => $credential,
+                'columnPrefix' => null,
+            ]];
+            unset($credential);
+        });
+
+        return $credentials + [
             Features\ResettablePassword::class => [
                 // @todo
             ],

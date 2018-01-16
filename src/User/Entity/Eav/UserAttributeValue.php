@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Entity;
+namespace MsgPhp\User\Entity\Eav;
 
 use MsgPhp\Eav\Entity\AttributeValue;
 use MsgPhp\Eav\Entity\Fields\AttributeValueField;
 use MsgPhp\User\Entity\Fields\UserField;
+use MsgPhp\User\Entity\User;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

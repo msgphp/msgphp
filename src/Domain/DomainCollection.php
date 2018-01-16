@@ -11,6 +11,9 @@ final class DomainCollection implements DomainCollectionInterface
 {
     private $elements;
 
+    /**
+     * @return $this|self
+     */
     public static function fromValue(?iterable $value): DomainCollectionInterface
     {
         return new self($value ?? []);

@@ -12,7 +12,7 @@ use MsgPhp\User\Entity\Credential\EmailSaltedPassword;
 trait EmailSaltedPasswordCredential
 {
     use AbstractSaltedPasswordCredential;
-    use EmailPasswordCredential;
+    use EmailCredential;
 
     /** @var EmailSaltedPassword */
     private $credential;

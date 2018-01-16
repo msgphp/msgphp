@@ -19,7 +19,7 @@ trait PasswordProtected
         return $this->password;
     }
 
-    public function createPasswordAlgorithm(): PasswordAlgorithm
+    public function getPasswordAlgorithm(): PasswordAlgorithm
     {
         return PasswordAlgorithm::create();
     }

@@ -15,7 +15,9 @@ final class BundleHelper
 {
     public static function prepareDoctrineTypes(Container $container): void
     {
-        if (!$container->hasParameter('msgphp.doctrine.type_config')) {
+        static $prepared = false;
+
+        if ($prepared || !$container->hasParameter('msgphp.doctrine.type_config')) {
             return;
         }
 
@@ -23,6 +25,8 @@ final class BundleHelper
             $config['type']::setClass($config['class']);
             $config['type']::setDataType($config['data_type']);
         }
+
+        $prepared = true;
     }
 
     private function __construct()

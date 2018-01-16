@@ -13,7 +13,6 @@ class UserSecondaryEmail
 {
     use UserField;
 
-    private $user;
     private $email;
     private $token;
     private $pendingPrimary = false;

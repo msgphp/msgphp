@@ -13,12 +13,10 @@ use MsgPhp\User\Entity\Credential\Anonymous;
 class User
 {
     private $id;
-    private $credential;
 
     public function __construct(UserIdInterface $id)
     {
         $this->id = $id;
-        $this->credential = new Anonymous();
     }
 
     public function getId(): UserIdInterface
@@ -31,6 +29,6 @@ class User
      */
     public function getCredential()
     {
-        return $this->credential;
+        return new Anonymous();
     }
 }

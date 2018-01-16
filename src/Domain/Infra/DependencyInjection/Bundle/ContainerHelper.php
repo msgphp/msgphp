@@ -206,6 +206,10 @@ final class ContainerHelper
                 'dbal' => $config,
             ]);
 
+            if ($container->hasParameter('msgphp.doctrine.type_config')) {
+                $typeConfig += $container->getParameter('msgphp.doctrine.type_config');
+            }
+
             $container->setParameter('msgphp.doctrine.type_config', $typeConfig);
         }
     }

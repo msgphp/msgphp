@@ -11,6 +11,9 @@ class DomainId implements DomainIdInterface
 {
     private $id;
 
+    /**
+     * @return $this|self
+     */
     final public static function fromValue($value): DomainIdInterface
     {
         if (null !== $value && !is_string($value)) {

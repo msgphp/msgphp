@@ -15,6 +15,9 @@ class DomainId implements DomainIdInterface
 {
     private $uuid;
 
+    /**
+     * @return $this|self
+     */
     final public static function fromValue($value): DomainIdInterface
     {
         if (null !== $value && !$value instanceof UuidInterface) {

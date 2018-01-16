@@ -87,7 +87,7 @@ final class SecurityUserTest extends TestCase
                 ->method('getPassword')
                 ->willReturn($password);
             $credential->expects($this->any())
-                ->method('createPasswordAlgorithm')
+                ->method('getPasswordAlgorithm')
                 ->willReturn(null === $salt ? PasswordAlgorithm::create() : PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt)));
         }
 

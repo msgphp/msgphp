@@ -10,10 +10,10 @@ use MsgPhp\Domain\CommandBusInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\Command\Handler\{AddUserAttributeValueHandler, AddUserRoleHandler, AddUserSecondaryEmailHandler, ChangeUserAttributeValueHandler, ConfirmPendingUserHandler, ConfirmUserSecondaryEmailHandler, CreatePendingUserHandler, DeleteUserAttributeValueHandler, DeleteUserRoleHandler, DeleteUserSecondaryEmailHandler, MarkUserSecondaryEmailPrimaryHandler, SetUserPendingPrimaryEmailHandler};
-use MsgPhp\User\Entity\{PendingUser, User, UserAttributeValue, UserRole, UserSecondaryEmail};
+use MsgPhp\User\Entity\{PendingUser, User, UserRole, UserSecondaryEmail};
+use MsgPhp\User\Entity\Eav\UserAttributeValue;
 use MsgPhp\User\Infra\Console\Command\{AddUserRoleCommand, CreatePendingUserCommand, DeleteUserRoleCommand};
 use MsgPhp\User\Infra\Doctrine\{EntityFieldsMapping, SqlEmailLookup};
-use MsgPhp\User\Infra\Doctrine\Event as DoctrineEvent;
 use MsgPhp\User\Infra\Doctrine\Repository\{PendingUserRepository, UserAttributeValueRepository, UserRepository, UserRoleRepository, UserSecondaryEmailRepository};
 use MsgPhp\User\Infra\Doctrine\Type\UserIdType;
 use MsgPhp\User\Infra\Validator\{EmailLookupInterface, ExistingEmailValidator, UniqueEmailValidator};
@@ -100,36 +100,34 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $bundles = ContainerHelper::getBundles($container);
         $classMapping = $config['class_mapping'];
 
-        if (isset($bundles[DoctrineBundle::class])) {
-            if (class_exists(DoctrineOrmEvents::class)) {
+        if (isset($bundles[DoctrineBundle::class]) && class_exists(DoctrineOrmEvents::class)) {
+            $container->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'resolve_target_entities' => $classMapping,
+                    'mappings' => [
+                        'msgphp_user' => [
+                            'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping',
+                            'type' => 'xml',
+                            'prefix' => 'MsgPhp\\User\\Entity',
+                            'is_bundle' => false,
+                        ],
+                    ],
+                ],
+            ]);
+
+            if (isset($bundles[MsgPhpEavBundle::class])) {
                 $container->prependExtensionConfig('doctrine', [
                     'orm' => [
-                        'resolve_target_entities' => $classMapping,
                         'mappings' => [
-                            'msgphp_user' => [
-                                'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping',
+                            'msgphp_user_eav' => [
+                                'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping-eav',
                                 'type' => 'xml',
-                                'prefix' => 'MsgPhp\\User\\Entity',
+                                'prefix' => 'MsgPhp\\User\\Entity\\Eav',
                                 'is_bundle' => false,
                             ],
                         ],
                     ],
                 ]);
-
-                if (isset($bundles[MsgPhpEavBundle::class])) {
-                    $container->prependExtensionConfig('doctrine', [
-                        'orm' => [
-                            'mappings' => [
-                                'msgphp_user' => [
-                                    'dir' => '%kernel.project_dir%/vendor/msgphp/user/Infra/Doctrine/Resources/mapping-eav',
-                                    'type' => 'xml',
-                                    'prefix' => 'MsgPhp\\User\\Entity',
-                                    'is_bundle' => false,
-                                ],
-                            ],
-                        ],
-                    ]);
-                }
             }
         }
     }
@@ -143,10 +141,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $loader->load('doctrine.php');
 
         $classMapping = $config['class_mapping'];
-
-        $container->register(DoctrineEvent\ResolveUserCredentialListener::class)
-            ->setArgument('$targetClass', $classMapping[User::class])
-            ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
 
         foreach ([
             PendingUserRepository::class => $classMapping[PendingUser::class] ?? null,

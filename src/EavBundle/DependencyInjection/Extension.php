@@ -72,22 +72,20 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $bundles = ContainerHelper::getBundles($container);
         $classMapping = $config['class_mapping'];
 
-        if (isset($bundles[DoctrineBundle::class])) {
-            if (class_exists(DoctrineOrmVersion::class)) {
-                $container->prependExtensionConfig('doctrine', [
-                    'orm' => [
-                        'resolve_target_entities' => $classMapping,
-                        'mappings' => [
-                            'msgphp_eav' => [
-                                'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
-                                'type' => 'xml',
-                                'prefix' => 'MsgPhp\\Eav\\Entity',
-                                'is_bundle' => false,
-                            ],
+        if (isset($bundles[DoctrineBundle::class]) && class_exists(DoctrineOrmVersion::class)) {
+            $container->prependExtensionConfig('doctrine', [
+                'orm' => [
+                    'resolve_target_entities' => $classMapping,
+                    'mappings' => [
+                        'msgphp_eav' => [
+                            'dir' => '%kernel.project_dir%/vendor/msgphp/eav/Infra/Doctrine/Resources/mapping',
+                            'type' => 'xml',
+                            'prefix' => 'MsgPhp\\Eav\\Entity',
+                            'is_bundle' => false,
                         ],
                     ],
-                ]);
-            }
+                ],
+            ]);
         }
     }
 
