@@ -24,9 +24,11 @@
         "doctrine/orm": "^2.6",
         "msgphp/eav": "^1.0",
         "sensio/framework-extra-bundle": "^5.1",
+        "symfony/console": "^3.4|^4.0",
         "symfony/http-kernel": "^3.4|^4.0",
         "symfony/phpunit-bridge": "^3.4|^4.0",
         "symfony/security-core": "^3.4|^4.0",
+        "symfony/validator": "^3.4|^4.0",
         "symfony/var-dumper": "^3.4|^4.0"
     },
     "config": {

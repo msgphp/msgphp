@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\{Factory, DomainIdentityMapInterface};
+use MsgPhp\Domain\{CommandBusInterface, Factory, DomainIdentityMapInterface, EventBusInterface};
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
-use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra};
+use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
+use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,6 +38,20 @@ final class ResolveDomainPass implements CompilerPassInterface
                 ->setArgument('$dirname', '%msgphp.doctrine.mapping_cache_dirname%')
                 ->setArgument('$mappingFiles', array_merge(...$container->getParameter('msgphp.doctrine.mapping_files')))
                 ->addTag('kernel.cache_warmer');
+        }
+
+        if (isset($bundles[SimpleBusCommandBusBundle::class])) {
+            self::register($container, SimpleBusInfra\DomainCommandBus::class)
+                ->setArgument('$messageBus', new Reference('command_bus'));
+
+            self::alias($container, CommandBusInterface::class, SimpleBusInfra\DomainCommandBus::class);
+        }
+
+        if (isset($bundles[SimpleBusEventBusBundle::class])) {
+            self::register($container, SimpleBusInfra\DomainEventBus::class)
+                ->setArgument('$messageBus', new Reference('event_bus'));
+
+            self::alias($container, EventBusInterface::class, SimpleBusInfra\DomainEventBus::class);
         }
     }
 
