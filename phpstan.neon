@@ -10,6 +10,9 @@ parameters:
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\DomainEntityRepositoryTraitTest::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
 
+        # see https://github.com/symfony/symfony/pull/25644
+        - '#Strict comparison using === between null and string will always evaluate to false#'
+
         # see https://github.com/sebastianbergmann/phpunit/pull/2963
         - '#Parameter \#1 \$originalClassName of method PHPUnit\\Framework\\TestCase::createMock\(\) expects string, array<int, string> given\.#'
 
