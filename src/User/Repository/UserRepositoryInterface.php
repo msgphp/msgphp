@@ -24,6 +24,8 @@ interface UserRepositoryInterface
 
     public function exists(UserIdInterface $id): bool;
 
+    public function usernameExists(string $username): bool;
+
     public function save(User $user): void;
 
     public function delete(User $user): void;

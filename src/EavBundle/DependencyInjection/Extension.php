@@ -46,7 +46,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($container), [EntityFieldsMapping::class]);
+        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [EntityFieldsMapping::class]);
 
         $bundles = ContainerHelper::getBundles($container);
 
@@ -84,7 +84,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             AttributeRepository::class => $classMapping[Attribute::class],
         ] as $repository => $class) {
             if (null === $class) {
-                $container->removeDefinition($repository);
+                ContainerHelper::removeDefinitionWithAliases($container, $repository);
                 continue;
             }
 
@@ -93,7 +93,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }
     }
 
-    private static function getDoctrineMappingFiles(ContainerBuilder $container): array
+    private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
     {
         return glob(dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName()).'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml');
     }

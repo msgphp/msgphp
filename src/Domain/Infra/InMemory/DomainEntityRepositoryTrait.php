@@ -12,17 +12,16 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
-    use AbstractDomainEntityRepositoryTrait {
-        __construct as private __parent_construct;
-    }
+    use AbstractDomainEntityRepositoryTrait;
 
     private $memory;
     private $accessor;
 
     public function __construct(string $class, DomainIdentityMappingInterface $identityMapping, array $fieldMapping = [], GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)
     {
-        $this->__parent_construct($class, $identityMapping, $fieldMapping);
-
+        $this->class = $class;
+        $this->identityMapping = $identityMapping;
+        $this->fieldMapping = $fieldMapping;
         $this->memory = $memory ?? GlobalObjectMemory::createDefault();
         $this->accessor = $accessor ?? new ObjectFieldAccessor();
     }

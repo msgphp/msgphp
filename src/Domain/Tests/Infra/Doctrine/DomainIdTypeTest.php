@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
@@ -81,10 +80,7 @@ final class DomainIdTypeTest extends TestCase
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
         $this->assertSame('1', $this->type->convertToDatabaseValue(new DomainId('1'), $this->platform));
-
-        $this->expectException(ConversionException::class);
-
-        $this->type->convertToDatabaseValue(123, $this->platform);
+        $this->assertSame('1', $this->type->convertToDatabaseValue('1', $this->platform));
     }
 
     public function testConvertToPHPValue(): void

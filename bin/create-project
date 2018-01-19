@@ -13,9 +13,7 @@ for PACKAGE in $(find src/*/composer.json -type f) ; do
     PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
     if [[ ! -z $PACKAGE_NAME ]] ; then
         PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
-        if [[ ! $PACKAGE_NAME = *-bundle ]] ; then
-            COMPONENTS="${COMPONENTS}msgphp/${PACKAGE_NAME}:@dev "
-        else
+        if [[ $PACKAGE_NAME = *-bundle ]] ; then
             echo -en "\e[34mInstall \"msgphp/${PACKAGE_NAME}\"? [yN]\e[0m "
             read answer
             if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
@@ -30,16 +28,10 @@ composer create-project --prefer-dist symfony/skeleton "${DIR}"
 
 pushd "${DIR}" &> /dev/null
 
-echo -e "\e[34mInstalling components...\e[0m"
-composer require --prefer-dist --no-suggest ${COMPONENTS}
+echo -e "\e[34mInstalling dependencies...\e[0m"
+composer config extra.symfony.allow-contrib true
+composer require --prefer-dist --no-suggest ${COMPONENTS} ${BUNDLES}
 [[ $? -ne 0 ]] && exit 1
-
-if [[ ! -z $BUNDLES ]] ; then
-    echo -e "\e[34mInstalling bundles...\e[0m"
-    composer config extra.symfony.allow-contrib true
-    composer require --prefer-dist --no-suggest ${BUNDLES}
-    [[ $? -ne 0 ]] && exit 1
-fi
 
 popd &> /dev/null
 

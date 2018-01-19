@@ -58,6 +58,17 @@ final class ContainerHelper
         }
     }
 
+    public static function removeDefinitionWithAliases(ContainerBuilder $container, string $id): void
+    {
+        $container->removeDefinition($id);
+
+        foreach ($container->getAliases() as $aliasId => $alias) {
+            if ($id === (string) $alias) {
+                $container->removeAlias($aliasId);
+            }
+        }
+    }
+
     public static function configureIdentityMap(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
         foreach ($identityMapping as $class => $mapping) {

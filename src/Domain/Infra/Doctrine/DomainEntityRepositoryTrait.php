@@ -17,16 +17,15 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
-    use AbstractDomainEntityRepositoryTrait {
-        __construct as private __parent_construct;
-    }
+    use AbstractDomainEntityRepositoryTrait;
 
     private $em;
 
     public function __construct(string $class, EntityManagerInterface $em, array $fieldMapping = [])
     {
-        $this->__parent_construct($class, new DomainIdentityMapping($em), $fieldMapping);
-
+        $this->class = $class;
+        $this->identityMapping = new DomainIdentityMapping($em);
+        $this->fieldMapping = $fieldMapping;
         $this->em = $em;
     }
 
@@ -132,7 +131,7 @@ trait DomainEntityRepositoryTrait
         $this->em->flush();
     }
 
-    private function createResultSet(Query $query, int $offset = null, int $limit = null): DomainCollectionInterface
+    private function createResultSet(Query $query, int $offset = null, int $limit = null, $hydrate = Query::HYDRATE_OBJECT): DomainCollectionInterface
     {
         if (null !== $offset || !$query->getFirstResult()) {
             $query->setFirstResult($offset ?? 0);
@@ -142,14 +141,18 @@ trait DomainEntityRepositoryTrait
             $query->setMaxResults(0 === $limit ? null : $limit);
         }
 
-        return DomainCollectionFactory::create($query->getResult());
+        return DomainCollectionFactory::create($query->getResult($hydrate));
     }
 
     private function createQueryBuilder(string $alias = null): QueryBuilder
     {
+        if (null === $alias) {
+            $alias = $this->alias;
+        }
+
         $qb = $this->em->createQueryBuilder();
-        $qb->select($this->alias);
-        $qb->from($this->class, $alias ?? $this->alias);
+        $qb->select($alias);
+        $qb->from($this->class, $alias);
 
         return $qb;
     }

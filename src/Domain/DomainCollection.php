@@ -48,8 +48,6 @@ final class DomainCollection implements DomainCollectionInterface
                 return false;
             }
 
-            $this->elements = iterator_to_array($this->elements);
-
             return true;
         }
 
@@ -67,12 +65,27 @@ final class DomainCollection implements DomainCollectionInterface
                 }
             }
 
-            $this->elements = iterator_to_array($this->elements);
-
             return false;
         }
 
         return in_array($element, $this->elements, true);
+    }
+
+    public function containsKey($key): bool
+    {
+        if ($this->elements instanceof \Traversable) {
+            foreach ($this->elements as $knownKey => $element) {
+                if ((string) $key === (string) $knownKey) {
+                    $this->toArray(true);
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return isset($this->elements[$key]) || array_key_exists($key, $this->elements);
     }
 
     public function first()
@@ -95,6 +108,23 @@ final class DomainCollection implements DomainCollectionInterface
         $this->toArray();
 
         return end($this->elements);
+    }
+
+    public function get($key)
+    {
+        if ($this->elements instanceof \Traversable) {
+            foreach ($this->elements as $knownKey => $element) {
+                if ((string) $key === (string) $knownKey) {
+                    $this->toArray(true);
+
+                    return $element;
+                }
+            }
+
+            return null;
+        }
+
+        return $this->elements[$key] ?? null;
     }
 
     public function filter(callable $filter): DomainCollectionInterface

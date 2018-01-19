@@ -17,8 +17,12 @@ abstract class AbstractDomainCollectionTest extends TestCase
         $this->assertTrue($collection->isEmpty());
         $this->assertFalse($collection->contains(1));
         $this->assertFalse($collection->contains('1'));
+        $this->assertFalse($collection->containsKey(1));
+        $this->assertFalse($collection->containsKey('1'));
         $this->assertFalse($collection->first());
         $this->assertFalse($collection->last());
+        $this->assertNull($collection->get(1));
+        $this->assertNull($collection->get('1'));
         $this->assertSame([], iterator_to_array($collection->filter(function (): bool {
             return true;
         })));
@@ -43,9 +47,13 @@ abstract class AbstractDomainCollectionTest extends TestCase
 
         $this->assertFalse($collection->isEmpty());
         $this->assertTrue($collection->contains(reset($expected)));
+        $this->assertTrue($collection->containsKey($key = key($expected)));
+        $this->assertTrue($collection->containsKey((string) $key));
         $this->assertFalse($collection->contains('2'));
         $this->assertSame(reset($expected), $collection->first());
         $this->assertSame(end($expected), $collection->last());
+        $this->assertSame($expected[$key], $collection->get($key));
+        $this->assertSame($expected[$key], $collection->get((string) $key));
         $this->assertSame(array_slice($expected, 1, null, true), iterator_to_array($collection->filter(function () use (&$i): bool {
             return ++$i > 1;
         })));

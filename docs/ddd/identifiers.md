@@ -30,7 +30,7 @@ $id = new DomainId('1'); // allowed
 ### `isEmpty(): bool`
 
 Tells if an identifier value is considered empty. In general this is the case when an identifier is created from a
-primitive `NULL` value, and therefor enables to differ its string value from an explicit empty string value (`""`).
+primitive `null` value, and therefor enables to differ its string value from an explicit empty string value (`""`).
 
 ```php
 <?php

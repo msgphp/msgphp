@@ -79,13 +79,14 @@ class DomainIdType extends Type
         }
 
         if ($value instanceof DomainIdInterface) {
-            try {
-                return static::getInnerType()->convertToDatabaseValue($value->isEmpty() ? null : $value->toString(), $platform);
-            } catch (ConversionException $e) {
-            }
+            $value = $value->isEmpty() ? null : $value->toString();
         }
 
-        throw ConversionException::conversionFailed($value, $this->getName());
+        try {
+            return static::getInnerType()->convertToDatabaseValue($value, $platform);
+        } catch (ConversionException $e) {
+            throw ConversionException::conversionFailed($value, $this->getName());
+        }
     }
 
     final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface

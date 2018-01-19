@@ -15,9 +15,19 @@ interface DomainCollectionInterface extends \Countable, \IteratorAggregate
 
     public function contains($element): bool;
 
+    /**
+     * @param string|int $key
+     */
+    public function containsKey($key): bool;
+
     public function first();
 
     public function last();
+
+    /**
+     * @param string|int $key
+     */
+    public function get($key);
 
     public function filter(callable $filter): self;
 

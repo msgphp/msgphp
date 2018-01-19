@@ -47,6 +47,11 @@ final class DomainCollection implements DomainCollectionInterface
         return $this->collection->contains($element);
     }
 
+    public function containsKey($key): bool
+    {
+        return $this->collection->containsKey($key);
+    }
+
     public function first()
     {
         return $this->collection->first();
@@ -55,6 +60,11 @@ final class DomainCollection implements DomainCollectionInterface
     public function last()
     {
         return $this->collection->last();
+    }
+
+    public function get($key)
+    {
+        return $this->collection->get($key);
     }
 
     public function filter(callable $filter): DomainCollectionInterface

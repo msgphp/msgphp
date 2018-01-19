@@ -64,9 +64,26 @@ $collection->contains('2'); // false
 
 ---
 
+### `containsKey($key): bool`
+
+Tells if a collection contains an element at the given key/index.
+
+```php
+<?php
+
+use MsgPhp\Domain\DomainCollection;
+
+$collection = new DomainCollection([1, 2, 3]);
+
+$collection->containsKey(2); // true
+$collection->containsKey(3); // false
+```
+
+---
+
 ### `first()`
 
-Returns the first element value, or `false` if the collection is empty.
+Returns the first element, or `false` if the collection is empty.
 
 ```php
 <?php
@@ -81,7 +98,7 @@ $collection->first(); // int(1)
 
 ### `last()`
 
-Returns the last element value, or `false` if the collection is empty.
+Returns the last element, or `false` if the collection is empty.
 
 ```php
 <?php
@@ -90,6 +107,21 @@ use MsgPhp\Domain\DomainCollection;
 
 $collection = new DomainCollection([1, 2, 3]);
 $collection->last(); // int(3)
+```
+
+---
+
+### `get($key)`
+
+Returns the element at the given key/index, or `null` if the collection is empty.
+
+```php
+<?php
+
+use MsgPhp\Domain\DomainCollection;
+
+$collection = new DomainCollection([1, 2, 3]);
+$collection->get(1); // int(2)
 ```
 
 ---
