@@ -23,8 +23,8 @@ final class ResolveDomainPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $this->processIdentityMap($container);
-        $this->processEntityFactory($container);
+        $this->registerIdentityMap($container);
+        $this->registerEntityFactory($container);
 
         if (ContainerHelper::isDoctrineOrmEnabled($container)) {
             self::register($container, DoctrineInfra\DomainIdentityMapping::class)
@@ -39,9 +39,9 @@ final class ResolveDomainPass implements CompilerPassInterface
         }
     }
 
-    private static function register(ContainerBuilder $container, string $class): Definition
+    private static function register(ContainerBuilder $container, string $class, string $id = null): Definition
     {
-        return $container->register($class, $class)->setPublic(false);
+        return $container->register($id ?? $class, $class)->setPublic(false);
     }
 
     private static function alias(ContainerBuilder $container, string $alias, string $id): void
@@ -49,7 +49,7 @@ final class ResolveDomainPass implements CompilerPassInterface
         $container->setAlias($alias, new Alias($id, false));
     }
 
-    private function processIdentityMap(ContainerBuilder $container): void
+    private function registerIdentityMap(ContainerBuilder $container): void
     {
         self::register($container, InMemoryInfra\ObjectFieldAccessor::class);
 
@@ -60,7 +60,7 @@ final class ResolveDomainPass implements CompilerPassInterface
         self::alias($container, DomainIdentityMappingInterface::class, InMemoryInfra\DomainIdentityMapping::class);
     }
 
-    private function processEntityFactory(ContainerBuilder $container): void
+    private function registerEntityFactory(ContainerBuilder $container): void
     {
         self::register($container, Factory\DomainObjectFactory::class)
             ->addMethodCall('setNestedFactory', [new Reference(Factory\DomainObjectFactoryInterface::class)]);

@@ -11,6 +11,9 @@ use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 
 /**
+ * Proof of concept implementation for in-memory persistence. Currently no full support due extra maintenance and no
+ * real practical added value.
+ *
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 final class UserRepository implements UserRepositoryInterface
