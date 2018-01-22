@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
 use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Infra\Uuid\DomainId as DomainUuid;
+use MsgPhp\Domain\Infra\Uuid as UuidInfra;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -80,7 +80,7 @@ final class ConfigHelper
                     throw new \LogicException(sprintf('Data type "%s" for identifier "%s" requires "ramsey/uuid".', $dataType, $key));
                 }
 
-                $value = DomainUuid::class;
+                $value = UuidInfra\DomainId::class;
             }
 
             if (!isset($dataTypeMap[$key])) {

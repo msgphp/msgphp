@@ -6,11 +6,8 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
-use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
-use MsgPhp\Eav\Entity\Attribute;
-use MsgPhp\Eav\Infra\Doctrine\EntityFieldsMapping;
-use MsgPhp\Eav\Infra\Doctrine\Repository\AttributeRepository;
-use MsgPhp\Eav\Infra\Doctrine\Type\{AttributeIdType, AttributeValueIdType};
+use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
+use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -46,7 +43,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [EntityFieldsMapping::class]);
+        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\EntityFieldsMapping::class]);
 
         $bundles = ContainerHelper::getBundles($container);
 
@@ -64,8 +61,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAP, $config['data_type_mapping'], $config['class_mapping']);
 
         ContainerHelper::configureDoctrineTypes($container, $config['data_type_mapping'], $config['class_mapping'], [
-            AttributeIdInterface::class => AttributeIdType::class,
-            AttributeValueIdInterface::class => AttributeValueIdType::class,
+            AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
+            AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
         ]);
         ContainerHelper::configureDoctrineOrmTargetEntities($container, $config['class_mapping']);
     }
@@ -81,7 +78,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $classMapping = $config['class_mapping'];
 
         foreach ([
-            AttributeRepository::class => $classMapping[Attribute::class],
+            DoctrineInfra\Repository\AttributeRepository::class => $classMapping[Entity\Attribute::class],
         ] as $repository => $class) {
             if (null === $class) {
                 ContainerHelper::removeDefinitionWithAliases($container, $repository);

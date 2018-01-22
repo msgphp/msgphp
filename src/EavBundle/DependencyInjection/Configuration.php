@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ConfigHelper;
-use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface};
-use MsgPhp\Eav\Entity\{Attribute, AttributeValue};
-use MsgPhp\Eav\Infra\Uuid;
+use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Entity};
+use MsgPhp\Eav\Infra\Uuid as UuidInfra;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -17,22 +16,22 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const IDENTITY_MAP = [
-        Attribute::class => 'id',
-        AttributeValue::class => 'id',
+        Entity\Attribute::class => 'id',
+        Entity\AttributeValue::class => 'id',
     ];
     public const DATA_TYPE_MAP = [
         AttributeIdInterface::class => [
             AttributeId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            Uuid\AttributeId::class => ConfigHelper::UUID_DATA_TYPES,
+            UuidInfra\AttributeId::class => ConfigHelper::UUID_DATA_TYPES,
         ],
         AttributeValueIdInterface::class => [
             AttributeValueId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            Uuid\AttributeValueId::class => ConfigHelper::UUID_DATA_TYPES,
+            UuidInfra\AttributeValueId::class => ConfigHelper::UUID_DATA_TYPES,
         ],
     ];
     public const REQUIRED_AGGREGATE_ROOTS = [
-        Attribute::class => AttributeIdInterface::class,
-        AttributeValue::class => AttributeValueIdInterface::class,
+        Entity\Attribute::class => AttributeIdInterface::class,
+        Entity\AttributeValue::class => AttributeValueIdInterface::class,
     ];
     public const OPTIONAL_AGGREGATE_ROOTS = [];
     public const AGGREGATE_ROOTS = self::REQUIRED_AGGREGATE_ROOTS + self::OPTIONAL_AGGREGATE_ROOTS;
