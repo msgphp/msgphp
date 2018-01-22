@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use Doctrine\ORM\Version as DoctrineOrmVersion;
+use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
-use MsgPhp\User\{Entity, Repository, UserIdInterface};
+use MsgPhp\User\{Command, Entity, Repository, UserIdInterface};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra, Validator as ValidatorInfra};
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -59,6 +60,15 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         // persistence infra
         if (class_exists(DoctrineOrmVersion::class)) {
             $this->prepareDoctrineOrm($config, $loader, $container);
+        }
+
+        // message infra
+        if (ContainerHelper::isMessageBusEnabled($container) && $container->has(Repository\UserRepositoryInterface::class)) {
+            $loader->load('message.php');
+
+            if (!self::uses($config['class_mapping'][Entity\User::class], Features\CanBeEnabled::class)) {
+                $container->removeDefinition(Command\Handler\EnableUserHandler::class);
+            }
         }
 
         // framework infra
@@ -165,5 +175,16 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }
 
         return array_values(array_flip($files));
+    }
+
+    private static function uses(string $class, string $trait)
+    {
+        static $uses = [];
+
+        if (!isset($uses[$class])) {
+            $uses[$class] = class_uses($class);
+        }
+
+        return isset($uses[$class][$trait]);
     }
 }

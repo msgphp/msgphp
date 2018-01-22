@@ -26,3 +26,6 @@ pages:
 - Event sourcing:
     - Domain events: event-sourcing/domain-events.md
     - Domain event handlers: event-sourcing/domain-event-handlers.md
+- Message driven:
+    - Domain message bus: message-driven/domain-message-bus.md
+    - CQRS: message-driven/cqrs.md

@@ -8,6 +8,8 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
+use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -181,6 +183,13 @@ final class ContainerHelper
                 'resolve_target_entities' => $classMapping,
             ],
         ]);
+    }
+
+    public static function isMessageBusEnabled(Container $container): bool
+    {
+        $bundles = self::getBundles($container);
+
+        return isset($bundles[SimpleBusCommandBusBundle::class]) || isset($bundles[SimpleBusEventBusBundle::class]);
     }
 
     private function __construct()

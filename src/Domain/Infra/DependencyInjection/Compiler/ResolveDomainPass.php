@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
-use MsgPhp\Domain\{Factory, DomainIdentityMappingInterface};
-use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra};
+use MsgPhp\Domain\{Factory, DomainIdentityMappingInterface, DomainMessageBusInterface};
+use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
+use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
+use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,6 +41,25 @@ final class ResolveDomainPass implements CompilerPassInterface
                     ->setArgument('$mappingFiles', array_merge(...$container->getParameter('msgphp.doctrine.mapping_files')))
                     ->addTag('kernel.cache_warmer');
             }
+        }
+
+        if (ContainerHelper::isMessageBusEnabled($container)) {
+            $bus = ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)
+                ? new Reference('command_bus')
+                : new Reference('event_bus');
+            $eventBus = 'command_bus' === (string) $bus
+                ? ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class) ? new Reference('event_bus') : null
+                : null;
+            $callableMap = 'command_bus' === (string) $bus
+                ? new Reference('simple_bus.command_bus.command_handler_map')
+                : null;
+
+            self::register($container, SimpleBusInfra\DomainMessageBus::class)
+                ->setArgument('$bus', $bus)
+                ->setArgument('$eventBus', $eventBus)
+                ->setArgument('$callableMap', $callableMap);
+
+            self::alias($container, DomainMessageBusInterface::class, SimpleBusInfra\DomainMessageBus::class);
         }
     }
 

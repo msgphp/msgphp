@@ -41,6 +41,10 @@ use Other\SomeOtherB;
 - Follows PHPStan level max
 - Exclude / ignore rules are discussed per case/topic
 
+## PHP 7.x forward compatibility
+
+- Intended object values are type hinted (`@param object $value` and `@return object`)
+
 ## Unit tests
 
 - All of the above, _in general_, applies to unit tests as well
