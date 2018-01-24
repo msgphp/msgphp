@@ -6,4 +6,5 @@
 
 # News
 
+- **`2018-01-25`** Added initial project [code conventions](code_conventions.md)
 - **`2018-01-18`** Initial documentation setup. Work in progress as of today.

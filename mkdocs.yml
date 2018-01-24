@@ -12,6 +12,7 @@ markdown_extensions:
 
 pages:
 - Home: index.md
+- Code conventions: code_conventions.md
 - Domain-driven-design:
     - Identifiers: ddd/identifiers.md
     - Identity mapping: ddd/identity_mapping.md
