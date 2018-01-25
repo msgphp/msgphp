@@ -1,13 +1,15 @@
 # Identifiers
 
-An identifier is a domain value object and is bound to `MsgPhp\Domain\DomainIdInterface`. It's used to identify domain
-objects, i.e. entities.
+An identifier is a domain value object and is bound to `MsgPhp\Domain\DomainIdInterface`. Its purpose is to identify
+domain objects, e.g. entities.
 
 ## Implementations
 
-- `MsgPhp\Domain\DomainId` (generic scalar values)
-- `MsgPhp\Domain\Infra\Uuid\DomainId` (UUID values)
-    - requires: `ramsey/uuid`
+- `MsgPhp\Domain\DomainId`
+    - Generic scalar values
+- `MsgPhp\Domain\Infra\Uuid\DomainId`
+    - UUID values
+    - Requires `ramsey/uuid`
 
 ## API
 

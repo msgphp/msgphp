@@ -6,5 +6,6 @@
 
 # News
 
+- **`2018-01-26`** Added initial event sourcing chapter
 - **`2018-01-25`** Added initial project [code conventions](code-conventions.md)
 - **`2018-01-18`** Initial documentation setup. Work in progress as of today.

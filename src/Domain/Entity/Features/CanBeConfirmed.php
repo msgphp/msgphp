@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Entity\Features;
 
+use MsgPhp\Domain\Event\ConfirmDomainEvent;
+
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
@@ -34,5 +36,10 @@ trait CanBeConfirmed
     {
         $this->confirmationToken = null;
         $this->confirmedAt = new \DateTimeImmutable();
+    }
+
+    private function handleConfirmEvent(ConfirmDomainEvent $event): void
+    {
+        $this->confirm();
     }
 }

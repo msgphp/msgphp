@@ -23,3 +23,6 @@ pages:
         - Static factory: ddd/factory/static.md
     - Repositories: ddd/repositories.md
     - Entities: ddd/entities.md
+- Event sourcing:
+    - Domain events: event-sourcing/domain-events.md
+    - Domain event handlers: event-sourcing/domain-event-handlers.md

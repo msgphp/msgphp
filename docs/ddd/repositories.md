@@ -8,9 +8,11 @@ Note default (interface bound) repositories are provided per domain layer.
 
 ## Implementations
 
-- `MsgPhp\Domain\Infra\InMemory\DomainEntityRepositoryTrait` (In-memory persistence)
-- `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait` (Doctrine persistence)
-    - requires: `doctrine/orm`
+- `MsgPhp\Domain\Infra\InMemory\DomainEntityRepositoryTrait`
+    - In-memory persistence
+- `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`
+    - Doctrine persistence
+    - Requires `doctrine/orm`
 
 ## API
 

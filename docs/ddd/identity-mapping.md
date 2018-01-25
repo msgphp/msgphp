@@ -1,13 +1,15 @@
 # Identity mapping
 
-An identity mapping is a domain service and is bound to `MsgPhp\Domain\DomainIdentityMappingInterface`. It tells about the
-identifier mappings for a known domain object.
+An identity mapping is a domain service and is bound to `MsgPhp\Domain\DomainIdentityMappingInterface`. It tells about
+the identifier mappings for a known domain object.
 
 ## Implementations
 
-- `MsgPhp\Domain\Infra\InMemory\DomainIdentityMapping` (uses in-memory identity map)
-- `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping` (uses Doctrine identity map)
-    - requires: `doctrine/orm`
+- `MsgPhp\Domain\Infra\InMemory\DomainIdentityMapping`
+    - In-memory identity map
+- `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`
+    - Doctrine identity map
+    - Requires `doctrine/orm`
 
 ## API
 

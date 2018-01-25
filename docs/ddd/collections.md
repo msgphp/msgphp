@@ -1,15 +1,17 @@
 # Collections
 
-A domain collection is bound to `MsgPhp\Domain\DomainCollectionInterface`. It's main usage is to aggregate objects bound
-together by a root entity.
+A domain collection is bound to `MsgPhp\Domain\DomainCollectionInterface`. Its main purpose is is to aggregate objects
+bound together by a root entity.
 
 The technical implementation is generic and may hold any type of elements from any iterable value.
 
 ## Implementations
 
-- `MsgPhp\Domain\DomainCollection` (generic collection)
-- `MsgPhp\Domain\Infra\Doctrine\DomainCollection` (Doctrine collection)
-    - requires: `doctrine/collections`
+- `MsgPhp\Domain\DomainCollection`
+    - Generic collection
+- `MsgPhp\Domain\Infra\Doctrine\DomainCollection`
+    - Doctrine collection
+    - Requires `doctrine/collections`
 
 ## API
 
