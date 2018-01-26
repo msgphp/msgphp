@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
+use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 use MsgPhp\Domain\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -22,23 +23,26 @@ final class BundleHelper
     {
         ContainerHelper::addCompilerPassOnce($container, Compiler\ResolveDomainPass::class);
 
-        if (ContainerHelper::isDoctrineOrmEnabled($container)) {
+        if (class_exists(DoctrineOrmVersion::class)) {
             ContainerHelper::addCompilerPassOnce($container, Compiler\DoctrineObjectFieldMappingPass::class);
 
             $container->setParameter('msgphp.doctrine.mapping_cache_dirname', 'msgphp/doctrine-mapping');
-            (new Filesystem())->mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/%msgphp.doctrine.mapping_cache_dirname%'));
-
-            $container->prependExtensionConfig('doctrine', ['orm' => ['mappings' => ['msgphp' => [
-                'dir' => $mappingDir,
-                'type' => 'xml',
-                'prefix' => 'MsgPhp',
-                'is_bundle' => false,
-            ]]]]);
 
             $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
                 ->setPublic(false)
                 ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
                 ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
+
+            if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
+                @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/%msgphp.doctrine.mapping_cache_dirname%'), 0777, true);
+
+                $container->prependExtensionConfig('doctrine', ['orm' => ['mappings' => ['msgphp' => [
+                    'dir' => $mappingDir,
+                    'type' => 'xml',
+                    'prefix' => 'MsgPhp',
+                    'is_bundle' => false,
+                ]]]]);
+            }
         }
     }
 

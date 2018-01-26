@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{Factory, DomainIdentityMappingInterface};
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra};
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -26,16 +26,18 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerIdentityMap($container);
         $this->registerEntityFactory($container);
 
-        if (ContainerHelper::isDoctrineOrmEnabled($container)) {
+        if (interface_exists(DoctrineEntityManager::class)) {
             self::register($container, DoctrineInfra\DomainIdentityMapping::class)
-                ->setArgument('$em', new Reference(EntityManagerInterface::class));
+                ->setArgument('$em', new Reference(DoctrineEntityManager::class));
 
             self::alias($container, DomainIdentityMappingInterface::class, DoctrineInfra\DomainIdentityMapping::class);
 
-            self::register($container, DoctrineInfra\MappingCacheWarmer::class)
-                ->setArgument('$dirname', '%msgphp.doctrine.mapping_cache_dirname%')
-                ->setArgument('$mappingFiles', array_merge(...$container->getParameter('msgphp.doctrine.mapping_files')))
-                ->addTag('kernel.cache_warmer');
+            if (interface_exists(CacheWarmerInterface::class)) {
+                self::register($container, DoctrineInfra\MappingCacheWarmer::class)
+                    ->setArgument('$dirname', '%msgphp.doctrine.mapping_cache_dirname%')
+                    ->setArgument('$mappingFiles', array_merge(...$container->getParameter('msgphp.doctrine.mapping_files')))
+                    ->addTag('kernel.cache_warmer');
+            }
         }
     }
 

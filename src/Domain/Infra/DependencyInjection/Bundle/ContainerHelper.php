@@ -96,27 +96,9 @@ final class ContainerHelper
         $container->setParameter($param, $idClassMap);
     }
 
-    public static function configureDoctrineOrmMapping(ContainerBuilder $container, array $mappingFiles, array $objectFieldMappings = []): void
-    {
-        if (!self::isDoctrineOrmEnabled($container)) {
-            return;
-        }
-
-        $mappingFileList = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
-        $mappingFileList[] = $mappingFiles;
-
-        $container->setParameter($param, $mappingFileList);
-
-        foreach ($objectFieldMappings as $class) {
-            $container->register($class)
-                ->setPublic(false)
-                ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
-        }
-    }
-
     public static function configureDoctrineTypes(ContainerBuilder $container, array $dataTypeMapping, array $classMapping, array $typeMapping): void
     {
-        if (!self::hasBundle($container, DoctrineBundle::class)) {
+        if (!class_exists(DoctrineType::class)) {
             return;
         }
 
@@ -156,21 +138,41 @@ final class ContainerHelper
         }
 
         if ($config) {
-            $container->prependExtensionConfig('doctrine', [
-                'dbal' => $config,
-            ]);
-
             if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
                 $typeConfig += $container->getParameter($param);
             }
 
             $container->setParameter($param, $typeConfig);
+
+            if (self::hasBundle($container, DoctrineBundle::class)) {
+                $container->prependExtensionConfig('doctrine', [
+                    'dbal' => $config,
+                ]);
+            }
+        }
+    }
+
+    public static function configureDoctrineOrmMapping(ContainerBuilder $container, array $mappingFiles, array $objectFieldMappings = []): void
+    {
+        if (!class_exists(DoctrineOrmVersion::class)) {
+            return;
+        }
+
+        $mappingFileList = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
+        $mappingFileList[] = $mappingFiles;
+
+        $container->setParameter($param, $mappingFileList);
+
+        foreach ($objectFieldMappings as $class) {
+            $container->register($class)
+                ->setPublic(false)
+                ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
         }
     }
 
     public static function configureDoctrineOrmTargetEntities(ContainerBuilder $container, array $classMapping): void
     {
-        if (!self::isDoctrineOrmEnabled($container)) {
+        if (!class_exists(DoctrineOrmVersion::class) || !self::hasBundle($container, DoctrineBundle::class)) {
             return;
         }
 
@@ -179,11 +181,6 @@ final class ContainerHelper
                 'resolve_target_entities' => $classMapping,
             ],
         ]);
-    }
-
-    public static function isDoctrineOrmEnabled(Container $container): bool
-    {
-        return self::hasBundle($container, DoctrineBundle::class) && class_exists(DoctrineOrmVersion::class);
     }
 
     private function __construct()

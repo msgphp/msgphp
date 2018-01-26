@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
@@ -45,11 +45,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
         ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\EntityFieldsMapping::class]);
 
-        $bundles = ContainerHelper::getBundles($container);
-
         // persistence infra
-        if (isset($bundles[DoctrineBundle::class])) {
-            $this->prepareDoctrineBundle($config, $loader, $container);
+        if (class_exists(DoctrineOrmVersion::class)) {
+            $this->prepareDoctrineOrm($config, $loader, $container);
         }
     }
 
@@ -67,12 +65,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ContainerHelper::configureDoctrineOrmTargetEntities($container, $config['class_mapping']);
     }
 
-    private function prepareDoctrineBundle(array $config, LoaderInterface $loader, ContainerBuilder $container): void
+    private function prepareDoctrineOrm(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
-        if (!ContainerHelper::isDoctrineOrmEnabled($container)) {
-            return;
-        }
-
         $loader->load('doctrine.php');
 
         $classMapping = $config['class_mapping'];
