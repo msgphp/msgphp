@@ -10,9 +10,10 @@ events. By convention a trait implementation is provided to map concrete events 
 
 ## API
 
-### `handleEvent(DomainEventInterface $event): void`
+### `handleEvent(DomainEventInterface $event): bool`
 
-Handles the given domain event for a known subject.
+Handles the given domain event for a known subject. A boolean return value tells a domain event is actually handled yes
+or no.
 
 ## Generic example
 
@@ -26,7 +27,8 @@ class MyDomainEvent
 {
     public $newValue;
     
-    public function __construct($value) {
+    public function __construct($value)
+    {
         $this->newValue = $value;
     }
 }
@@ -37,13 +39,21 @@ class MyEntity implements DomainEventHandlerInterface
     
     public $value;
     
-    private function handleMyEvent(MyDomainEvent $event): void
+    private function handleMyEvent(MyDomainEvent $event): bool
     {
+        if ($this->value === $event->newValue) {
+            return false;
+        }
+
         $this->value = $event->newValue;
+        
+        return true;
     }
     
 }
 
 $entity = new MyEntity();
-$entity->handleEvent(new MyDomainEvent('value'));
+if ($entity->handleEvent(new MyDomainEvent('value'))) {
+    // do something
+}
 ```

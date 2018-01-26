@@ -38,8 +38,14 @@ trait CanBeConfirmed
         $this->confirmedAt = new \DateTimeImmutable();
     }
 
-    private function handleConfirmEvent(ConfirmDomainEvent $event): void
+    private function handleConfirmEvent(ConfirmDomainEvent $event): bool
     {
+        if (null !== $this->confirmedAt) {
+            return false;
+        }
+
         $this->confirm();
+
+        return true;
     }
 }

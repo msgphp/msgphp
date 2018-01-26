@@ -9,5 +9,5 @@ namespace MsgPhp\Domain\Event;
  */
 interface DomainEventHandlerInterface
 {
-    public function handleEvent(DomainEventInterface $event): void;
+    public function handleEvent(DomainEventInterface $event): bool;
 }

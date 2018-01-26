@@ -11,7 +11,7 @@ use MsgPhp\Domain\Exception\UnknownDomainEventException;
  */
 trait DomainEventHandlerTrait
 {
-    public function handleEvent(DomainEventInterface $event): void
+    public function handleEvent(DomainEventInterface $event): bool
     {
         $method = false === ($pos = strrpos($class = get_class($event), '\\')) ? $class : substr($class, $pos + 1);
 
@@ -25,6 +25,6 @@ trait DomainEventHandlerTrait
             throw UnknownDomainEventException::createForHandler($this, $event);
         }
 
-        $this->$method($event);
+        return $this->$method($event);
     }
 }

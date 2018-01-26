@@ -24,13 +24,25 @@ trait CanBeEnabled
         $this->enabled = false;
     }
 
-    private function handleEnableEvent(EnableDomainEvent $event): void
+    private function handleEnableEvent(EnableDomainEvent $event): bool
     {
+        if ($this->enabled) {
+            return false;
+        }
+
         $this->enable();
+
+        return true;
     }
 
-    private function handleDisableEvent(DisableDomainEvent $event): void
+    private function handleDisableEvent(DisableDomainEvent $event): bool
     {
+        if (!$this->enabled) {
+            return false;
+        }
+
         $this->disable();
+
+        return true;
     }
 }
