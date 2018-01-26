@@ -57,6 +57,10 @@ final class UsernameListener
         }
 
         foreach ($this->mapping[$class] as $mapping) {
+            if (!$event->hasChangedField($mapping['field'])) {
+                continue;
+            }
+
             $this->updateUsernames[$event->getOldValue($mapping['field'])] = $event->getNewValue($mapping['field']);
         }
     }

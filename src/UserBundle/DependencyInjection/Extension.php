@@ -64,6 +64,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         // framework infra
         if (class_exists(Security::class)) {
             $loader->load('security.php');
+
+            if (!$container->has(Repository\UserRepositoryInterface::class)) {
+                $container->removeDefinition(SecurityInfra\SecurityUserProvider::class);
+                $container->removeDefinition(SecurityInfra\UserParamConverter::class);
+                $container->removeDefinition(SecurityInfra\UserValueResolver::class);
+            }
         }
 
         if (class_exists(Validation::class)) {
