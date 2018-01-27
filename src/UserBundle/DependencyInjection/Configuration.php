@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\DependencyInjection;
 
+use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ConfigHelper;
-use MsgPhp\User\{CredentialInterface, Entity, UserId, UserIdInterface};
+use MsgPhp\User\{Command, CredentialInterface, Entity, UserId, UserIdInterface};
 use MsgPhp\User\Infra\Uuid as UuidInfra;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -33,6 +34,14 @@ final class Configuration implements ConfigurationInterface
             UuidInfra\UserId::class => ConfigHelper::UUID_DATA_TYPES,
         ],
     ];
+    private const COMMAND_MAPPING = [
+        Entity\User::class => [
+            Features\CanBeEnabled::class => [
+                Command\DisableUserCommand::class,
+                Command\EnableUserCommand::class,
+            ],
+        ],
+    ];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -56,6 +65,9 @@ final class Configuration implements ConfigurationInterface
 
                     return $value;
                 })->addDefaultChildrenIfNoneSet($availableIds)
+            )
+            ->append(
+                ConfigHelper::createClassMappingNode('commands', [], null, true, 'boolean')
             )
             ->children()
                 ->arrayNode('username_lookup')
@@ -96,6 +108,8 @@ final class Configuration implements ConfigurationInterface
 
                     $config['username_field'] = $usernameField;
                     $config['username_lookup'] = $usernameLookup;
+
+                    ConfigHelper::resolveCommandMapping($config['class_mapping'], self::COMMAND_MAPPING, $config['commands']);
 
                     return $config;
                 })

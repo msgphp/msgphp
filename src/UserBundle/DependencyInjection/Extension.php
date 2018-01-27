@@ -8,7 +8,7 @@ use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
 use MsgPhp\EavBundle\MsgPhpEavBundle;
-use MsgPhp\User\{Entity, Repository, UserIdInterface};
+use MsgPhp\User\{Command, Entity, Repository, UserIdInterface};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra, Validator as ValidatorInfra};
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -57,6 +57,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         // persistence infra
         if (class_exists(DoctrineOrmVersion::class)) {
             $this->prepareDoctrineOrm($config, $loader, $container);
+        }
+
+        // message infra
+        if (ContainerHelper::isMessageBusEnabled($container) && $container->has(Repository\UserRepositoryInterface::class)) {
+            $loader->load('message.php');
+
+            ContainerHelper::removeDisabledCommandMessages($container, $config['commands']);
         }
 
         // framework infra

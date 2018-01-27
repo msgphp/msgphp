@@ -99,7 +99,26 @@ final class ConfigHelper
         unset($value, $config);
     }
 
-    public static function uses(string $class, string $trait): bool
+    public static function resolveCommandMapping(array $classMapping, array $mapping, array &$config): void
+    {
+        foreach ($mapping as $class => $traits) {
+            $mappedClass = $classMapping[$class] ?? $class;
+
+            if ($class !== $mappedClass && !is_subclass_of($mappedClass, $class)) {
+                continue;
+            }
+
+            foreach ($traits as $trait => $traitConfig) {
+                if (!self::uses($mappedClass, $trait)) {
+                    continue;
+                }
+
+                $config += array_fill_keys($traitConfig, true);
+            }
+        }
+    }
+
+    private static function uses(string $class, string $trait): bool
     {
         static $uses = [];
 

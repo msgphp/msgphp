@@ -185,6 +185,23 @@ final class ContainerHelper
         ]);
     }
 
+    public static function removeDisabledCommandMessages(ContainerBuilder $container, array $commands): void
+    {
+        if (!self::isMessageBusEnabled($container)) {
+            return;
+        }
+
+        foreach ($container->findTaggedServiceIds('command_handler') as $id => $attr) {
+            foreach ($attr as $attr) {
+                if (!isset($attr['handles']) || !empty($commands[$attr['handles']])) {
+                    continue;
+                }
+
+                $container->removeDefinition($id);
+            }
+        }
+    }
+
     public static function isMessageBusEnabled(Container $container): bool
     {
         $bundles = self::getBundles($container);
