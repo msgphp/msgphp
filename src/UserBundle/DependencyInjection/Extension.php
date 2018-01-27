@@ -126,7 +126,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         foreach ([
             DoctrineInfra\Repository\UserRepository::class => $classMapping[Entity\User::class],
-            DoctrineInfra\Repository\UsernameRepository::class => $config['username_lookup'] ? Entity\Username::class : null,
+            DoctrineInfra\Repository\UsernameRepository::class => $config['username_lookup'] ? $classMapping[Entity\Username::class] : null,
             DoctrineInfra\Repository\UserAttributeValueRepository::class => $classMapping[Entity\UserAttributeValue::class] ?? null,
             DoctrineInfra\Repository\UserRoleRepository::class => $classMapping[Entity\UserRole::class] ?? null,
             DoctrineInfra\Repository\UserSecondaryEmailRepository::class => $classMapping[Entity\UserSecondaryEmail::class] ?? null,
@@ -169,6 +169,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             unset($files[$baseDir.'/User.Entity.Username.orm.xml']);
         }
 
-        return array_values(array_flip($files));
+        return array_keys($files);
     }
 }

@@ -83,7 +83,6 @@ final class Configuration implements ConfigurationInterface
             ->validate()
                 ->always()
                 ->then(function (array $config): array {
-                    $userClass = $config['class_mapping'][Entity\User::class];
                     $usernameLookup = [];
                     foreach ($config['username_lookup'] as &$value) {
                         if (isset($config['class_mapping'][$value['target']])) {
@@ -98,12 +97,25 @@ final class Configuration implements ConfigurationInterface
                     }
                     unset($value);
 
-                    if (isset($usernameLookup[$userClass])) {
-                        throw new \LogicException(sprintf('Username lookup mapping for "%s" cannot be overwritten.', $userClass));
-                    }
+                    $userClass = $config['class_mapping'][Entity\User::class];
+                    $usernameField = self::getUsernameField($userClass);
 
-                    if (null !== ($usernameField = self::getUsernameField($userClass)) && $usernameLookup) {
-                        $usernameLookup[$userClass][] = ['target' => $userClass, 'field' => $usernameField];
+                    if ($usernameLookup) {
+                        if (isset($usernameLookup[$userClass])) {
+                            throw new \LogicException(sprintf('Username lookup mapping for "%s" cannot be overwritten.', $userClass));
+                        }
+
+                        if (null !== $usernameField) {
+                            $usernameLookup[$userClass][] = ['target' => $userClass, 'field' => $usernameField];
+                        }
+
+                        if (!isset($config['class_mapping'][Entity\Username::class])) {
+                            $config['class_mapping'][Entity\Username::class] = Entity\Username::class;
+                        }
+
+                        if (isset($usernameLookup[$usernameClasss = $config['class_mapping'][Entity\Username::class]])) {
+                            throw new \LogicException(sprintf('Username lookup mapping for "%s" is not applicable.', $usernameClass));
+                        }
                     }
 
                     $config['username_field'] = $usernameField;
