@@ -31,7 +31,7 @@ final class EnableUserHandler
         $this->factory = $factory;
     }
 
-    public function handle(EnableUserCommand $command): void
+    public function __invoke(EnableUserCommand $command): void
     {
         $this->doHandle($command, function (User $user): void {
             $this->repository->save($user);
@@ -44,7 +44,7 @@ final class EnableUserHandler
         return $this->factory->create(EnableDomainEvent::class);
     }
 
-    protected function getDomainEventHandler(EnableUserCommand $command)
+    protected function getDomainEventHandler(EnableUserCommand $command): User
     {
         return $this->repository->find($command->userId);
     }

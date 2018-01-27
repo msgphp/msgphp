@@ -25,8 +25,6 @@ trait EventSourcingCommandHandlerTrait
 
         if ($handler->handleEvent($event) && null !== $onHandled) {
             $onHandled($handler);
-
-            return;
         }
     }
 
@@ -38,5 +36,5 @@ trait EventSourcingCommandHandlerTrait
     /**
      * @param object $command
      */
-    abstract protected function getDomainEventHandler($command);
+    abstract protected function getDomainEventHandler($command): DomainEventHandlerInterface;
 }

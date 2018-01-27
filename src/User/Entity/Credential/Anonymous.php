@@ -18,6 +18,6 @@ final class Anonymous implements CredentialInterface
 
     public function getUsername(): string
     {
-        throw new \LogicException('An anonymous credential has no username.');
+        return 'anonymous_'.bin2hex(random_bytes(8));
     }
 }

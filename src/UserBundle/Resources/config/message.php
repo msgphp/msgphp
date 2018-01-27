@@ -28,7 +28,7 @@ return function (ContainerConfigurator $container) use ($reflector, $simpleComma
     if ($simpleCommandBusEnabled) {
         foreach (glob($handlers) as $file) {
             $services->get($handler = $ns.basename($file, '.php'))->tag('command_handler', [
-                'handles' => $reflector($handler)->getMethod('handle')->getParameters()[0]->getClass()->getName(),
+                'handles' => $reflector($handler)->getMethod('__invoke')->getParameters()[0]->getClass()->getName(),
             ]);
         }
     }
