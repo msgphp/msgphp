@@ -15,29 +15,30 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 final class Configuration implements ConfigurationInterface
 {
-    public const IDENTITY_MAP = [
-        Entity\UserAttributeValue::class => ['user', 'attributeValue'],
-        Entity\User::class => 'id',
-        Entity\UserRole::class => ['user', 'role'],
-        Entity\UserSecondaryEmail::class => ['user', 'email'],
-    ];
-    public const DATA_TYPE_MAP = [
-        UserIdInterface::class => [
-            UserId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            UuidInfra\UserId::class => ConfigHelper::UUID_DATA_TYPES,
-        ],
-    ];
     public const REQUIRED_AGGREGATE_ROOTS = [
         Entity\User::class => UserIdInterface::class,
     ];
     public const OPTIONAL_AGGREGATE_ROOTS = [];
     public const AGGREGATE_ROOTS = self::REQUIRED_AGGREGATE_ROOTS + self::OPTIONAL_AGGREGATE_ROOTS;
+    public const IDENTITY_MAPPING = [
+        Entity\UserAttributeValue::class => ['user', 'attributeValue'],
+        Entity\User::class => 'id',
+        Entity\Username::class => ['user', 'username'],
+        Entity\UserRole::class => ['user', 'role'],
+        Entity\UserSecondaryEmail::class => ['user', 'email'],
+    ];
+    public const DATA_TYPE_MAPPING = [
+        UserIdInterface::class => [
+            UserId::class => ConfigHelper::NATIVE_DATA_TYPES,
+            UuidInfra\UserId::class => ConfigHelper::UUID_DATA_TYPES,
+        ],
+    ];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
-        $requiredEntities = array_keys(self::REQUIRED_AGGREGATE_ROOTS);
         $availableIds = array_values(self::AGGREGATE_ROOTS);
+        $requiredEntities = array_keys(self::REQUIRED_AGGREGATE_ROOTS);
 
         $treeBuilder->root(Extension::ALIAS)
             ->append(
@@ -46,7 +47,7 @@ final class Configuration implements ConfigurationInterface
                 })
             )
             ->append(
-                ConfigHelper::createClassMappingNode('data_type_mapping', [], function ($value) use ($availableIds) {
+                ConfigHelper::createClassMappingNode('data_type_mapping', [], function ($value) use ($availableIds): array {
                     if (!is_array($value)) {
                         $value = array_fill_keys($availableIds, $value);
                     } else {
@@ -54,8 +55,7 @@ final class Configuration implements ConfigurationInterface
                     }
 
                     return $value;
-                })
-                ->addDefaultChildrenIfNoneSet($availableIds)
+                })->addDefaultChildrenIfNoneSet($availableIds)
             )
             ->children()
                 ->arrayNode('username_lookup')

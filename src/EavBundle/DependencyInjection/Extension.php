@@ -39,9 +39,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         ConfigHelper::resolveResolveDataTypeMapping($container, $config['data_type_mapping']);
-        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAP, $config['data_type_mapping'], $config['class_mapping']);
+        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAPPING, $config['data_type_mapping'], $config['class_mapping']);
 
-        ContainerHelper::configureIdentityMap($container, $config['class_mapping'], Configuration::IDENTITY_MAP);
+        ContainerHelper::configureIdentityMapping($container, $config['class_mapping'], Configuration::IDENTITY_MAPPING);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
         ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\EntityFieldsMapping::class]);
 
@@ -56,7 +56,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
 
         ConfigHelper::resolveResolveDataTypeMapping($container, $config['data_type_mapping']);
-        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAP, $config['data_type_mapping'], $config['class_mapping']);
+        ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAPPING, $config['data_type_mapping'], $config['class_mapping']);
 
         ContainerHelper::configureDoctrineTypes($container, $config['data_type_mapping'], $config['class_mapping'], [
             AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,

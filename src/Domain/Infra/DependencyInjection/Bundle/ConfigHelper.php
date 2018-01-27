@@ -21,30 +21,31 @@ final class ConfigHelper
     public const NATIVE_DATA_TYPES = ['string', 'integer', 'bigint'];
     public const UUID_DATA_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
 
-    public static function createClassMappingNode(string $name, array $required = [], \Closure $normalizer = null, $defaultValue = null, NodeBuilder $builder = null): ArrayNodeDefinition
+    public static function createClassMappingNode(string $name, array $required = [], \Closure $normalizer = null, $defaultValue = null, string $prototype = 'scalar', \Closure $prototypeCallback = null, NodeBuilder $builder = null): ArrayNodeDefinition
     {
         $node = ($builder ?? new NodeBuilder())->arrayNode($name);
+        $node->useAttributeAsKey('class');
 
         if ($required) {
             $node->isRequired();
 
             foreach ($required as $class) {
-                $node->validate()
-                    ->ifTrue(function (array $value) use ($class) {
-                        return !isset($value[$class]);
-                    })
-                    ->thenInvalid(sprintf('Class "%s" must be configured.', $class))
-                ->end();
+                $node->validate()->ifTrue(function (array $value) use ($class) {
+                    return !isset($value[$class]);
+                })->thenInvalid(sprintf('Class "%s" must be configured.', $class));
             }
         }
 
-        if ($normalizer) {
+        if (null !== $normalizer) {
             $node->beforeNormalization()->always($normalizer);
         }
 
-        $node
-            ->useAttributeAsKey('class')
-            ->scalarPrototype()->defaultValue($defaultValue)->end();
+        $prototype = $node->prototype($prototype);
+        $prototype->defaultValue($defaultValue);
+
+        if (null !== $prototypeCallback) {
+            $prototypeCallback($prototype);
+        }
 
         return $node;
     }
@@ -96,6 +97,28 @@ final class ConfigHelper
         }
 
         unset($value, $config);
+    }
+
+    public static function uses(string $class, string $trait): bool
+    {
+        static $uses = [];
+
+        if (!isset($uses[$class])) {
+            $resolve = function (string $class) use (&$resolve): array {
+                $resolved = [];
+
+                foreach (class_uses($class) as $used) {
+                    $resolved[$used] = true;
+                    $resolved += $resolve($used);
+                }
+
+                return $resolved;
+            };
+
+            $uses[$class] = $resolve($class);
+        }
+
+        return isset($uses[$class][$trait]);
     }
 
     private function __construct()

@@ -78,7 +78,7 @@ final class ResolveDomainPass implements CompilerPassInterface
         self::register($container, InMemoryInfra\ObjectFieldAccessor::class);
 
         self::register($container, InMemoryInfra\DomainIdentityMapping::class)
-            ->setArgument('$mapping', array_merge(...$container->getParameter('msgphp.domain.identity_map')))
+            ->setArgument('$mapping', array_merge(...$container->getParameter('msgphp.domain.identity_mapping')))
             ->setArgument('$accessor', new Reference(InMemoryInfra\ObjectFieldAccessor::class));
 
         self::alias($container, DomainIdentityMappingInterface::class, InMemoryInfra\DomainIdentityMapping::class);
@@ -91,11 +91,11 @@ final class ResolveDomainPass implements CompilerPassInterface
 
         self::register($container, Factory\ClassMappingObjectFactory::class)
             ->setDecoratedService(Factory\DomainObjectFactory::class)
-            ->setArgument('$mapping', array_merge(...$container->getParameter('msgphp.domain.class_map')))
+            ->setArgument('$mapping', array_merge(...$container->getParameter('msgphp.domain.class_mapping')))
             ->setArgument('$factory', new Reference(Factory\ClassMappingObjectFactory::class.'.inner'));
 
         self::register($container, Factory\EntityFactory::class)
-            ->setArgument('$identifierMapping', array_merge(...$container->getParameter('msgphp.domain.id_class_map')))
+            ->setArgument('$identifierMapping', array_merge(...$container->getParameter('msgphp.domain.id_class_mapping')))
             ->setArgument('$factory', new Reference(Factory\DomainObjectFactory::class));
 
         self::alias($container, Factory\DomainObjectFactoryInterface::class, Factory\DomainObjectFactory::class);

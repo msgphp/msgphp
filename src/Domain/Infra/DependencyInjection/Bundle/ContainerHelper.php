@@ -71,7 +71,7 @@ final class ContainerHelper
         }
     }
 
-    public static function configureIdentityMap(ContainerBuilder $container, array $classMapping, array $identityMapping): void
+    public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
         foreach ($identityMapping as $class => $mapping) {
             if (isset($classMapping[$class])) {
@@ -79,23 +79,23 @@ final class ContainerHelper
             }
         }
 
-        $identiyMap = $container->hasParameter($param = 'msgphp.domain.identity_map') ? $container->getParameter($param) : [];
-        $identiyMap[] = $identityMapping;
+        $values = $container->hasParameter($param = 'msgphp.domain.identity_mapping') ? $container->getParameter($param) : [];
+        $values[] = $identityMapping;
 
-        $container->setParameter($param, $identiyMap);
+        $container->setParameter($param, $values);
     }
 
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
-        $classMap = $container->hasParameter($param = 'msgphp.domain.class_map') ? $container->getParameter($param) : [];
-        $classMap[] = $classMapping;
+        $values = $container->hasParameter($param = 'msgphp.domain.class_mapping') ? $container->getParameter($param) : [];
+        $values[] = $classMapping;
 
-        $container->setParameter($param, $classMap);
+        $container->setParameter($param, $values);
 
-        $idClassMap = $container->hasParameter($param = 'msgphp.domain.id_class_map') ? $container->getParameter($param) : [];
-        $idClassMap[] = $idClassMapping;
+        $values = $container->hasParameter($param = 'msgphp.domain.id_class_mapping') ? $container->getParameter($param) : [];
+        $values[] = $idClassMapping;
 
-        $container->setParameter($param, $idClassMap);
+        $container->setParameter($param, $values);
     }
 
     public static function configureDoctrineTypes(ContainerBuilder $container, array $dataTypeMapping, array $classMapping, array $typeMapping): void
@@ -160,10 +160,10 @@ final class ContainerHelper
             return;
         }
 
-        $mappingFileList = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
-        $mappingFileList[] = $mappingFiles;
+        $values = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
+        $values[] = $mappingFiles;
 
-        $container->setParameter($param, $mappingFileList);
+        $container->setParameter($param, $values);
 
         foreach ($objectFieldMappings as $class) {
             $container->register($class)
