@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{Factory, DomainIdentityMappingInterface, DomainMessageBusInterface};
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
-use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
-use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,9 +25,9 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerIdentityMapping($container);
         $this->registerEntityFactory($container);
 
-        if (interface_exists(DoctrineEntityManager::class)) {
+        if ($container->has('doctrine.orm.entity_manager')) {
             self::register($container, DoctrineInfra\DomainIdentityMapping::class)
-                ->setArgument('$em', new Reference(DoctrineEntityManager::class));
+                ->setAutowired(true);
 
             self::alias($container, DomainIdentityMappingInterface::class, DoctrineInfra\DomainIdentityMapping::class);
 
@@ -43,19 +39,9 @@ final class ResolveDomainPass implements CompilerPassInterface
             }
         }
 
-        if (ContainerHelper::isMessageBusEnabled($container)) {
-            if (ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-                $bus = new Reference('simple_bus.command_bus');
-                $eventBus = ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class) ? new Reference('simple_bus.event_bus') : null;
-            } else {
-                $bus = new Reference('simple_bus.event_bus');
-                $eventBus = null;
-            }
-
+        if ($container->has('simple_bus.command_bus')) {
             self::register($container, SimpleBusInfra\DomainMessageBus::class)
-                ->setAutowired(true)
-                ->setArgument('$bus', $bus)
-                ->setArgument('$eventBus', $eventBus);
+                ->setArgument('$bus', new Reference('simple_bus.command_bus'));
 
             self::alias($container, DomainMessageBusInterface::class, SimpleBusInfra\DomainMessageBus::class);
         }

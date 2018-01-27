@@ -86,6 +86,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
     {
-        return glob(dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName()).'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml');
+        $baseDir = dirname(ContainerHelper::getClassReflection($container, AttributeIdInterface::class)->getFileName()).'/Infra/Doctrine/Resources/dist-mapping';
+
+        return glob($baseDir.'/*.orm.xml');
     }
 }

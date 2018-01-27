@@ -9,12 +9,13 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
+use MsgPhp\Domain\Infra\SimpleBus as SimpleBusInfra;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -68,6 +69,18 @@ final class ContainerHelper
             if ($id === (string) $alias) {
                 $container->removeAlias($aliasId);
             }
+        }
+    }
+
+    public static function removeIf(ContainerBuilder $container, $condition, array $ids): void
+    {
+        if (!$condition) {
+            return;
+        }
+
+        foreach ($ids as $id) {
+            self::removeDefinitionWithAliases($container, $id);
+            $container->removeAlias($id);
         }
     }
 
@@ -187,7 +200,7 @@ final class ContainerHelper
 
     public static function removeDisabledCommandMessages(ContainerBuilder $container, array $commands): void
     {
-        if (!self::isMessageBusEnabled($container)) {
+        if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
             return;
         }
 
@@ -202,11 +215,20 @@ final class ContainerHelper
         }
     }
 
-    public static function isMessageBusEnabled(Container $container): bool
+    public static function registerEventMessages(ContainerBuilder $container, array $events): void
     {
-        $bundles = self::getBundles($container);
+        if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
+            return;
+        }
 
-        return isset($bundles[SimpleBusCommandBusBundle::class]) || isset($bundles[SimpleBusEventBusBundle::class]);
+        $definition = $container->register(uniqid('msgphp'), SimpleBusInfra\EventMessageHandler::class);
+        $definition
+            ->setPublic(true)
+            ->setArgument('$bus', new Reference('simple_bus.event_bus', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+
+        foreach ($events as $event) {
+            $definition->addTag('command_handler', ['handles' => $event]);
+        }
     }
 
     private function __construct()

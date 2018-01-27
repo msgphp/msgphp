@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp;
 
 use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
+use MsgPhp\User\UserIdInterface;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -12,17 +13,16 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 /** @var ContainerBuilder $container */
 $container = $container ?? (function (): ContainerBuilder { throw new \LogicException('Invalid context.'); })();
 $reflector = ContainerHelper::getClassReflector($container);
-$pattern = '%kernel.project_dir%/vendor/msgphp/user/Command/Handler/*Handler.php';
-$handlers = $container->getParameterBag()->resolveValue($pattern);
 $simpleCommandBusEnabled = ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class);
 
-return function (ContainerConfigurator $container) use ($reflector, $handlers, $pattern, $simpleCommandBusEnabled): void {
+return function (ContainerConfigurator $container) use ($reflector, $simpleCommandBusEnabled): void {
+    $baseDir = dirname($reflector(UserIdInterface::class)->getFileName());
     $services = $container->services()
         ->defaults()
         ->autowire()
         ->public()
 
-        ->load($ns = 'MsgPhp\\User\\Command\\Handler\\', $pattern)
+        ->load($ns = 'MsgPhp\\User\\Command\\Handler\\', $handlers = $baseDir.'/Command/Handler/*Handler.php')
     ;
 
     if ($simpleCommandBusEnabled) {

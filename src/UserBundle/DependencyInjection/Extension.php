@@ -10,6 +10,7 @@ use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelpe
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\{Command, Entity, Repository, UserIdInterface};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra, Validator as ValidatorInfra};
+use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -60,38 +61,51 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }
 
         // message infra
-        if (ContainerHelper::isMessageBusEnabled($container) && $container->has(Repository\UserRepositoryInterface::class)) {
+        if (interface_exists(MessageBus::class)) {
             $loader->load('message.php');
 
+            ContainerHelper::removeIf($container, !$container->has(Repository\UserRepositoryInterface::class), [
+                Command\Handler\DisableUserHandler::class,
+                Command\Handler\EnableUserHandler::class,
+            ]);
             ContainerHelper::removeDisabledCommandMessages($container, $config['commands']);
+            ContainerHelper::registerEventMessages($container, array_map(function (string $file): string {
+                return 'MsgPhp\\User\\Event\\'.basename($file, '.php');
+            }, glob(dirname(ContainerHelper::getClassReflection($container, UserIdInterface::class)->getFileName()).'/Event/*Event.php')));
         }
 
         // framework infra
         if (class_exists(Security::class)) {
             $loader->load('security.php');
 
-            if (!$container->has(Repository\UserRepositoryInterface::class)) {
-                $container->removeDefinition(SecurityInfra\SecurityUserProvider::class);
-                $container->removeDefinition(SecurityInfra\UserParamConverter::class);
-                $container->removeDefinition(SecurityInfra\UserValueResolver::class);
-            }
+            ContainerHelper::removeIf($container, !$container->has(Repository\UserRepositoryInterface::class), [
+                SecurityInfra\SecurityUserProvider::class,
+                SecurityInfra\UserParamConverter::class,
+                SecurityInfra\UserValueResolver::class,
+            ]);
         }
 
         if (class_exists(Validation::class)) {
             $loader->load('validator.php');
 
-            if (!$container->has(Repository\UserRepositoryInterface::class)) {
-                $container->removeDefinition(ValidatorInfra\ExistingUsernameValidator::class);
-                $container->removeDefinition(ValidatorInfra\UniqueUsernameValidator::class);
-            }
+            ContainerHelper::removeIf($container, !$container->has(Repository\UserRepositoryInterface::class), [
+                ValidatorInfra\ExistingUsernameValidator::class,
+                ValidatorInfra\UniqueUsernameValidator::class,
+            ]);
         }
 
         if (class_exists(ConsoleEvents::class)) {
             $loader->load('console.php');
 
-            if (!$container->has(Repository\UsernameRepositoryInterface::class)) {
-                $container->removeDefinition(ConsoleInfra\Command\SynchronizeUsernamesCommand::class);
-            }
+            ContainerHelper::removeIf($container, !$container->has(Repository\UsernameRepositoryInterface::class), [
+                ConsoleInfra\Command\SynchronizeUsernamesCommand::class,
+            ]);
+            ContainerHelper::removeIf($container, !$container->has(Command\Handler\DisableUserHandler::class), [
+                ConsoleInfra\Command\DisableUserCommand::class,
+            ]);
+            ContainerHelper::removeIf($container, !$container->has(Command\Handler\EnableUserHandler::class), [
+                ConsoleInfra\Command\EnableUserCommand::class,
+            ]);
         }
     }
 
@@ -110,8 +124,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if ($container->hasDefinition('data_collector.security')) {
-            $container->getDefinition('data_collector.security')
+        if ($container->has('data_collector.security')) {
+            $container->findDefinition('data_collector.security')
                 ->setClass(SecurityInfra\DataCollector::class)
                 ->setArgument('$repository', new Reference(Repository\UserRepositoryInterface::class, ContainerBuilder::NULL_ON_INVALID_REFERENCE))
                 ->setArgument('$factory', new Reference(EntityFactoryInterface::class, ContainerBuilder::NULL_ON_INVALID_REFERENCE));
@@ -158,8 +172,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
     private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
     {
-        $files = glob(($baseDir = dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Infra/Doctrine/Resources/dist-mapping').'/*.orm.xml');
-        $files = array_flip($files);
+        $baseDir = dirname(ContainerHelper::getClassReflection($container, UserIdInterface::class)->getFileName()).'/Infra/Doctrine/Resources/dist-mapping';
+        $files = array_flip(glob($baseDir.'/*.orm.xml'));
 
         if (!ContainerHelper::hasBundle($container, MsgPhpEavBundle::class)) {
             unset($files[$baseDir.'/User.Entity.UserAttributeValue.orm.xml']);
