@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
 
 use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Infra\Uuid as UuidInfra;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -103,17 +104,17 @@ final class ConfigHelper
     {
         foreach ($mapping as $class => $traits) {
             $mappedClass = $classMapping[$class] ?? $class;
-
             if ($class !== $mappedClass && !is_subclass_of($mappedClass, $class)) {
                 continue;
             }
 
+            $isEventHandler = is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
             foreach ($traits as $trait => $traitConfig) {
                 if (!self::uses($mappedClass, $trait)) {
                     continue;
                 }
 
-                $config += array_fill_keys($traitConfig, true);
+                $config += array_fill_keys($traitConfig, $isEventHandler);
             }
         }
     }

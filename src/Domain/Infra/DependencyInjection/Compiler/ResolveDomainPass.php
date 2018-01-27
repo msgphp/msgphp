@@ -26,7 +26,7 @@ final class ResolveDomainPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $this->registerIdentityMap($container);
+        $this->registerIdentityMapping($container);
         $this->registerEntityFactory($container);
 
         if (interface_exists(DoctrineEntityManager::class)) {
@@ -44,20 +44,18 @@ final class ResolveDomainPass implements CompilerPassInterface
         }
 
         if (ContainerHelper::isMessageBusEnabled($container)) {
-            $bus = ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)
-                ? new Reference('command_bus')
-                : new Reference('event_bus');
-            $eventBus = 'command_bus' === (string) $bus
-                ? ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class) ? new Reference('event_bus') : null
-                : null;
-            $callableMap = 'command_bus' === (string) $bus
-                ? new Reference('simple_bus.command_bus.command_handler_map')
-                : null;
+            if (ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)) {
+                $bus = new Reference('simple_bus.command_bus');
+                $eventBus = ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class) ? new Reference('simple_bus.event_bus') : null;
+            } else {
+                $bus = new Reference('simple_bus.event_bus');
+                $eventBus = null;
+            }
 
             self::register($container, SimpleBusInfra\DomainMessageBus::class)
+                ->setAutowired(true)
                 ->setArgument('$bus', $bus)
-                ->setArgument('$eventBus', $eventBus)
-                ->setArgument('$callableMap', $callableMap);
+                ->setArgument('$eventBus', $eventBus);
 
             self::alias($container, DomainMessageBusInterface::class, SimpleBusInfra\DomainMessageBus::class);
         }
@@ -73,7 +71,7 @@ final class ResolveDomainPass implements CompilerPassInterface
         $container->setAlias($alias, new Alias($id, false));
     }
 
-    private function registerIdentityMap(ContainerBuilder $container): void
+    private function registerIdentityMapping(ContainerBuilder $container): void
     {
         self::register($container, InMemoryInfra\ObjectFieldAccessor::class);
 

@@ -113,7 +113,7 @@ final class Configuration implements ConfigurationInterface
                             $config['class_mapping'][Entity\Username::class] = Entity\Username::class;
                         }
 
-                        if (isset($usernameLookup[$usernameClasss = $config['class_mapping'][Entity\Username::class]])) {
+                        if (isset($usernameLookup[$usernameClass = $config['class_mapping'][Entity\Username::class]])) {
                             throw new \LogicException(sprintf('Username lookup mapping for "%s" is not applicable.', $usernameClass));
                         }
                     }
