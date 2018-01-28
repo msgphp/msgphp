@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Event\{DomainEventInterface, DisableDomainEvent};
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Command\DisableUserCommand;

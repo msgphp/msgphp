@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\SimpleBus;
 
-use MsgPhp\Domain\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use SimpleBus\Message\Bus\MessageBus;
 
 /**

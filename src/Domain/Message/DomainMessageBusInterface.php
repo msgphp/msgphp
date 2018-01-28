@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain;
+namespace MsgPhp\Domain\Message;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
