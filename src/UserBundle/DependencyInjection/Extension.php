@@ -69,8 +69,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 Command\Handler\DisableUserHandler::class,
                 Command\Handler\EnableUserHandler::class,
             ]);
-            ContainerHelper::removeDisabledCommandMessages($container, $config['commands']);
-            ContainerHelper::registerEventMessages($container, array_map(function (string $file): string {
+            ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
+            ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file) use ($config): string {
                 return 'MsgPhp\\User\\Event\\'.basename($file, '.php');
             }, glob(dirname(ContainerHelper::getClassReflection($container, UserIdInterface::class)->getFileName()).'/Event/*Event.php')));
         }

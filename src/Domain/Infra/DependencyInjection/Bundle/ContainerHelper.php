@@ -198,15 +198,24 @@ final class ContainerHelper
         ]);
     }
 
-    public static function removeDisabledCommandMessages(ContainerBuilder $container, array $commands): void
+    public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
         if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
             return;
         }
 
-        foreach ($container->findTaggedServiceIds('command_handler') as $id => $attr) {
+        foreach ($container->findTaggedServiceIds($tag = 'command_handler') as $id => $attr) {
             foreach ($attr as $attr) {
-                if (!isset($attr['handles']) || !empty($commands[$attr['handles']])) {
+                if (!isset($attr[$attrName = 'handles'])) {
+                    continue;
+                }
+
+                if ($commands[$command = $attr[$attrName]] ?? false) {
+                    if (isset($classMapping[$command])) {
+                        $container->getDefinition($id)
+                            ->addTag($tag, [$attrName => $classMapping[$command]]);
+                    }
+
                     continue;
                 }
 
@@ -215,19 +224,23 @@ final class ContainerHelper
         }
     }
 
-    public static function registerEventMessages(ContainerBuilder $container, array $events): void
+    public static function configureEventMessages(ContainerBuilder $container, array $classMapping, array $events): void
     {
         if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
             return;
         }
 
-        $definition = $container->register(uniqid('msgphp'), SimpleBusInfra\EventMessageHandler::class);
+        $definition = $container->register(uniqid(SimpleBusInfra\EventMessageHandler::class), SimpleBusInfra\EventMessageHandler::class);
         $definition
             ->setPublic(true)
             ->setArgument('$bus', new Reference('simple_bus.event_bus', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
 
         foreach ($events as $event) {
-            $definition->addTag('command_handler', ['handles' => $event]);
+            $definition->addTag($tag = 'command_handler', [$attrName = 'handles' => $event]);
+
+            if (isset($classMapping[$event])) {
+                $definition->addTag($tag, [$attrName => $classMapping[$event]]);
+            }
         }
     }
 
