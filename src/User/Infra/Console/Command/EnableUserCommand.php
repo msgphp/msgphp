@@ -28,7 +28,7 @@ final class EnableUserCommand extends UserCommand
         $io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $io);
 
-        $this->dispatch(new DomainCommand\EnableUserCommand($user->getId()));
+        $this->dispatch(DomainCommand\EnableUserCommand::class, [$user->getId()]);
 
         $io->success('Enabled user '.$user->getCredential()->getUsername());
 

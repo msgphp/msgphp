@@ -28,7 +28,7 @@ final class DisableUserCommand extends UserCommand
         $io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $io);
 
-        $this->dispatch(new DomainCommand\DisableUserCommand($user->getId()));
+        $this->dispatch(DomainCommand\DisableUserCommand::class, [$user->getId()]);
 
         $io->success('Disabled user '.$user->getCredential()->getUsername());
 

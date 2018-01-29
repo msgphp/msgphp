@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
 use MsgPhp\Domain\Factory\EntityFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
@@ -18,17 +18,19 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 abstract class UserCommand extends Command
 {
-    private $bus;
-    private $repository;
-    private $factory;
+    use DomainMessageDispatchingTrait {
+        dispatch as protected;
+    }
 
-    public function __construct(DomainMessageBusInterface $bus, UserRepositoryInterface $repository, EntityFactoryInterface $factory)
+    private $repository;
+
+    public function __construct(EntityFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
         parent::__construct();
 
+        $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
-        $this->factory = $factory;
     }
 
     protected function configure(): void
@@ -36,14 +38,6 @@ abstract class UserCommand extends Command
         $this
             ->addOption('id', null, InputOption::VALUE_NONE, 'Find user by identifier')
             ->addArgument('username', null, 'The username or identifier value');
-    }
-
-    /**
-     * @param object $message
-     */
-    protected function dispatch($message): void
-    {
-        $this->bus->dispatch($message);
     }
 
     protected function getUser(InputInterface $input, StyleInterface $io): User
