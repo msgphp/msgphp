@@ -7,6 +7,6 @@ namespace MsgPhp\Domain\Event;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DisableDomainEvent implements DomainEventInterface
+class DisableDomainEvent implements DomainEventInterface
 {
 }

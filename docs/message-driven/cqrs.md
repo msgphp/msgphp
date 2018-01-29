@@ -13,10 +13,9 @@ Usually a command handler is designed, but not limited, to handle one specific c
 
 ### `MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait`
 
-Sources a domain event from a command message.
+Handles a command message by sourcing a domain event.
 
-- `doHandle(object $command, callable $onHandled = null): void`
-    - Invokes the domain event for the given command message
+- `handle(object $command, callable $onHandled = null): void`
     - If the domain event is handled `$onHandled` will be invoked (if given), receiving the handler as first argument
 - `abstract getDomainEvent(object $command): DomainEventInterface`
     - The [domain event](../event-sourcing/domain-events.md) to be handled

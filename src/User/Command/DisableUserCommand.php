@@ -9,7 +9,7 @@ use MsgPhp\User\UserIdInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DisableUserCommand
+class DisableUserCommand
 {
     public $userId;
 

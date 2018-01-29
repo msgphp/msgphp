@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
-use MsgPhp\Domain\Event\{DomainEventInterface, EnableDomainEvent};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
+use MsgPhp\Domain\Event\EnableDomainEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Command\EnableUserCommand;
 use MsgPhp\User\Entity\User;
@@ -19,27 +19,26 @@ use MsgPhp\User\Repository\UserRepositoryInterface;
 final class EnableUserHandler
 {
     use EventSourcingCommandHandlerTrait;
+    use DomainMessageDispatchingTrait;
 
-    private $bus;
     private $repository;
-    private $factory;
 
-    public function __construct(DomainMessageBusInterface $bus, UserRepositoryInterface $repository, DomainObjectFactoryInterface $factory)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
+        $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
-        $this->factory = $factory;
     }
 
     public function __invoke(EnableUserCommand $command): void
     {
-        $this->doHandle($command, function (User $user): void {
+        $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->bus->dispatch($this->factory->create(UserEnabledEvent::class, ['user' => $user]));
+            $this->dispatch(UserEnabledEvent::class, ['user' => $user]);
         });
     }
 
-    protected function getDomainEvent(EnableUserCommand $command): DomainEventInterface
+    protected function getDomainEvent(EnableUserCommand $command): EnableDomainEvent
     {
         return $this->factory->create(EnableDomainEvent::class);
     }

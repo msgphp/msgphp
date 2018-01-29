@@ -14,7 +14,7 @@ trait EventSourcingCommandHandlerTrait
     /**
      * @param object $command
      */
-    protected function doHandle($command, callable $onHandled = null): void
+    private function handle($command, callable $onHandled = null): void
     {
         $event = $this->getDomainEvent($command);
         $handler = $this->getDomainEventHandler($command);

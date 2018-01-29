@@ -9,7 +9,7 @@ use MsgPhp\User\Entity\User;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserEnabledEvent
+class UserEnabledEvent
 {
     public $user;
 
