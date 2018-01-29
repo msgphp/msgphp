@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityFactoryInterface;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRolesProviderInterface};
 use MsgPhp\User\Repository\UserRepositoryInterface;
@@ -85,9 +85,9 @@ final class SecurityUserProviderTest extends TestCase
         $this->assertFalse($provider->supportsClass(UserInterface::class));
     }
 
-    private function createFactory(): EntityFactoryInterface
+    private function createFactory(): EntityAwareFactoryInterface
     {
-        $factory = $this->createMock(EntityFactoryInterface::class);
+        $factory = $this->createMock(EntityAwareFactoryInterface::class);
         $factory->expects($this->any())
             ->method('identify')
             ->willReturnCallback(function ($class, $id) {

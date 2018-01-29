@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
-use MsgPhp\Domain\Factory\EntityFactoryInterface;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +24,7 @@ abstract class UserCommand extends Command
 
     private $repository;
 
-    public function __construct(EntityFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
         parent::__construct();
 

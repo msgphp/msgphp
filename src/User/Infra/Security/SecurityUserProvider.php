@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityFactoryInterface;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -22,7 +22,7 @@ final class SecurityUserProvider implements UserProviderInterface
     private $factory;
     private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, EntityFactoryInterface $factory, UserRolesProviderInterface $roleProvider = null)
+    public function __construct(UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory, UserRolesProviderInterface $roleProvider = null)
     {
         $this->repository = $repository;
         $this->factory = $factory;

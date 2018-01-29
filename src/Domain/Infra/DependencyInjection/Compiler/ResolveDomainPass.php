@@ -81,12 +81,12 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setArgument('$mapping', array_merge(...$classMapping))
             ->setArgument('$factory', new Reference(Factory\ClassMappingObjectFactory::class.'.inner'));
 
-        self::register($container, Factory\EntityFactory::class)
+        self::register($container, Factory\EntityAwareFactory::class)
             ->setArgument('$identifierMapping', array_merge(...$idClassMapping))
             ->setArgument('$factory', new Reference(Factory\DomainObjectFactory::class));
 
-        self::alias($container, Factory\DomainObjectFactoryInterface::class, Factory\DomainObjectFactory::class);
-        self::alias($container, Factory\EntityFactoryInterface::class, Factory\EntityFactory::class);
+        self::alias($container, Factory\DomainObjectFactoryInterface::class, Factory\EntityAwareFactory::class);
+        self::alias($container, Factory\EntityAwareFactoryInterface::class, Factory\EntityAwareFactory::class);
     }
 
     private function registerMessageBus(ContainerBuilder $container): void

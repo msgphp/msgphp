@@ -6,12 +6,12 @@ namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\{DomainObjectFactoryInterface, EntityFactory};
+use MsgPhp\Domain\Factory\{DomainObjectFactoryInterface, EntityAwareFactory};
 use PHPUnit\Framework\TestCase;
 
-final class EntityFactoryTest extends TestCase
+final class EntityAwareFactoryTest extends TestCase
 {
-    /** @var EntityFactory */
+    /** @var EntityAwareFactory */
     private $factory;
 
     protected function setUp(): void
@@ -36,7 +36,7 @@ final class EntityFactoryTest extends TestCase
                 return $o;
             });
 
-        $this->factory = new EntityFactory(['alias_id' => 'id'], $innerFactory);
+        $this->factory = new EntityAwareFactory(['alias_id' => 'id'], $innerFactory);
     }
 
     public function testCreate(): void

@@ -1,15 +1,15 @@
-# Entity factory
+# Entity aware factory
 
-An entity factory is a domain object factory and is bound to `MsgPhp\Domain\Factory\EntityFactoryInterface`.
-Besides initializing the entity via `create()` it can also initialize an identifier using either `identify()` or 
-`nextIdentifier()`.
+An entity aware factory is a domain object factory and is bound to `MsgPhp\Domain\Factory\EntityAwareFactoryInterface`.
+Besides initializing any domain object via `create()` it can also initialize an entity identifier using either
+`identify()` or `nextIdentifier()`.
 
 ## Implementations
 
-### `MsgPhp\Domain\Factory\EntityFactory`
+### `MsgPhp\Domain\Factory\EntityAwareFactory`
 
-Generic entity factory and decorates any object factory. Additionally it must be provided with the identifier class 
-mapping.
+Generic entity factory and decorates any object factory. Additionally it must be provided with an entity to identifier
+class mapping.
 
 ## API
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityFactoryInterface;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector as BaseDataCollector;
@@ -30,7 +30,7 @@ final class DataCollector extends BaseDataCollector
     private $repository;
     private $factory;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, UserRepositoryInterface $repository = null, EntityFactoryInterface $factory = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, UserRepositoryInterface $repository = null, EntityAwareFactoryInterface $factory = null)
     {
         parent::__construct($tokenStorage, $roleHierarchy, $logoutUrlGenerator, $accessDecisionManager, $firewallMap, $firewall);
 

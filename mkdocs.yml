@@ -19,7 +19,7 @@ pages:
     - Collections: ddd/collections.md
     - Factories:
         - Object factory: ddd/factory/object.md
-        - Entity factory: ddd/factory/entity.md
+        - Entity aware factory: ddd/factory/entity_aware.md
         - Static factory: ddd/factory/static.md
     - Repositories: ddd/repositories.md
     - Entities: ddd/entities.md

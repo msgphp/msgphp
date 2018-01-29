@@ -9,7 +9,7 @@ use MsgPhp\Domain\DomainIdInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-interface EntityFactoryInterface extends DomainObjectFactoryInterface
+interface EntityAwareFactoryInterface extends DomainObjectFactoryInterface
 {
     public function identify(string $class, $id): DomainIdInterface;
 

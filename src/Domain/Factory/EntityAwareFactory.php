@@ -10,7 +10,7 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class EntityFactory implements EntityFactoryInterface
+final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $identifierMapping;
     private $factory;
