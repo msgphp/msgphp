@@ -62,6 +62,24 @@ class DomainIdType extends Type
         self::$mapping = [];
     }
 
+    /**
+     * @internal
+     */
+    final public static function resolveName($value): ?string
+    {
+        if ($value instanceof DomainIdInterface) {
+            $class = get_class($value);
+
+            foreach (self::$mapping as $type => $mapping) {
+                if ($class === $mapping['class']) {
+                    return $type::NAME;
+                }
+            }
+        }
+
+        return null;
+    }
+
     final public function getName(): string
     {
         return static::NAME;

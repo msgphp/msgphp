@@ -87,13 +87,15 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
     private function addAttributeCriteria(QueryBuilder $qb, AttributeIdInterface $attributeId, $value = null): void
     {
         if (3 === func_num_args()) {
-            $qb->join($this->alias.'.attributeValue', 'attribute_value', Join::WITH, 'attribute_value.checksum = :attribute_value');
-            $qb->setParameter('attribute_value', md5(serialize($value)));
+            $param = $this->addFieldParameter($qb, 'attributeValue', md5(serialize($value)));
+
+            $qb->join($this->alias.'.attributeValue', 'attribute_value', Join::WITH, 'attribute_value.checksum = '.$param);
         } else {
             $qb->join($this->alias.'.attributeValue', 'attribute_value');
         }
 
-        $qb->join('attribute_value.attribute', 'attribute', Join::WITH, 'attribute.id = :attribute');
-        $qb->setParameter('attribute', $attributeId);
+        $param = $this->addFieldParameter($qb, 'attribute', $attributeId);
+
+        $qb->join('attribute_value.attribute', 'attribute', Join::WITH, 'attribute.id = '.$param);
     }
 }

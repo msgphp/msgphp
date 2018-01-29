@@ -174,27 +174,34 @@ trait DomainEntityRepositoryTrait
 
             if (null === $value) {
                 $where->add($expr->isNull($fieldAlias));
-            } elseif (true === $value) {
-                $where->add($expr->eq($fieldAlias, 'TRUE'));
-            } elseif (false === $value) {
-                $where->add($expr->eq($fieldAlias, 'FALSE'));
-            } elseif (is_array($value)) {
-                $where->add($expr->in($fieldAlias, ':'.($param = self::getPlaceholder($field))));
-                $qb->setParameter($param, $value);
+                continue;
+            }
+
+            if (true === $value || false === $value) {
+                $where->add($expr->eq($fieldAlias, $value ? 'TRUE' : 'FALSE'));
+                continue;
+            }
+
+            $param = $this->addFieldParameter($qb, $field, $value);
+
+            if (is_array($value)) {
+                $where->add($expr->in($fieldAlias, $param));
             } elseif ($metadata->hasAssociation($field)) {
-                $where->add($expr->eq('IDENTITY('.$fieldAlias.')', ':'.($param = self::getPlaceholder($field))));
-                $qb->setParameter($param, $value);
+                $where->add($expr->eq('IDENTITY('.$fieldAlias.')', $param));
             } else {
-                $where->add($expr->eq($fieldAlias, ':'.($param = self::getPlaceholder($field))));
-                $qb->setParameter($param, $value);
+                $where->add($expr->eq($fieldAlias, $param));
             }
         }
 
         $qb->andWhere($where);
     }
 
-    private static function getPlaceholder(string $name): string
+    private function addFieldParameter(QueryBuilder $qb, string $field, $value, string $type = null): string
     {
-        return uniqid(strtr($name, ['.' => '_', '[' => '_', ']' => '_']));
+        $name = uniqid(strtr($field, ['.' => '_', '[' => '_', ']' => '_']));
+
+        $qb->setParameter($name, $value, $type ?? DomainIdType::resolveName($value));
+
+        return ':'.$name;
     }
 }
