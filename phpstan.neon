@@ -13,9 +13,6 @@ parameters:
         # see https://github.com/sebastianbergmann/phpunit/pull/2963
         - '#Parameter \#1 \$originalClassName of method PHPUnit\\Framework\\TestCase::createMock\(\) expects string, array<int, string> given\.#'
 
-        # see https://github.com/symfony/symfony/pull/25644
-        - '#Strict comparison using === between null and string will always evaluate to false\.#'
-
         # fluent mixed interface usage in src/*Bundle/DependencyInjection/Configuration.php
         - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::append\(\)\.#'
 
