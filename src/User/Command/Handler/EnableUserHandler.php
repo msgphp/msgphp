@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
 use MsgPhp\Domain\Event\EnableDomainEvent;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
 use MsgPhp\User\Command\EnableUserCommand;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserEnabledEvent;
@@ -23,7 +23,7 @@ final class EnableUserHandler
 
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
@@ -45,6 +45,6 @@ final class EnableUserHandler
 
     protected function getDomainEventHandler(EnableUserCommand $command): User
     {
-        return $this->repository->find($command->userId);
+        return $this->repository->find($this->factory->identify(User::class, $command->userId));
     }
 }

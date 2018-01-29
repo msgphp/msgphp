@@ -28,6 +28,10 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function identify(string $class, $id): DomainIdInterface
     {
+        if ($id instanceof DomainIdInterface) {
+            return $id;
+        }
+
         $object = $this->factory->create($this->identifierMapping[$class] ?? $class, [$id]);
 
         if (!$object instanceof DomainIdInterface) {

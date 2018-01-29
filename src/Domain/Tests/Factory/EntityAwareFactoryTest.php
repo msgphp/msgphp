@@ -49,6 +49,8 @@ final class EntityAwareFactoryTest extends TestCase
     {
         $this->assertSame('1', $this->factory->identify('id', '1')->toString());
         $this->assertSame('1', $this->factory->identify('alias_id', '1')->toString());
+        $this->assertSame($id = $this->createMock(DomainIdInterface::class), $this->factory->identify('id', $id));
+        $this->assertSame($id = $this->createMock(DomainIdInterface::class), $this->factory->identify('alias_id', $id));
 
         $this->expectException(InvalidClassException::class);
 
