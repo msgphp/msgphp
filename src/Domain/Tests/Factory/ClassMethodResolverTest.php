@@ -12,24 +12,16 @@ final class ClassMethodResolverTest extends TestCase
 {
     public function testResolve(): void
     {
-        $object = new class('foo', null, null) {
-            public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, SELF $bar = null)
-            {
-                $fooBar;
-                $foo_bar;
-                $fooBar_Baz;
-                $foo;
-                $bar;
-            }
-        };
-        $arguments = ClassMethodResolver::resolve($class = get_class($object), '__construct');
+        $arguments = ClassMethodResolver::resolve(TestClass::class, '__construct');
 
         $this->assertSame([
-            ['name' => 'fooBar', 'required' => true, 'default' => null, 'type' => 'string'],
-            ['name' => 'foo_bar', 'required' => false, 'default' => null, 'type' => WrongCase::class],
-            ['name' => 'fooBar_Baz', 'required' => false, 'default' => null, 'type' => null],
-            ['name' => 'foo', 'required' => false, 'default' => 1, 'type' => 'int'],
-            ['name' => 'bar', 'required' => false, 'default' => null, 'type' => get_class($object)],
+            ['name' => 'fooBar', 'key' => 'foo_bar', 'required' => true, 'default' => null, 'type' => 'string'],
+            ['name' => 'foo_bar', 'key' => 'foo_bar', 'required' => false, 'default' => null, 'type' => WrongCase::class],
+            ['name' => 'fooBar_Baz', 'key' => 'foo_bar_baz', 'required' => false, 'default' => null, 'type' => null],
+            ['name' => 'foo', 'key' => 'foo', 'required' => false, 'default' => 1, 'type' => 'int'],
+            ['name' => 'bar', 'key' => 'bar', 'required' => false, 'default' => null, 'type' => TestClass::class],
+            ['name' => 'baz', 'key' => 'baz', 'required' => false, 'default' => [1], 'type' => 'array'],
+            ['name' => 'qux', 'key' => 'qux', 'required' => false, 'default' => [], 'type' => 'iterable'],
         ], $arguments);
     }
 
@@ -57,6 +49,13 @@ final class ClassMethodResolverTest extends TestCase
         $this->expectException(InvalidClassException::class);
 
         ClassMethodResolver::resolve(get_class($object), 'bar');
+    }
+}
+
+class TestClass
+{
+    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, SELF $bar = null, array $baz = [1], iterable $qux)
+    {
     }
 }
 

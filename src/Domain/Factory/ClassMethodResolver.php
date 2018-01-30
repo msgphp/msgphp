@@ -47,10 +47,23 @@ final class ClassMethodResolver
                 }
             }
 
+            $required = false;
+            if ($param->isDefaultValueAvailable()) {
+                $default = $param->getDefaultValue();
+            } elseif ($param->allowsNull()) {
+                $default = null;
+            } elseif ('array' === $type || 'iterable' === $type) {
+                $default = [];
+            } else {
+                $default = null;
+                $required = true;
+            }
+
             return [
-                'name' => $param->getName(),
-                'required' => !$param->isDefaultValueAvailable() && !$param->allowsNull(),
-                'default' => $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null,
+                'name' => $name = $param->getName(),
+                'key' => strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), $name)),
+                'required' => $required,
+                'default' => $default,
                 'type' => $type,
             ];
         }, $reflection->getParameters());
