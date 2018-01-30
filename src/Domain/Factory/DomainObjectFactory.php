@@ -37,10 +37,10 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
         $arguments = [];
 
         foreach (ClassMethodResolver::resolve($class, $method) as $i => $argument) {
-            $key = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), $argument['name']));
             $given = true;
-
-            if (array_key_exists($key, $context)) {
+            if (array_key_exists($name = $argument['name'], $context)) {
+                $value = $context[$name];
+            } elseif (array_key_exists($key = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), $name)), $context)) {
                 $value = $context[$key];
             } elseif (array_key_exists($i, $context)) {
                 $value = $context[$i];

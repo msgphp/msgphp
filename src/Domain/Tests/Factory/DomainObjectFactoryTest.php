@@ -67,7 +67,15 @@ final class DomainObjectFactoryTest extends TestCase
         $factory->create(NestedTestObject::class);
     }
 
-    public function testCreateWithNumericArgs(): void
+    public function testCreateWithNamedContext(): void
+    {
+        $object = (new DomainObjectFactory())->create(TestObject::class, [1 => 'b', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 'a']);
+
+        $this->assertSame('a', $object->a);
+        $this->assertSame('b', $object->b);
+    }
+
+    public function testCreateWithNumericContext(): void
     {
         $object = (new DomainObjectFactory())->create(TestObject::class, [1 => 'b', 'arg_a' => 'a', 0 => 'ignore']);
 
