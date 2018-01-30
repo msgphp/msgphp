@@ -41,7 +41,7 @@ final class CreateUserCommand extends Command
         $this->contextBuilder->configure($this->getDefinition());
     }
 
-    public function run(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $context = $this->contextBuilder->getContext($input, $io);

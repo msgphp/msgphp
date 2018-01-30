@@ -56,6 +56,13 @@ class TestClass
 {
     public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, SELF $bar = null, array $baz = [1], iterable $qux)
     {
+        $fooBar;
+        $foo_bar;
+        $fooBar_Baz;
+        $foo;
+        $bar;
+        $baz;
+        $qux;
     }
 }
 

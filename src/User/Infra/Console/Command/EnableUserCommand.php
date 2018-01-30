@@ -23,7 +23,7 @@ final class EnableUserCommand extends UserCommand
         $this->setDescription('Enable a user');
     }
 
-    public function run(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $io);

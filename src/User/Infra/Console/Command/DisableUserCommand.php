@@ -23,7 +23,7 @@ final class DisableUserCommand extends UserCommand
         $this->setDescription('Disable a user');
     }
 
-    public function run(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $io);
