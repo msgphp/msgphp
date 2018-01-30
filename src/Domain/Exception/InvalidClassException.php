@@ -13,4 +13,9 @@ final class InvalidClassException extends \LogicException implements DomainExcep
     {
         return new self(sprintf('Invalid class "%s" detected.', $class));
     }
+
+    public static function createForMethod(string $class, string $method): self
+    {
+        return new self(sprintf('Invalid class "%s" detected for method "%s".', $class, $method));
+    }
 }
