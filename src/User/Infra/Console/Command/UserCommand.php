@@ -26,11 +26,11 @@ abstract class UserCommand extends Command
 
     public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
-        parent::__construct();
-
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
+
+        parent::__construct();
     }
 
     protected function configure(): void

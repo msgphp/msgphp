@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Infra\Console\ContextBuilderInterface;
+use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
 use MsgPhp\User\Command as DomainCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,11 +26,11 @@ final class CreateUserCommand extends Command
 
     public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ContextBuilderInterface $contextBuilder)
     {
-        parent::__construct();
-
         $this->factory = $factory;
         $this->bus = $bus;
         $this->contextBuilder = $contextBuilder;
+
+        parent::__construct();
     }
 
     protected function configure(): void
@@ -38,16 +38,7 @@ final class CreateUserCommand extends Command
         parent::configure();
 
         $this->setDescription('Create a user');
-
-        $definition = $this->getDefinition();
-
-        foreach ($this->contextBuilder->getOptions() as $option) {
-            $definition->addOption($option);
-        }
-
-        foreach ($this->contextBuilder->getArguments() as $argument) {
-            $definition->addArgument($argument);
-        }
+        $this->contextBuilder->configure($this->getDefinition());
     }
 
     public function run(InputInterface $input, OutputInterface $output): int

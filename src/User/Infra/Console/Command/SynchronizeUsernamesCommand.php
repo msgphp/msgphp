@@ -23,9 +23,9 @@ final class SynchronizeUsernamesCommand extends Command
 
     public function __construct(UsernameRepositoryInterface $repository)
     {
-        parent::__construct();
-
         $this->repository = $repository;
+
+        parent::__construct();
     }
 
     protected function configure(): void

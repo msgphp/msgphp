@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Console;
+namespace MsgPhp\Domain\Infra\Console\ContextBuilder;
 
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\StyleInterface;
 
 /**
@@ -14,15 +13,7 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 interface ContextBuilderInterface
 {
-    /**
-     * @return InputOption[]
-     */
-    public function getOptions(): iterable;
-
-    /**
-     * @return InputArgument[]
-     */
-    public function getArguments(): iterable;
+    public function configure(InputDefinition $definition): void;
 
     public function getContext(InputInterface $input, StyleInterface $io): array;
 }
