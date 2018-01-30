@@ -12,8 +12,6 @@ use MsgPhp\Domain\Exception\InvalidClassException;
  */
 final class DomainObjectFactory implements DomainObjectFactoryInterface
 {
-    private static $reflectionCache = [];
-
     private $factory;
 
     public function setNestedFactory(?DomainObjectFactoryInterface $factory): void
@@ -23,66 +21,39 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
 
     public function create(string $class, array $context = [])
     {
+        if (is_subclass_of($class, DomainIdInterface::class) || is_subclass_of($class, DomainCollectionInterface::class)) {
+            return $class::fromValue(...$this->resolveArguments($class, 'fromValue', $context));
+        }
+
         if (!class_exists($class)) {
             throw InvalidClassException::create($class);
         }
 
-        if (is_subclass_of($class, DomainIdInterface::class) || is_subclass_of($class, DomainCollectionInterface::class)) {
-            return $class::fromValue(...$this->resolveArguments($class, $context, 'fromValue'));
-        }
-
-        return new $class(...$this->resolveArguments($class, $context));
+        return new $class(...$this->resolveArguments($class, '__construct', $context));
     }
 
-    private function resolveArguments(string $class, array $context, string $method = '__construct'): array
+    private function resolveArguments(string $class, string $method, array $context): array
     {
-        if (!isset(self::$reflectionCache[$cacheKey = $class.'::'.$method])) {
-            $reflection = new \ReflectionClass($class);
-            if ('__construct' === $method) {
-                if (null === $method = $reflection->getConstructor()) {
-                    return self::$reflectionCache[$cacheKey] = [];
-                }
-            } elseif (!($method = $reflection->getMethod($method))->isStatic() || !$method->isPublic()) {
-                throw new \LogicException(sprintf('To factorize object "%s" the method "%s" must be static and public.', $class, $method->getName()));
-            }
-
-            self::$reflectionCache[$cacheKey] = array_map(function (\ReflectionParameter $param): array {
-                return [
-                    strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), $param->getName())),
-                    $param->isDefaultValueAvailable() || $param->allowsNull(),
-                    $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null,
-                    null !== ($type = $param->getType()) && !$type->isBuiltin()
-                        ? ('self' === strtolower($name = $type->getName())
-                            ? $param->getClass()->getName()
-                            : $name)
-                        : null,
-                ];
-            }, $method->getParameters());
-        }
-
         $arguments = [];
 
-        foreach (self::$reflectionCache[$cacheKey] as $i => $argument) {
-            list($key, $hasDefault, $default, $type) = $argument;
+        foreach (ClassMethodResolver::resolve($class, $method) as $i => $argument) {
+            $key = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), $argument['name']));
+            $given = true;
 
             if (array_key_exists($key, $context)) {
                 $value = $context[$key];
-                $hasContext = true;
             } elseif (array_key_exists($i, $context)) {
                 $value = $context[$i];
-                $hasContext = true;
+            } elseif (!$argument['required']) {
+                $value = $argument['default'];
+                $given = false;
             } else {
-                $value = $default;
-                $hasContext = false;
+                throw new \LogicException(sprintf('No value available for argument #%d in class method "%s::%s()".', $i, $class, $method));
             }
 
-            if (!$hasContext && !$hasDefault) {
-                throw new \LogicException(sprintf('No value available for constructor argument #%d in class "%s".', $i, $class));
-            }
-
-            if (null !== $type && $hasContext && !is_object($value)) {
+            if ($given && isset($argument['type']) && (interface_exists($argument['type']) || class_exists($argument['type'])) && !is_object($value)) {
                 try {
-                    $arguments[] = ($this->factory ?? $this)->create($type, (array) $value);
+                    $arguments[] = ($this->factory ?? $this)->create($argument['type'], (array) $value);
 
                     continue;
                 } catch (InvalidClassException $e) {
