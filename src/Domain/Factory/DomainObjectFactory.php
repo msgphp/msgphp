@@ -48,7 +48,7 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
                 $value = $argument['default'];
                 $given = false;
             } else {
-                throw new \LogicException(sprintf('No value available for argument #%d in class method "%s::%s()".', $i, $class, $method));
+                throw new \LogicException(sprintf('No value available for argument $%s in class method "%s::%s()".', $name, $class, $method));
             }
 
             if ($given && isset($argument['type']) && (interface_exists($argument['type']) || class_exists($argument['type'])) && !is_object($value)) {

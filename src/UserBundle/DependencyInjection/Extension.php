@@ -118,7 +118,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                     ->setArgument('$contextBuilder', $container->register(uniqid($class = BaseConsoleInfra\ContextBuilder\ClassContextBuilder::class), $class)
                         ->setPublic(false)
                         ->setArgument('$class', $config['class_mapping'][Entity\User::class]));
-
             }
         }
     }

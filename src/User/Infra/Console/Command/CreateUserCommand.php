@@ -46,7 +46,7 @@ final class CreateUserCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $context = $this->contextBuilder->getContext($input, $io);
 
-        $this->dispatch(DomainCommand\CreateUserCommand::class, $context);
+        $this->dispatch(DomainCommand\CreateUserCommand::class, ['context' => $context]);
 
         return 0;
     }
