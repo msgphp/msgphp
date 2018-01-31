@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\Compiler;
-use MsgPhp\Domain\Infra\Doctrine as DoctrineInfra;
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra};
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,6 +22,9 @@ final class BundleHelper
     public static function initDomain(ContainerBuilder $container): void
     {
         ContainerHelper::addCompilerPassOnce($container, Compiler\ResolveDomainPass::class);
+
+        $container->registerForAutoconfiguration(ConsoleInfra\ContextBuilder\ContextElementProviderInterface::class)
+            ->addTag('msgphp.console.context_element_provider');
 
         if (class_exists(DoctrineOrmVersion::class)) {
             ContainerHelper::addCompilerPassOnce($container, Compiler\DoctrineObjectFieldMappingPass::class);
