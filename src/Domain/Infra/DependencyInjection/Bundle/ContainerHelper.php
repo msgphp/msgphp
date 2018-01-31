@@ -10,6 +10,7 @@ use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use MsgPhp\Domain\Infra\SimpleBus as SimpleBusInfra;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -234,6 +235,12 @@ final class ContainerHelper
         $definition
             ->setPublic(true)
             ->setArgument('$bus', new Reference('simple_bus.event_bus', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+
+        if (class_exists(ConsoleEvents::class)) {
+            $definition
+                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onConsoleCommand'])
+                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onConsoleTerminate']);
+        }
 
         foreach ($events as $event) {
             $definition->addTag($tag = 'command_handler', [$attrName = 'handles' => $event]);
