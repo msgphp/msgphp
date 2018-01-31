@@ -23,6 +23,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
     private $classMapping;
     private $resolved;
     private $isOption = [];
+    private $generatedValues = [];
 
     /**
      * @param ContextElementProviderInterface[] $elementProviders
@@ -118,6 +119,17 @@ final class ClassContextBuilder implements ContextBuilderInterface
             $context[$key] = $this->askRequiredValue($io, $element, $value);
         }
 
+        $generatedValues = [];
+        while (null !== $generatedValue = array_shift($this->generatedValues)) {
+            list ($label, $value) = $generatedValue;
+
+            $generatedValues[] = [$label, json_encode($value)];
+        }
+        if ($generatedValues) {
+            $io->note('Generated values');
+            $io->table([], $generatedValues);
+        }
+
         return $context;
     }
 
@@ -166,15 +178,24 @@ final class ClassContextBuilder implements ContextBuilderInterface
     private function askRequiredValue(StyleInterface $io, ContextElement $element, $default)
     {
         $label = $element->label;
+        $generated = null !== $element->generator;
 
         if (null === $default) {
-            if ($isGenerated = $this->generatedValue($element, $generated)) {
+            if ($generated) {
                 $label .= ' (leave blank to generate a value)';
             }
 
             do {
-                $value = ($element->hidden ? $io->askHidden($label) : $io->ask($label)) ?? $generated;
-            } while (!$isGenerated && null === $value);
+                if (null === $value = $element->hidden ? $io->askHidden($label) : $io->ask($label)) {
+                    $this->generatedValue($element, $value);
+                }
+            } while (!$generated && null === $value);
+
+            return $value;
+        }
+
+        if ($generated && $io->confirm(sprintf('Generate value for "%s"?', $label))) {
+            $this->generatedValue($element, $value);
 
             return $value;
         }
@@ -206,6 +227,8 @@ final class ClassContextBuilder implements ContextBuilderInterface
         } else {
             $generated = ($element->generator)();
             $result = true;
+
+            $this->generatedValues[] = [$element->label, $generated];
         }
 
         unset($generated);
