@@ -75,34 +75,47 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 continue;
             }
 
+            /** @var ContextElement $element */
+            $element = $argument['element'];
+
             if (!$argument['required']) {
-                $context[$key] = $argument['default'];
+                $context[$key] = $this->generatedValue($element, $generated) ? $generated : $argument['default'];
                 continue;
             }
 
-            if ([] === $value && self::isObject($type = $argument['type'])) {
+            if (self::isObject($type = $argument['type'])) {
+                if ($this->generatedValue($element, $generated)) {
+                    $context[$key] = $generated;
+                    continue;
+                }
+
                 $class = $this->classMapping[$type] ?? $type;
                 $method = is_subclass_of($class, DomainCollectionInterface::class) || is_subclass_of($class, DomainIdInterface::class) ? 'fromValue' : '__construct';
-                $context[$key] = $this->getContext($input, $io, array_map(function (array $nestedArgument) use ($class, $method, $argument): array {
-                    if ('bool' === $nestedArgument['type']) {
-                        $nestedArgument['value'] = false;
+                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument) use ($class, $method, $element): array {
+                    if ('bool' === $argument['type']) {
+                        $argument['value'] = false;
                     } elseif (self::isComplex($argument['type'])) {
-                        $nestedArgument['value'] = [];
+                        $argument['value'] = [];
                     }
 
-                    $element = $this->getElement($class, $method, $nestedArgument['name']);
-                    $element->label = $argument['element']->label.' > '.$element->label;
+                    $child = $this->getElement($class, $method, $argument['name']);
+                    $child->label = $element->label.' > '.$child->label;
 
-                    return ['element' => $element] + $nestedArgument;
+                    return ['element' => $child] + $argument;
                 }, ClassMethodResolver::resolve($class, $method)));
                 continue;
             }
 
             if (!$interactive) {
+                if ($this->generatedValue($element, $generated)) {
+                    $context[$key] = $generated;
+                    continue;
+                }
+
                 throw new \LogicException(sprintf('No value provided for "%s".', $field));
             }
 
-            $context[$key] = $this->askRequiredValue($io, $argument['element'], $value);
+            $context[$key] = $this->askRequiredValue($io, $element, $value);
         }
 
         return $context;
@@ -152,23 +165,30 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
     private function askRequiredValue(StyleInterface $io, ContextElement $element, $default)
     {
+        $label = $element->label;
+
         if (null === $default) {
+            if ($isGenerated = $this->generatedValue($element, $generated)) {
+                $label .= ' (leave blank to generate a value)';
+            }
+
             do {
-                $value = $io->ask($element->label);
-            } while (null === $value);
+                $value = ($element->hidden ? $io->askHidden($label) : $io->ask($label)) ?? $generated;
+            } while (!$isGenerated && null === $value);
 
             return $value;
         }
 
         if (false === $default) {
-            return $io->confirm($element->label, false);
+            return $io->confirm($label, false);
         }
 
         if ([] === $default) {
-            $i = 1;
+            $i = 0;
             $value = [];
             do {
-                $value[] = $io->ask($element->label.(1 < $i ? ' ('.$i.')' : ''));
+                $offsetLabel = $label .' ['.$i.']';
+                $value[] = $element->hidden ? $io->askHidden($offsetLabel) : $io->ask($offsetLabel);
                 ++$i;
             } while ($io->confirm('Add another value?', false));
 
@@ -176,5 +196,20 @@ final class ClassContextBuilder implements ContextBuilderInterface
         }
 
         return $default;
+    }
+
+    private function generatedValue(ContextElement $element, &$generated): bool
+    {
+        if (null === $element->generator) {
+            $generated = null;
+            $result = false;
+        } else {
+            $generated = ($element->generator)();
+            $result = true;
+        }
+
+        unset($generated);
+
+        return $result;
     }
 }

@@ -11,10 +11,14 @@ final class ContextElement
 {
     public $label;
     public $description;
+    public $hidden;
+    public $generator;
 
-    public function __construct(string $label, string $description = '')
+    public function __construct(string $label, string $description = '', bool $hidden = false, callable $generator = null)
     {
         $this->label = $label;
         $this->description = $description;
+        $this->hidden = $hidden;
+        $this->generator = $generator;
     }
 }
