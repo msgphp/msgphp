@@ -39,7 +39,9 @@ final class ClassContextBuilder implements ContextBuilderInterface
     public function configure(InputDefinition $definition): void
     {
         foreach ($this->resolve() as $argument) {
-            $this->isOption[$field = $argument['field']] = true;
+            $field = $argument['field'];
+            $this->isOption[$field] = true;
+
             if ('bool' === $argument['type']) {
                 $mode = InputOption::VALUE_NONE;
             } elseif (self::isComplex($argument['type'])) {
@@ -121,7 +123,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
         $generatedValues = [];
         while (null !== $generatedValue = array_shift($this->generatedValues)) {
-            list ($label, $value) = $generatedValue;
+            list($label, $value) = $generatedValue;
 
             $generatedValues[] = [$label, json_encode($value)];
         }
@@ -208,7 +210,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
             $i = 0;
             $value = [];
             do {
-                $offsetLabel = $label .' ['.$i.']';
+                $offsetLabel = $label.' ['.$i.']';
                 $value[] = $element->hidden ? $io->askHidden($offsetLabel) : $io->ask($offsetLabel);
                 ++$i;
             } while ($io->confirm('Add another value?', false));

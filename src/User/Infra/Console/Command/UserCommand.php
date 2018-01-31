@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait, MessageReceivingInterface};
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-abstract class UserCommand extends Command
+abstract class UserCommand extends Command implements MessageReceivingInterface
 {
     use MessageDispatchingTrait {
         dispatch as protected;
@@ -33,25 +34,31 @@ abstract class UserCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @internal
+     */
+    public function onMessageReceived($message): void
+    {
+    }
+
     protected function configure(): void
     {
         $this
             ->addOption('id', null, InputOption::VALUE_NONE, 'Find user by identifier')
-            ->addArgument('username', null, 'The username or identifier value');
+            ->addArgument('username', InputArgument::OPTIONAL, 'The username or identifier value');
     }
 
     protected function getUser(InputInterface $input, StyleInterface $io): User
     {
         $byId = $input->getOption('id');
-        $label = $byId ? 'identifier' : 'username';
 
         if (null === $username = $input->getArgument('username')) {
             if (!$input->isInteractive()) {
-                throw new \LogicException(sprintf('No %s provided.', $label));
+                throw new \LogicException('No value provided for "username".');
             }
 
             do {
-                $username = $io->ask(ucfirst($label));
+                $username = $io->ask($byId ? 'Identifier' : 'Username');
             } while (null === $username);
         }
 
