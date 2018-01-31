@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 abstract class UserCommand extends Command
 {
-    use DomainMessageDispatchingTrait {
+    use MessageDispatchingTrait {
         dispatch as protected;
     }
 

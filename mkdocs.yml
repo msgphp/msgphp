@@ -28,5 +28,5 @@ pages:
     - Domain event handlers: event-sourcing/domain-event-handlers.md
 - Message driven:
     - Domain message bus: message-driven/domain-message-bus.md
-    - Domain message dispatcher: message-driven/domain-message-dispatcher.md
+    - Message dispatcher: message-driven/message-dispatcher.md
     - CQRS: message-driven/cqrs.md

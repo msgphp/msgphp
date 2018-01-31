@@ -6,7 +6,7 @@ namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command as DomainCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class CreateUserCommand extends Command
 {
-    use DomainMessageDispatchingTrait;
+    use MessageDispatchingTrait;
 
     protected static $defaultName = 'user:create';
 

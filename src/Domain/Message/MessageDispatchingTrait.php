@@ -9,7 +9,7 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-trait DomainMessageDispatchingTrait
+trait MessageDispatchingTrait
 {
     private $factory;
     private $bus;

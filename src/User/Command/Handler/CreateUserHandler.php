@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\CreateUserCommand;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserCreatedEvent;
@@ -16,7 +16,7 @@ use MsgPhp\User\Repository\UserRepositoryInterface;
  */
 final class CreateUserHandler
 {
-    use DomainMessageDispatchingTrait;
+    use MessageDispatchingTrait;
 
     private $repository;
 

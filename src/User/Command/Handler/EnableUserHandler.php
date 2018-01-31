@@ -7,7 +7,7 @@ namespace MsgPhp\User\Command\Handler;
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Event\EnableDomainEvent;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, DomainMessageDispatchingTrait};
+use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\EnableUserCommand;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserEnabledEvent;
@@ -19,7 +19,7 @@ use MsgPhp\User\Repository\UserRepositoryInterface;
 final class EnableUserHandler
 {
     use EventSourcingCommandHandlerTrait;
-    use DomainMessageDispatchingTrait;
+    use MessageDispatchingTrait;
 
     private $repository;
 
