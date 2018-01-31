@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\SimpleBus;
 
+use MsgPhp\Domain\Message\MessageReceivingInterface;
 use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -14,8 +14,9 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 final class EventMessageHandler
 {
     private $bus;
-    private $collect = false;
-    private $collected = [];
+
+    /** @var MessageReceivingInterface|null */
+    private $receiver;
 
     public function __construct(MessageBus $bus = null)
     {
@@ -31,20 +32,18 @@ final class EventMessageHandler
             $this->bus->handle($message);
         }
 
-        if ($this->collect) {
-            $this->collected[] = $message;
+        if (null !== $this->receiver) {
+            $this->receiver->onMessageReceived($message);
         }
     }
 
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
-        $this->collect = true;
+        $this->receiver = ($command = $event->getCommand()) instanceof MessageReceivingInterface ? $command : null;
     }
 
-    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
+    public function onConsoleTerminate(): void
     {
-        dump($this->collected);
-
-        $this->collect = false;
+        $this->receiver = null;
     }
 }
