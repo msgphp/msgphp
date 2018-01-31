@@ -54,6 +54,7 @@ final class ClassMethodResolver
                 $default = null;
             } elseif ('array' === $type || 'iterable' === $type) {
                 $default = [];
+                $required = true;
             } else {
                 $default = null;
                 $required = true;

@@ -21,7 +21,7 @@ final class ClassMethodResolverTest extends TestCase
             ['name' => 'foo', 'key' => 'foo', 'required' => false, 'default' => 1, 'type' => 'int'],
             ['name' => 'bar', 'key' => 'bar', 'required' => false, 'default' => null, 'type' => TestClass::class],
             ['name' => 'baz', 'key' => 'baz', 'required' => false, 'default' => [1], 'type' => 'array'],
-            ['name' => 'qux', 'key' => 'qux', 'required' => false, 'default' => [], 'type' => 'iterable'],
+            ['name' => 'qux', 'key' => 'qux', 'required' => true, 'default' => [], 'type' => 'iterable'],
         ], $arguments);
     }
 
