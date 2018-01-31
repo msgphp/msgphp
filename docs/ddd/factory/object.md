@@ -19,7 +19,8 @@ the original provided class name.
 Generic object factory. Initializes the given class name by reading its constructor arguments. Argument values are
 resolved from the provided context. By convention a camel cased argument name (e.g. `$myArgument`) matches a
 corresponding underscored context key (e.g. `['my_argument' => 'value']`). If the context key is numeric its value will
-be provided to a corresponding argument at index N.
+be provided to a corresponding argument at index N. In case an exact match exists (e.g. `['myArgument' => 'value']`) it
+will always be used instead.
 
 Any sub class of `MsgPhp\Domain\DomainIdInterface` or `MsgPhp\Domain\DomainCollectionInterface` will be initialized
 from `$class::fromValue()` by default, otherwise initialization happens regulary (i.e. `new $class(...$args)`).
