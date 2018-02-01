@@ -80,16 +80,6 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 $normalizers[$key] = $element->normalizer;
             }
 
-            if (null !== $value && false !== $value && [] !== $value) {
-                $context[$key] = $value;
-                continue;
-            }
-
-            if (!$argument['required']) {
-                $context[$key] = $this->generatedValue($element, $generated) ? $generated : $argument['default'];
-                continue;
-            }
-
             if (self::isObject($type = $argument['type'])) {
                 if ($this->generatedValue($element, $generated)) {
                     $context[$key] = $generated;
@@ -98,8 +88,10 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
                 $class = $this->classMapping[$type] ?? $type;
                 $method = is_subclass_of($class, DomainCollectionInterface::class) || is_subclass_of($class, DomainIdInterface::class) ? 'fromValue' : '__construct';
-                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument) use ($class, $method, $element): array {
-                    if ('bool' === $argument['type']) {
+                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument, int $i) use ($class, $method, $value, $element): array {
+                    if (array_key_exists($i, $value)) {
+                        $argument['value'] = $value[$i];
+                    } elseif ('bool' === $argument['type']) {
                         $argument['value'] = false;
                     } elseif (self::isComplex($argument['type'])) {
                         $argument['value'] = [];
@@ -109,7 +101,17 @@ final class ClassContextBuilder implements ContextBuilderInterface
                     $child->label = $element->label.' > '.$child->label;
 
                     return ['element' => $child] + $argument;
-                }, ClassMethodResolver::resolve($class, $method)));
+                }, $objectResolved = ClassMethodResolver::resolve($class, $method), array_keys($objectResolved)));
+                continue;
+            }
+
+            if (null !== $value && false !== $value && [] !== $value) {
+                $context[$key] = $value;
+                continue;
+            }
+
+            if (!$argument['required']) {
+                $context[$key] = $this->generatedValue($element, $generated) ? $generated : $argument['default'];
                 continue;
             }
 
