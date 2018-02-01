@@ -63,7 +63,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
     public function getContext(InputInterface $input, StyleInterface $io, iterable $resolved = null): array
     {
-        $context = [];
+        $context = $normalizers = [];
         $interactive = $input->isInteractive();
 
         foreach ($resolved ?? $this->resolve() as $argument) {
@@ -73,13 +73,17 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 ? ($this->isOption[$field] ? $input->getOption($field) : $input->getArgument($field))
                 : ($argument['value'] ?? null);
 
+            /** @var ContextElement $element */
+            $element = $argument['element'];
+
+            if (null !== $element->normalizer) {
+                $normalizers[$key] = $element->normalizer;
+            }
+
             if (null !== $value && false !== $value && [] !== $value) {
                 $context[$key] = $value;
                 continue;
             }
-
-            /** @var ContextElement $element */
-            $element = $argument['element'];
 
             if (!$argument['required']) {
                 $context[$key] = $this->generatedValue($element, $generated) ? $generated : $argument['default'];
@@ -119,6 +123,10 @@ final class ClassContextBuilder implements ContextBuilderInterface
             }
 
             $context[$key] = $this->askRequiredValue($io, $element, $value);
+        }
+
+        foreach ($normalizers as $key => $normalizer) {
+            $context[$key] = $normalizer($context[$key], $context);
         }
 
         $generatedValues = [];
