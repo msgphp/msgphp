@@ -11,9 +11,6 @@ parameters:
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
         - '#Class MsgPhp\\Domain\\Tests\\Factory\\WrongCase referenced with incorrect case: MsgPhp\\Domain\\Tests\\Factory\\wrongcase\.#'
 
-        # see https://github.com/sebastianbergmann/phpunit/pull/2963
-        - '#Parameter \#1 \$originalClassName of method PHPUnit\\Framework\\TestCase::createMock\(\) expects string, array<int, string> given\.#'
-
         # fluent mixed interface usage in src/*Bundle/DependencyInjection/Configuration.php
         - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::append\(\)\.#'
 
