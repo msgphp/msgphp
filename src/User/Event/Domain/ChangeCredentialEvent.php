@@ -9,7 +9,7 @@ use MsgPhp\Domain\Event\DomainEventInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class ChangeUserCredentialEvent implements DomainEventInterface
+class ChangeCredentialEvent implements DomainEventInterface
 {
     public $fields;
 

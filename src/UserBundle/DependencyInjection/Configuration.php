@@ -156,6 +156,6 @@ final class Configuration implements ConfigurationInterface
             throw new \LogicException(sprintf('Method "%s::getCredential()" cannot be null-able.', $userClass));
         }
 
-        return ['class' => $class, 'username_field' => $class::getUsernameField()];
+        return ['class' => $class, 'username_field' => 'credential.'.$class::getUsernameField()];
     }
 }

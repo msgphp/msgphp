@@ -6,7 +6,7 @@ namespace MsgPhp\User\Infra\Doctrine\Event;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Doctrine\ORM\Event\PreFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use MsgPhp\User\Entity\Username;
@@ -85,7 +85,7 @@ final class UsernameListener
         }
     }
 
-    public function preFlush(PreFlushEventArgs $event): void
+    public function postFlush(PostFlushEventArgs $event): void
     {
         if (!$this->updateUsernames) {
             return;
@@ -105,6 +105,8 @@ final class UsernameListener
         }
 
         $this->updateUsernames = [];
+
+        $em->flush();
     }
 
     /**

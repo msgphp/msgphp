@@ -21,7 +21,7 @@ trait NicknameCredential
         return $this->credential;
     }
 
-    public function getNickname()
+    public function getNickname(): string
     {
         return $this->credential->getNickname();
     }

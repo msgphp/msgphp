@@ -12,7 +12,9 @@ use MsgPhp\User\Entity\Credential\NicknameSaltedPassword;
 trait NicknameSaltedPasswordCredential
 {
     use AbstractSaltedPasswordCredential;
-    use NicknameCredential;
+    use NicknameCredential {
+        NicknameCredential::handleChangeCredentialEvent insteadof AbstractSaltedPasswordCredential;
+    }
 
     /** @var NicknameSaltedPassword */
     private $credential;

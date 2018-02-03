@@ -26,23 +26,23 @@ trait CanBeEnabled
 
     private function handleEnableEvent(EnableEvent $event): bool
     {
-        if ($this->enabled) {
-            return false;
+        if (!$this->enabled) {
+            $this->enable();
+
+            return true;
         }
 
-        $this->enable();
-
-        return true;
+        return false;
     }
 
     private function handleDisableEvent(DisableEvent $event): bool
     {
-        if (!$this->enabled) {
-            return false;
+        if ($this->enabled) {
+            $this->disable();
+
+            return true;
         }
 
-        $this->disable();
-
-        return true;
+        return false;
     }
 }

@@ -12,7 +12,9 @@ use MsgPhp\User\Entity\Credential\EmailPassword;
 trait EmailPasswordCredential
 {
     use AbstractPasswordCredential;
-    use EmailCredential;
+    use EmailCredential {
+        EmailCredential::handleChangeCredentialEvent insteadof AbstractPasswordCredential;
+    }
 
     /** @var EmailPassword */
     private $credential;

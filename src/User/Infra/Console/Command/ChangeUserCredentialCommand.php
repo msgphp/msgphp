@@ -8,6 +8,7 @@ use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\ChangeUserCredentialCommand as ChangeUserCredentialDomainCommand;
+use MsgPhp\User\Event\UserCredentialChangedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +37,15 @@ final class ChangeUserCredentialCommand extends UserCommand
 
     public function onMessageReceived($message): void
     {
+        if ($message instanceof UserCredentialChangedEvent) {
+            $messages = ['Changed user credential for '.$message->user->getCredential()->getUsername()];
+            foreach (array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential) as $key => $value) {
+                $field = false === ($i = strrpos($key, "\00")) ? $key : substr($key, $i + 1);
+                $messages[] = sprintf('> Field "%s" changed from %s to %s', $field, json_encode($oldValues[$key] ?? null), json_encode($value));
+            }
+
+            $this->io->success($messages);
+        }
     }
 
     protected function configure(): void
@@ -58,7 +68,7 @@ final class ChangeUserCredentialCommand extends UserCommand
         $context = $this->contextBuilder->getContext($input, $this->io);
 
         if (!$context) {
-            $field = $this->io->choice('Select field to change', $this->fields);
+            $field = $this->io->choice('Select a field to change', $this->fields);
 
             return $this->run(new ArrayInput([
                 '--'.$field => null,

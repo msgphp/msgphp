@@ -21,7 +21,7 @@ trait EmailCredential
         return $this->credential;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->credential->getEmail();
     }

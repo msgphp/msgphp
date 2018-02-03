@@ -13,13 +13,10 @@ trait DomainEventHandlerTrait
 {
     public function handleEvent(DomainEventInterface $event): bool
     {
-        $method = false === ($pos = strrpos($class = get_class($event), '\\')) ? $class : substr($class, $pos + 1);
-
-        if ('DomainEvent' === substr($method, -11)) {
-            $method = substr($method, 0, -11);
+        $method = 'handle'.(false === ($pos = strrpos($class = get_class($event), '\\')) ? $class : substr($class, $pos + 1));
+        if ('Event' !== substr($method, -5)) {
+            $method .= 'Event';
         }
-
-        $method = 'handle'.ucfirst($method).'Event';
 
         if (!method_exists($this, $method)) {
             throw UnknownDomainEventException::createForHandler($this, $event);

@@ -9,7 +9,7 @@ use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\ChangeUserCredentialCommand;
 use MsgPhp\User\Entity\User;
-use MsgPhp\User\Event\Domain\ChangeUserCredentialEvent;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 use MsgPhp\User\Event\UserCredentialChangedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 
@@ -35,14 +35,14 @@ final class ChangeUserCredentialHandler
         $oldCredential = $this->getDomainEventHandler($command)->getCredential();
 
         $this->handle($command, function (User $user) use ($oldCredential): void {
-            //$this->repository->save($user);
+            $this->repository->save($user);
             $this->dispatch(UserCredentialChangedEvent::class, [$user, $oldCredential, $user->getCredential()]);
         });
     }
 
-    protected function getDomainEvent(ChangeUserCredentialCommand $command): ChangeUserCredentialEvent
+    protected function getDomainEvent(ChangeUserCredentialCommand $command): ChangeCredentialEvent
     {
-        return $this->factory->create(ChangeUserCredentialEvent::class, [$command->context]);
+        return $this->factory->create(ChangeCredentialEvent::class, [$command->context]);
     }
 
     protected function getDomainEventHandler(ChangeUserCredentialCommand $command): User

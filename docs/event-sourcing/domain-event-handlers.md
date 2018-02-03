@@ -7,7 +7,7 @@ specialized handling methods.
 ## Implementations
 
 - `MsgPhp\Domain\Event\DomainEventHandlerTrait`
-    - Maps `<Type>DomainEvent` to `handle<Type>Event()`
+    - Maps events to `handle<ClassName_Without_Event_Suffix>Event()` methods
 
 ## API
 
@@ -24,7 +24,7 @@ or no.
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 
-class MyDomainEvent
+class MyEvent
 {
     public $newValue;
     
@@ -40,7 +40,7 @@ class MyEntity implements DomainEventHandlerInterface
     
     public $value;
     
-    private function handleMyEvent(MyDomainEvent $event): bool
+    private function handleMyEvent(MyEvent $event): bool
     {
         if ($this->value === $event->newValue) {
             return false;
@@ -54,7 +54,7 @@ class MyEntity implements DomainEventHandlerInterface
 }
 
 $entity = new MyEntity();
-if ($entity->handleEvent(new MyDomainEvent('value'))) {
+if ($entity->handleEvent(new MyEvent('value'))) {
     // do something
 }
 ```

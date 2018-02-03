@@ -40,11 +40,11 @@ trait CanBeConfirmed
 
     private function handleConfirmEvent(ConfirmEvent $event): bool
     {
-        if (null !== $this->confirmedAt) {
-            return false;
-        }
+        if (null === $this->confirmedAt) {
+            $this->confirm();
 
-        $this->confirm();
+            return true;
+        }
 
         return true;
     }
