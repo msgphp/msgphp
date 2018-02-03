@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\User\Command as DomainCommand;
+use MsgPhp\User\Command\DisableUserCommand as DisableUserDomainCommand;
 use MsgPhp\User\Event\UserDisabledEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,7 +40,7 @@ final class DisableUserCommand extends UserCommand
         $this->io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $this->io);
 
-        $this->dispatch(DomainCommand\DisableUserCommand::class, [$user->getId()]);
+        $this->dispatch(DisableUserDomainCommand::class, [$user->getId()]);
 
         return 0;
     }

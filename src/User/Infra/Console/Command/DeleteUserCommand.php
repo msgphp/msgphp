@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\User\Command as DomainCommand;
+use MsgPhp\User\Command\DeleteUserCommand as DeleteUserDomainCommand;
 use MsgPhp\User\Event\UserDeletedEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +48,7 @@ final class DeleteUserCommand extends UserCommand
             }
         }
 
-        $this->dispatch(DomainCommand\DeleteUserCommand::class, [$user->getId()]);
+        $this->dispatch(DeleteUserDomainCommand::class, [$user->getId()]);
 
         return 0;
     }

@@ -7,7 +7,7 @@ namespace MsgPhp\User\Infra\Console\Command;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait, MessageReceivingInterface};
-use MsgPhp\User\Command as DomainCommand;
+use MsgPhp\User\Command\CreateUserCommand as CreateUserDomainCommand;
 use MsgPhp\User\Event\UserCreatedEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,7 +61,7 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
         $this->io = new SymfonyStyle($input, $output);
         $context = $this->contextBuilder->getContext($input, $this->io);
 
-        $this->dispatch(DomainCommand\CreateUserCommand::class, [$context]);
+        $this->dispatch(CreateUserDomainCommand::class, [$context]);
 
         return 0;
     }

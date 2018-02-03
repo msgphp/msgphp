@@ -7,6 +7,7 @@ namespace MsgPhp\User\Infra\Console\Command;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\User\Command\ChangeUserCredentialCommand as ChangeUserCredentialDomainCommand;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,7 +67,7 @@ final class ChangeUserCredentialCommand extends UserCommand
             ]), $output);
         }
 
-        dump($user, $context);
+        $this->dispatch(ChangeUserCredentialDomainCommand::class, [$user->getId(), $context]);
 
         return 0;
     }

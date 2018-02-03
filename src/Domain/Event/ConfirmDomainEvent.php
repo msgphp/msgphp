@@ -7,6 +7,6 @@ namespace MsgPhp\Domain\Event;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class ConfirmDomainEvent implements DomainEventInterface
+class ConfirmEvent implements DomainEventInterface
 {
 }
