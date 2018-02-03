@@ -117,12 +117,21 @@ final class Configuration implements ConfigurationInterface
                         }
                     }
 
-                    $config['user_credential'] = $userCredential;
+                    $config['username_field'] = $userCredential['username_field'];
                     $config['username_lookup'] = $usernameLookup;
                     $config['commands'] += [
                         Command\CreateUserCommand::class => true,
                         Command\DeleteUserCommand::class => true,
                     ];
+
+                    if (null !== $userCredential['class']) {
+                        if (isset($config['class_mapping'][CredentialInterface::class])) {
+                            throw new \LogicException(sprintf('Class mapping for "%s" cannot be overwritten.', CredentialInterface::class));
+                        }
+
+                        $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
+                        $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
+                    }
 
                     ConfigHelper::resolveCommandMapping($config['class_mapping'], self::COMMAND_MAPPING, $config['commands']);
 

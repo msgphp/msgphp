@@ -35,7 +35,7 @@ abstract class UserCommand extends Command implements MessageReceivingInterface
     }
 
     /**
-     * @internal
+     * @internal2
      */
     public function onMessageReceived($message): void
     {
