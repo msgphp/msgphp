@@ -11,10 +11,12 @@ use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use MsgPhp\Domain\Infra\SimpleBus as SimpleBusInfra;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -83,6 +85,14 @@ final class ContainerHelper
             self::removeDefinitionWithAliases($container, $id);
             $container->removeAlias($id);
         }
+    }
+
+    public static function registerAnonymous(ContainerBuilder $container, string $class, bool $child = false): Definition
+    {
+        $definition = $child ? new ChildDefinition($class) : new Definition($class);
+        $definition->setPublic(false);
+
+        return $container->setDefinition(uniqid($class.'.'), $definition);
     }
 
     public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void

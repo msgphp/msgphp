@@ -17,47 +17,60 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 final class ClassContextBuilder implements ContextBuilderInterface
 {
+    public const ALWAYS_OPTIONAL = 1;
+    public const NO_DEFAULTS = 2;
+
     private $class;
     private $method;
     private $elementProviders;
     private $classMapping;
+    private $flags = 0;
     private $resolved;
-    private $isOption = [];
+    private $fieldMapping = [];
     private $generatedValues = [];
 
     /**
      * @param ContextElementProviderInterface[] $elementProviders
      */
-    public function __construct(string $class, string $method, iterable $elementProviders = [], array $classMapping = [])
+    public function __construct(string $class, string $method, iterable $elementProviders = [], array $classMapping = [], int $flags = 0)
     {
         $this->class = $class;
         $this->method = $method;
         $this->elementProviders = $elementProviders;
         $this->classMapping = $classMapping;
+        $this->flags = $flags;
     }
 
     public function configure(InputDefinition $definition): void
     {
-        foreach ($this->resolve() as $argument) {
-            $field = $argument['field'];
-            $this->isOption[$field] = true;
+        $known = array_flip(array_keys($definition->getOptions() + $definition->getArguments()));
 
+        foreach ($this->resolve() as $argument) {
+            $required = false;
             if ('bool' === $argument['type']) {
                 $mode = InputOption::VALUE_NONE;
             } elseif (self::isComplex($argument['type'])) {
                 $mode = InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY;
-            } elseif (!$argument['required']) {
+            } elseif (!$argument['required'] || ($this->flags & self::ALWAYS_OPTIONAL)) {
                 $mode = InputOption::VALUE_OPTIONAL;
             } else {
                 $mode = InputArgument::OPTIONAL;
-                $this->isOption[$field] = false;
+                $required = true;
             }
 
-            if ($this->isOption[$field]) {
-                $definition->addOption(new InputOption($field, null, $mode, $argument['element']->description));
-            } else {
-                $definition->addArgument(new InputArgument($field, $mode, $argument['element']->description));
+            $i = 1;
+            $field = $key = str_replace('_', '-', $argument['key']);
+            while (isset($known[$field])) {
+                $field = $key.++$i;
             }
+
+            if ($required) {
+                $definition->addArgument(new InputArgument($field, $mode, $argument['element']->description));
+            } else {
+                $definition->addOption(new InputOption($field, null, $mode, $argument['element']->description));
+            }
+
+            $this->fieldMapping[$argument['name']] = [$field, $required];
         }
     }
 
@@ -68,27 +81,31 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
         foreach ($resolved ?? $this->resolve() as $argument) {
             $key = $argument['name'];
-            $field = $argument['field'] ?? $key;
-            $value = null === $resolved
-                ? ($this->isOption[$field] ? $input->getOption($field) : $input->getArgument($field))
-                : ($argument['value'] ?? null);
+            if (null === $resolved) {
+                list($field, $isArg) = $this->fieldMapping[$key];
+                $value = $isArg ? $input->getArgument($field) : $input->getOption($field);
+            } else {
+                $field = $key;
+                $value = $argument['value'] ?? null;
+            }
 
             /** @var ContextElement $element */
             $element = $argument['element'];
-
             if (null !== $element->normalizer) {
                 $normalizers[$key] = $element->normalizer;
             }
 
-            if (self::isObject($type = $argument['type']) && ($argument['required'] || $value)) {
-                if ($this->generatedValue($element, $generated)) {
-                    $context[$key] = $generated;
-                    continue;
-                }
+            $given = $value || $input->hasParameterOption('--'.$field);
+            if (!$given && $this->generatedValue($element, $generated)) {
+                $context[$key] = $generated;
+                continue;
+            }
 
-                $class = $this->classMapping[$type] ?? $type;
-                $method = is_subclass_of($class, DomainCollectionInterface::class) || is_subclass_of($class, DomainIdInterface::class) ? 'fromValue' : '__construct';
-                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument, int $i) use ($class, $method, $value, $element): array {
+            $required = $argument['required'] && !($this->flags & self::ALWAYS_OPTIONAL);
+
+            if (self::isObject($type = $argument['type']) && ($required || $given)) {
+                $method = is_subclass_of($type, DomainCollectionInterface::class) || is_subclass_of($type, DomainIdInterface::class) ? 'fromValue' : '__construct';
+                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
                     if (array_key_exists($i, $value)) {
                         $argument['value'] = $value[$i];
                     } elseif ('bool' === $argument['type']) {
@@ -97,11 +114,11 @@ final class ClassContextBuilder implements ContextBuilderInterface
                         $argument['value'] = [];
                     }
 
-                    $child = $this->getElement($class, $method, $argument['name']);
+                    $child = $this->getElement($type, $method, $argument['name']);
                     $child->label = $element->label.' > '.$child->label;
 
                     return ['element' => $child] + $argument;
-                }, $objectResolved = ClassMethodResolver::resolve($class, $method), array_keys($objectResolved)));
+                }, $objectResolved = ClassMethodResolver::resolve($type, $method), array_keys($objectResolved)));
                 continue;
             }
 
@@ -110,21 +127,20 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 continue;
             }
 
-            if (!$argument['required']) {
-                $context[$key] = $this->generatedValue($element, $generated) ? $generated : $argument['default'];
+            if ($required || $given) {
+                if (!$interactive) {
+                    throw new \LogicException(sprintf('No value provided for "%s".', $field));
+                }
+
+                $context[$key] = $this->askRequiredValue($io, $element, $value);
                 continue;
             }
 
-            if (!$interactive) {
-                if ($this->generatedValue($element, $generated)) {
-                    $context[$key] = $generated;
-                    continue;
-                }
-
-                throw new \LogicException(sprintf('No value provided for "%s".', $field));
+            if ($this->flags & self::NO_DEFAULTS) {
+                unset($normalizers[$key]);
+            } else {
+                $context[$key] = $argument['default'];
             }
-
-            $context[$key] = $this->askRequiredValue($io, $element, $value);
         }
 
         foreach ($normalizers as $key => $normalizer) {
@@ -134,7 +150,6 @@ final class ClassContextBuilder implements ContextBuilderInterface
         $generatedValues = [];
         while (null !== $generatedValue = array_shift($this->generatedValues)) {
             list($label, $value) = $generatedValue;
-
             $generatedValues[] = [$label, json_encode($value)];
         }
         if ($generatedValues) {
@@ -164,13 +179,10 @@ final class ClassContextBuilder implements ContextBuilderInterface
         $this->resolved = [];
 
         foreach (ClassMethodResolver::resolve($this->class, $this->method) as $argument) {
-            $field = $argument['key'];
-            $i = 0;
-            while (isset($this->resolved[$field])) {
-                $field = $argument['key'].++$i;
-            }
-
-            $this->resolved[$field] = ['field' => $field, 'element' => $this->getElement($this->class, $this->method, $argument['name'])] + $argument;
+            $this->resolved[] = [
+                'element' => $this->getElement($this->class, $this->method, $argument['name']),
+                'type' => isset($argument['type']) ? ($this->classMapping[$argument['type']] ?? $argument['type']) : null,
+            ] + $argument;
         }
 
         return $this->resolved;
