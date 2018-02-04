@@ -96,11 +96,6 @@ final class ClassContextBuilder implements ContextBuilderInterface
             }
 
             $given = $value || $input->hasParameterOption('--'.$field);
-            if (!$given && $this->generatedValue($element, $generated)) {
-                $context[$key] = $generated;
-                continue;
-            }
-
             $required = $argument['required'] && !($this->flags & self::ALWAYS_OPTIONAL);
 
             if (self::isObject($type = $argument['type']) && ($required || $given)) {
@@ -138,9 +133,15 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
             if ($this->flags & self::NO_DEFAULTS) {
                 unset($normalizers[$key]);
-            } else {
-                $context[$key] = $argument['default'];
+                continue;
             }
+
+            if ($this->generatedValue($element, $generated)) {
+                $context[$key] = $generated;
+                continue;
+            }
+
+            $context[$key] = $argument['default'];
         }
 
         foreach ($normalizers as $key => $normalizer) {
