@@ -14,7 +14,6 @@ shift;
 
 BIN="vendor/bin/simple-phpunit"
 CMD="${BIN} ${@}"
-export SYMFONY_PHPUNIT_VERSION="7.0"
 
 if [[ ! -f "${PACKAGE_DIR}/phpunit.xml.dist" ]] ; then
     echo "No valid package found in \"${PACKAGE_DIR}\""
@@ -26,11 +25,11 @@ if [[ ! -f "${PACKAGE_DIR}/${BIN}" ]] ; then
     [[ $? -ne 0 ]] && exit 1
 fi
 
-if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_BRANCH = master ]] ) ; then
+if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_BRANCH = master && $TRAVIS_PULL_REQUEST = false ]] ) ; then
     WORKING_DIR="$(dirname $(dirname "$0"))"
     composer link -h &> /dev/null
     if [[ $? != 0 ]] ; then
-        composer require --dev --no-progress --prefer-dist --no-interaction --no-suggest --working-dir="${WORKING_DIR}" ro0nl/link
+        composer update --no-progress --prefer-dist --no-interaction --no-suggest --working-dir="${WORKING_DIR}"
         [[ $? -ne 0 ]] && exit 1
     fi
 
