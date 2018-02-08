@@ -27,14 +27,14 @@ final class UserRoleRepository implements UserRoleRepositoryInterface
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }
 
-    public function find(UserIdInterface $userId, string $role): UserRole
+    public function find(UserIdInterface $userId, string $roleName): UserRole
     {
-        return $this->doFind(['user' => $userId, 'role' => $role]);
+        return $this->doFind(['user' => $userId, 'role' => $roleName]);
     }
 
-    public function exists(UserIdInterface $userId, string $role): bool
+    public function exists(UserIdInterface $userId, string $roleName): bool
     {
-        return $this->doExists(['user' => $userId, 'role' => $role]);
+        return $this->doExists(['user' => $userId, 'role' => $roleName]);
     }
 
     public function save(UserRole $userRole): void

@@ -15,5 +15,5 @@ interface ContextBuilderInterface
 {
     public function configure(InputDefinition $definition): void;
 
-    public function getContext(InputInterface $input, StyleInterface $io): array;
+    public function getContext(InputInterface $input, StyleInterface $io, array $values = []): array;
 }

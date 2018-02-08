@@ -72,8 +72,8 @@ final class ChangeUserCredentialCommand extends UserCommand
 
             return $this->run(new ArrayInput([
                 '--'.$field => null,
-                '--id' => true,
-                'username' => $user->getId()->toString(),
+                '--by-id' => true,
+                'user' => $user->getId()->toString(),
             ]), $output);
         }
 

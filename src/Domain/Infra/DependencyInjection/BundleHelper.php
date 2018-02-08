@@ -8,6 +8,8 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra};
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -28,6 +30,14 @@ final class BundleHelper
 
         $container->registerForAutoconfiguration(ConsoleInfra\ContextBuilder\ContextElementProviderInterface::class)
             ->addTag('msgphp.console.context_element_provider');
+
+        if (class_exists(ConsoleEvents::class)) {
+            $container->register(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)
+                ->setPublic(false)
+                ->setAbstract(true)
+                ->setArgument('$method', '__construct')
+                ->setArgument('$elementProviders', new TaggedIteratorArgument('msgphp.console.context_element_provider'));
+        }
 
         if (class_exists(DoctrineOrmVersion::class)) {
             $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass());

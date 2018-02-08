@@ -13,5 +13,5 @@ final class UniqueUsername extends Constraint
 {
     public const IS_NOT_UNIQUE_ERROR = '37c4ba30-07ae-48e5-9767-19764e027346';
 
-    public $message = 'This value is not a valid username.';
+    public $message = 'This value is not valid.';
 }

@@ -44,26 +44,26 @@ abstract class UserCommand extends Command implements MessageReceivingInterface
     protected function configure(): void
     {
         $this
-            ->addOption('id', null, InputOption::VALUE_NONE, 'Find user by identifier')
-            ->addArgument('username', InputArgument::OPTIONAL, 'The username or identifier value');
+            ->addOption('by-id', null, InputOption::VALUE_NONE, 'Find user by identifier')
+            ->addArgument('user', InputArgument::OPTIONAL, 'The username or user ID');
     }
 
     protected function getUser(InputInterface $input, StyleInterface $io): User
     {
-        $byId = $input->getOption('id');
+        $byId = $input->getOption('by-id');
 
-        if (null === $username = $input->getArgument('username')) {
+        if (null === $value = $input->getArgument('user')) {
             if (!$input->isInteractive()) {
-                throw new \LogicException('No value provided for "username".');
+                throw new \LogicException('No value provided for "user".');
             }
 
             do {
-                $username = $io->ask($byId ? 'Identifier' : 'Username');
-            } while (null === $username);
+                $value = $io->ask($byId ? 'Identifier' : 'Username');
+            } while (null === $value);
         }
 
         return $byId
-            ? $this->repository->find($this->factory->identify(User::class, $username))
-            : $this->repository->findByUsername($username);
+            ? $this->repository->find($this->factory->identify(User::class, $value))
+            : $this->repository->findByUsername($value);
     }
 }

@@ -19,6 +19,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
 {
     public const ALWAYS_OPTIONAL = 1;
     public const NO_DEFAULTS = 2;
+    public const REUSE_DEFINITION = 4;
 
     private $class;
     private $method;
@@ -43,10 +44,15 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
     public function configure(InputDefinition $definition): void
     {
-        $known = array_flip(array_keys($definition->getOptions() + $definition->getArguments()));
+        if ($this->flags & self::REUSE_DEFINITION) {
+            $origOptions = $definition->getOptions();
+            $origArgs = $definition->getArguments();
+        } else {
+            $origOptions = $origArgs = [];
+        }
 
         foreach ($this->resolve() as $argument) {
-            $required = false;
+            $isOption = true;
             if ('bool' === $argument['type']) {
                 $mode = InputOption::VALUE_NONE;
             } elseif (self::isComplex($argument['type'])) {
@@ -55,26 +61,27 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 $mode = InputOption::VALUE_OPTIONAL;
             } else {
                 $mode = InputArgument::OPTIONAL;
-                $required = true;
+                $isOption = false;
             }
 
-            $i = 1;
-            $field = $key = str_replace('_', '-', $argument['key']);
-            while (isset($known[$field])) {
-                $field = $key.++$i;
-            }
+            $field = $isOption ? str_replace('_', '-', $argument['key']) : $argument['key'];
+            if (!isset($origOptions[$field]) && !isset($origArgs[$field])) {
+                $field = self::getUniqueFieldName($definition, $field, $isOption);
 
-            if ($required) {
-                $definition->addArgument(new InputArgument($field, $mode, $argument['element']->description));
+                if ($isOption) {
+                    $definition->addOption(new InputOption($field, null, $mode, $argument['element']->description));
+                } else {
+                    $definition->addArgument(new InputArgument($field, $mode, $argument['element']->description));
+                }
             } else {
-                $definition->addOption(new InputOption($field, null, $mode, $argument['element']->description));
+                $isOption = isset($origOptions[$field]);
             }
 
-            $this->fieldMapping[$argument['name']] = [$field, $required];
+            $this->fieldMapping[$argument['name']] = [$field, $isOption];
         }
     }
 
-    public function getContext(InputInterface $input, StyleInterface $io, iterable $resolved = null): array
+    public function getContext(InputInterface $input, StyleInterface $io, array $values = [], iterable $resolved = null): array
     {
         $context = $normalizers = [];
         $interactive = $input->isInteractive();
@@ -82,12 +89,20 @@ final class ClassContextBuilder implements ContextBuilderInterface
         foreach ($resolved ?? $this->resolve() as $argument) {
             $key = $argument['name'];
             if (null === $resolved) {
-                [$field, $isArg] = $this->fieldMapping[$key];
-                $value = $isArg ? $input->getArgument($field) : $input->getOption($field);
+                [$field, $isOption] = $this->fieldMapping[$key];
+                $value = $isOption ? $input->getOption($field) : $input->getArgument($field);
             } else {
                 $field = $key;
                 $value = $argument['value'] ?? null;
             }
+
+            if (array_key_exists($field, $values)) {
+                $context[$key] = $values[$field];
+                continue;
+            }
+
+            $isEmpty = null === $value || false === $value || [] === $value;
+            $given = !$isEmpty || $input->hasParameterOption('--'.$field);
 
             /** @var ContextElement $element */
             $element = $argument['element'];
@@ -95,13 +110,14 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 $normalizers[$key] = $element->normalizer;
             }
 
-            $given = $value || $input->hasParameterOption('--'.$field);
             $required = $argument['required'] && !($this->flags & self::ALWAYS_OPTIONAL);
 
-            if (self::isObject($type = $argument['type']) && ($required || $given)) {
+            if (is_array($value) && self::isObject($type = $argument['type']) && ($required || $given)) {
                 $method = is_subclass_of($type, DomainCollectionInterface::class) || is_subclass_of($type, DomainIdInterface::class) ? 'fromValue' : '__construct';
-                $context[$key] = $this->getContext($input, $io, array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
-                    if (array_key_exists($i, $value)) {
+                $context[$key] = $this->getContext($input, $io, $values[$field] ?? [], array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
+                    if (array_key_exists($argument['name'], $value)) {
+                        $argument['value'] = $value[$argument['name']];
+                    } elseif (array_key_exists($i, $value)) {
                         $argument['value'] = $value[$i];
                     } elseif ('bool' === $argument['type']) {
                         $argument['value'] = false;
@@ -117,7 +133,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
                 continue;
             }
 
-            if (null !== $value && false !== $value && [] !== $value) {
+            if (!$isEmpty) {
                 $context[$key] = $value;
                 continue;
             }
@@ -171,6 +187,18 @@ final class ClassContextBuilder implements ContextBuilderInterface
         return null !== $type && (class_exists($type) || interface_exists($type));
     }
 
+    private static function getUniqueFieldName(InputDefinition $definition, string $field, bool $isOption = true): string
+    {
+        $known = $isOption ? $definition->getOptions() : $definition->getArguments();
+        $base = $field;
+        $i = 1;
+        while (isset($known[$field])) {
+            $field = $base.++$i;
+        }
+
+        return $field;
+    }
+
     private function resolve(): iterable
     {
         if (null !== $this->resolved) {
@@ -179,9 +207,9 @@ final class ClassContextBuilder implements ContextBuilderInterface
 
         $this->resolved = [];
 
-        foreach (ClassMethodResolver::resolve($this->classMapping[$this->class] ?? $this->class, $this->method) as $argument) {
+        foreach (ClassMethodResolver::resolve($class = $this->classMapping[$this->class] ?? $this->class, $this->method) as $argument) {
             $this->resolved[] = [
-                'element' => $this->getElement($this->class, $this->method, $argument['name']),
+                'element' => $this->getElement($class, $this->method, $argument['name']),
                 'type' => isset($argument['type']) ? ($this->classMapping[$argument['type']] ?? $argument['type']) : null,
             ] + $argument;
         }
@@ -197,7 +225,7 @@ final class ClassContextBuilder implements ContextBuilderInterface
             }
         }
 
-        return new ContextElement(ucfirst(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1 \\2', '\\1 \\2'), $argument)));
+        return new ContextElement(ucfirst(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1 \\2', '\\1 \\2'], $argument)));
     }
 
     private function askRequiredValue(StyleInterface $io, ContextElement $element, $default)

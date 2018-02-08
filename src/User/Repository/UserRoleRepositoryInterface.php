@@ -18,9 +18,9 @@ interface UserRoleRepositoryInterface
      */
     public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
-    public function find(UserIdInterface $userId, string $role): UserRole;
+    public function find(UserIdInterface $userId, string $roleName): UserRole;
 
-    public function exists(UserIdInterface $userId, string $role): bool;
+    public function exists(UserIdInterface $userId, string $roleName): bool;
 
     public function save(UserRole $userRole): void;
 

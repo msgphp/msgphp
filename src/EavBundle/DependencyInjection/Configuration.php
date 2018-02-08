@@ -18,12 +18,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 final class Configuration implements ConfigurationInterface
 {
-    public const REQUIRED_AGGREGATE_ROOTS = [
+    public const AGGREGATE_ROOTS = [
         Entity\Attribute::class => AttributeIdInterface::class,
         Entity\AttributeValue::class => AttributeValueIdInterface::class,
     ];
-    public const OPTIONAL_AGGREGATE_ROOTS = [];
-    public const AGGREGATE_ROOTS = self::REQUIRED_AGGREGATE_ROOTS + self::OPTIONAL_AGGREGATE_ROOTS;
     public const IDENTITY_MAPPING = [
         Entity\Attribute::class => ['id'],
         Entity\AttributeValue::class => ['id'],
@@ -44,7 +42,7 @@ final class Configuration implements ConfigurationInterface
 
         $children
             ->classMappingNode('class_mapping')
-                ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
+                ->requireClasses([Entity\Attribute::class, Entity\AttributeValue::class])
                 ->subClassValues()
             ->end()
             ->classMappingNode('id_type_mapping')

@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
-use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +30,11 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerIdentityMapping($container, $classMapping, $identityMapping);
         $this->registerEntityFactory($container, $classMapping, $idClassMapping);
         $this->registerMessageBus($container);
+
+        if ($container->hasDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)) {
+            $container->getDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)
+                ->setArgument('$classMapping', $classMapping);
+        }
 
         if (interface_exists(CacheWarmerInterface::class) && $container->hasParameter('msgphp.doctrine.mapping_files')) {
             $mappingFiles = array_merge(...$container->getParameter('msgphp.doctrine.mapping_files'));
