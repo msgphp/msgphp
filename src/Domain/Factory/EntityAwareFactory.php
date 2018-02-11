@@ -12,18 +12,36 @@ use MsgPhp\Domain\Exception\InvalidClassException;
  */
 final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
-    private $identifierMapping;
     private $factory;
+    private $identifierMapping;
+    private $referenceLoaders;
 
-    public function __construct(array $identifierMapping, DomainObjectFactoryInterface $factory)
+    /**
+     * @param callable[] $referenceLoaders
+     */
+    public function __construct(DomainObjectFactoryInterface $factory, array $identifierMapping, iterable $referenceLoaders = [])
     {
-        $this->identifierMapping = $identifierMapping;
         $this->factory = $factory;
+        $this->identifierMapping = $identifierMapping;
+        $this->referenceLoaders = $referenceLoaders;
     }
 
     public function create(string $class, array $context = [])
     {
         return $this->factory->create($class, $context);
+    }
+
+    public function reference(string $class, $id, ...$idN)
+    {
+        array_unshift($idN, $id);
+
+        foreach ($this->referenceLoaders as $loader) {
+            if (is_object($object = $loader($class, $idN))) {
+                return $object;
+            }
+        }
+
+        throw new \RuntimeException(sprintf('Unable to create a reference object for "%s".', $class));
     }
 
     public function identify(string $class, $id): DomainIdInterface

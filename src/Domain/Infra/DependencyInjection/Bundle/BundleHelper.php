@@ -19,15 +19,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 final class BundleHelper
 {
+    private static $initialized = [];
+
     public static function initDomain(ContainerBuilder $container): void
     {
-        ContainerHelper::addCompilerPassOnce($container, Compiler\ResolveDomainPass::class);
+        if ($initialized = &self::getInitialized($container, __FUNCTION__)) {
+            return;
+        }
+
+        $container->addCompilerPass(new Compiler\ResolveDomainPass());
 
         $container->registerForAutoconfiguration(ConsoleInfra\ContextBuilder\ContextElementProviderInterface::class)
             ->addTag('msgphp.console.context_element_provider');
 
         if (class_exists(DoctrineOrmVersion::class)) {
-            ContainerHelper::addCompilerPassOnce($container, Compiler\DoctrineObjectFieldMappingPass::class);
+            $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass());
 
             $container->setParameter('msgphp.doctrine.mapping_cache_dirname', 'msgphp/doctrine-mapping');
 
@@ -47,22 +53,33 @@ final class BundleHelper
                 ]]]]);
             }
         }
+
+        $initialized = true;
     }
 
     public static function initDoctrineTypes(Container $container): void
     {
-        static $prepared = false;
-
-        if ($prepared || !$container->hasParameter($param = 'msgphp.doctrine.type_config')) {
+        if ($initialized = &self::getInitialized($container, __FUNCTION__)) {
             return;
         }
 
-        foreach ($container->getParameter($param) as $config) {
-            $config['type']::setClass($config['class']);
-            $config['type']::setDataType($config['data_type']);
+        if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
+            foreach ($container->getParameter($param) as $config) {
+                $config['type']::setClass($config['class']);
+                $config['type']::setDataType($config['data_type']);
+            }
         }
 
-        $prepared = true;
+        $initialized = true;
+    }
+
+    private static function &getInitialized(Container $container, string $key)
+    {
+        if (!isset(self::$initialized[$hash = spl_object_hash($container)."\0".$key])) {
+            self::$initialized[$hash] = false;
+        }
+
+        return self::$initialized[$hash];
     }
 
     private function __construct()

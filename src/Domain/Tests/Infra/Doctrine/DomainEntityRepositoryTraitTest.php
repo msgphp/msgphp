@@ -4,54 +4,14 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\IntegerType;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
-use MsgPhp\Domain\{DomainId, DomainIdInterface};
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\Domain\Tests\AbstractDomainEntityRepositoryTraitTest;
 use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
 
 final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityRepositoryTraitTest
 {
-    /** @var EntityManager */
-    private static $em;
-
-    public static function setUpBeforeClass(): void
-    {
-        if (Type::hasType('domain_id')) {
-            Type::overrideType('domain_id', TestDomainIdType::class);
-        } else {
-            Type::addType('domain_id', TestDomainIdType::class);
-        }
-
-        $config = new Configuration();
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), dirname(dirname(__DIR__)).'/Fixtures/Entities'));
-        $config->setProxyDir(\sys_get_temp_dir().'/msgphp_'.md5(microtime()));
-        $config->setProxyNamespace(__NAMESPACE__);
-
-        self::$em = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        if (null !== ($proxyDir = self::$em->getConfiguration()->getProxyDir()) && is_dir($proxyDir)) {
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($proxyDir, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
-                @($file->isDir() ? 'rmdir' : 'unlink')($file->getRealPath());
-            }
-
-            @rmdir($proxyDir);
-        }
-
-        self::$em->close();
-        self::$em = null;
-    }
+    use EntityManagerTrait;
 
     protected function setUp(): void
     {
@@ -120,39 +80,5 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         }
 
         self::$em->flush();
-    }
-}
-
-class TestDomainIdType extends IntegerType
-{
-    public function getName()
-    {
-        return 'domain_id';
-    }
-
-    final public function convertToDatabaseValue($value, AbstractPlatform $platform): ?int
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        if ($value instanceof DomainIdInterface) {
-            return $value->isEmpty() ? null : (int) $value->toString();
-        }
-
-        throw ConversionException::conversionFailed($value, $this->getName());
-    }
-
-    final public function convertToPHPValue($value, AbstractPlatform $platform): DomainIdInterface
-    {
-        if (null === $value) {
-            return new DomainId();
-        }
-
-        if (is_scalar($value)) {
-            return new DomainId((string) $value);
-        }
-
-        throw ConversionException::conversionFailed($value, $this->getName());
     }
 }

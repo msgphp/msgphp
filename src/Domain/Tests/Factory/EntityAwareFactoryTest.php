@@ -36,13 +36,37 @@ final class EntityAwareFactoryTest extends TestCase
                 return $o;
             });
 
-        $this->factory = new EntityAwareFactory(['alias_id' => 'id'], $innerFactory);
+        $this->factory = new EntityAwareFactory($innerFactory, ['alias_id' => 'id'], [
+            function () {
+                return null;
+            },
+            function ($class, $identity) {
+                $o = new \stdClass();
+                $o->class = $class;
+                $o->identity = $identity;
+
+                return $o;
+            },
+            function () {
+                return new \stdClass();
+            },
+        ]);
     }
 
     public function testCreate(): void
     {
-        $this->assertSame(['class' => 'foo', 'context' => []], (array) $this->factory->create('foo'));
-        $this->assertSame(['class' => 'bar', 'context' => ['context']], (array) $this->factory->create('bar', ['context']));
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->create('foo'));
+        $this->assertSame(['class' => 'foo', 'context' => []], (array) $object);
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->create('bar', ['context']));
+        $this->assertSame(['class' => 'bar', 'context' => ['context']], (array) $object);
+    }
+
+    public function testReference(): void
+    {
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('foo', 1));
+        $this->assertSame(['class' => 'foo', 'identity' => [1]], (array) $object);
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('bar', 1, '2'));
+        $this->assertSame(['class' => 'bar', 'identity' => [1, '2']], (array) $object);
     }
 
     public function testIdentify(): void

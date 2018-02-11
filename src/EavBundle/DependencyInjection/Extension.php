@@ -70,19 +70,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader->load('doctrine.php');
 
-        $classMapping = $config['class_mapping'];
-
-        foreach ([
-            DoctrineInfra\Repository\AttributeRepository::class => $classMapping[Entity\Attribute::class],
-        ] as $repository => $class) {
-            if (null === $class) {
-                ContainerHelper::removeDefinitionWithAliases($container, $repository);
-                continue;
-            }
-
-            $container->getDefinition($repository)
-                ->setArgument('$class', $class);
-        }
+        ContainerHelper::configureDoctrineOrmRepositories($container, $config['class_mapping'], [
+            DoctrineInfra\Repository\AttributeRepository::class => Entity\Attribute::class,
+        ]);
     }
 
     private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array

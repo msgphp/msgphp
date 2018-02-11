@@ -1,8 +1,8 @@
 # Entity aware factory
 
-An entity aware factory is a domain object factory and is bound to `MsgPhp\Domain\Factory\EntityAwareFactoryInterface`.
-Besides initializing any domain object via `create()` it can also initialize an entity identifier using either
-`identify()` or `nextIdentifier()`.
+An entity aware factory is a domain object factory, bound to `MsgPhp\Domain\Factory\EntityAwareFactoryInterface`.
+Besides initializing any domain object via `create()` it's also capable to initialize an entity identifier / reference
+object.
 
 ## Implementations
 
@@ -16,6 +16,13 @@ class mapping.
 ### `create(string $class, array $context = []): object`
 
 Inherited from `MsgPhp\Domain\Factory\DomainObjectFactoryInterface::create()`.
+
+---
+
+### `reference(string $class, $id, ...$idN): object`
+
+Returns a reference object for an existing entity by identity. Depending on the implementation the reference might be
+partially loaded. Meaning one can only safely rely on the entity identifier values being available.
 
 ---
 
@@ -35,22 +42,55 @@ empty if it's not capable to calculate one upfront.
 ```php
 <?php
 
-use MsgPhp\Domain\Factory\EntityFactory;
+use MsgPhp\Domain\Factory\EntityAwareFactory;
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infra\Uuid\DomainId as DomainUuid;
 
 $realFactory = ...;
 
-$factory = new EntityFactory([
+$factory = new EntityAwareFactory($realFactory, [
     MyEntity::class => DomainId::class,
     MyOtherEntity::class => DomainUuid::class,
-], $realFactory);
+]);
 
-/** @var DomainId $object */
+/** @var DomainId $entityId */
 $entityId = $factory->identify(MyEntity::class, '1');
 $factory->nextIdentifier(MyEntity::class)->isEmpty(); // true
 
-/** @var DomainUuid $object */
-$otherEntityId = $factory->identify(MyOtherEntity::class, 'cf3d2f85-6c86-44d1-8634-af51c91a9a74');
+/** @var DomainUuid $entityId */
+$entityId = $factory->identify(MyOtherEntity::class, 'cf3d2f85-6c86-44d1-8634-af51c91a9a74');
 $factory->nextIdentifier(MyOtherEntity::class)->isEmpty(); // false
+```
+
+## Entity reference example
+
+```php
+<?php
+
+use MsgPhp\Domain\Factory\EntityAwareFactory;
+
+class MyCompositeEntity
+{
+    public function __construct($idA, $idB)
+    { }
+}
+
+class Some
+{
+    public function __construct(MyCompositeEntity $entity)
+    { }
+}
+
+$realFactory = ...;
+
+$factory = new EntityAwareFactory($realFactory, [], [
+    function (string $class, array $identity) {
+        return new $class(...$identity);
+    },
+]);
+
+/** @var Some $object */
+$object = $factory->create(Some::class, [
+    'entity' => $factory->reference(MyCompositeEntity::class, 'id-a', 'id-b'),
+]);
 ```

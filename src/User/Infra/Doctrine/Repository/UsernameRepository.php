@@ -11,6 +11,7 @@ use MsgPhp\Domain\Factory\DomainCollectionFactory;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\{User, Username};
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
+use MsgPhp\User\UserIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -98,6 +99,16 @@ final class UsernameRepository implements UsernameRepositoryInterface
         $result = DomainCollectionFactory::create($result);
 
         return $offset || $limit ? $result->slice($offset, $limit) : $result;
+    }
+
+    public function find(UserIdInterface $userId, string $username): Username
+    {
+        return $this->doFind(...func_get_args());
+    }
+
+    public function exists(UserIdInterface $userId, string $username): bool
+    {
+        return $this->doExists(...func_get_args());
     }
 
     public function save(Username $user): void

@@ -23,6 +23,7 @@
     "require-dev": {
         "doctrine/doctrine-bundle": "^1.8",
         "doctrine/orm": "^2.6",
+        "psr/container": "^1.0",
         "ramsey/uuid": "^3.7",
         "ramsey/uuid-doctrine": "^1.4",
         "simple-bus/message-bus": "^3.0",
