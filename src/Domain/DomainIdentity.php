@@ -18,48 +18,6 @@ final class DomainIdentity
         $this->mapping = $mapping;
     }
 
-    public function isIdentity(string $class, array $value): bool
-    {
-        if (count($value) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
-            return false;
-        }
-
-        return [] === array_diff($value, $fields);
-    }
-
-    public function toIdentity(string $class, $id, ...$idN): ?array
-    {
-        array_unshift($idN, $id);
-
-        if (count($idN) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
-            return null;
-        }
-
-        foreach ($idN as $id) {
-            if ($this->isEmptyIdentifier($id)) {
-                return null;
-            }
-        }
-
-        return array_combine($fields, $idN);
-    }
-
-    /**
-     * @param object $object
-     */
-    public function getIdentity($object): array
-    {
-        return $this->mapping->getIdentity($object);
-    }
-
-    /**
-     * @param object $object
-     */
-    public function getIdentifiers($object): array
-    {
-        return array_values($this->mapping->getIdentity($object));
-    }
-
     public function isIdentifier($value): bool
     {
         if ($value instanceof DomainIdInterface) {
@@ -68,7 +26,7 @@ final class DomainIdentity
 
         if (is_object($value)) {
             try {
-                if ($this->mapping->getIdentity($value)) {
+                if ($this->mapping->getIdentifierFieldNames(get_class($value))) {
                     return true;
                 }
             } catch (InvalidClassException $e) {
@@ -104,10 +62,12 @@ final class DomainIdentity
 
         if (is_object($value)) {
             try {
-                $identity = $this->mapping->getIdentity($value);
+                if (!$identity = $this->mapping->getIdentity($value)) {
+                    return null;
+                }
             } catch (InvalidClassException $e) {
-                return null;
-            };
+                return $value;
+            }
 
             $identity = array_map(function ($id) {
                 return $this->normalizeIdentifier($id);
@@ -117,5 +77,47 @@ final class DomainIdentity
         }
 
         return $value;
+    }
+
+    /**
+     * @param object $object
+     */
+    public function getIdentifiers($object): array
+    {
+        return array_values($this->mapping->getIdentity($object));
+    }
+
+    public function isIdentity(string $class, array $value): bool
+    {
+        if (count($value) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
+            return false;
+        }
+
+        return [] === array_diff($value, $fields);
+    }
+
+    public function toIdentity(string $class, $id, ...$idN): ?array
+    {
+        array_unshift($idN, $id);
+
+        if (count($idN) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
+            return null;
+        }
+
+        foreach ($idN as $id) {
+            if ($this->isEmptyIdentifier($id)) {
+                return null;
+            }
+        }
+
+        return array_combine($fields, $idN);
+    }
+
+    /**
+     * @param object $object
+     */
+    public function getIdentity($object): array
+    {
+        return $this->mapping->getIdentity($object);
     }
 }

@@ -15,6 +15,7 @@ pages:
 - Code conventions: code-conventions.md
 - Domain-driven-design:
     - Identifiers: ddd/identifiers.md
+    - Identity: ddd/identity.md
     - Identity mapping: ddd/identity-mapping.md
     - Collections: ddd/collections.md
     - Factories:
