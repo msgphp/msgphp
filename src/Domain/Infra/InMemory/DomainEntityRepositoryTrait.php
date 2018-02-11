@@ -17,11 +17,10 @@ trait DomainEntityRepositoryTrait
     private $memory;
     private $accessor;
 
-    public function __construct(string $class, DomainIdentityMappingInterface $identityMapping, array $fieldMapping = [], GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)
+    public function __construct(string $class, DomainIdentityMappingInterface $identityMapping, GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)
     {
         $this->class = $class;
         $this->identityMapping = $identityMapping;
-        $this->fieldMapping = $fieldMapping;
         $this->memory = $memory ?? GlobalObjectMemory::createDefault();
         $this->accessor = $accessor ?? new ObjectFieldAccessor();
     }
@@ -148,7 +147,7 @@ trait DomainEntityRepositoryTrait
      */
     private function matchesFields($entity, array $fields): bool
     {
-        foreach ($this->mapFields($fields) as $field => $value) {
+        foreach ($fields as $field => $value) {
             if ($this->isEmptyIdentifier($value)) {
                 return false;
             }

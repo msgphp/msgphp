@@ -24,9 +24,9 @@ final class UsernameRepository implements UsernameRepositoryInterface
     private $alias = 'username';
     private $targetMapping;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $fieldMapping = [], array $targetMapping = [])
+    public function __construct(string $class, EntityManagerInterface $em, array $targetMapping = [])
     {
-        $this->__parent_construct($class, $em, $fieldMapping);
+        $this->__parent_construct($class, $em);
 
         $this->targetMapping = $targetMapping;
     }

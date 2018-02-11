@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Doctrine\Repository;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -19,9 +20,19 @@ use MsgPhp\User\UserIdInterface;
  */
 final class UserRepository implements UserRepositoryInterface
 {
-    use DomainEntityRepositoryTrait;
+    use DomainEntityRepositoryTrait {
+        __construct as private __parent_construct;
+    }
 
     private $alias = 'user';
+    private $usernameField;
+
+    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null)
+    {
+        $this->__parent_construct($class, $em);
+
+        $this->usernameField = $usernameField;
+    }
 
     /**
      * @return DomainCollectionInterface|User[]
@@ -39,15 +50,16 @@ final class UserRepository implements UserRepositoryInterface
     public function findByUsername(string $username): User
     {
         $qb = $this->createUsernameQueryBuilder($username);
+        $criteria = [$this->usernameField => $username];
 
         if (null === $qb) {
-            return $this->doFindByFields(['username' => $username]);
+            return $this->doFindByFields($criteria);
         }
 
         try {
             return $qb->getQuery()->getSingleResult();
         } catch (NoResultException $e) {
-            throw EntityNotFoundException::createForFields($this->class, ['username' => $username]);
+            throw EntityNotFoundException::createForFields($this->class, $criteria);
         }
     }
 

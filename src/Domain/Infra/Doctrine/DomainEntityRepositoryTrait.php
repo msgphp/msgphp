@@ -21,11 +21,10 @@ trait DomainEntityRepositoryTrait
 
     private $em;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $fieldMapping = [])
+    public function __construct(string $class, EntityManagerInterface $em)
     {
         $this->class = $class;
         $this->identityMapping = new DomainIdentityMapping($em);
-        $this->fieldMapping = $fieldMapping;
         $this->em = $em;
     }
 
@@ -168,7 +167,7 @@ trait DomainEntityRepositoryTrait
         $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
         $metadata = $this->em->getClassMetadata($this->class);
 
-        foreach ($this->mapFields($fields) as $field => $value) {
+        foreach ($fields as $field => $value) {
             if ($this->isEmptyIdentifier($value)) {
                 $where->add('TRUE = FALSE');
                 continue;
