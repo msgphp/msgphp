@@ -49,7 +49,7 @@ trait AbstractDomainEntityRepositoryTrait
                 $identity = $this->identityMapping->getIdentity($value);
             } catch (InvalidClassException $e) {
                 return null;
-            };
+            }
 
             $identity = array_map(function ($id) {
                 return $this->normalizeIdentifier($id);
