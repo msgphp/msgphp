@@ -149,22 +149,21 @@ trait DomainEntityRepositoryTrait
     private function matchesFields($entity, array $fields): bool
     {
         foreach ($this->mapFields($fields) as $field => $value) {
-            $value = $this->normalizeIdentifier($value, true);
-            $knownValue = $this->normalizeIdentifier($this->accessor->getValue($entity, $field), true);
-            if ($knownValue instanceof DomainIdInterface) {
-                $knownValue = $knownValue->isEmpty() ? null : $knownValue->toString();
-            }
-            if ($value instanceof DomainIdInterface) {
-                $value = $value->isEmpty() ? null : $value->toString();
+            if ($this->isEmptyIdentifier($value)) {
+                return false;
             }
 
+            $knownValue = $this->normalizeIdentifier($this->accessor->getValue($entity, $field));
+
             if (is_array($value)) {
-                if (!in_array($knownValue, $value)) {
+                if (!in_array($knownValue, array_map([$this, 'normalizeIdentifier'], $value))) {
                     return false;
                 }
 
                 continue;
             }
+
+            $value = $this->normalizeIdentifier($value);
 
             if (null === $value xor null === $knownValue) {
                 return false;

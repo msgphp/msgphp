@@ -22,33 +22,45 @@ trait AbstractDomainEntityRepositoryTrait
         $this->fieldMapping = $fieldMapping;
     }
 
-    private function normalizeIdentifier($id, bool $normalizeObjectIdentifier = false)
+    private function isEmptyIdentifier($value): bool
     {
-        if ($id instanceof DomainIdInterface) {
-            return $id->isEmpty() ? null : $id;
+        if ($value instanceof DomainIdInterface && $value->isEmpty()) {
+            return true;
         }
 
-        if (is_object($id)) {
+        if (is_object($value)) {
             try {
-                if (!$identity = $this->identityMapping->getIdentity($id)) {
-                    return null;
+                if (!$this->identityMapping->getIdentity($value)) {
+                    return true;
                 }
-
-                if (!$normalizeObjectIdentifier) {
-                    return $id;
-                }
-
-                $id = array_map(function ($id) {
-                    return $this->normalizeIdentifier($id, true);
-                }, $identity);
-
-                return 1 === count($id) ? reset($id) : $id;
             } catch (InvalidClassException $e) {
-                return $id;
             }
         }
 
-        return $id;
+        return false;
+    }
+
+    private function normalizeIdentifier($value)
+    {
+        if ($value instanceof DomainIdInterface) {
+            return $value->isEmpty() ? null : $value->toString();
+        }
+
+        if (is_object($value)) {
+            try {
+                $identity = $this->identityMapping->getIdentity($value);
+            } catch (InvalidClassException $e) {
+                return null;
+            };
+
+            $identity = array_map(function ($id) {
+                return $this->normalizeIdentifier($id);
+            }, $identity);
+
+            return 1 === count($identity) ? reset($identity) : $identity;
+        }
+
+        return $value;
     }
 
     private function toIdentity($id, ...$idN): ?array
@@ -58,7 +70,7 @@ trait AbstractDomainEntityRepositoryTrait
         }
 
         foreach ($ids as $id) {
-            if (null === $this->normalizeIdentifier($id)) {
+            if ($this->isEmptyIdentifier($id)) {
                 return null;
             }
         }

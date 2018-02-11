@@ -169,8 +169,12 @@ trait DomainEntityRepositoryTrait
         $metadata = $this->em->getClassMetadata($this->class);
 
         foreach ($this->mapFields($fields) as $field => $value) {
+            if ($this->isEmptyIdentifier($value)) {
+                $where->add('TRUE = FALSE');
+                continue;
+            }
+
             $fieldAlias = $alias.'.'.$field;
-            $value = $this->normalizeIdentifier($value);
 
             if (null === $value) {
                 $where->add($expr->isNull($fieldAlias));

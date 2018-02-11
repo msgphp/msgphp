@@ -207,9 +207,11 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = static::createRepository(Entities\TestDerivedEntity::class);
         $entity = Entities\TestEntity::create([
-            'intField' => -1,
+            'intField' => 0,
             'boolField' => true,
         ]);
+
+        $this->loadEntities();
 
         $this->assertFalse($repository->doExistsByFields(['entity' => $entity]));
     }

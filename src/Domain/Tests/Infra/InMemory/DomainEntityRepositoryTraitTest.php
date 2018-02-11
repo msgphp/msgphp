@@ -51,8 +51,10 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
     protected static function flushEntities(iterable $entities): void
     {
         foreach ($entities as $entity) {
-            if ($entity instanceof Entities\TestEntity && $entity->getId()->isEmpty()) {
-                $entity->identify(new DomainId(bin2hex(random_bytes(32))));
+            $testEntity = $entity instanceof Entities\TestDerivedEntity ? $entity->entity : $entity;
+
+            if ($testEntity instanceof Entities\TestEntity && $testEntity->getId()->isEmpty()) {
+                $testEntity->identify(new DomainId(bin2hex(random_bytes(32))));
             }
 
             self::$memory->persist($entity);
