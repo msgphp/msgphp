@@ -65,6 +65,6 @@ class TestEntity extends BaseTestEntity
 
     final public function getId(): DomainIdInterface
     {
-        return $this->id ?? new DomainId();
+        return $this->id ?? ($this->id = new DomainId());
     }
 }

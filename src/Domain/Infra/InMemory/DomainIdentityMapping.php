@@ -35,7 +35,9 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
         $ids = [];
 
         foreach ($this->getIdentifierFieldNames(get_class($object)) as $field) {
-            $ids[$field] = $this->accessor->getValue($object, $field);
+            if (null !== $value = $this->accessor->getValue($object, $field)) {
+                $ids[$field] = $value;
+            }
         }
 
         return $ids;

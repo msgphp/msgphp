@@ -82,6 +82,6 @@ trait AbstractDomainEntityRepositoryTrait
             return false;
         }
 
-        return [] === array_diff($fields, $idFields);
+        return [] === array_diff(array_keys($fields), $idFields);
     }
 }

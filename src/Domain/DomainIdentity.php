@@ -38,7 +38,7 @@ final class DomainIdentity
 
     public function isEmptyIdentifier($value): bool
     {
-        if ($value instanceof DomainIdInterface && $value->isEmpty()) {
+        if (null === $value || ($value instanceof DomainIdInterface && $value->isEmpty())) {
             return true;
         }
 
@@ -73,7 +73,7 @@ final class DomainIdentity
                 return $this->normalizeIdentifier($id);
             }, $identity);
 
-            return 1 === count($identity) ? reset($identity) : array_values($identity);
+            return 1 === count($this->mapping->getIdentifierFieldNames(get_class($value))) ? reset($identity) : array_values($identity);
         }
 
         return $value;
@@ -89,25 +89,19 @@ final class DomainIdentity
 
     public function isIdentity(string $class, array $value): bool
     {
-        if (count($value) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
+        if (!$value || count($value) !== count($fields = $this->mapping->getIdentifierFieldNames($class)) || in_array(null, $value, true)) {
             return false;
         }
 
-        return [] === array_diff($value, $fields);
+        return [] === array_diff(array_keys($value), $fields);
     }
 
     public function toIdentity(string $class, $id, ...$idN): ?array
     {
         array_unshift($idN, $id);
 
-        if (count($idN) !== count($fields = $this->mapping->getIdentifierFieldNames($class))) {
+        if (count($idN) !== count($fields = $this->mapping->getIdentifierFieldNames($class)) || in_array(null, $idN, true)) {
             return null;
-        }
-
-        foreach ($idN as $id) {
-            if ($this->isEmptyIdentifier($id)) {
-                return null;
-            }
         }
 
         return array_combine($fields, $idN);
