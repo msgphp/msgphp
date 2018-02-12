@@ -9,7 +9,7 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainIdentity
+final class DomainIdentityHelper
 {
     private $mapping;
 

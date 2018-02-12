@@ -6,8 +6,8 @@ object, and therefor qualifying it an entity object.
 Identifier values can be of any type, e.g. a [domain identifier](identifiers.md), another (foreign) entity object, or
 any primitive value.
 
-To ease working with the [identity mapping](identity-mapping.md) there's a domain service
-`MsgPhp\Domain\DomainIdentity`.
+To ease working with the [identity mapping](identity-mapping.md) one can use a `MsgPhp\Domain\DomainIdentityHelper`
+domain service.
 
 ## API
 
