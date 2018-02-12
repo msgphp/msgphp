@@ -8,7 +8,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\{AbstractDomainEntityRepositoryTrait, DomainCollectionInterface};
+use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Factory\DomainCollectionFactory;
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
 
@@ -17,15 +17,15 @@ use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
  */
 trait DomainEntityRepositoryTrait
 {
-    use AbstractDomainEntityRepositoryTrait;
-
+    private $class;
     private $em;
+    private $identityHelper;
 
-    public function __construct(string $class, EntityManagerInterface $em)
+    public function __construct(string $class, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
     {
         $this->class = $class;
-        $this->identityMapping = new DomainIdentityMapping($em);
         $this->em = $em;
+        $this->identityHelper = $identityHelper ?? new DomainIdentityHelper(new DomainIdentityMapping($em));
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -49,7 +49,7 @@ trait DomainEntityRepositoryTrait
      */
     private function doFind($id, ...$idN)
     {
-        $identity = $this->toIdentity(...$ids = func_get_args());
+        $identity = $this->identityHelper->toIdentity($this->class, ...$ids = func_get_args());
 
         if (null === $identity) {
             throw EntityNotFoundException::createForId($this->class, ...$ids);
@@ -72,7 +72,7 @@ trait DomainEntityRepositoryTrait
         $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
-            if ($this->isIdentity($fields)) {
+            if ($this->identityHelper->isIdentity($this->class, $fields)) {
                 throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
             }
 
@@ -84,7 +84,7 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id, ...$idN): bool
     {
-        $identity = $this->toIdentity(...func_get_args());
+        $identity = $this->identityHelper->toIdentity($this->class, ...func_get_args());
 
         if (null === $identity) {
             return false;
@@ -165,10 +165,11 @@ trait DomainEntityRepositoryTrait
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
         $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
-        $metadata = $this->em->getClassMetadata($this->class);
+        $idFields = array_flip($this->identityHelper->getIdentifierFieldNames($this->class));
+        $associations = $this->em->getClassMetadata($this->class)->getAssociationMappings();
 
         foreach ($fields as $field => $value) {
-            if ($this->isEmptyIdentifier($value)) {
+            if (isset($idFields[$field]) && $this->identityHelper->isEmptyIdentifier($value)) {
                 $where->add('TRUE = FALSE');
                 continue;
             }
@@ -189,7 +190,7 @@ trait DomainEntityRepositoryTrait
 
             if (is_array($value)) {
                 $where->add($expr->in($fieldAlias, $param));
-            } elseif ($metadata->hasAssociation($field)) {
+            } elseif (isset($associations[$field])) {
                 $where->add($expr->eq('IDENTITY('.$fieldAlias.')', $param));
             } else {
                 $where->add($expr->eq($fieldAlias, $param));

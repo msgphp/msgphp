@@ -9,7 +9,7 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
 use PHPUnit\Framework\TestCase;
 
-final class DomainIdentityTest extends TestCase
+final class DomainIdentityHelperTest extends TestCase
 {
     private $mapping;
 
@@ -131,6 +131,24 @@ final class DomainIdentityTest extends TestCase
 
         $helper->getIdentifiers(new class() {
         });
+    }
+
+    public function testGetIdentifierFieldNames(): void
+    {
+        $helper = new DomainIdentityHelper($this->mapping);
+
+        $this->assertSame(['id'], $helper->getIdentifierFieldNames(Entities\TestPrimitiveEntity::class));
+        $this->assertSame(['idA', 'idB'], $helper->getIdentifierFieldNames(Entities\TestCompositeEntity::class));
+        $this->assertSame([], $helper->getIdentifierFieldNames(\stdClass::class));
+    }
+
+    public function testGetIdentifierFieldNamesWithInvalidEntity(): void
+    {
+        $helper = new DomainIdentityHelper($this->mapping);
+
+        $this->expectException(InvalidClassException::class);
+
+        $helper->getIdentifierFieldNames('foo');
     }
 
     public function testIsIdentity(): void

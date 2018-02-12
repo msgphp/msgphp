@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
-use MsgPhp\Domain\{DomainIdentity, DomainIdentityMappingInterface, Factory, Message};
+use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
 use SimpleBus\Message\Bus\MessageBus as SimpleMessageBus;
 use Symfony\Component\DependencyInjection\Alias;
@@ -64,7 +64,7 @@ final class ResolveDomainPass implements CompilerPassInterface
 
         self::alias($container, DomainIdentityMappingInterface::class, $alias);
 
-        self::register($container, DomainIdentity::class)
+        self::register($container, DomainIdentityHelper::class)
             ->setAutowired(true);
     }
 

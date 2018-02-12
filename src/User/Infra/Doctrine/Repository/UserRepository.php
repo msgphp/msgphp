@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\{User, Username};
@@ -27,9 +27,9 @@ final class UserRepository implements UserRepositoryInterface
     private $alias = 'user';
     private $usernameField;
 
-    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null)
+    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null, DomainIdentityHelper $identityHelper = null)
     {
-        $this->__parent_construct($class, $em);
+        $this->__parent_construct($class, $em, $identityHelper);
 
         $this->usernameField = $usernameField;
     }
@@ -49,6 +49,10 @@ final class UserRepository implements UserRepositoryInterface
 
     public function findByUsername(string $username): User
     {
+        if (null === $this->usernameField) {
+            throw new \LogicException('Cannot find users by username without a username field name.');
+        }
+
         $qb = $this->createUsernameQueryBuilder($username);
         $criteria = [$this->usernameField => $username];
 

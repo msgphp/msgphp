@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\InMemory;
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\{DomainId, DomainIdentityHelper};
 use MsgPhp\Domain\Infra\InMemory\{DomainEntityRepositoryTrait, DomainIdentityMapping, GlobalObjectMemory};
 use MsgPhp\Domain\Tests\AbstractDomainEntityRepositoryTraitTest;
 use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities};
@@ -32,9 +32,9 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         foreach (self::$entityTypes as $knownClass) {
             $mapping[$knownClass] = $knownClass::getIdFields();
         }
-        $identityMap = new DomainIdentityMapping($mapping);
+        $identityHelper = new DomainIdentityHelper(new DomainIdentityMapping($mapping));
 
-        return new class($class, $identityMap, self::$memory) implements DomainEntityRepositoryTraitInterface {
+        return new class($class, $identityHelper, self::$memory) implements DomainEntityRepositoryTraitInterface {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
                 doFindAllByFields as public;

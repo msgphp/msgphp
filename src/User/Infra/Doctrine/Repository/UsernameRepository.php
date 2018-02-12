@@ -6,7 +6,7 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Factory\DomainCollectionFactory;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\{User, Username};
@@ -24,9 +24,9 @@ final class UsernameRepository implements UsernameRepositoryInterface
     private $alias = 'username';
     private $targetMapping;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $targetMapping = [])
+    public function __construct(string $class, EntityManagerInterface $em, array $targetMapping = [], DomainIdentityHelper $identityHelper = null)
     {
-        $this->__parent_construct($class, $em);
+        $this->__parent_construct($class, $em, $identityHelper);
 
         $this->targetMapping = $targetMapping;
     }

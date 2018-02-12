@@ -87,6 +87,14 @@ final class DomainIdentityHelper
         return array_values($this->mapping->getIdentity($object));
     }
 
+    /**
+     * @return string[]
+     */
+    public function getIdentifierFieldNames(string $class): array
+    {
+        return $this->mapping->getIdentifierFieldNames($class);
+    }
+
     public function isIdentity(string $class, array $value): bool
     {
         if (!$value || count($value) !== count($fields = $this->mapping->getIdentifierFieldNames($class)) || in_array(null, $value, true)) {
