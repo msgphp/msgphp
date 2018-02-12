@@ -3,13 +3,15 @@
 A static factory is a utility class, it cannot be initialized as a new instance using `new ...();`. Its purpose is to
 factorize a known implementation for a given class.
 
-## `MsgPhp\Domain\Factory\DomainIdFactory`
+## Implementations
+
+### `MsgPhp\Domain\Factory\DomainIdFactory`
 
 Factorize an [identifier](../identifiers.md) from any primitive value.
 
 - `static create($value): DomainIdInterface`
 
-### Basic example
+#### Basic example
 
 ```php
 <?php
@@ -25,13 +27,13 @@ $id = DomainIdFactory::create(1);
 $uuid = DomainIdFactory::create('cf3d2f85-6c86-44d1-8634-af51c91a9a74');
 ```
 
-## `MsgPhp\Domain\Factory\DomainCollectionFactory`
+### `MsgPhp\Domain\Factory\DomainCollectionFactory`
 
 Factorizes a [collection](../collections.md) from any primitive iterable value.
 
 - `static create(?iterable $value): DomainCollectionInterface`
 
-### Basic example
+#### Basic example
 
 ```php
 <?php
