@@ -1,7 +1,7 @@
 # Identities
 
-A domain identity is a composite value of individual identifier values. Its usage is to uniquely identify a domain
-object, and therefor qualifying it an entity object.
+A domain identity is a composite value of one or more individual identifier values, indexed by an identifier field name.
+Its usage is to uniquely identify a domain object, and therefor qualifying it an entity object.
 
 Identifier values can be of any type, e.g. a [domain identifier](identifiers.md), another (foreign) entity object, or
 any primitive value.
@@ -20,16 +20,16 @@ object.
 
 ### `isEmptyIdentifier($value): bool`
 
-Tells if `$value` is an empty identifier value. It returns `true` if the specified value is either an empty
-[domain identifier](identifiers.md) or an entity object without identity.
+Tells if `$value` is a known empty identifier value. It returns `true` if the specified value is either `null`, an empty
+[domain identifier](identifiers.md) or an entity object without its identity set.
 
 ---
 
 ### `normalizeIdentifier($value)`
 
-Returns the primitive identifier value of `$value`. Empty identifier values (see above) are normalized as `null`,
-otherwise a [domain identifier](identifiers.md) is returns its string value whereas an entity object returns its
-identity value. All other types values are returned as is.
+Returns the primitive identifier value of `$value`. Empty identifier values (see `isEmptyIdentifier()`) are normalized
+as `null`, a [domain identifier](identifiers.md) as string value and an entity object as normalized identity value.
+A value of any other type is returned as is.
 
 ---
 
@@ -46,22 +46,23 @@ See also `DomainIdentityMappingInterface::getIdentifierFieldNames()`.
 
 ---
 
-### `isIdentity(string $class, array $value): bool`
+### `isIdentity(string $class, $value): bool`
 
-Tells if `$value` is a valid identity for type `$class`. An identity value is considered valid if it's exactly indexed
-with all available identifier field names.
+Tells if `$value` is a valid identity for type `$class`. An identity value is considered valid if an entity object uses
+a single identifier value as identity and `$value` is a non empty identifier (see `isEmptyIdentifier()`).
 
----
-
-### `toIdentity(string $class, $id, ...$idN): ?array`
-
-Returns an identity value for `$classs` from individual identifier values, or `null` if the final identity is invalid.
-To get a valid identity the number of given identifies must exactly match the number of available identifier field
-names.
+In case of one or more identifier values, given in the form of an array, its keys must exactly match the available
+identifier field names and its values must contain no empty identifiers.
 
 ---
 
-### `getIdentity(object $object): ?array`
+### `toIdentity(string $class, $value): array`
 
-Returns the actual identifier values of `$object`, or `null` if the object has no identity set. Each identifier value is
-keyed by its corresponding identifier field name. See also `DomainIdentityMappingInterface::getIdentity()`.
+Returns a composite identity value for `$class` from `$value`.
+
+---
+
+### `getIdentity(object $object): array`
+
+Returns the actual, non empty, identifier values of `$object`. Each identifier value is keyed by its corresponding
+identifier field name. ee also `DomainIdentityMappingInterface::getIdentity()`.

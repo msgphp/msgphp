@@ -49,11 +49,11 @@ trait DomainEntityRepositoryTrait
      */
     private function doFind($id)
     {
-        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
+        if (!$this->identityHelper->isIdentity($this->class, $id)) {
             throw EntityNotFoundException::createForId($this->class, $id);
         }
 
-        return $this->doFindByFields($identity);
+        return $this->doFindByFields($this->identityHelper->toIdentity($this->class, $id));
     }
 
     /**
@@ -82,11 +82,11 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id): bool
     {
-        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
+        if (!$this->identityHelper->isIdentity($this->class, $id)) {
             return false;
         }
 
-        return $this->doExistsByFields($identity);
+        return $this->doExistsByFields($this->identityHelper->toIdentity($this->class, $id));
     }
 
     private function doExistsByFields(array $fields): bool

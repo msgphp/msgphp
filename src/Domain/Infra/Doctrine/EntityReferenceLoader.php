@@ -34,10 +34,10 @@ final class EntityReferenceLoader
             return null;
         }
 
-        if (null === $identity = $this->identityHelper->toIdentity($class, $id)) {
+        if (!$this->identityHelper->isIdentity($class, $id)) {
             return null;
         }
 
-        return $this->em->getReference($class, $identity);
+        return $this->em->getReference($class, $this->identityHelper->toIdentity($class, $id));
     }
 }

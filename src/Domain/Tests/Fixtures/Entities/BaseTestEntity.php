@@ -17,7 +17,11 @@ abstract class BaseTestEntity
         $entity = new static();
 
         foreach ($fields as $field => $value) {
-            $entity->$field = $value;
+            if (method_exists($entity, $method = 'set'.ucfirst($field))) {
+                $entity->$method($value);
+            } else {
+                $entity->$field = $value;
+            }
         }
 
         return $entity;

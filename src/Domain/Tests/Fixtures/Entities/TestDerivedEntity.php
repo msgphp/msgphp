@@ -30,7 +30,7 @@ class TestDerivedEntity extends BaseTestEntity
             $entity = TestEntity::create(['intField' => 0, 'boolField' => true]);
 
             // https://github.com/doctrine/doctrine2/issues/4584
-            $entity->identify(new DomainId('IRRELEVANT'));
+            $entity->setId(new DomainId('IRRELEVANT'));
         }
 
         return [

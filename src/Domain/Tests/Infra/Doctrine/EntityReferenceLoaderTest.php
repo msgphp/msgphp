@@ -16,15 +16,49 @@ final class EntityReferenceLoaderTest extends TestCase
     public function testInvoke(): void
     {
         $loader = new EntityReferenceLoader(self::$em, ['alias' => Entities\TestEntity::class]);
+        $id = $this->createMock(DomainIdInterface::class);
+        $id->expects($this->any())
+            ->method('isEmpty')
+            ->willReturn(false);
 
-        $this->assertNull($loader(\stdClass::class, []));
-        $this->assertInstanceOf(Entities\TestEntity::class, $entity = $loader('alias', $id = $this->createMock(DomainIdInterface::class)));
+        $this->assertInstanceOf(Entities\TestEntity::class, $entity = $loader('alias', $id));
         $this->assertSame($id, $entity->getId());
-        $this->assertInstanceOf(Entities\TestCompositeEntity::class, $entity = $loader(Entities\TestCompositeEntity::class, ['idA' => $id = $this->createMock(DomainIdInterface::class), 'idB' => 'b']));
+        $this->assertInstanceOf(Entities\TestCompositeEntity::class, $entity = $loader(Entities\TestCompositeEntity::class, ['idA' => $id, 'idB' => 'b']));
         $this->assertSame($id, $entity->idA);
         $this->assertSame('b', $entity->idB);
-        $this->assertInstanceOf(Entities\TestPrimitiveEntity::class, $loader(Entities\TestPrimitiveEntity::class, ['id' => 1]));
-        $this->assertNull($loader(Entities\TestPrimitiveEntity::class, ['id' => 1, 'foo' => 2]));
+        $this->assertInstanceOf(Entities\TestPrimitiveEntity::class, $entity = $loader(Entities\TestPrimitiveEntity::class, ['id' => $id]));
+        $this->assertSame($id, $entity->id);
+    }
+
+    public function testInvokeWithEmptyIdentifier(): void
+    {
+        $loader = new EntityReferenceLoader(self::$em);
+        $emptyId = $this->createMock(DomainIdInterface::class);
+        $emptyId->expects($this->any())
+            ->method('isEmpty')
+            ->willReturn(true);
+        $id = $this->createMock(DomainIdInterface::class);
+        $id->expects($this->any())
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        $this->assertNull($loader(\stdClass::class, null));
+        $this->assertNull($loader(\stdClass::class, []));
+        $this->assertNull($loader(Entities\TestEntity::class, $emptyId));
+        $this->assertNull($loader(Entities\TestPrimitiveEntity::class, ['id' => $emptyId]));
+        $this->assertNull($loader(Entities\TestCompositeEntity::class, ['idA' => $id, 'idB' => $emptyId]));
+        $this->assertNull($loader(Entities\TestDerivedCompositeEntity::class, ['entity' => Entities\TestPrimitiveEntity::create(['id' => $emptyId]), 'id' => 0]));
+    }
+
+    public function testInvokeWithInvalidIdentifier(): void
+    {
+        $loader = new EntityReferenceLoader(self::$em);
+        $id = $this->createMock(DomainIdInterface::class);
+        $id->expects($this->any())
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        $this->assertNull($loader(Entities\TestPrimitiveEntity::class, ['id' => $id, 'foo' => 'bar']));
     }
 
     public function testInvokeWithInvalidClass(): void

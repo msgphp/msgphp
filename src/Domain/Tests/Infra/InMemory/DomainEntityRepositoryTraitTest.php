@@ -54,7 +54,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
             $testEntity = $entity instanceof Entities\TestDerivedEntity ? $entity->entity : $entity;
 
             if ($testEntity instanceof Entities\TestEntity && $testEntity->getId()->isEmpty()) {
-                $testEntity->identify(new DomainId(bin2hex(random_bytes(32))));
+                $testEntity->setId(new DomainId(bin2hex(random_bytes(32))));
             }
 
             self::$memory->persist($entity);

@@ -58,7 +58,7 @@ class TestEntity extends BaseTestEntity
         ];
     }
 
-    final public function identify(DomainIdInterface $id): void
+    final public function setId(DomainIdInterface $id): void
     {
         $this->id = $id;
     }

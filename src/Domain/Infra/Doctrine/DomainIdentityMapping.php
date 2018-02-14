@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\Doctrine;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainIdentityMappingInterface;
+use MsgPhp\Domain\{DomainIdentityMappingInterface, DomainIdInterface};
 use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
@@ -26,9 +26,19 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
         return $this->getMetadata($class)->getIdentifierFieldNames();
     }
 
-    public function getIdentity($object): ?array
+    public function getIdentity($object): array
     {
-        return $this->getMetadata(get_class($object))->getIdentifierValues($object) ?: null;
+        return array_filter($this->getMetadata(get_class($object))->getIdentifierValues($object), function ($value) {
+            if ($value instanceof DomainIdInterface) {
+                return !$value->isEmpty();
+            }
+
+            if (is_object($value)) {
+                return (bool) $this->getIdentity($value);
+            }
+
+            return null !== $value;
+        });
     }
 
     private function getMetadata(string $class): ClassMetadata
