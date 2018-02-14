@@ -14,16 +14,13 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $factory;
     private $identifierMapping;
-    private $referenceLoaders;
+    private $referenceLoader;
 
-    /**
-     * @param callable[] $referenceLoaders
-     */
-    public function __construct(DomainObjectFactoryInterface $factory, array $identifierMapping, iterable $referenceLoaders = [])
+    public function __construct(DomainObjectFactoryInterface $factory, array $identifierMapping, callable $referenceLoader = null)
     {
         $this->factory = $factory;
         $this->identifierMapping = $identifierMapping;
-        $this->referenceLoaders = $referenceLoaders;
+        $this->referenceLoader = $referenceLoader;
     }
 
     public function create(string $class, array $context = [])
@@ -31,26 +28,26 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         return $this->factory->create($class, $context);
     }
 
-    public function reference(string $class, $id, ...$idN)
+    public function reference(string $class, $id)
     {
-        array_unshift($idN, $id);
+        if (null === $this->referenceLoader) {
+            throw new \LogicException('No reference loader set.');
+        }
 
-        foreach ($this->referenceLoaders as $loader) {
-            if (is_object($object = $loader($class, $idN))) {
-                return $object;
-            }
+        if (is_object($object = ($this->referenceLoader)($class, $id))) {
+            return $object;
         }
 
         throw new \RuntimeException(sprintf('Unable to create a reference object for "%s".', $class));
     }
 
-    public function identify(string $class, $id): DomainIdInterface
+    public function identify(string $class, $value): DomainIdInterface
     {
-        if ($id instanceof DomainIdInterface) {
-            return $id;
+        if ($value instanceof DomainIdInterface) {
+            return $value;
         }
 
-        $object = $this->factory->create($this->identifierMapping[$class] ?? $class, [$id]);
+        $object = $this->factory->create($this->identifierMapping[$class] ?? $class, [$value]);
 
         if (!$object instanceof DomainIdInterface) {
             throw InvalidClassException::create($class);

@@ -66,12 +66,12 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
 
     public function find(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): UserAttributeValue
     {
-        return $this->doFind(...func_get_args());
+        return $this->doFind(['user' => $userId, 'attributeValue' => $attributeValueId]);
     }
 
     public function exists(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): bool
     {
-        return $this->doExists(...func_get_args());
+        return $this->doExists(['user' => $userId, 'attributeValue' => $attributeValueId]);
     }
 
     public function save(UserAttributeValue $userAttributeValue): void

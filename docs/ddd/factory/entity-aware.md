@@ -19,14 +19,13 @@ Inherited from `MsgPhp\Domain\Factory\DomainObjectFactoryInterface::create()`.
 
 ---
 
-### `reference(string $class, $id, ...$idN): object`
+### `reference(string $class, $id): object`
 
-Returns a reference for a known entity object. Depending on the implementation the reference object might be partially
-loaded. Meaning one can only safely rely on the entity identifier values being available.
+Returns a reference for a known existing entity object.
 
 ---
 
-### `identify(string $class, $id): DomainIdInterface`
+### `identify(string $class, $value): DomainIdInterface`
 
 Returns an identifier for the given entity class from a known primitive value.
 
@@ -83,14 +82,16 @@ class Some
 
 $realFactory = ...;
 
-$factory = new EntityAwareFactory($realFactory, [], [
-    function (string $class, array $ids) {
-        return new $class(...$ids);
-    },
-]);
+$factory = new EntityAwareFactory($realFactory, [], function (string $class, $id) {
+    if (MyCompositeEntity::class === $class && is_array($id)) {
+        return new $class($id['idA'] ?? null, $id['idB'] ?? null);
+    }
+
+    return new $class($id);
+});
 
 /** @var Some $object */
 $object = $factory->create(Some::class, [
-    'entity' => $factory->reference(MyCompositeEntity::class, 'id-a', 'id-b'),
+    'entity' => $factory->reference(MyCompositeEntity::class, ['idA' => 1, 'idB' => 2]),
 ]);
 ```

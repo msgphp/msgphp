@@ -98,7 +98,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         $repository = static::createRepository($class);
 
         try {
-            $repository->doFind(...$ids);
+            $repository->doFind($ids);
 
             $this->fail();
         } catch (EntityNotFoundException $e) {
@@ -107,7 +107,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         $this->loadEntities($entity);
 
-        $this->assertEntityEquals($entity, $repository->doFind(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+        $this->assertEntityEquals($entity, $repository->doFind(Entities\BaseTestEntity::getPrimaryIds($entity)));
     }
 
     /**
@@ -173,11 +173,11 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = static::createRepository($class);
 
-        $this->assertFalse($repository->doExists(...$ids));
+        $this->assertFalse($repository->doExists($ids));
 
         $this->loadEntities($entity);
 
-        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+        $this->assertTrue($repository->doExists(Entities\BaseTestEntity::getPrimaryIds($entity)));
     }
 
     /**
@@ -223,7 +223,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
     {
         $repository = static::createRepository($class);
 
-        $this->assertFalse($repository->doExists(...$ids));
+        $this->assertFalse($repository->doExists($ids));
 
         $repository->doSave($entity);
 
@@ -235,7 +235,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
             }
         }
 
-        $this->assertTrue($repository->doExists(...Entities\BaseTestEntity::getPrimaryIds($entity)));
+        $this->assertTrue($repository->doExists(Entities\BaseTestEntity::getPrimaryIds($entity)));
     }
 
     public function testSaveUpdates(): void
@@ -292,11 +292,11 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         static::flushEntities([$entity]);
 
-        $this->assertTrue($repository->doExists(...$ids = Entities\BaseTestEntity::getPrimaryIds($entity)));
+        $this->assertTrue($repository->doExists($ids = Entities\BaseTestEntity::getPrimaryIds($entity)));
 
         $repository->doDelete($entity);
 
-        $this->assertFalse($repository->doExists(...$ids));
+        $this->assertFalse($repository->doExists($ids));
     }
 
     public function provideEntityTypes(): iterable

@@ -9,18 +9,13 @@ namespace MsgPhp\Domain\Exception;
  */
 final class EntityNotFoundException extends \RuntimeException implements DomainExceptionInterface
 {
-    public static function createForId(string $entity, $id, ...$idN): self
+    public static function createForId(string $class, $id): self
     {
-        if ($idN) {
-            $id = func_get_args();
-            array_shift($id);
-        }
-
-        return new self(sprintf('Entity "%s" with identifier %s cannot be found.', $entity, json_encode($id)));
+        return new self(sprintf('Entity "%s" with identifier %s cannot be found.', $class, json_encode($id)));
     }
 
-    public static function createForFields(string $entity, array $fields): self
+    public static function createForFields(string $class, array $fields): self
     {
-        return new self(sprintf('Entity "%s" with fields matching %s cannot be found.', $entity, json_encode($fields)));
+        return new self(sprintf('Entity "%s" with fields matching %s cannot be found.', $class, json_encode($fields)));
     }
 }

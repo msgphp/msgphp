@@ -29,7 +29,7 @@ final class UserSecondaryEmailRepository implements UserSecondaryEmailRepository
 
     public function find(UserIdInterface $userId, string $email): UserSecondaryEmail
     {
-        return $this->doFind(...func_get_args());
+        return $this->doFind(['user' => $userId, 'email' => $email]);
     }
 
     public function findPendingPrimary(UserIdInterface $userId): UserSecondaryEmail
@@ -49,7 +49,7 @@ final class UserSecondaryEmailRepository implements UserSecondaryEmailRepository
 
     public function exists(UserIdInterface $userId, string $email): bool
     {
-        return $this->doExists(...func_get_args());
+        return $this->doExists(['user' => $userId, 'email' => $email]);
     }
 
     public function save(UserSecondaryEmail $userSecondaryEmail): void

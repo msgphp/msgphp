@@ -28,16 +28,16 @@ abstract class BaseTestEntity
         $ids = $primitives = [];
 
         foreach ($entity::getIdFields() as $field) {
-            $ids[] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->$method() : $entity->$field;
+            $ids[$field] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->$method() : $entity->$field;
 
             if ($id instanceof DomainIdInterface) {
-                $primitives[] = $id->isEmpty() ? null : $id->toString();
+                $primitives[$field] = $id->isEmpty() ? null : $id->toString();
             } elseif ($id instanceof self) {
                 self::getPrimaryIds($id, $nestedPrimitives);
 
-                $primitives[] = $nestedPrimitives;
+                $primitives[$field] = $nestedPrimitives;
             } else {
-                $primitives[] = $id;
+                $primitives[$field] = $id;
             }
         }
 

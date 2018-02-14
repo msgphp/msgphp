@@ -103,12 +103,12 @@ final class UsernameRepository implements UsernameRepositoryInterface
 
     public function find(UserIdInterface $userId, string $username): Username
     {
-        return $this->doFind(...func_get_args());
+        return $this->doFind(['user' => $userId, 'username' => $username]);
     }
 
     public function exists(UserIdInterface $userId, string $username): bool
     {
-        return $this->doExists(...func_get_args());
+        return $this->doExists(['user' => $userId, 'username' => $username]);
     }
 
     public function save(Username $user): void

@@ -57,12 +57,10 @@ trait DomainEntityRepositoryTrait
     /**
      * @return object
      */
-    private function doFind($id, ...$idN)
+    private function doFind($id)
     {
-        $identity = $this->identityHelper->toIdentity($this->class, ...$ids = func_get_args());
-
-        if (null === $identity) {
-            throw EntityNotFoundException::createForId($this->class, ...$ids);
+        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
+            throw EntityNotFoundException::createForId($this->class, $id);
         }
 
         return $this->doFindByFields($identity);
@@ -78,17 +76,15 @@ trait DomainEntityRepositoryTrait
         }
 
         if ($this->identityHelper->isIdentity($this->class, $fields)) {
-            throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
+            throw EntityNotFoundException::createForId($this->class, $fields);
         }
 
         throw EntityNotFoundException::createForFields($this->class, $fields);
     }
 
-    private function doExists($id, ...$idN): bool
+    private function doExists($id): bool
     {
-        $identity = $this->identityHelper->toIdentity($this->class, ...func_get_args());
-
-        if (null === $identity) {
+        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
             return false;
         }
 
@@ -115,8 +111,8 @@ trait DomainEntityRepositoryTrait
             return;
         }
 
-        if ($this->doExists(...$ids = array_values($this->identityHelper->getIdentity($entity)))) {
-            throw DuplicateEntityException::createForId(get_class($entity), ...$ids);
+        if ($this->doExists($id = $this->identityHelper->getIdentity($entity))) {
+            throw DuplicateEntityException::createForId(get_class($entity), $id);
         }
 
         $this->memory->persist($entity);

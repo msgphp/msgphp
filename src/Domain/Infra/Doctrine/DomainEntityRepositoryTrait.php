@@ -47,12 +47,10 @@ trait DomainEntityRepositoryTrait
     /**
      * @return object
      */
-    private function doFind($id, ...$idN)
+    private function doFind($id)
     {
-        $identity = $this->identityHelper->toIdentity($this->class, ...$ids = func_get_args());
-
-        if (null === $identity) {
-            throw EntityNotFoundException::createForId($this->class, ...$ids);
+        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
+            throw EntityNotFoundException::createForId($this->class, $id);
         }
 
         return $this->doFindByFields($identity);
@@ -73,7 +71,7 @@ trait DomainEntityRepositoryTrait
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
             if ($this->identityHelper->isIdentity($this->class, $fields)) {
-                throw EntityNotFoundException::createForId($this->class, ...array_values($fields));
+                throw EntityNotFoundException::createForId($this->class, $fields);
             }
 
             throw EntityNotFoundException::createForFields($this->class, $fields);
@@ -82,11 +80,9 @@ trait DomainEntityRepositoryTrait
         return $entity;
     }
 
-    private function doExists($id, ...$idN): bool
+    private function doExists($id): bool
     {
-        $identity = $this->identityHelper->toIdentity($this->class, ...func_get_args());
-
-        if (null === $identity) {
+        if (null === $identity = $this->identityHelper->toIdentity($this->class, $id)) {
             return false;
         }
 
@@ -117,7 +113,7 @@ trait DomainEntityRepositoryTrait
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(get_class($entity), ...array_values($this->em->getClassMetadata($this->class)->getIdentifierValues($entity)));
+            throw DuplicateEntityException::createForId(get_class($entity), $this->identityHelper->getIdentity($entity));
         }
     }
 

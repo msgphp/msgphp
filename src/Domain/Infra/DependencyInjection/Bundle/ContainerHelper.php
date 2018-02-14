@@ -9,7 +9,6 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use MsgPhp\Domain\Factory\EntityReferenceLoader;
 use MsgPhp\Domain\Infra\SimpleBus as SimpleBusInfra;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -18,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -204,33 +202,14 @@ final class ContainerHelper
             return;
         }
 
-        $locatorMap = $methodMap = [];
         foreach ($repositoryMapping as $repository => $class) {
-            if (is_array($class)) {
-                list($class, $method) = $class;
-            } else {
-                $method = 'find';
-            }
-
             if (null === $class || !isset($classMapping[$class])) {
                 self::removeDefinitionWithAliases($container, $repository);
                 continue;
             }
 
-            $locatorMap[$class] = $locatorMap[$classMapping[$class]] = new Reference($repository);
-            $methodMap[$class] = $methodMap[$classMapping[$class]] = $method;
-
             $container->getDefinition($repository)
                 ->setArgument('$class', $classMapping[$class]);
-        }
-
-        if ($locatorMap) {
-            self::registerAnonymous($container, EntityReferenceLoader::class)
-                ->addTag('msgphp.domain.entity_reference_loader')
-                ->setArgument('$repositoryLocator', self::registerAnonymous($container, ServiceLocator::class)
-                    ->addTag('container.service_locator')
-                    ->addArgument($locatorMap))
-                ->setArgument('$methodMap', $methodMap);
         }
     }
 

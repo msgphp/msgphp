@@ -26,7 +26,7 @@ final class EntityReferenceLoader
     /**
      * @return null|object
      */
-    public function __invoke(string $class, array $ids)
+    public function __invoke(string $class, $id)
     {
         $class = $this->classMapping[$class] ?? $class;
 
@@ -34,6 +34,10 @@ final class EntityReferenceLoader
             return null;
         }
 
-        return $this->em->getReference($class, $this->identityHelper->toIdentity($class, ...$ids));
+        if (null === $identity = $this->identityHelper->toIdentity($class, $id)) {
+            return null;
+        }
+
+        return $this->em->getReference($class, $identity);
     }
 }

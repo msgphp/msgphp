@@ -14,9 +14,9 @@ interface EntityAwareFactoryInterface extends DomainObjectFactoryInterface
     /**
      * @return object
      */
-    public function reference(string $class, $id, ...$idN);
+    public function reference(string $class, $id);
 
-    public function identify(string $class, $id): DomainIdInterface;
+    public function identify(string $class, $value): DomainIdInterface;
 
     public function nextIdentifier(string $class): DomainIdInterface;
 }

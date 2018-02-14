@@ -38,7 +38,7 @@ $this->doFindAllByFields(['field' => ['one', 'of', 'these']);
 
 ---
 
-### `doFind($id, ...$idN): object`
+### `doFind($id): object`
 
 Finds a single entity by its identity.
 
@@ -50,7 +50,7 @@ Finds the first entity matching all specified fields.
 
 ---
 
-### `doExists($id, ...$idN): bool`
+### `doExists($id): bool`
 
 Verify if an entity exists by its identity.
 
@@ -84,7 +84,6 @@ class MyGenericRepository
 {
     use DomainEntityRepositoryTrait {
         doFind as public find;
-        doExists as public exists;
     }
 }
 

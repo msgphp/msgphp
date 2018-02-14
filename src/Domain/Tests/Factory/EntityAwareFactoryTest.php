@@ -36,21 +36,13 @@ final class EntityAwareFactoryTest extends TestCase
                 return $o;
             });
 
-        $this->factory = new EntityAwareFactory($innerFactory, ['alias_id' => 'id'], [
-            function () {
-                return null;
-            },
-            function ($class, $identity) {
-                $o = new \stdClass();
-                $o->class = $class;
-                $o->identity = $identity;
+        $this->factory = new EntityAwareFactory($innerFactory, ['alias_id' => 'id'], function ($class, $id) {
+            $o = new \stdClass();
+            $o->class = $class;
+            $o->id = $id;
 
-                return $o;
-            },
-            function () {
-                return new \stdClass();
-            },
-        ]);
+            return $o;
+        });
     }
 
     public function testCreate(): void
@@ -64,9 +56,29 @@ final class EntityAwareFactoryTest extends TestCase
     public function testReference(): void
     {
         $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('foo', 1));
-        $this->assertSame(['class' => 'foo', 'identity' => [1]], (array) $object);
-        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('bar', 1, '2'));
-        $this->assertSame(['class' => 'bar', 'identity' => [1, '2']], (array) $object);
+        $this->assertSame(['class' => 'foo', 'id' => 1], (array) $object);
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('bar', ['id' => 1, 'foo' => '2']));
+        $this->assertSame(['class' => 'bar', 'id' => ['id' => 1, 'foo' => '2']], (array) $object);
+    }
+
+    public function testReferenceWithoutLoader(): void
+    {
+        $factory = new EntityAwareFactory($this->createMock(DomainObjectFactoryInterface::class), []);
+
+        $this->expectException(\LogicException::class);
+
+        $factory->reference('foo', 1);
+    }
+
+    public function testReferenceWithoutResult(): void
+    {
+        $factory = new EntityAwareFactory($this->createMock(DomainObjectFactoryInterface::class), [], function ($class, $id) {
+            return null;
+        });
+
+        $this->expectException(\RuntimeException::class);
+
+        $factory->reference('foo', 1);
     }
 
     public function testIdentify(): void

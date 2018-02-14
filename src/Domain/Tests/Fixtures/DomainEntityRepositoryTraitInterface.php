@@ -12,11 +12,11 @@ interface DomainEntityRepositoryTraitInterface
 
     public function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
-    public function doFind($id, ...$idN);
+    public function doFind($id);
 
     public function doFindByFields(array $fields);
 
-    public function doExists($id, ...$idN): bool;
+    public function doExists($id): bool;
 
     public function doExistsByFields(array $fields): bool;
 

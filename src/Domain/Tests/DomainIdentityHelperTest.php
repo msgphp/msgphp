@@ -176,11 +176,12 @@ final class DomainIdentityHelperTest extends TestCase
     {
         $helper = new DomainIdentityHelper($this->mapping);
 
-        $this->assertSame(['idA' => 'a', 'idB' => 'b'], $helper->toIdentity(Entities\TestCompositeEntity::class, 'a', 'b'));
-        $this->assertNull($helper->toIdentity(Entities\TestCompositeEntity::class, 'a', null));
+        $this->assertSame(['idA' => 'a', 'idB' => 'b'], $helper->toIdentity(Entities\TestCompositeEntity::class, (['idA' => 'a', 'idB' => 'b'])));
+        $this->assertNull($helper->toIdentity(Entities\TestCompositeEntity::class, ['idA' => 'a', 'idB' => 'b', 'foo' => 'bar']));
+        $this->assertNull($helper->toIdentity(Entities\TestCompositeEntity::class, ['idA' => 'a', 'idB' => null]));
         $this->assertSame(['id' => 1], $helper->toIdentity(Entities\TestPrimitiveEntity::class, 1));
         $this->assertNull($helper->toIdentity(Entities\TestPrimitiveEntity::class, null));
-        $this->assertNull($helper->toIdentity(Entities\TestPrimitiveEntity::class, 1, 'foo'));
+        $this->assertNull($helper->toIdentity(Entities\TestPrimitiveEntity::class, ['id' => 1, 'foo' => 'bar']));
     }
 
     public function testToIdentityWithInvalidClass(): void

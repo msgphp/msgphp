@@ -104,15 +104,21 @@ final class DomainIdentityHelper
         return [] === array_diff(array_keys($value), $fields);
     }
 
-    public function toIdentity(string $class, $id, ...$idN): ?array
+    public function toIdentity(string $class, $value): ?array
     {
-        array_unshift($idN, $id);
-
-        if (count($idN) !== count($fields = $this->mapping->getIdentifierFieldNames($class)) || in_array(null, $idN, true)) {
+        if (null === $value || 0 === $count = count($fields = $this->mapping->getIdentifierFieldNames($class))) {
             return null;
         }
 
-        return array_combine($fields, $idN);
+        if (!is_array($value)) {
+            return 1 === $count ? [reset($fields) => $value] : null;
+        }
+
+        if ([] !== array_diff(array_keys($value), $fields) || in_array(null, $value, true)) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

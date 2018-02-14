@@ -29,12 +29,12 @@ final class UserRoleRepository implements UserRoleRepositoryInterface
 
     public function find(UserIdInterface $userId, string $role): UserRole
     {
-        return $this->doFind(...func_get_args());
+        return $this->doFind(['user' => $userId, 'role' => $role]);
     }
 
     public function exists(UserIdInterface $userId, string $role): bool
     {
-        return $this->doExists(...func_get_args());
+        return $this->doExists(['user' => $userId, 'role' => $role]);
     }
 
     public function save(UserRole $userRole): void

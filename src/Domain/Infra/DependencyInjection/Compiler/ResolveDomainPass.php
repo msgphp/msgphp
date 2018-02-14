@@ -10,7 +10,6 @@ use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
 use SimpleBus\Message\Bus\MessageBus as SimpleMessageBus;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -81,13 +80,6 @@ final class ResolveDomainPass implements CompilerPassInterface
         $idClassMapping = array_merge(...$container->getParameter($param = 'msgphp.domain.id_class_mapping'));
         $container->getParameterBag()->remove($param);
 
-        if ($container->has(DoctrineEntityManager::class)) {
-            ContainerHelper::registerAnonymous($container, DoctrineInfra\EntityReferenceLoader::class)
-                ->setAutowired(true)
-                ->setArgument('$classMapping', $classMapping)
-                ->addTag('msgphp.domain.entity_reference_loader', ['priority' => 100]);
-        }
-
         self::register($container, Factory\DomainObjectFactory::class)
             ->addMethodCall('setNestedFactory', [new Reference(Factory\DomainObjectFactoryInterface::class)]);
 
@@ -96,10 +88,15 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setArgument('$mapping', $classMapping)
             ->setArgument('$factory', new Reference(Factory\ClassMappingObjectFactory::class.'.inner'));
 
-        self::register($container, Factory\EntityAwareFactory::class)
+        $entityFactory = self::register($container, Factory\EntityAwareFactory::class)
             ->setArgument('$factory', new Reference(Factory\DomainObjectFactory::class))
-            ->setArgument('$identifierMapping', $idClassMapping)
-            ->setArgument('$referenceLoaders', new TaggedIteratorArgument('msgphp.domain.entity_reference_loader'));
+            ->setArgument('$identifierMapping', $idClassMapping);
+
+        if ($container->has(DoctrineEntityManager::class)) {
+            $entityFactory->setArgument('$referenceLoader', ContainerHelper::registerAnonymous($container, DoctrineInfra\EntityReferenceLoader::class)
+                ->setAutowired(true)
+                ->setArgument('$classMapping', $classMapping));
+        }
 
         self::alias($container, Factory\DomainObjectFactoryInterface::class, Factory\EntityAwareFactory::class);
         self::alias($container, Factory\EntityAwareFactoryInterface::class, Factory\EntityAwareFactory::class);
