@@ -44,7 +44,7 @@ final class DomainIdentityHelper
 
         if (is_object($value)) {
             try {
-                if (!$this->mapping->getIdentity($value)) {
+                if (null === $this->mapping->getIdentity($value)) {
                     return true;
                 }
             } catch (InvalidClassException $e) {
@@ -62,7 +62,7 @@ final class DomainIdentityHelper
 
         if (is_object($value)) {
             try {
-                if (!$identity = $this->mapping->getIdentity($value)) {
+                if (null === $identity = $this->mapping->getIdentity($value)) {
                     return null;
                 }
             } catch (InvalidClassException $e) {
@@ -84,7 +84,7 @@ final class DomainIdentityHelper
      */
     public function getIdentifiers($object): array
     {
-        return array_values($this->mapping->getIdentity($object));
+        return null === ($identity = $this->mapping->getIdentity($object)) ? [] : array_values($identity);
     }
 
     /**
@@ -124,7 +124,7 @@ final class DomainIdentityHelper
     /**
      * @param object $object
      */
-    public function getIdentity($object): array
+    public function getIdentity($object): ?array
     {
         return $this->mapping->getIdentity($object);
     }

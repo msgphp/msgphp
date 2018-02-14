@@ -23,23 +23,15 @@ final class DomainIdentityHelperTest extends TestCase
                     return $class::getIdFields();
                 }
 
-                if (\stdClass::class === $class) {
-                    return [];
-                }
-
                 throw InvalidClassException::create($class);
             });
         $this->mapping->expects($this->any())
             ->method('getIdentity')
-            ->willReturnCallback(function ($object): array {
+            ->willReturnCallback(function ($object): ?array {
                 if ($object instanceof Entities\BaseTestEntity) {
-                    return array_filter(array_combine($object::getIdFields(), Entities\BaseTestEntity::getPrimaryIds($object)), function ($value): bool {
+                    return array_filter(Entities\BaseTestEntity::getPrimaryIds($object), function ($value): bool {
                         return null !== $value;
-                    });
-                }
-
-                if ($object instanceof \stdClass) {
-                    return [];
+                    }) ?: null;
                 }
 
                 throw InvalidClassException::create(get_class($object));
@@ -53,7 +45,6 @@ final class DomainIdentityHelperTest extends TestCase
         $this->assertTrue($helper->isIdentifier($this->createMock(DomainIdInterface::class)));
         $this->assertTrue($helper->isIdentifier(Entities\TestEntity::create()));
         $this->assertTrue($helper->isIdentifier(Entities\TestCompositeEntity::create()));
-        $this->assertFalse($helper->isIdentifier(new \stdClass()));
         $this->assertFalse($helper->isIdentifier(new class() {
         }));
     }
@@ -74,7 +65,6 @@ final class DomainIdentityHelperTest extends TestCase
         $this->assertTrue($helper->isEmptyIdentifier(null));
         $this->assertTrue($helper->isEmptyIdentifier($emptyId));
         $this->assertTrue($helper->isEmptyIdentifier(Entities\TestPrimitiveEntity::create()));
-        $this->assertTrue($helper->isEmptyIdentifier(new \stdClass()));
         $this->assertFalse($helper->isEmptyIdentifier(Entities\TestCompositeEntity::create(['idB' => 'foo'])));
         $this->assertFalse($helper->isEmptyIdentifier($id));
         $this->assertFalse($helper->isEmptyIdentifier(1));
@@ -102,7 +92,6 @@ final class DomainIdentityHelperTest extends TestCase
         $this->assertNull($helper->normalizeIdentifier(null));
         $this->assertNull($helper->normalizeIdentifier($emptyId));
         $this->assertNull($helper->normalizeIdentifier(Entities\TestPrimitiveEntity::create()));
-        $this->assertNull($helper->normalizeIdentifier(new \stdClass()));
         $this->assertSame('id', $helper->normalizeIdentifier($id));
         $this->assertSame('id', $helper->normalizeIdentifier(Entities\TestPrimitiveEntity::create(['id' => 'id'])));
         $this->assertSame(['id'], $helper->normalizeIdentifier(Entities\TestCompositeEntity::create(['idA' => $id])));
@@ -120,7 +109,6 @@ final class DomainIdentityHelperTest extends TestCase
         $this->assertSame(['foo'], $helper->getIdentifiers(Entities\TestPrimitiveEntity::create(['id' => 'foo'])));
         $this->assertSame(['bar'], $helper->getIdentifiers(Entities\TestCompositeEntity::create(['idB' => 'bar'])));
         $this->assertSame([], $helper->getIdentifiers(Entities\TestPrimitiveEntity::create()));
-        $this->assertSame([], $helper->getIdentifiers(new \stdClass()));
     }
 
     public function testGetIdentifiersWithInvalidEntity(): void
@@ -129,8 +117,7 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $helper->getIdentifiers(new class() {
-        });
+        $helper->getIdentifiers(new \stdClass());
     }
 
     public function testGetIdentifierFieldNames(): void
@@ -139,7 +126,6 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->assertSame(['id'], $helper->getIdentifierFieldNames(Entities\TestPrimitiveEntity::class));
         $this->assertSame(['idA', 'idB'], $helper->getIdentifierFieldNames(Entities\TestCompositeEntity::class));
-        $this->assertSame([], $helper->getIdentifierFieldNames(\stdClass::class));
     }
 
     public function testGetIdentifierFieldNamesWithInvalidEntity(): void
@@ -148,7 +134,7 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $helper->getIdentifierFieldNames('foo');
+        $helper->getIdentifierFieldNames(\stdClass::class);
     }
 
     public function testIsIdentity(): void
@@ -169,7 +155,7 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $helper->isIdentity('foo', ['id' => 1]);
+        $helper->isIdentity(\stdClass::class, ['id' => 1]);
     }
 
     public function testToIdentity(): void
@@ -190,7 +176,7 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $helper->toIdentity('foo', 1);
+        $helper->toIdentity(\stdClass::class, 1);
     }
 
     public function testGetIdentity(): void
@@ -199,8 +185,7 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->assertSame(['id' => 'foo'], $helper->getIdentity(Entities\TestPrimitiveEntity::create(['id' => 'foo'])));
         $this->assertSame(['idB' => 'bar'], $helper->getIdentity(Entities\TestCompositeEntity::create(['idB' => 'bar'])));
-        $this->assertSame([], $helper->getIdentity(Entities\TestPrimitiveEntity::create()));
-        $this->assertSame([], $helper->getIdentity(new \stdClass()));
+        $this->assertNull($helper->getIdentity(Entities\TestPrimitiveEntity::create()));
     }
 
     public function testGetIdentityWithInvalidClass(): void
@@ -209,7 +194,6 @@ final class DomainIdentityHelperTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $helper->getIdentity(new class() {
-        });
+        $helper->getIdentity(new \stdClass());
     }
 }

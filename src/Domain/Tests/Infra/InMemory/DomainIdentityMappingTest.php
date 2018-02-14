@@ -25,7 +25,7 @@ final class DomainIdentityMappingTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $mapping->getIdentifierFieldNames('foo');
+        $mapping->getIdentifierFieldNames(\stdClass::class);
     }
 
     public function testGetIdentity(): void
@@ -45,7 +45,7 @@ final class DomainIdentityMappingTest extends TestCase
 
         $this->assertSame(['b' => 2, 'c' => 3], $mapping->getIdentity($object1));
         $this->assertSame(['b' => 2], $mapping->getIdentity($object2));
-        $this->assertSame([], $mapping->getIdentity($object3));
+        $this->assertNull($mapping->getIdentity($object3));
     }
 
     public function testGetIdentityWithInvalidClass(): void

@@ -111,7 +111,7 @@ trait DomainEntityRepositoryTrait
             return;
         }
 
-        if ($this->doExists($id = $this->identityHelper->getIdentity($entity))) {
+        if (null !== ($id = $this->identityHelper->getIdentity($entity)) && $this->doExists($id)) {
             throw DuplicateEntityException::createForId(get_class($entity), $id);
         }
 

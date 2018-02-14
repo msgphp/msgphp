@@ -61,7 +61,7 @@ names.
 
 ---
 
-### `getIdentity(object $object): array`
+### `getIdentity(object $object): ?array`
 
-Returns the actual identifier values of `$object`. Each identifier value is keyed by its corresponding identifier field
-name. See also `DomainIdentityMappingInterface::getIdentity()`.
+Returns the actual identifier values of `$object`, or `null` if the object has no identity set. Each identifier value is
+keyed by its corresponding identifier field name. See also `DomainIdentityMappingInterface::getIdentity()`.

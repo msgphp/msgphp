@@ -30,7 +30,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
         return (array) $this->mapping[$class];
     }
 
-    public function getIdentity($object): array
+    public function getIdentity($object): ?array
     {
         $ids = [];
 
@@ -40,6 +40,6 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
             }
         }
 
-        return $ids;
+        return $ids ?: null;
     }
 }

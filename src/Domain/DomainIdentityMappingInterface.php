@@ -17,5 +17,5 @@ interface DomainIdentityMappingInterface
     /**
      * @param object $object
      */
-    public function getIdentity($object): array;
+    public function getIdentity($object): ?array;
 }
