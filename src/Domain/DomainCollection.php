@@ -26,13 +26,13 @@ final class DomainCollection implements DomainCollectionInterface
 
     public function getIterator(): \Traversable
     {
-        $this->toArray(true);
-
         if ($this->elements instanceof \Traversable) {
             return (function () {
-                foreach ($this->elements as $element) {
-                    yield $element;
+                foreach ($this->elements as $key => $element) {
+                    yield $key => $element;
                 }
+
+                $this->toArray(true);
             })();
         }
 
@@ -43,10 +43,10 @@ final class DomainCollection implements DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $element) {
-                $this->toArray(true);
-
                 return false;
             }
+
+            $this->toArray(true);
 
             return true;
         }
@@ -59,11 +59,11 @@ final class DomainCollection implements DomainCollectionInterface
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $knownElement) {
                 if ($element === $knownElement) {
-                    $this->toArray(true);
-
                     return true;
                 }
             }
+
+            $this->toArray(true);
 
             return false;
         }
@@ -76,11 +76,11 @@ final class DomainCollection implements DomainCollectionInterface
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $knownKey => $element) {
                 if ((string) $key === (string) $knownKey) {
-                    $this->toArray(true);
-
                     return true;
                 }
             }
+
+            $this->toArray(true);
 
             return false;
         }
@@ -92,10 +92,10 @@ final class DomainCollection implements DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $element) {
-                $this->toArray(true);
-
                 return $element;
             }
+
+            $this->toArray(true);
 
             return false;
         }
@@ -115,10 +115,10 @@ final class DomainCollection implements DomainCollectionInterface
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $knownKey => $element) {
                 if ((string) $key === (string) $knownKey) {
-                    $this->toArray(true);
-
                     return $element;
                 }
+
+                $this->toArray(true);
             }
 
             return null;
