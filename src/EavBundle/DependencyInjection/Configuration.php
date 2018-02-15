@@ -39,25 +39,26 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
-        $availableIds = array_values(self::AGGREGATE_ROOTS);
+        $ids = array_values(self::AGGREGATE_ROOTS);
+        $entities = array_keys(self::AGGREGATE_ROOTS);
         $requiredEntities = array_keys(self::REQUIRED_AGGREGATE_ROOTS);
 
         $treeBuilder->root(Extension::ALIAS)
             ->append(
-                ConfigHelper::createClassMappingNode('class_mapping', $requiredEntities, function (array $value) use ($availableIds): array {
-                    return $value + array_fill_keys($availableIds, null);
+                ConfigHelper::createClassMappingNode('class_mapping', $requiredEntities, $entities, function (array $value) use ($ids): array {
+                    return $value + array_fill_keys($ids, null);
                 })
             )
             ->append(
-                ConfigHelper::createClassMappingNode('data_type_mapping', [], function ($value) use ($availableIds): array {
+                ConfigHelper::createClassMappingNode('data_type_mapping', [], [], function ($value) use ($ids): array {
                     if (!is_array($value)) {
-                        $value = array_fill_keys($availableIds, $value);
+                        $value = array_fill_keys($ids, $value);
                     } else {
-                        $value += array_fill_keys($availableIds, null);
+                        $value += array_fill_keys($ids, null);
                     }
 
                     return $value;
-                })->addDefaultChildrenIfNoneSet($availableIds)
+                })->addDefaultChildrenIfNoneSet($ids)
             );
 
         return $treeBuilder;

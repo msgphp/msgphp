@@ -22,7 +22,8 @@ final class ConfigHelper
     public const NATIVE_DATA_TYPES = ['string', 'integer', 'bigint'];
     public const UUID_DATA_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
 
-    public static function createClassMappingNode(string $name, array $required = [], \Closure $normalizer = null, $defaultValue = null, string $prototype = 'scalar', \Closure $prototypeCallback = null, NodeBuilder $builder = null): ArrayNodeDefinition
+    // @todo consider custom node type instead
+    public static function createClassMappingNode(string $name, array $required = [], array $abstracts = [], \Closure $normalizer = null, $defaultValue = null, string $prototype = 'scalar', \Closure $prototypeCallback = null, NodeBuilder $builder = null): ArrayNodeDefinition
     {
         $node = ($builder ?? new NodeBuilder())->arrayNode($name);
         $node->useAttributeAsKey('class');
@@ -47,6 +48,28 @@ final class ConfigHelper
         if (null !== $prototypeCallback) {
             $prototypeCallback($prototype);
         }
+
+        $node->validate()->always(function (array $value) use ($abstracts): array {
+            foreach ($value as $class => $mappedClass) {
+                if (!($isClass = class_exists($class)) && !interface_exists($class)) {
+                    throw new \LogicException(sprintf('A class or interface named "%s" does not exists.', $class));
+                }
+
+                if (null === $mappedClass || ($isClass && $mappedClass === $class)) {
+                    continue;
+                }
+
+                if (!class_exists($mappedClass)) {
+                    throw new \LogicException(sprintf('A class named "%s" does not exists.', $mappedClass));
+                }
+
+                if ((!$isClass || in_array($class, $abstracts, true) || (new \ReflectionClass($class))->isAbstract()) && !is_subclass_of($mappedClass, $class)) {
+                    throw new \LogicException(sprintf('The class "%s" must be a sub class of "%s".', $mappedClass, $class));
+                }
+            }
+
+            return $value;
+        });
 
         return $node;
     }
