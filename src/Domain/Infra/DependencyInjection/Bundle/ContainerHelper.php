@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class ContainerHelper
 {
+    private static $counter = 0;
+
     public static function hasBundle(Container $container, string $class): bool
     {
         return in_array($class, $container->getParameter('kernel.bundles'), true);
@@ -79,7 +81,7 @@ final class ContainerHelper
         $definition = $child ? new ChildDefinition($class) : new Definition($class);
         $definition->setPublic(false);
 
-        return $container->setDefinition(uniqid($class.'.'), $definition);
+        return $container->setDefinition($class.'.'.ContainerBuilder::hash(__METHOD__.++self::$counter), $definition);
     }
 
     public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void
@@ -245,7 +247,7 @@ final class ContainerHelper
             return;
         }
 
-        $definition = $container->register(uniqid(SimpleBusInfra\EventMessageHandler::class), SimpleBusInfra\EventMessageHandler::class);
+        $definition = self::registerAnonymous($container, SimpleBusInfra\EventMessageHandler::class);
         $definition
             ->setPublic(true)
             ->setArgument('$bus', new Reference('simple_bus.event_bus', ContainerBuilder::NULL_ON_INVALID_REFERENCE));

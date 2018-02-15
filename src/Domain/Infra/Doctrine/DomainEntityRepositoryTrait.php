@@ -198,7 +198,12 @@ trait DomainEntityRepositoryTrait
 
     private function addFieldParameter(QueryBuilder $qb, string $field, $value, string $type = null): string
     {
-        $name = uniqid(strtr($field, ['.' => '_', '[' => '_', ']' => '_']));
+        $name = $base = str_replace('.', '_', $field);
+        $counter = 0;
+
+        while (null !== $qb->getParameter($name)) {
+            $name = $base.++$counter;
+        }
 
         $qb->setParameter($name, $value, $type ?? DomainIdType::resolveName($value));
 

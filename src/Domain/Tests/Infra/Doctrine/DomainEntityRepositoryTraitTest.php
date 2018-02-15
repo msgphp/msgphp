@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\Domain\Tests\AbstractDomainEntityRepositoryTraitTest;
 use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
+use MsgPhp\Domain\Tests\Fixtures\Entities;
 
 final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityRepositoryTraitTest
 {
@@ -27,6 +28,24 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         (new SchemaTool(self::$em))->dropDatabase();
 
         self::$em->clear();
+    }
+
+    public function testDuplicateFieldParameters(): void
+    {
+        $repository = new class(Entities\TestEntity::class, self::$em) {
+            use DomainEntityRepositoryTrait {
+                createQueryBuilder as public;
+                addFieldCriteria as public;
+            }
+
+            private $alias = 'root';
+        };
+        $qb = $repository->createQueryBuilder();
+        $repository->addFieldCriteria($qb, ['foo.bar' => 'bar1']);
+        $repository->addFieldCriteria($qb, ['foo.bar' => 'bar2']);
+        $repository->addFieldCriteria($qb, ['foo.bar' => 'bar3']);
+
+        $this->assertCount(3, $qb->getParameters());
     }
 
     protected function equalsEntity($expected, $actual)
