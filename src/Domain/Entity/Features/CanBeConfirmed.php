@@ -46,6 +46,6 @@ trait CanBeConfirmed
             return true;
         }
 
-        return true;
+        return false;
     }
 }

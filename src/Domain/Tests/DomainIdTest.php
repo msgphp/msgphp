@@ -4,37 +4,77 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\{DomainId, DomainIdInterface};
+use MsgPhp\Domain\DomainId;
+use PHPUnit\Framework\TestCase;
 
-final class DomainIdTest extends AbstractDomainIdTest
+final class DomainIdTest extends TestCase
 {
-    public function provideEmptyIds(): iterable
+    public function testFromValue(): void
     {
-        yield [new DomainId()];
-        yield [new DomainId(null)];
-        yield [DomainId::fromValue(null)];
+        $this->assertSame((array) new DomainId(), (array) DomainId::fromValue(null));
+        $this->assertSame((array) new DomainId(null), (array) DomainId::fromValue(null));
+        $this->assertNotSame((array) new DomainId(''), (array) DomainId::fromValue(null));
+        $this->assertSame((array) new DomainId(''), (array) DomainId::fromValue(''));
+        $this->assertSame((array) new DomainId(''), (array) DomainId::fromValue(false));
+        $this->assertSame((array) new DomainId('1'), (array) DomainId::fromValue(1));
+        $this->assertInstanceOf(OtherTestDomainId::class, OtherTestDomainId::fromValue(null));
     }
 
-    public function provideNonEmptyIds(): iterable
+    public function testIsEmpty(): void
     {
+        $this->assertTrue((new DomainId())->isEmpty());
+        $this->assertTrue((new DomainId(null))->isEmpty());
+        $this->assertFalse((new DomainId(''))->isEmpty());
+        $this->assertFalse((new DomainId(' '))->isEmpty());
+        $this->assertFalse((new DomainId('foo'))->isEmpty());
+    }
+
+    public function testEquals(): void
+    {
+        $id = new DomainId('foo');
+        $emptyId = new DomainId();
+
+        $this->assertTrue($id->equals($id));
+        $this->assertTrue($id->equals(new DomainId('foo')));
+        $this->assertFalse($id->equals($emptyId));
+        $this->assertFalse($id->equals(new OtherTestDomainId('foo')));
+        $this->assertTrue($emptyId->equals($emptyId));
+        $this->assertFalse($emptyId->equals(new DomainId()));
+        $this->assertFalse($emptyId->equals(new OtherTestDomainId()));
+    }
+
+    /**
+     * @dataProvider provideIds
+     */
+    public function testToString(DomainId $id, string $value): void
+    {
+        $this->assertSame($value, $id->toString());
+        $this->assertSame($value, (string) $id);
+    }
+
+    /**
+     * @dataProvider provideIds
+     */
+    public function testSerialize(DomainId $id): void
+    {
+        $this->assertSame((array) $id, (array) unserialize(serialize($id)));
+    }
+
+    /**
+     * @dataProvider provideIds
+     */
+    public function testJsonSerialize(DomainId $id): void
+    {
+        $this->assertSame($id->isEmpty() ? null : $id->toString(), json_decode(json_encode($id)));
+    }
+
+    public function provideIds(): iterable
+    {
+        yield [new DomainId(), ''];
+        yield [new DomainId(null), ''];
         yield [new DomainId(''), ''];
         yield [new DomainId(' '), ' '];
-        yield [new DomainId('0'), '0'];
         yield [new DomainId('foo'), 'foo'];
-        yield [DomainId::fromValue(1), '1'];
-        yield [DomainId::fromValue(new class() {
-            public function __toString(): string
-            {
-                return 'string';
-            }
-        }), 'string'];
-    }
-
-    protected static function duplicateDomainId(DomainIdInterface $id, bool $otherType = false): DomainIdInterface
-    {
-        $class = $otherType ? OtherTestDomainId::class : DomainId::class;
-
-        return $id->isEmpty() ? new $class() : new $class($id->toString());
     }
 }
 
