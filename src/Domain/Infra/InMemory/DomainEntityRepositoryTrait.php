@@ -28,7 +28,7 @@ trait DomainEntityRepositoryTrait
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet($this->memory->all($this->class), $offset, $limit);
+        return $this->createResultSet(iterator_to_array($this->memory->all($this->class)), $offset, $limit);
     }
 
     private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface

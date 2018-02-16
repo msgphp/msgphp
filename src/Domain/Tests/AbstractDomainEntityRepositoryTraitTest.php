@@ -82,6 +82,8 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new DomainId('2')], 10, 10));
         $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idA' => new DomainId('1')], 0, 2));
         $this->assertEntityCollectionEquals([$entity1, $entity2], $repository->doFindAllByFields(['idB' => 'foo']));
+        $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idB' => 'foo'], 0, 1));
+        $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idB' => 'foo'], 1, 1));
         $this->assertEntityCollectionEquals([$entity1, $entity2], $repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo']));
         $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idA' => [1, '2'], 'idB' => 'foo'], 1));
 

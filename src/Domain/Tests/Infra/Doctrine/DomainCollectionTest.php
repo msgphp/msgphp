@@ -5,34 +5,20 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Infra\Doctrine\DomainCollection;
 use MsgPhp\Domain\Tests\AbstractDomainCollectionTest;
 
 final class DomainCollectionTest extends AbstractDomainCollectionTest
 {
-    public function provideEmptyCollections(): iterable
+    public function testFromValueWithCollection(): void
     {
-        foreach (self::getEmptyValues() as $value) {
-            if (is_array($value)) {
-                yield [new DomainCollection(new ArrayCollection($value)), $value];
-            }
-
-            yield [DomainCollection::fromValue($value), $value];
-        }
+        $this->assertEquals(new DomainCollection($collection = $this->createMock(Collection::class)), DomainCollection::fromValue($collection));
     }
 
-    public function provideNonEmptyCollections(): iterable
+    protected static function createCollection(array $elements): DomainCollectionInterface
     {
-        foreach (self::getNonEmptyValues() as $value) {
-            if (is_array($value)) {
-                yield [new DomainCollection(new ArrayCollection($value)), $value];
-            }
-
-            yield [DomainCollection::fromValue($value), $value];
-        }
-
-        yield [DomainCollection::fromValue((function () {
-            yield null;
-        })()), [null]];
+        return new DomainCollection(new ArrayCollection($elements));
     }
 }

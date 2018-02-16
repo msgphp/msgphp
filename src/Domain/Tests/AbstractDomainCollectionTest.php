@@ -9,85 +9,118 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractDomainCollectionTest extends TestCase
 {
-    /**
-     * @dataProvider provideEmptyCollections
-     */
-    public function testEmptyCollection(DomainCollectionInterface $collection): void
+    public function testFromValue(): void
     {
-        $this->assertTrue($collection->isEmpty());
-        $this->assertFalse($collection->contains(1));
-        $this->assertFalse($collection->contains('1'));
+        $class = get_class(static::createCollection([]));
+
+        $this->assertSame([], iterator_to_array($class::fromValue(null)));
+        $this->assertSame([1], iterator_to_array($class::fromValue([1])));
+        $this->assertSame([1, 'k' => '2'], iterator_to_array($class::fromValue([1, 'k' => '2'])));
+        $this->assertSame([1, 2, 3], iterator_to_array($class::fromValue(new \ArrayIterator([1, 2, 3]))));
+        $this->assertEquals(['k' => 1, 2, '3' => 'v'], iterator_to_array($class::fromValue((function () {
+            yield from ['k' => 1, 2];
+            yield '3' => 'v';
+        })())));
+    }
+
+    public function testGetIterator(): void
+    {
+        $this->assertSame([], iterator_to_array(static::createCollection([])));
+        $this->assertSame([1], iterator_to_array(static::createCollection([1])));
+        $this->assertSame([null], iterator_to_array(static::createCollection([null])));
+        $this->assertSame(['k' => 'v'], iterator_to_array(static::createCollection(['k' => 'v'])));
+    }
+
+    public function testIsEmpty(): void
+    {
+        $this->assertTrue(static::createCollection([])->isEmpty());
+        $this->assertFalse(static::createCollection([1])->isEmpty());
+        $this->assertFalse(static::createCollection([null])->isEmpty());
+    }
+
+    public function testContains(): void
+    {
+        $this->assertFalse(static::createCollection([])->contains(1));
+        $this->assertTrue(static::createCollection([null])->contains(null));
+        $this->assertTrue(($collection = static::createCollection([1, '2']))->contains(1));
+        $this->assertFalse($collection->contains(2));
+        $this->assertFalse($collection->contains(null));
+    }
+
+    public function testContainsKey(): void
+    {
+        $this->assertFalse(static::createCollection([])->containsKey(1));
+        $this->assertTrue(($collection = static::createCollection([1, 'k' => 'v', '2' => null]))->containsKey(0));
+        $this->assertTrue($collection->containsKey('k'));
+        $this->assertTrue($collection->containsKey(2));
+        $this->assertTrue($collection->containsKey('2'));
         $this->assertFalse($collection->containsKey(1));
-        $this->assertFalse($collection->containsKey('1'));
-        $this->assertFalse($collection->first());
-        $this->assertFalse($collection->last());
-        $this->assertNull($collection->get(1));
-        $this->assertNull($collection->get('1'));
-        $this->assertSame([], iterator_to_array($collection->filter(function (): bool {
+    }
+
+    public function testFirst(): void
+    {
+        $this->assertFalse(static::createCollection([])->first());
+        $this->assertSame(1, static::createCollection([1])->first());
+        $this->assertSame(1, static::createCollection([1, 2])->first());
+        $this->assertNull(static::createCollection([null, 2])->first());
+    }
+
+    public function testLast(): void
+    {
+        $this->assertFalse(static::createCollection([])->last());
+        $this->assertSame(1, static::createCollection([1])->last());
+        $this->assertSame(2, static::createCollection([1, 2])->last());
+        $this->assertNull(static::createCollection([1, null])->last());
+    }
+
+    public function testGet(): void
+    {
+        $this->assertNull(static::createCollection([])->get(0));
+        $this->assertNull(static::createCollection([])->get('k'));
+        $this->assertSame(1, ($collection = static::createCollection([1, 'k' => 'v', 2 => null]))->get(0));
+        $this->assertSame(1, $collection->get('0'));
+        $this->assertNull($collection->get(2));
+        $this->assertNull($collection->get('2'));
+    }
+
+    public function testFilter(): void
+    {
+        $this->assertNotSame($collection = static::createCollection([]), $filtered = $collection->filter(function (): bool {
             return true;
-        })));
-        $this->assertSame([], iterator_to_array($collection->slice(10)));
-        $this->assertSame([], iterator_to_array($collection->slice(0, 10)));
-        $this->assertSame([], iterator_to_array($collection->slice(1, 1)));
-        $this->assertSame([], iterator_to_array($collection->slice(10, 10)));
-        $this->assertSame([], $collection->map(function () {
-            return null;
         }));
-        $this->assertCount(0, $collection);
-        $this->assertSame([], iterator_to_array($collection));
-    }
-
-    /**
-     * @dataProvider provideNonEmptyCollections
-     */
-    public function testNonEmptyCollection(DomainCollectionInterface $collection, iterable $expected): void
-    {
-        $expected = $expected instanceof \Traversable ? iterator_to_array($expected) : $expected;
-        $count = count($expected);
-
-        $this->assertFalse($collection->isEmpty());
-        $this->assertTrue($collection->contains(reset($expected)));
-        $this->assertTrue($collection->containsKey($key = key($expected)));
-        $this->assertTrue($collection->containsKey((string) $key));
-        $this->assertFalse($collection->contains('2'));
-        $this->assertSame(reset($expected), $collection->first());
-        $this->assertSame(end($expected), $collection->last());
-        $this->assertSame($expected[$key], $collection->get($key));
-        $this->assertSame($expected[$key], $collection->get((string) $key));
-        $this->assertSame(array_slice($expected, 1, null, true), iterator_to_array($collection->filter(function () use (&$i): bool {
-            return ++$i > 1;
+        $this->assertSame([], iterator_to_array($filtered));
+        $this->assertSame([1, 2 => 3], iterator_to_array(static::createCollection([1, null, 3])->filter(function ($v): bool {
+            return null !== $v;
         })));
-        unset($i);
-        $this->assertSame([], iterator_to_array($collection->slice($count)));
-        $this->assertSame(array_slice($expected, $count - 1, null, true), iterator_to_array($collection->slice($count - 1)));
-        $this->assertSame(array_slice($expected, 0, $count - 1 ?: null, true), iterator_to_array($collection->slice(0, $count - 1)));
-        $this->assertSame(array_slice($expected, 0, $count, true), iterator_to_array($collection->slice(0, $count)));
-        $this->assertSame(array_slice($expected, 1, 1, true), iterator_to_array($collection->slice(1, 1)));
-        $this->assertSame([], iterator_to_array($collection->slice(10, 10)));
-        $this->assertSame(range(1, $count), $collection->map(function () use (&$i) {
-            return ++$i;
+    }
+
+    public function testSlice(): void
+    {
+        $this->assertNotSame($collection = static::createCollection([]), $slice = $collection->slice(0));
+        $this->assertSame([], iterator_to_array($slice));
+        $this->assertSame([3 => null, 4 => 5], iterator_to_array(($collection = static::createCollection([1, 2, 3, null, 5]))->slice(3)));
+        $this->assertSame([1], iterator_to_array($collection->slice(0, 1)));
+        $this->assertSame([1 => 2], iterator_to_array($collection->slice(1, 1)));
+        $this->assertSame([4 => 5], iterator_to_array($collection->slice(4, 20)));
+        $this->assertSame([], iterator_to_array($collection->slice(15, 20)));
+    }
+
+    public function testMap(): void
+    {
+        $this->assertSame([], static::createCollection([])->map(function ($v) {
+            return $v;
         }));
-        unset($i);
-        $this->assertCount($count, $collection);
-        $this->assertSame($expected, iterator_to_array($collection));
+        $this->assertSame(['k' => 2, 4, 6], static::createCollection(['k' => 1, 2, 3])->map(function (int $v): int {
+            return $v * 2;
+        }));
     }
 
-    abstract public function provideEmptyCollections(): iterable;
-
-    abstract public function provideNonEmptyCollections(): iterable;
-
-    final protected static function getEmptyValues(): iterable
+    public function testCount(): void
     {
-        yield null;
-        yield [];
-        yield new \EmptyIterator();
+        $this->assertCount(0, static::createCollection([]));
+        $this->assertCount(1, static::createCollection([null]));
+        $this->assertCount(3, static::createCollection([1, 'k' => null, 2]));
     }
 
-    final protected static function getNonEmptyValues(): iterable
-    {
-        yield [null];
-        yield [''];
-        yield [1, 2, 3, '1'];
-        yield new \ArrayIterator([true, false]);
-    }
+    abstract protected static function createCollection(array $elements): DomainCollectionInterface;
 }
