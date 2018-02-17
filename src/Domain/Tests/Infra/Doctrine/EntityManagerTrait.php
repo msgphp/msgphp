@@ -9,7 +9,8 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use MsgPhp\Domain\Tests\Fixtures\DoctrineDomainIdType;
+use Doctrine\ORM\Tools\SchemaTool;
+use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 
 trait EntityManagerTrait
 {
@@ -19,9 +20,9 @@ trait EntityManagerTrait
     public static function setUpBeforeClass(): void
     {
         if (Type::hasType('domain_id')) {
-            Type::overrideType('domain_id', DoctrineDomainIdType::class);
+            Type::overrideType('domain_id', DomainIdType::class);
         } else {
-            Type::addType('domain_id', DoctrineDomainIdType::class);
+            Type::addType('domain_id', DomainIdType::class);
         }
 
         $config = new Configuration();
@@ -44,5 +45,29 @@ trait EntityManagerTrait
 
         self::$em->close();
         self::$em = null;
+    }
+
+    protected function setUp(): void
+    {
+        if (!$this->createSchema) {
+            return;
+        }
+
+        if (!self::$em->isOpen()) {
+            self::$em = self::$em::create(self::$em->getConnection(), self::$em->getConfiguration(), self::$em->getEventManager());
+        }
+
+        (new SchemaTool(self::$em))->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
+    }
+
+    protected function tearDown(): void
+    {
+        if (!$this->createSchema) {
+            return;
+        }
+
+        (new SchemaTool(self::$em))->dropDatabase();
+
+        self::$em->clear();
     }
 }

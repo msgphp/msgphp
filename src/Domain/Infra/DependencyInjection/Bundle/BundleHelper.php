@@ -42,6 +42,10 @@ final class BundleHelper
                 ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
                 ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
 
+//            $container->prependExtensionConfig('doctrine', ['orm' => ['hydrators' => [
+//                // @todo
+//            ]]]);
+
             if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
                 @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/%msgphp.doctrine.mapping_cache_dirname%'), 0777, true);
 

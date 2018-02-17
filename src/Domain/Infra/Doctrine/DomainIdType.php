@@ -75,9 +75,33 @@ class DomainIdType extends Type
                     return $type::NAME;
                 }
             }
+
+            return self::NAME;
         }
 
         return null;
+    }
+
+    /**
+     * @internal
+     */
+    final public static function resolveValue($value, AbstractPlatform $platform)
+    {
+        if ($value instanceof DomainIdInterface) {
+            $class = get_class($value);
+            $type = null;
+
+            foreach (self::$mapping as $type => $mapping) {
+                if ($class === $mapping['class']) {
+                    $type = self::getType($mapping['data_type']);
+                    break;
+                }
+            }
+
+            return ($type ?? self::getType(Type::INTEGER))->convertToPHPValue($value->isEmpty() ? null : $value->toString(), $platform);
+        }
+
+        return $value;
     }
 
     final public function getName(): string

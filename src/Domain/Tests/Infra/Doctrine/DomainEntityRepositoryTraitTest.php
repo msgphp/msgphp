@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\Domain\Tests\AbstractDomainEntityRepositoryTraitTest;
 use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
@@ -14,21 +13,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
 {
     use EntityManagerTrait;
 
-    protected function setUp(): void
-    {
-        if (!self::$em->isOpen()) {
-            self::$em = self::$em::create(self::$em->getConnection(), self::$em->getConfiguration(), self::$em->getEventManager());
-        }
-
-        (new SchemaTool(self::$em))->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
-    }
-
-    protected function tearDown(): void
-    {
-        (new SchemaTool(self::$em))->dropDatabase();
-
-        self::$em->clear();
-    }
+    protected $createSchema = true;
 
     public function testDuplicateFieldParameters(): void
     {
