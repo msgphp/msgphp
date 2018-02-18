@@ -13,7 +13,7 @@ final class EntityReferenceLoaderTest extends TestCase
 {
     use EntityManagerTrait;
 
-    protected $createSchema = false;
+    private $createSchema = false;
 
     public function testInvoke(): void
     {

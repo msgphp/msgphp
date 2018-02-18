@@ -89,16 +89,16 @@ class DomainIdType extends Type
     {
         if ($value instanceof DomainIdInterface) {
             $class = get_class($value);
-            $type = null;
+            $type = Type::INTEGER;
 
             foreach (self::$mapping as $type => $mapping) {
                 if ($class === $mapping['class']) {
-                    $type = self::getType($mapping['data_type']);
+                    $type = $mapping['data_type'];
                     break;
                 }
             }
 
-            return ($type ?? self::getType(Type::INTEGER))->convertToPHPValue($value->isEmpty() ? null : $value->toString(), $platform);
+            return self::getType($type)->convertToPHPValue($value->isEmpty() ? null : $value->toString(), $platform);
         }
 
         return $value;
@@ -116,10 +116,6 @@ class DomainIdType extends Type
 
     final public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (null === $value) {
-            return null;
-        }
-
         if ($value instanceof DomainIdInterface) {
             $value = $value->isEmpty() ? null : $value->toString();
         }
@@ -139,11 +135,7 @@ class DomainIdType extends Type
             throw ConversionException::conversionFailed($value, $this->getName());
         }
 
-        if (null === $value) {
-            return null;
-        }
-
-        return static::getClass()::fromValue($value);
+        return null === $value ? null : static::getClass()::fromValue($value);
     }
 
     final protected static function getInnerType(): Type

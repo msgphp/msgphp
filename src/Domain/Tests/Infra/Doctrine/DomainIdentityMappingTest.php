@@ -12,7 +12,7 @@ final class DomainIdentityMappingTest extends AbstractDomainIdentityMappingTest
 {
     use EntityManagerTrait;
 
-    protected $createSchema = false;
+    private $createSchema = false;
 
     protected static function createMapping(): DomainIdentityMappingInterface
     {

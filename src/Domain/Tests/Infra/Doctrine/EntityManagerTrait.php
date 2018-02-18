@@ -19,10 +19,10 @@ trait EntityManagerTrait
 
     public static function setUpBeforeClass(): void
     {
-        if (Type::hasType('domain_id')) {
-            Type::overrideType('domain_id', DomainIdType::class);
+        if (Type::hasType(DomainIdType::NAME)) {
+            Type::overrideType(DomainIdType::NAME, DomainIdType::class);
         } else {
-            Type::addType('domain_id', DomainIdType::class);
+            Type::addType(DomainIdType::NAME, DomainIdType::class);
         }
 
         $config = new Configuration();

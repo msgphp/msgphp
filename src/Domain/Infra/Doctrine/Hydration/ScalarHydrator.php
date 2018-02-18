@@ -9,6 +9,8 @@ use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 
 final class ScalarHydrator extends BaseScalarHydrator
 {
+    public const NAME = 'msgphp_scalar';
+
     protected function gatherScalarRowData(&$data): array
     {
         array_walk($data, function (&$value, $key): void {

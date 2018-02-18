@@ -14,7 +14,7 @@ final class SingleScalarHydratorTest extends TestCase
 {
     use EntityManagerTrait;
 
-    protected $createSchema = true;
+    private $createSchema = true;
 
     public function testHydrator(): void
     {
@@ -25,8 +25,9 @@ final class SingleScalarHydratorTest extends TestCase
 
         $this->assertSame('1', $query->getSingleScalarResult());
 
-        self::$em->getConfiguration()->addCustomHydrationMode('domain_single_scalar', SingleScalarHydrator::class);
+        self::$em->getConfiguration()->addCustomHydrationMode(SingleScalarHydrator::NAME, SingleScalarHydrator::class);
 
-        $this->assertSame(1, $query->getSingleResult('domain_single_scalar'));
+        $this->assertSame(1, $query->getResult(SingleScalarHydrator::NAME));
+        $this->assertSame(1, $query->getSingleResult(SingleScalarHydrator::NAME));
     }
 }

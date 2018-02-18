@@ -13,7 +13,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
 {
     use EntityManagerTrait;
 
-    protected $createSchema = true;
+    private $createSchema = true;
 
     public function testDuplicateFieldParameters(): void
     {
