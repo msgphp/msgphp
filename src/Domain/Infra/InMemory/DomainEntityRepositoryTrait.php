@@ -126,13 +126,9 @@ trait DomainEntityRepositoryTrait
         $this->memory->remove($entity);
     }
 
-    private function createResultSet(iterable $entities, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    private function createResultSet(array $entities, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         if ($offset || $limit) {
-            if ($entities instanceof \Traversable) {
-                $entities = iterator_to_array($entities);
-            }
-
             $entities = array_slice($entities, $offset, $limit ?: null);
         }
 
@@ -153,7 +149,7 @@ trait DomainEntityRepositoryTrait
             $knownValue = $this->identityHelper->normalizeIdentifier($this->accessor->getValue($entity, $field));
 
             if (is_array($value)) {
-                if (!in_array($knownValue, array_map([$this->identityHelper, 'normalizeIdentifier'], $value))) {
+                if (!in_array($knownValue, array_map([$this->identityHelper, 'normalizeIdentifier'], $value)) || in_array(null, $value, true)) {
                     return false;
                 }
 

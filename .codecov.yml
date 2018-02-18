@@ -3,5 +3,6 @@ ignore:
     - "src/*/Tests/"
     - "src/*/Command/*Command.php"
     - "src/*/Event/*Event.php"
+    - "src/*/Event/Domain/*Event.php"
     - "src/*/Infra/Doctrine/Type/*Type.php"
     - "src/Domain/Infra/DependencyInjection/Bundle/*Helper.php"

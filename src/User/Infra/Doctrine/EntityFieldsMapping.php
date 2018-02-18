@@ -21,6 +21,7 @@ final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
         Features\NicknameCredential::class => Credential\Nickname::class,
         Features\NicknamePasswordCredential::class => Credential\NicknamePassword::class,
         Features\NicknameSaltedPasswordCredential::class => Credential\NicknameSaltedPassword::class,
+        Features\TokenCredential::class => Credential\Token::class,
     ];
 
     public static function getObjectFieldMapping(): array

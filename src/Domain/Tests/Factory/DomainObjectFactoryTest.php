@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface};
 use PHPUnit\Framework\TestCase;
 
 final class DomainObjectFactoryTest extends TestCase
@@ -41,32 +41,6 @@ final class DomainObjectFactoryTest extends TestCase
         $factory->create(KnownTestObject::class, [123]);
     }
 
-    public function testNestedCreate(): void
-    {
-        $object = (new DomainObjectFactory())->create(NestedTestObject::class, [
-            'test' => ['arg_a' => 'nested_a', 'arg_b' => 'nested_b'],
-            'self' => ['test' => ['arg_a' => 'foo', 'arg_b' => 'bar'], 'other' => $other = new TestObject(1, 2)],
-        ]);
-
-        $this->assertInstanceOf(NestedTestObject::class, $object);
-        $this->assertInstanceOf(TestObject::class, $object->test);
-        $this->assertSame('nested_a', $object->test->a);
-        $this->assertSame('nested_b', $object->test->b);
-        $this->assertInstanceOf(NestedTestObject::class, $object->self);
-        $this->assertSame('foo', $object->self->test->a);
-        $this->assertSame('bar', $object->self->test->b);
-        $this->assertSame($other, $object->self->other);
-    }
-
-    public function testNestedCreateWithoutContext(): void
-    {
-        $factory = new DomainObjectFactory();
-
-        $this->expectException(\LogicException::class);
-
-        $factory->create(NestedTestObject::class);
-    }
-
     public function testCreateWithNamedContext(): void
     {
         $object = (new DomainObjectFactory())->create(TestObject::class, [1 => 'b', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 'a']);
@@ -95,6 +69,62 @@ final class DomainObjectFactoryTest extends TestCase
         $this->expectException(\Error::class);
 
         $factory->create(PrivateTestObject::class, ['arg']);
+    }
+
+    public function testNestedCreate(): void
+    {
+        $object = (new DomainObjectFactory())->create(NestedTestObject::class, [
+            'test' => ['arg_a' => 'nested_a', 'arg_b' => 'nested_b'],
+            'self' => ['test' => ['arg_a' => 'foo', 'arg_b' => 'bar'], 'other' => $other = new TestObject(1, 2)],
+        ]);
+
+        $this->assertInstanceOf(NestedTestObject::class, $object);
+        $this->assertInstanceOf(TestObject::class, $object->test);
+        $this->assertSame('nested_a', $object->test->a);
+        $this->assertSame('nested_b', $object->test->b);
+        $this->assertInstanceOf(NestedTestObject::class, $object->self);
+        $this->assertSame('foo', $object->self->test->a);
+        $this->assertSame('bar', $object->self->test->b);
+        $this->assertSame($other, $object->self->other);
+    }
+
+    public function testNestedCreateWithoutContext(): void
+    {
+        $factory = new DomainObjectFactory();
+
+        $this->expectException(\LogicException::class);
+
+        $factory->create(NestedTestObject::class);
+    }
+
+    public function testNestedCreateWithNestedFactory(): void
+    {
+        $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $nestedFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($nested = new TestObject(1, 2));
+
+        $factory = new DomainObjectFactory();
+        $factory->setNestedFactory($nestedFactory);
+
+        $this->assertInstanceOf(NestedTestObject::class, $object = $factory->create(NestedTestObject::class, [['a', 'b']]));
+        $this->assertSame($nested, $object->test);
+    }
+
+    public function testNestedCreateWithInvalidNestedFactory(): void
+    {
+        $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $nestedFactory->expects($this->any())
+            ->method('create')
+            ->willThrowException(InvalidClassException::create(TestObject::class));
+
+        $factory = new DomainObjectFactory();
+        $factory->setNestedFactory($nestedFactory);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\TestObject, array given\b/', preg_quote(NestedTestObject::class)));
+
+        $factory->create(NestedTestObject::class, [['a', 'b']]);
     }
 }
 
