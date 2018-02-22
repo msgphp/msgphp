@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\{DomainCollectionInterface, DomainId, DomainIdInterface};
-use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
+use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException, InvalidClassException};
 use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities};
 use PHPUnit\Framework\TestCase;
 
@@ -308,6 +308,15 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
     }
 
+    public function testSaveWithInvalidClass(): void
+    {
+        $repository = static::createRepository(Entities\TestPrimitiveEntity::class);
+
+        $this->expectException(InvalidClassException::class);
+
+        $repository->doSave(Entities\TestEntity::create());
+    }
+
     /**
      * @dataProvider provideEntities
      */
@@ -322,6 +331,15 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         $repository->doDelete($entity);
 
         $this->assertFalse($repository->doExists($ids));
+    }
+
+    public function testDeleteWithInvalidClass(): void
+    {
+        $repository = static::createRepository(Entities\TestPrimitiveEntity::class);
+
+        $this->expectException(InvalidClassException::class);
+
+        $repository->doDelete(Entities\TestEntity::create());
     }
 
     public function provideEntityTypes(): iterable

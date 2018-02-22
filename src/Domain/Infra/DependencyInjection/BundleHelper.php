@@ -38,7 +38,6 @@ final class BundleHelper
 
             $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
                 ->setPublic(false)
-                ->setArgument('$typeConfig', '%msgphp.doctrine.type_config%')
                 ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
 
             if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {

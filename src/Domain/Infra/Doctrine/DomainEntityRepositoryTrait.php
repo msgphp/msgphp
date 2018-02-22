@@ -10,7 +10,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Factory\DomainCollectionFactory;
-use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException};
+use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException, InvalidClassException};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -108,6 +108,10 @@ trait DomainEntityRepositoryTrait
      */
     private function doSave($entity): void
     {
+        if (!$entity instanceof $this->class) {
+            throw InvalidClassException::create(get_class($entity));
+        }
+
         $this->em->persist($entity);
 
         try {
@@ -122,6 +126,10 @@ trait DomainEntityRepositoryTrait
      */
     private function doDelete($entity): void
     {
+        if (!$entity instanceof $this->class) {
+            throw InvalidClassException::create(get_class($entity));
+        }
+
         $this->em->remove($entity);
         $this->em->flush();
     }

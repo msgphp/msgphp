@@ -11,7 +11,7 @@ use MsgPhp\User\Entity\Fields\UserField;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class UserAttributeValue
+abstract class UserAttributeValue
 {
     use UserField;
     use AttributeValueField;

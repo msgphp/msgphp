@@ -10,7 +10,7 @@ use MsgPhp\User\Entity\Fields\UserField;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class UserSecondaryEmail
+abstract class UserSecondaryEmail
 {
     use UserField;
     use CanBeConfirmed;

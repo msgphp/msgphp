@@ -10,19 +10,9 @@ use MsgPhp\User\Entity\Credential\Anonymous;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class User
+abstract class User
 {
-    private $id;
-
-    public function __construct(UserIdInterface $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): UserIdInterface
-    {
-        return $this->id;
-    }
+    abstract public function getId(): UserIdInterface;
 
     /**
      * @return CredentialInterface

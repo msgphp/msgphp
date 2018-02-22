@@ -21,12 +21,11 @@ final class GlobalObjectMemoryTest extends TestCase
         $anonymous = new class() {
         };
 
-        foreach ([$std1 = new \stdClass(), $std2 = new \stdClass(), $anonymous, $anonymous2 = clone $anonymous] as $object) {
+        foreach ([$std1 = new \stdClass(), $std2 = new \stdClass(), $anonymous] as $object) {
             $memory->persist($object);
             $objects[get_class($object)] = [];
         }
         $memory->persist($std1);
-        $memory->persist($anonymous2);
 
         foreach (array_keys($objects) as $class) {
             foreach ($memory->all($class) as $i => $object) {
@@ -35,16 +34,18 @@ final class GlobalObjectMemoryTest extends TestCase
         }
 
         $this->assertSame([$std1, $std2], $objects[\stdClass::class]);
-        $this->assertSame([$anonymous, $anonymous2], $objects[get_class($anonymous)]);
+        $this->assertSame([$anonymous], $objects[get_class($anonymous)]);
 
         $memory->remove($anonymous);
-        $objects[$class = get_class($anonymous)] = [];
 
-        foreach ($memory->all($class = get_class($anonymous2)) as $i => $object) {
+        $class = get_class($anonymous);
+        $objects[$class] = [];
+
+        foreach ($memory->all($class) as $i => $object) {
             $objects[$class][$i] = $object;
         }
 
-        $this->assertSame([$anonymous2], $objects[$class]);
+        $this->assertSame([], $objects[$class]);
     }
 
     public function testContains(): void

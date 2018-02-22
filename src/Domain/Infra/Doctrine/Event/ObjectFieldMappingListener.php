@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine\Event;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -14,51 +13,27 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 final class ObjectFieldMappingListener
 {
-    private $typeConfig;
     private $mapping;
 
     /** @var ClassMetadataFactory|null */
     private $metadataFactory;
 
-    public function __construct(array $typeConfig, array $mapping)
+    public function __construct(array $mapping)
     {
-        $this->typeConfig = $typeConfig;
         $this->mapping = $mapping;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        if (!$this->mapping && !$this->typeConfig) {
+        if (!$this->mapping) {
             return;
         }
 
         $this->metadataFactory = $event->getEntityManager()->getMetadataFactory();
-        $metadata = $event->getClassMetadata();
 
-        if ($this->typeConfig) {
-            $this->processClassIdentifiers($metadata);
-        }
-
-        if ($this->mapping) {
-            $this->processClassFields($metadata);
-        }
+        $this->processClassFields($event->getClassMetadata());
 
         $this->metadataFactory = null;
-    }
-
-    private function processClassIdentifiers(ClassMetadataInfo $metadata): void
-    {
-        if ($metadata->usesIdGenerator()) {
-            return;
-        }
-
-        foreach ($metadata->getIdentifierFieldNames() as $field) {
-            if (!isset($this->typeConfig[$type = $metadata->getTypeOfField($field)]) || !in_array($this->typeConfig[$type]['type'], [Type::INTEGER, Type::BIGINT], true)) {
-                continue;
-            }
-
-            $metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
-        }
     }
 
     private function processClassFields(ClassMetadataInfo $metadata, \ReflectionClass $class = null): void

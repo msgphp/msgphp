@@ -23,7 +23,7 @@ final class GlobalObjectMemory
     public function all(string $class): iterable
     {
         foreach ($this->storage as $k => $object) {
-            if ($class === $this->storage->getInfo()) {
+            if (($stored = $this->storage->getInfo()) === $class || is_subclass_of($stored, $class)) {
                 yield $object;
             }
         }
