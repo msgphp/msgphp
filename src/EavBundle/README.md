@@ -17,7 +17,7 @@ composer require msgphp/eav-bundle
 ## Features
 
 - Symfony 3.4 / 4.0 ready
-- Doctrine persistence
+- Doctrine persistence (with built-in discriminator support)
 - Standard supported attribute value types: `bool`, `int`, `float`, `string`, `\DateTimeInterface` and `null`
 
 ## Configuration

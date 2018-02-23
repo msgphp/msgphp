@@ -116,7 +116,9 @@ final class UsernameListener
      */
     private function getUsernames($entity, ClassMetadataInfo $metadata): iterable
     {
+
         if (!isset($this->mapping[$class = get_class($entity)])) {
+            // @fixme resolve discriminated classes
             throw new \LogicException(sprintf('No username mapping available for entity "%s".', $class));
         }
 

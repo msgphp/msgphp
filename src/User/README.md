@@ -16,7 +16,7 @@ composer require msgphp/user
 
 ## Features
 
-- Doctrine persistence
+- Doctrine persistence (with built-in discriminator support)
 - Symfony console commands
 - Symfony security infrastructure
 - Symfony validators
