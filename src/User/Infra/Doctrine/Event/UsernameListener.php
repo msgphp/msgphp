@@ -123,7 +123,6 @@ final class UsernameListener
         foreach ($this->mapping[$class] as $mapping) {
             $user = isset($mapping['mapped_by']) ? $metadata->getFieldValue($entity, $mapping['mapped_by']) : $entity;
 
-            // @todo use factory
             yield new Username($user, $metadata->getFieldValue($entity, $mapping['field']));
         }
     }

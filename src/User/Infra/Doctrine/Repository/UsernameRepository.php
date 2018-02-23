@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Factory\DomainCollectionFactory;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\{User, Username};
+use MsgPhp\User\Entity\Username;
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 
@@ -49,11 +49,11 @@ final class UsernameRepository implements UsernameRepositoryInterface
     public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         if (!$this->targetMapping) {
-            throw new \LogicException('Cannot find usernames from targets, no mapping available.');
+            throw new \LogicException('No username mapping available.');
         }
 
         $qb = $this->em->createQueryBuilder();
-        $aliases = $usernames = [];
+        $targetInfo = $aliases = [];
         foreach ($this->targetMapping as $class => $mappings) {
             $metadata = $this->em->getClassMetadata($class);
             $alias = $aliases[$class] ?? ($aliases[$class] = 'target'.count($aliases));
@@ -78,7 +78,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
                 $qb->addSelect(sprintf('partial %s.{%s}', $alias, implode(', ', array_keys($fields))));
                 $qb->from($mapping['target'], $alias);
 
-                $usernames[$class][] = ['user' => $userField, 'username' => $mapping['field']];
+                $targetInfo[$class][] = ['user_field' => $userField, 'username_field' => $mapping['field']];
             }
         }
 
@@ -86,13 +86,16 @@ final class UsernameRepository implements UsernameRepositoryInterface
         foreach ($qb->getQuery()->getResult() as $targetEntity) {
             $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(get_class($targetEntity)));
 
-            foreach ($usernames[$class] as $username) {
-                $user = $metadata->getFieldValue($targetEntity, $username['user']);
-                if (!$user instanceof User) {
-                    $user = $this->em->getPartialReference(User::class, $user);
+            foreach ($targetInfo[$class] as $info) {
+                if (null === $user = $metadata->getFieldValue($targetEntity, $info['user_field'])) {
+                    continue;
                 }
 
-                $result[] = new Username($user, $metadata->getFieldValue($targetEntity, $username['username']));
+                if (null === $username = $metadata->getFieldValue($targetEntity, $info['username_field'])) {
+                    continue;
+                }
+
+                $result[] = new $this->class($user, $username);
             }
         }
 
