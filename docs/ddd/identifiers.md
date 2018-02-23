@@ -80,9 +80,9 @@ $emptyId->isEmpty() ? null : $emptyId->toString(); // null
 
 ### `MsgPhp\Domain\Infra\Uuid\DomainId`
 
-Domain identifier based on UUID values.
+A UUID tailored domain identifier.
 
-- [Read more](../infrastructure/uuid.md)
+- [Read more](../infrastructure/uuid.md#domain-identifier)
 
 [string-able]: https://secure.php.net/manual/en/language.oop5.magic.php#object.tostring
 [serializable]: https://secure.php.net/serializable

@@ -99,6 +99,50 @@ if ($repository->exists($id = ['name' => ..., 'year' => ...])) {
 }
 ```
 
+## Entity aware factory
+
+@TODO: outdated, favoring EntityAwareFactory
+
+A Doctrine tailored entity reference loader in the form of an invokable object is provided by
+`MsgPhp\Domain\Infra\Doctrine\EntityReferenceLoader`. Its main purpose is to be used as a callable _reference loader_
+when working with the generic [entity aware factory](../ddd/factory/entity-aware.md#msgphpdomainfactoryentityawarefactory)
+in effort to get a lazy-loading reference object, managed by Doctrine. See also [`EntityManagerInterface::getReference()`][api-em-getreference].
+
+- `__construct(EntityManagerInterface $em, array $classMapping = [], DomainIdentityHelper $identityHelper = null)`
+    - `$em`: The entity manager to use
+    - `$classMapping`: An optional class mapping to use (`['SourceClass' => 'TargetClass']`)
+    - `$identityHelper`: Custom domain identity helper. By default it's resolved from the given entity manager.
+      [Read more](../ddd/identities.md).
+- `__invoke(string $class, $id): ?object`
+
+### Basic example
+
+```php
+<?php
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping as ORM;
+use MsgPhp\Domain\Infra\Doctrine\EntityReferenceLoader;
+
+// --- SETUP ---
+
+/** @ORM\Entity */
+class MyEntity
+{
+    /** @ORM\Id */
+    public $id;
+}
+
+/** @var EntityManagerInterface $em */
+$em = ...;
+$loader = new EntityReferenceLoader($em);
+
+// --- USAGE ---
+
+/** @var MyEntity|null $ref */
+$ref = $loader(MyEntity::class, 1); // no database hit
+```
+
 ## Hydration
 
 When working with [identifiers](../ddd/identifiers.md) and the corresponding [type](doctrine-dbal.md#domain-identifier-type)
@@ -145,48 +189,6 @@ $query->getResult(ScalarHydrator::NAME)[0]['id']; // int(1)
 
 $query->getSingleScalarResult(); // "1"
 $query->getSingleResult(SingleScalarHydrator::NAME); // int(1)
-```
-
-## Entity reference loader
-
-A Doctrine tailored entity reference loader in the form of an invokable object is provided by
-`MsgPhp\Domain\Infra\Doctrine\EntityReferenceLoader`. Its main purpose is to be used as a callable _reference loader_
-when working with the generic [entity aware factory](../ddd/factory/entity-aware.md#msgphpdomainfactoryentityawarefactory)
-in effort to get a lazy-loading reference object, managed by Doctrine. See also [`EntityManagerInterface::getReference()`][api-em-getreference].
-
-- `__construct(EntityManagerInterface $em, array $classMapping = [], DomainIdentityHelper $identityHelper = null)`
-    - `$em`: The entity manager to use
-    - `$classMapping`: An optional class mapping to use (`['SourceClass' => 'TargetClass']`)
-    - `$identityHelper`: Custom domain identity helper. By default it's resolved from the given entity manager.
-      [Read more](../ddd/identities.md).
-- `__invoke(string $class, $id): ?object`
-
-### Basic example
-
-```php
-<?php
-
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\Infra\Doctrine\EntityReferenceLoader;
-
-// --- SETUP ---
-
-/** @ORM\Entity */
-class MyEntity
-{
-    /** @ORM\Id */
-    public $id;
-}
-
-/** @var EntityManagerInterface $em */
-$em = ...;
-$loader = new EntityReferenceLoader($em);
-
-// --- USAGE ---
-
-/** @var MyEntity|null $ref */
-$ref = $loader(MyEntity::class, 1); // no database hit
 ```
 
 [orm-project]: http://www.doctrine-project.org/projects/orm.html

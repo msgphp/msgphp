@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
+use MsgPhp\Domain\DomainIdentityMappingInterface;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Factory\{DomainObjectFactoryInterface, EntityAwareFactory};
@@ -36,13 +37,12 @@ final class EntityAwareFactoryTest extends TestCase
                 return $o;
             });
 
-        $this->factory = new EntityAwareFactory($innerFactory, ['alias_id' => 'id'], function ($class, $id) {
-            $o = new \stdClass();
-            $o->class = $class;
-            $o->id = $id;
+        $identityMapping = $this->createMock(DomainIdentityMappingInterface::class);
+        $identityMapping->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id_field', 'id_field2']);
 
-            return $o;
-        });
+        $this->factory = new EntityAwareFactory($innerFactory, $identityMapping, ['alias_id' => 'id']);
     }
 
     public function testCreate(): void
@@ -56,29 +56,9 @@ final class EntityAwareFactoryTest extends TestCase
     public function testReference(): void
     {
         $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('foo', 1));
-        $this->assertSame(['class' => 'foo', 'id' => 1], (array) $object);
-        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('bar', ['id' => 1, 'foo' => '2']));
-        $this->assertSame(['class' => 'bar', 'id' => ['id' => 1, 'foo' => '2']], (array) $object);
-    }
-
-    public function testReferenceWithoutLoader(): void
-    {
-        $factory = new EntityAwareFactory($this->createMock(DomainObjectFactoryInterface::class), []);
-
-        $this->expectException(\LogicException::class);
-
-        $factory->reference('foo', 1);
-    }
-
-    public function testReferenceWithoutResult(): void
-    {
-        $factory = new EntityAwareFactory($this->createMock(DomainObjectFactoryInterface::class), [], function ($class, $id) {
-            return null;
-        });
-
-        $this->expectException(\RuntimeException::class);
-
-        $factory->reference('foo', 1);
+        $this->assertSame(['class' => 'foo', 'context' => ['id_field' => 1, 'id_field2' => null]], (array) $object);
+        $this->assertInstanceOf(\stdClass::class, $object = $this->factory->reference('foo', ['id_field2' => 2, 'foo' => 'bar']));
+        $this->assertSame(['class' => 'foo', 'context' => ['id_field2' => 2, 'foo' => 'bar', 'id_field' => null]], (array) $object);
     }
 
     public function testIdentify(): void

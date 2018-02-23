@@ -124,7 +124,7 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainCollection`
 
-Domain collection based on _Doctrine Collections_.
+A Doctrine tailored domain collection.
 
 - [Read more](../infrastructure/doctrine-collections.md#domain-collection)
 

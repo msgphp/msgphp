@@ -27,7 +27,11 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
             throw InvalidClassException::create($class);
         }
 
-        return (array) $this->mapping[$class];
+        if (!$fields = (array) $this->mapping[$class]) {
+            throw new \LogicException(sprintf('No identifier fields available for class "%s".', $class));
+        }
+
+        return $fields;
     }
 
     public function getIdentity($object): array

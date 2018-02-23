@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\{DomainIdentityMappingInterface, DomainIdInterface};
 use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
@@ -13,14 +13,14 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $factory;
+    private $identityMapping;
     private $identifierMapping;
-    private $referenceLoader;
 
-    public function __construct(DomainObjectFactoryInterface $factory, array $identifierMapping, callable $referenceLoader = null)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainIdentityMappingInterface $identityMapping, array $identifierMapping)
     {
         $this->factory = $factory;
+        $this->identityMapping = $identityMapping;
         $this->identifierMapping = $identifierMapping;
-        $this->referenceLoader = $referenceLoader;
     }
 
     public function create(string $class, array $context = [])
@@ -30,15 +30,13 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function reference(string $class, $id)
     {
-        if (null === $this->referenceLoader) {
-            throw new \LogicException('No reference loader set.');
+        $idFields = $this->identityMapping->getIdentifierFieldNames($class);
+
+        if (!is_array($id)) {
+            $id = [array_shift($idFields) => $id];
         }
 
-        if (is_object($object = ($this->referenceLoader)($class, $id))) {
-            return $object;
-        }
-
-        throw new \RuntimeException(sprintf('Unable to create a reference object for "%s".', $class));
+        return $this->factory->create($class, $id + array_fill_keys($idFields, null));
     }
 
     public function identify(string $class, $value): DomainIdInterface

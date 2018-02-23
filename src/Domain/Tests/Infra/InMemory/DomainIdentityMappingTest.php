@@ -11,12 +11,21 @@ use MsgPhp\Domain\Tests\Fixtures\Entities;
 
 final class DomainIdentityMappingTest extends AbstractDomainIdentityMappingTest
 {
-    public function testCreateCastsMapping(): void
+    public function testGetIdentifierFieldNamesCastsMapping(): void
     {
         $mapping = new DomainIdentityMapping(['foo' => 'a', 'bar' => ['b']]);
 
         $this->assertSame(['a'], $mapping->getIdentifierFieldNames('foo'));
         $this->assertSame(['b'], $mapping->getIdentifierFieldNames('bar'));
+    }
+
+    public function testGetIdentifierFieldNamesWithEmptyMapping(): void
+    {
+        $mapping = new DomainIdentityMapping(['foo' => []]);
+
+        $this->expectException(\LogicException::class);
+
+        $mapping->getIdentifierFieldNames('foo');
     }
 
     protected static function createMapping(): DomainIdentityMappingInterface

@@ -33,50 +33,54 @@ might be considered empty if it's not capable to calculate one upfront.
 
 ### `MsgPhp\Domain\Factory\EntityAwareFactory`
 
-A generic entity factory. It decorates any object factory and additionally must be provided with an entity to identifier
-class mapping.
+A generic entity factory. It decorates any object factory and is based on a known [identity mapping](../identity-mapping.md)
+as well as the entity to identifier class mapping.
 
-- `__construct(DomainObjectFactoryInterface $factory, array $identifierMapping, callable $referenceLoader = null)`
+- `__construct(DomainObjectFactoryInterface $factory, DomainIdentityMappingInterface $identityMapping, array $identifierMapping)`
     - `$factory`: The decorated object factory
-    - `$identifierMapping`: The identifier class mapping (`['EntityClass' => 'IdClass']`)
-    - `$referenceLoader`: An optional reference loader. If `null` using `reference()` is not supported. The callable
-      receives the same arguments as given to `reference()`. It should return an instance of the received class name.
+    - `$identityMapping`: The identity mapping
+    - `$identifierMapping`: The identifier class mapping (`['EntityType' => 'IdType']`)
 
 #### Basic example
 
 ```php
 <?php
 
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Factory\{DomainObjectFactory, EntityAwareFactory};
-use MsgPhp\Domain\Infra\Uuid\DomainId as DomainUuid;
+use MsgPhp\Domain\Infra\InMemory\DomainIdentityMapping;
 
 // --- SETUP ---
 
 class MyEntity
 {
     public $id;
+
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
 }
 
-$factory = new EntityAwareFactory(new DomainObjectFactory(), [
-    MyEntity::class => DomainUuid::class,
-], function (string $class, $id) {
-    $object = new $class();
-    $object->id = $id;
-
-    return $object;
-});
+$factory = new EntityAwareFactory(new DomainObjectFactory(), new DomainIdentityMapping([
+    MyEntity::class => 'id',
+]), [
+    MyEntity::class => DomainId::class,
+]);
 
 // --- USAGE ---
 
 /** @var MyEntity $entity */
-$ref = $factory->reference(MyEntity::class, new DomainUuid());
+$ref = $factory->reference(MyEntity::class, new DomainId('1'));
 
-/** @var DomainUuid $id */
-$id = $factory->identify(MyEntity::class, 'cf3d2f85-6c86-44d1-8634-af51c91a9a74');
+/** @var DomainId $id */
+$id = $factory->identify(MyEntity::class, 1);
 
-/** @var DomainUuid $id */
+/** @var DomainId $id */
 $id = $factory->nextIdentifier(MyEntity::class);
 ```
+### `MsgPhp\Domain\Infra\Doctrine\EntityAwareFactory`
 
-When working with Doctrine one can leverage its tailored [entity reference loader](../../infrastructure/doctrine-orm.md#entity-reference-loader)
-and provide it as the callable reference loader to be used.
+A Doctrine tailored entity aware factory.
+
+- [Read more](../../infrastructure/doctrine-orm.md#entity-aware-factory)

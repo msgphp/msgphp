@@ -98,7 +98,7 @@ mapping. In case the class is not mapped it will be used as is.
 
 - `__construct(DomainObjectFactoryInterface $factory, array $mapping)`
     - `$factory`: The decorated object factory
-    - `$mapping`: The class mapping (`['SourceClass' => 'TargetClass']`)
+    - `$mapping`: The class mapping (`['SourceType' => 'TargetType']`)
 
 #### Basic example
 

@@ -65,6 +65,6 @@ $mapping->getIdentity($compositeEntity); // ['name' => ..., 'year' => ...]
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`
 
-Identity mapping based on Doctrine's identity map.
+A Doctrine tailored identity mapping.
 
 - [Read more](../infrastructure/doctrine-orm.md#domain-identity-mapping)

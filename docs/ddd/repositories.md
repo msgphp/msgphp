@@ -110,7 +110,7 @@ if ($repository->exists(1)) {
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`
 
-Repository trait based on _Doctrine ORM_ persistence.
+A Doctrine tailored repository trait.
 
 - [Read more](../infrastructure/doctrine-orm.md#domain-repository)
 
