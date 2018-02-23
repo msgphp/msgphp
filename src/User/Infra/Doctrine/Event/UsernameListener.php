@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Doctrine\Event;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use MsgPhp\User\Entity\Username;
 
 /**
@@ -42,7 +43,7 @@ final class UsernameListener
     {
         $em = $event->getEntityManager();
 
-        foreach ($this->getUsernames($entity, $event->getEntityManager()->getClassMetadata(get_class($entity))) as $username) {
+        foreach ($this->getUsernames($entity, $em) as $username) {
             $em->persist($username);
         }
     }
@@ -52,11 +53,7 @@ final class UsernameListener
      */
     public function update($entity, PreUpdateEventArgs $event): void
     {
-        if (!isset($this->mapping[$class = get_class($entity)])) {
-            throw new \LogicException(sprintf('No username mapping available for entity "%s".', $class));
-        }
-
-        foreach ($this->mapping[$class] as $mapping) {
+        foreach ($this->getMapping($entity, $event->getEntityManager()) as $mapping) {
             if (!$event->hasChangedField($mapping['field'])) {
                 continue;
             }
@@ -70,13 +67,10 @@ final class UsernameListener
      */
     public function remove($entity, LifecycleEventArgs $event): void
     {
-        if (!isset($this->mapping[$class = get_class($entity)])) {
-            throw new \LogicException(sprintf('No username mapping available for entity "%s".', $class));
-        }
+        $em = $event->getEntityManager();
+        $metadata = $em->getClassMetadata(get_class($entity));
 
-        $metadata = $event->getEntityManager()->getClassMetadata($class);
-
-        foreach ($this->mapping[$class] as $mapping) {
+        foreach ($this->getMapping($entity, $em) as $mapping) {
             if (!isset($mapping['mapped_by'])) {
                 continue;
             }
@@ -104,9 +98,9 @@ final class UsernameListener
             }
         }
 
-        $this->updateUsernames = [];
-
         $em->flush();
+
+        $this->updateUsernames = [];
     }
 
     /**
@@ -114,18 +108,29 @@ final class UsernameListener
      *
      * @return Username[]
      */
-    private function getUsernames($entity, ClassMetadataInfo $metadata): iterable
+    private function getUsernames($entity, EntityManagerInterface $em): iterable
     {
+        $metadata = $em->getClassMetadata(get_class($entity));
 
-        if (!isset($this->mapping[$class = get_class($entity)])) {
-            // @fixme resolve discriminated classes
-            throw new \LogicException(sprintf('No username mapping available for entity "%s".', $class));
-        }
-
-        foreach ($this->mapping[$class] as $mapping) {
+        foreach ($this->getMapping($entity, $em) as $mapping) {
             $user = isset($mapping['mapped_by']) ? $metadata->getFieldValue($entity, $mapping['mapped_by']) : $entity;
 
             yield new Username($user, $metadata->getFieldValue($entity, $mapping['field']));
         }
+    }
+
+    private function getMapping($entity, EntityManagerInterface $em): array
+    {
+        if (isset($this->mapping[$class = ClassUtils::getClass($entity)])) {
+            return $this->mapping[$class];
+        }
+
+        foreach ($em->getClassMetadata($class)->parentClasses as $parent) {
+            if (isset($this->mapping[$parent])) {
+                return $this->mapping[$parent];
+            }
+        }
+
+        throw new \LogicException(sprintf('No username mapping available for entity "%s".', $class));
     }
 }
