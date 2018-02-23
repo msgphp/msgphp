@@ -90,17 +90,17 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setArgument('$mapping', $classMapping);
 
         $entityFactory = self::register($container, Factory\EntityAwareFactory::class)
-            ->setArgument('$factory', new Reference(Factory\DomainObjectFactory::class))
+            ->setAutowired(true)
             ->setArgument('$identifierMapping', $idClassMapping);
 
         if ($container->has(DoctrineEntityManager::class)) {
-            $entityFactory->setArgument('$referenceLoader', ContainerHelper::registerAnonymous($container, DoctrineInfra\EntityReferenceLoader::class)
+            $entityFactory = self::register($container, DoctrineInfra\EntityAwareFactory::class)
                 ->setAutowired(true)
-                ->setArgument('$classMapping', $classMapping));
+                ->setArgument('$factory', new Reference(Factory\EntityAwareFactory::class));
         }
 
         self::alias($container, Factory\DomainObjectFactoryInterface::class, $aliasId);
-        self::alias($container, Factory\EntityAwareFactoryInterface::class, Factory\EntityAwareFactory::class);
+        self::alias($container, Factory\EntityAwareFactoryInterface::class, $entityFactory->getClass());
     }
 
     private function registerMessageBus(ContainerBuilder $container): void

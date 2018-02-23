@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
+use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 
@@ -13,10 +14,12 @@ use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $factory;
+    private $em;
 
-    public function __construct(EntityAwareFactoryInterface $factory)
+    public function __construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em)
     {
         $this->factory = $factory;
+        $this->em = $em;
     }
 
     public function create(string $class, array $context = [])
@@ -26,7 +29,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function reference(string $class, $id)
     {
-        return $this->factory->reference($class, $id);
+        return $this->em->getReference($class, $id);
     }
 
     public function identify(string $class, $value): DomainIdInterface
