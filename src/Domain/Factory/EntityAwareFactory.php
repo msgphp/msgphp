@@ -16,7 +16,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
     private $identityMapping;
     private $identifierMapping;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainIdentityMappingInterface $identityMapping, array $identifierMapping)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainIdentityMappingInterface $identityMapping, array $identifierMapping = [])
     {
         $this->factory = $factory;
         $this->identityMapping = $identityMapping;

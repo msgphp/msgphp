@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 
 /**
@@ -29,7 +30,11 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function reference(string $class, $id)
     {
-        return $this->em->getReference($class, $id);
+        if (null === $ref = $this->em->getReference($class, $id)) {
+            throw InvalidClassException::create($class);
+        }
+
+        return $ref;
     }
 
     public function identify(string $class, $value): DomainIdInterface
