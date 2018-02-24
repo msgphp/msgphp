@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 final class ConfigHelper
 {
+    public const DEFAULT_ID_TYPE = 'integer';
+    public const UUID_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
     public const NATIVE_DATA_TYPES = ['string', 'integer', 'bigint'];
     public const UUID_DATA_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
 

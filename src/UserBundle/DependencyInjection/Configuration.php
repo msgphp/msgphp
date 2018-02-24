@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection;
 
 use MsgPhp\Domain\Entity\Features;
+use MsgPhp\Domain\Infra\Config\NodeBuilder;
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\User\{Command, CredentialInterface, Entity, UserId, UserIdInterface};
 use MsgPhp\User\Infra\Uuid as UuidInfra;
@@ -23,7 +24,7 @@ final class Configuration implements ConfigurationInterface
     public const AGGREGATE_ROOTS = self::REQUIRED_AGGREGATE_ROOTS + self::OPTIONAL_AGGREGATE_ROOTS;
     public const IDENTITY_MAPPING = [
         Entity\UserAttributeValue::class => ['user', 'attributeValue'],
-        Entity\User::class => 'id',
+        Entity\User::class => ['id'],
         Entity\Username::class => ['user', 'username'],
         Entity\UserRole::class => ['user', 'role'],
         Entity\UserSecondaryEmail::class => ['user', 'email'],
@@ -51,10 +52,22 @@ final class Configuration implements ConfigurationInterface
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
+        /** @var NodeBuilder $children */
+        $children = ($treeBuilder = new TreeBuilder())->root(Extension::ALIAS, 'array', new NodeBuilder())->children();
         $ids = array_values(self::AGGREGATE_ROOTS);
         $entities = array_keys(self::IDENTITY_MAPPING);
         $requiredEntities = array_keys(self::REQUIRED_AGGREGATE_ROOTS);
+
+
+        $children
+            ->classMappingNode('class_mapping')
+                ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
+                ->forceSubClassValues()
+            ->end()
+            //->scalarNode('other_node')->end()
+            ->classMappingNode('other_class_mapping')->end()
+        ->end();
+
 
         $treeBuilder->root(Extension::ALIAS)
             ->append(
