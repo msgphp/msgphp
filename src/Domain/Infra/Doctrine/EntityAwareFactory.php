@@ -30,6 +30,10 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function reference(string $class, $id)
     {
+        if ($this->em->getMetadataFactory()->isTransient($class) || !class_exists($class)) {
+            throw InvalidClassException::create($class);
+        }
+
         if (null === $ref = $this->em->getReference($class, $id)) {
             throw InvalidClassException::create($class);
         }

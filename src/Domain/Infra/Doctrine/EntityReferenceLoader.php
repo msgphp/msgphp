@@ -9,6 +9,7 @@ use MsgPhp\Domain\DomainIdentityHelper;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
  * @todo remove, built in with EntityAwareFactory
  */
 final class EntityReferenceLoader
