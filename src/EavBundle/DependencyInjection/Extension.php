@@ -6,7 +6,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\{ConfigHelper, ContainerHelper};
+use MsgPhp\Domain\Infra\DependencyInjection\{ConfigHelper, ContainerHelper};
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

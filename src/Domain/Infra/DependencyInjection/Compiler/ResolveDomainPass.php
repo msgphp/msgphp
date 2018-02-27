@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
 use SimpleBus\Message\Bus\MessageBus as SimpleMessageBus;
 use Symfony\Component\DependencyInjection\Alias;

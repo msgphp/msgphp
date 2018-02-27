@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\Doctrine\{EntityFieldsMapping, ObjectFieldMappingProviderInterface};
 use MsgPhp\Domain\Infra\Doctrine\Event\ObjectFieldMappingListener;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

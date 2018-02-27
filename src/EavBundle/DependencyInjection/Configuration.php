@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ConfigHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Uuid as UuidInfra;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

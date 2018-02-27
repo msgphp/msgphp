@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\DependencyInjection\Bundle;
+namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;

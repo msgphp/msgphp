@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp;
 
-use MsgPhp\Domain\Infra\DependencyInjection\Bundle\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Eav\AttributeIdInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
