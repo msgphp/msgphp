@@ -100,6 +100,12 @@ final class ContainerHelper
 
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
+        foreach ($idClassMapping as $class => $idClass) {
+            if (isset($classMapping[$class])) {
+                $idClassMapping[$classMapping[$class]] = $idClass;
+            }
+        }
+
         $values = $container->hasParameter($param = 'msgphp.domain.class_mapping') ? $container->getParameter($param) : [];
         $values[] = $classMapping;
 
