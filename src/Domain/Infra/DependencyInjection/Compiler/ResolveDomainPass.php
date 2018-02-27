@@ -36,7 +36,7 @@ final class ResolveDomainPass implements CompilerPassInterface
             self::register($container, DoctrineInfra\MappingCacheWarmer::class)
                 ->setArgument('$dirname', '%msgphp.doctrine.mapping_cache_dirname%')
                 ->setArgument('$mappingFiles', $mappingFiles)
-                ->addTag('kernel.cache_warmer');
+                ->addTag('kernel.cache_warmer', ['priority' => 100]);
         }
     }
 
