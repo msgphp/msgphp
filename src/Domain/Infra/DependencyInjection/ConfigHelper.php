@@ -12,8 +12,6 @@ use MsgPhp\Domain\Infra\Uuid as UuidInfra;
  * @author Roland Franssen <franssen.roland@gmail.com>
  *
  * @internal
- *
- * @todo move to BundleHelper
  */
 final class ConfigHelper
 {
