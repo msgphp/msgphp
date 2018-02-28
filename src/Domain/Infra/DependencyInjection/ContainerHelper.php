@@ -117,48 +117,43 @@ final class ContainerHelper
         $container->setParameter($param, $values);
     }
 
-    public static function configureDoctrineTypes(ContainerBuilder $container, array $dataTypeMapping, array $classMapping, array $typeMapping): void
+    public static function configureDoctrineTypes(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping): void
     {
         if (!class_exists(DoctrineType::class)) {
             return;
         }
 
-        $types = $mappingTypes = $typeConfig = [];
+        $dbalTypes = $mappingTypes = $typeConfig = [];
         $uuidMapping = [
             'uuid' => DoctrineUuid\UuidType::class,
             'uuid_binary' => DoctrineUuid\UuidBinaryType::class,
             'uuid_binary_ordered_time' => DoctrineUuid\UuidBinaryOrderedTimeType::class,
         ];
 
-        foreach ($typeMapping as $class => $type) {
-            $dataType = $dataTypeMapping[$class] ?? DoctrineType::INTEGER;
+        foreach ($typeClassMapping as $idClass => $typeClass) {
+            $type = $idTypeMapping[$idClass] ?? DoctrineType::INTEGER;
 
-            if (isset($uuidMapping[$dataType])) {
-                if (!class_exists($uuidClass = $uuidMapping[$dataType])) {
-                    throw new \LogicException(sprintf('Data type "%s" for identifier "%s" requires "ramsey/uuid-doctrine".', $dataType, $class));
+            if (isset($uuidMapping[$type])) {
+                if (!class_exists($uuidClass = $uuidMapping[$type])) {
+                    throw new \LogicException(sprintf('Type "%s" for identifier "%s" requires "ramsey/uuid-doctrine".', $type, $idClass));
                 }
 
-                $types[$uuidClass::NAME] = $uuidClass;
+                $dbalTypes[$uuidClass::NAME] = $uuidClass;
 
-                if ('uuid_binary' === $dataType || 'uuid_binary_ordered_time' === $dataType) {
-                    $mappingTypes[$dataType] = 'binary';
+                if ('uuid_binary' === $type || 'uuid_binary_ordered_time' === $type) {
+                    $mappingTypes[$type] = 'binary';
                 }
             }
 
-            if (!defined($type.'::NAME')) {
-                throw new \LogicException(sprintf('Type class "%s" for identifier "%s" requires a "NAME" constant.', $type, $class));
+            if (!defined($typeClass.'::NAME')) {
+                throw new \LogicException(sprintf('Type class "%s" for identifier "%s" requires a "NAME" constant.', $typeClass, $idClass));
             }
 
-            $types[$type::NAME] = $type;
-            $typeConfig[$type::NAME] = ['class' => $classMapping[$class] ?? $class, 'type' => $type, 'data_type' => $dataType];
+            $dbalTypes[$typeClass::NAME] = $typeClass;
+            $typeConfig[$typeClass::NAME] = ['class' => $classMapping[$idClass] ?? $idClass, 'type' => $type, 'type_class' => $typeClass];
         }
 
-        $config = $types ? ['types' => $types] : [];
-        if ($mappingTypes) {
-            $config['mapping_types'] = $mappingTypes;
-        }
-
-        if ($config) {
+        if ($dbalTypes || $mappingTypes) {
             if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
                 $typeConfig += $container->getParameter($param);
             }
@@ -166,9 +161,7 @@ final class ContainerHelper
             $container->setParameter($param, $typeConfig);
 
             if (self::hasBundle($container, DoctrineBundle::class)) {
-                $container->prependExtensionConfig('doctrine', [
-                    'dbal' => $config,
-                ]);
+                $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => $dbalTypes, 'mapping_types' => $mappingTypes]]);
             }
         }
     }

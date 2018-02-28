@@ -72,8 +72,8 @@ final class BundleHelper
 
         if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
             foreach ($container->getParameter($param) as $config) {
-                $config['type']::setClass($config['class']);
-                $config['type']::setDataType($config['data_type']);
+                $config['type_class']::setClass($config['class']);
+                $config['type_class']::setDataType($config['type']);
             }
         }
 
