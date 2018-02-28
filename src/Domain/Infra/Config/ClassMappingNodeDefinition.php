@@ -23,6 +23,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     /** @var BaseNodeBuilder|null */
     private $builder;
     private $prototype;
+    private $type = 'scalar';
 
     public function requireClasses(array $classes): self
     {
@@ -50,6 +51,13 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
                 })
                 ->thenInvalid(sprintf('Class mapping for "%s" is not applicable.', $class));
         }
+
+        return $this;
+    }
+
+    public function typeOfValues(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
@@ -84,6 +92,16 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
             }
 
             return $value;
+        });
+
+        return $this;
+    }
+
+    public function defaultMapping(array $mapping): self
+    {
+        $this->defaultValue($mapping);
+        $this->validate()->always(function (array $value) use ($mapping): array {
+            return $value + $mapping;
         });
 
         return $this;
@@ -133,7 +151,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         $prototypedNode = $prototype->getNode();
 
         if (!$prototypedNode instanceof PrototypeNodeInterface) {
-            throw new \LogicException(sprintf('Protoryped nodes must be an instance of "%s", got "%s".', PrototypeNodeInterface::class, get_class($prototypedNode)));
+            throw new \LogicException(sprintf('Prototyped node must be an instance of "%s", got "%s".', PrototypeNodeInterface::class, get_class($prototypedNode)));
         }
 
         $node->setPrototype($prototypedNode);
@@ -144,7 +162,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     private function getPrototype(): NodeDefinition
     {
         if (null === $this->prototype) {
-            $this->prototype = ($this->builder ?? new NodeBuilder())->node(null, 'scalar');
+            $this->prototype = ($this->builder ?? new NodeBuilder())->node(null, $this->type);
             $this->prototype->setParent($this);
         }
 

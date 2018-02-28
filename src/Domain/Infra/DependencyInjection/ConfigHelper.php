@@ -7,10 +7,6 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Infra\Uuid as UuidInfra;
-use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -23,7 +19,6 @@ final class ConfigHelper
 {
     public const DEFAULT_ID_TYPE = 'integer';
     public const UUID_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
-    public const UUID_DATA_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
 
     public static function defaultBundleConfig(array $defaultIdClassMapping, array $idClassMappingPerType): \Closure
     {
@@ -57,21 +52,16 @@ final class ConfigHelper
         };
     }
 
-    public static function resolveCommandMapping(array $classMapping, array $mapping, array &$config): void
+    public static function resolveCommandMappingConfig(array $commandMapping, array $classMapping, array &$config): void
     {
-        foreach ($mapping as $class => $traits) {
-            $mappedClass = $classMapping[$class] ?? $class;
-            if ($class !== $mappedClass && !is_subclass_of($mappedClass, $class)) {
-                continue;
-            }
-
+        foreach ($commandMapping as $commandClass => $features) {
+            $mappedClass = $classMapping[$commandClass] ?? $commandClass;
             $isEventHandler = is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
-            foreach ($traits as $trait => $traitConfig) {
-                if (!self::uses($mappedClass, $trait)) {
-                    continue;
-                }
 
-                $config += array_fill_keys($traitConfig, $isEventHandler);
+            foreach ($features as $feature => $featureCommands) {
+                if (self::uses($mappedClass, $feature)) {
+                    $config += array_fill_keys($featureCommands, $isEventHandler);
+                }
             }
         }
     }

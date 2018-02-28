@@ -48,7 +48,10 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('id_type_mapping')
                 ->subClassKeys([DomainIdInterface::class])
             ->end()
-            ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
+            ->scalarNode('default_id_type')
+                ->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)
+                ->cannotBeEmpty()
+            ->end()
         ->end()
         ->validate()
             ->always(ConfigHelper::defaultBundleConfig(

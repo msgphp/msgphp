@@ -64,8 +64,17 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('id_type_mapping')
                 ->subClassKeys([DomainIdInterface::class])
             ->end()
-            ->classMappingNode('commands')->end()
-            ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
+            ->classMappingNode('commands')
+                ->typeOfValues('boolean')
+                ->defaultMapping([
+                    Command\CreateUserCommand::class => true,
+                    Command\DeleteUserCommand::class => true,
+                ])
+            ->end()
+            ->scalarNode('default_id_type')
+                ->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)
+                ->cannotBeEmpty()
+            ->end()
             ->arrayNode('username_lookup')
                 ->arrayPrototype()
                     ->children()
@@ -122,16 +131,12 @@ final class Configuration implements ConfigurationInterface
                 $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
                 $config['username_field'] = $userCredential['username_field'];
                 $config['username_lookup'] = $usernameLookup;
-                $config['commands'] += [
-                    Command\CreateUserCommand::class => true,
-                    Command\DeleteUserCommand::class => true,
-                ];
 
-                if (null !== $userCredential['username_field']) {
+                if (null !== $userCredential['username_field'] && !isset($config['commands'][Command\ChangeUserCredentialCommand::class])) {
                     $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
                 }
 
-                ConfigHelper::resolveCommandMapping($config['class_mapping'], self::COMMAND_MAPPING, $config['commands']);
+                ConfigHelper::resolveCommandMappingConfig(self::COMMAND_MAPPING, $config['class_mapping'], $config['commands']);
 
                 return $config;
             })
