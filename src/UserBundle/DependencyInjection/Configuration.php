@@ -69,7 +69,16 @@ final class Configuration implements ConfigurationInterface
             ->arrayNode('username_lookup')
                 ->arrayPrototype()
                     ->children()
-                        ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
+                        ->scalarNode('target')
+                            ->isRequired()
+                            ->cannotBeEmpty()
+                            ->validate()
+                                ->ifTrue(function ($value): bool {
+                                    return Entity\Username::class === $value;
+                                })
+                                ->thenInvalid('Target %s is not applicable.')
+                            ->end()
+                        ->end()
                         ->scalarNode('field')->isRequired()->cannotBeEmpty()->end()
                         ->scalarNode('mapped_by')->defaultValue('user')->cannotBeEmpty()->end()
                     ->end()
@@ -108,12 +117,9 @@ final class Configuration implements ConfigurationInterface
                     if (null !== $userCredential['username_field']) {
                         $usernameLookup[$userClass][] = ['target' => $userClass, 'field' => $userCredential['username_field']];
                     }
-
-                    if (isset($usernameLookup[Entity\Username::class])) {
-                        throw new \LogicException(sprintf('Username lookup mapping for "%s" is not applicable.', Entity\Username::class));
-                    }
                 }
 
+                $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
                 $config['username_field'] = $userCredential['username_field'];
                 $config['username_lookup'] = $usernameLookup;
                 $config['commands'] += [
@@ -121,8 +127,7 @@ final class Configuration implements ConfigurationInterface
                     Command\DeleteUserCommand::class => true,
                 ];
 
-                if (null !== $userCredential['class']) {
-                    $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
+                if (null !== $userCredential['username_field']) {
                     $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
                 }
 
@@ -138,7 +143,7 @@ final class Configuration implements ConfigurationInterface
     private static function getUserCredential(string $userClass): array
     {
         if (null === $credential = (new \ReflectionMethod($userClass, 'getCredential'))->getReturnType()) {
-            return ['class' => null, 'username_field' => null];
+            return ['class' => Entity\Credential\Anonymous::class, 'username_field' => null];
         }
 
         if ($credential->isBuiltin() || !is_subclass_of($class = $credential->getName(), CredentialInterface::class)) {

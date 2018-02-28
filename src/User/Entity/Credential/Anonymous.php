@@ -13,7 +13,7 @@ final class Anonymous implements CredentialInterface
 {
     public static function getUsernameField(): string
     {
-        return 'username';
+        throw new \LogicException('An anonymous credential has no username field.');
     }
 
     public function getUsername(): string
