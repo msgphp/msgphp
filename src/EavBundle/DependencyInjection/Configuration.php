@@ -26,16 +26,6 @@ final class Configuration implements ConfigurationInterface
         Entity\Attribute::class => ['id'],
         Entity\AttributeValue::class => ['id'],
     ];
-    public const DATA_TYPE_MAPPING = [
-        AttributeIdInterface::class => [
-            AttributeId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            UuidInfra\AttributeId::class => ConfigHelper::UUID_DATA_TYPES,
-        ],
-        AttributeValueIdInterface::class => [
-            AttributeValueId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            UuidInfra\AttributeValueId::class => ConfigHelper::UUID_DATA_TYPES,
-        ],
-    ];
     public const DEFAULT_ID_CLASS_MAPPING = [
         AttributeIdInterface::class => AttributeId::class,
         AttributeValueIdInterface::class => AttributeValueId::class,
