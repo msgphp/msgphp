@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\DependencyInjection;
 
+use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilder};
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
@@ -58,9 +59,11 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('class_mapping')
                 ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
                 ->disallowClasses([CredentialInterface::class, Entity\Username::class])
-                ->forceSubClassValues()
+                ->subClassValues()
             ->end()
-            ->classMappingNode('id_type_mapping')->end()
+            ->classMappingNode('id_type_mapping')
+                ->subClassKeys([DomainIdInterface::class])
+            ->end()
             ->classMappingNode('commands')->end()
             ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
             ->arrayNode('username_lookup')

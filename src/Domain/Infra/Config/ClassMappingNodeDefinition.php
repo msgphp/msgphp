@@ -54,12 +54,32 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         return $this;
     }
 
-    public function forceSubClassValues(): self
+    public function subClassValues(): self
     {
         $this->validate()->always(function (array $value): array {
             foreach ($value as $class => $mappedClass) {
+                if (!is_string($mappedClass)) {
+                    throw new \LogicException(sprintf('Mapped value for class "%s" must be a string, got "%s".', $class, gettype($mappedClass)));
+                }
                 if (!is_subclass_of($mappedClass, $class)) {
-                    throw new \LogicException(sprintf('Class "%s" must be a sub class of "%s".', $mappedClass, $class));
+                    throw new \LogicException(sprintf('Mapped class "%s" must be a sub class of "%s".', $mappedClass, $class));
+                }
+            }
+
+            return $value;
+        });
+
+        return $this;
+    }
+
+    public function subClassKeys(array $classes): self
+    {
+        $this->validate()->always(function (array $value) use ($classes): array {
+            foreach ($value as $class => $classValue) {
+                foreach ($classes as $subClass) {
+                    if (!is_subclass_of($class, $subClass)) {
+                        throw new \LogicException(sprintf('Class "%s" must be a sub class of "%s".', $class, $subClass));
+                    }
                 }
             }
 

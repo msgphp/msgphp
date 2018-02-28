@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
+use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilder};
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Entity};
@@ -42,9 +43,11 @@ final class Configuration implements ConfigurationInterface
         $children
             ->classMappingNode('class_mapping')
                 ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
-                ->forceSubClassValues()
+                ->subClassValues()
             ->end()
-            ->classMappingNode('id_type_mapping')->end()
+            ->classMappingNode('id_type_mapping')
+                ->subClassKeys([DomainIdInterface::class])
+            ->end()
             ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
         ->end()
         ->validate()
