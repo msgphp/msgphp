@@ -10,8 +10,16 @@ parameters:
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
         - '#Class MsgPhp\\Domain\\Tests\\Factory\\WrongCase referenced with incorrect case: MsgPhp\\Domain\\Tests\\Factory\\wrongcase\.#'
 
-        # fluent mixed interface usage in src/*Bundle/DependencyInjection/Configuration.php
-        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::append\(\)\.#'
+        # see https://github.com/symfony/symfony/pull/26297
+        - '#Parameter \#1 \$name of method Symfony\\Component\\Config\\Definition\\Builder\\NodeBuilder::node\(\) expects string, null given\.#'
+
+        # forward compatibility
+        - '#Class MsgPhp\\Domain\\Infra\\Config\\ClassMappingNode constructor invoked with 3 parameters, 1\-2 required\.#'
+        - '#Access to an undefined property MsgPhp\\Domain\\Infra\\Config\\ClassMappingNodeDefinition::\$pathSeparator#'
+
+        # symfony fluent config
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface::classMappingNode\(\)\.#'
+        - '#Calling method classMappingNode\(\) on possibly null value of type Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
 
     excludes_analyse:
         - '*/vendor/*'

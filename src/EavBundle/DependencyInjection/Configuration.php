@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use MsgPhp\Domain\Infra\Config\NodeBuilder;
+use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilder};
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Uuid as UuidInfra;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
@@ -38,7 +37,7 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         /** @var NodeBuilder $children */
-        $children = ($treeBuilder = new TreeBuilder())->root(Extension::ALIAS, 'array', new NodeBuilder())->children();
+        $children = ($treeBuilder = new TreeBuilder())->rootArray(Extension::ALIAS)->children();
 
         $children
             ->classMappingNode('class_mapping')

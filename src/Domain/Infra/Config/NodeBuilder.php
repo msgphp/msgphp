@@ -15,11 +15,14 @@ final class NodeBuilder extends BaseNodeBuilder
     {
         parent::__construct();
 
-        $this->nodeMapping[ClassMappingNodeDefinition::NAME] = ClassMappingNodeDefinition::class;
+        $this->setNodeClass(ClassMappingNodeDefinition::NAME, ClassMappingNodeDefinition::class);
     }
 
     public function classMappingNode(string $name): ClassMappingNodeDefinition
     {
-        return $this->node($name, ClassMappingNodeDefinition::NAME);
+        /** @var ClassMappingNodeDefinition $node */
+        $node = $this->node($name, ClassMappingNodeDefinition::NAME);
+
+        return $node;
     }
 }

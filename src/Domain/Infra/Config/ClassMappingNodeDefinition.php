@@ -11,6 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\PrototypeNodeInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -89,7 +90,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     }
 
     /**
-     * @return NodeParentInterface|BaseNodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|NodeBuilder|null
+     * @return NodeParentInterface|BaseNodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|NodeBuilder|self|null
      */
     public function end()
     {
@@ -109,7 +110,13 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
 
         $prototype = $this->getPrototype();
         $prototype->parent = $node;
-        $node->setPrototype($prototype->getNode());
+        $prototypedNode = $prototype->getNode();
+
+        if (!$prototypedNode instanceof PrototypeNodeInterface) {
+            throw new \LogicException(sprintf('Protoryped nodes must be an instance of "%s", got "%s".', PrototypeNodeInterface::class, get_class($prototypedNode)));
+        }
+
+        $node->setPrototype($prototypedNode);
 
         return $node;
     }

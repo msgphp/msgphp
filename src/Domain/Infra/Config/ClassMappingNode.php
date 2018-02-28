@@ -17,7 +17,7 @@ final class ClassMappingNode extends PrototypedArrayNode
         $this->setMinNumberOfElements($allowEmptyValue ? 0 : 1);
     }
 
-    protected function validateType($value)
+    protected function validateType($value): void
     {
         parent::validateType($value);
 
