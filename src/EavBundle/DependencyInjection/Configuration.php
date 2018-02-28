@@ -48,10 +48,12 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('id_type_mapping')->end()
             ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
         ->end()
-        ->validate()->always(ConfigHelper::defaultBundleConfig(
-            self::DEFAULT_ID_CLASS_MAPPING,
-            array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_CLASS_MAPPING)
-        ));
+        ->validate()
+            ->always(ConfigHelper::defaultBundleConfig(
+                self::DEFAULT_ID_CLASS_MAPPING,
+                array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_CLASS_MAPPING)
+            ))
+        ->end();
 
         return $treeBuilder;
     }

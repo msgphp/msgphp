@@ -29,11 +29,11 @@ final class Configuration implements ConfigurationInterface
         Entity\UserRole::class => ['user', 'role'],
         Entity\UserSecondaryEmail::class => ['user', 'email'],
     ];
-    public const DATA_TYPE_MAPPING = [
-        UserIdInterface::class => [
-            UserId::class => ConfigHelper::NATIVE_DATA_TYPES,
-            UuidInfra\UserId::class => ConfigHelper::UUID_DATA_TYPES,
-        ],
+    public const DEFAULT_ID_CLASS_MAPPING = [
+        UserIdInterface::class => UserId::class,
+    ];
+    public const UUID_CLASS_MAPPING = [
+        UserIdInterface::class => UuidInfra\UserId::class,
     ];
     private const COMMAND_MAPPING = [
         Entity\User::class => [
@@ -54,111 +54,81 @@ final class Configuration implements ConfigurationInterface
     {
         /** @var NodeBuilder $children */
         $children = ($treeBuilder = new TreeBuilder())->root(Extension::ALIAS, 'array', new NodeBuilder())->children();
-        $ids = array_values(self::AGGREGATE_ROOTS);
-        $entities = array_keys(self::IDENTITY_MAPPING);
-        $requiredEntities = array_keys(self::REQUIRED_AGGREGATE_ROOTS);
-
 
         $children
             ->classMappingNode('class_mapping')
                 ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
+                ->disallowClasses([CredentialInterface::class, Entity\Username::class])
                 ->forceSubClassValues()
             ->end()
-            //->scalarNode('other_node')->end()
-            ->classMappingNode('other_class_mapping')->end()
-        ->end();
-
-
-        $treeBuilder->root(Extension::ALIAS)
-            ->append(
-                ConfigHelper::createClassMappingNode('class_mapping', $requiredEntities, $entities, true, function (array $value) use ($ids): array {
-                    return $value + array_fill_keys($ids, null);
-                })
-            )
-            ->append(
-                ConfigHelper::createClassMappingNode('data_type_mapping', [], [], false, function ($value) use ($ids): array {
-                    if (!is_array($value)) {
-                        $value = array_fill_keys($ids, $value);
-                    } else {
-                        $value += array_fill_keys($ids, null);
-                    }
-
-                    return $value;
-                })->addDefaultChildrenIfNoneSet($ids)
-            )
-            ->append(
-                ConfigHelper::createClassMappingNode('commands', [], [], false, null, true, 'boolean')
-            )
-            ->children()
-                ->arrayNode('username_lookup')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('field')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('mapped_by')->defaultValue('user')->cannotBeEmpty()->end()
-                        ->end()
+            ->classMappingNode('id_type_mapping')->end()
+            ->classMappingNode('commands')->end()
+            ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
+            ->arrayNode('username_lookup')
+                ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('target')->isRequired()->cannotBeEmpty()->end()
+                        ->scalarNode('field')->isRequired()->cannotBeEmpty()->end()
+                        ->scalarNode('mapped_by')->defaultValue('user')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end()
-            ->validate()
-                ->always(function (array $config): array {
-                    if (isset($config['class_mapping'][Entity\Username::class])) {
-                        throw new \LogicException(sprintf('Class mapping for "%s" is not applicable.', Entity\Username::class));
+        ->end()
+        ->validate()
+            ->always(ConfigHelper::defaultBundleConfig(
+                self::DEFAULT_ID_CLASS_MAPPING,
+                array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_CLASS_MAPPING)
+            ))
+        ->end()
+        ->validate()
+            ->always(function (array $config): array {
+                $usernameLookup = [];
+                foreach ($config['username_lookup'] as &$value) {
+                    if (isset($config['class_mapping'][$value['target']])) {
+                        $value['target'] = $config['class_mapping'][$value['target']];
                     }
 
-                    $usernameLookup = [];
-                    foreach ($config['username_lookup'] as &$value) {
-                        if (isset($config['class_mapping'][$value['target']])) {
-                            $value['target'] = $config['class_mapping'][$value['target']];
-                        }
-
-                        if (isset($usernameLookup[$value['target']]) && in_array($value, $usernameLookup[$value['target']], true)) {
-                            throw new \LogicException(sprintf('Duplicate username lookup mapping for "%s".', $value['target']));
-                        }
-
-                        $usernameLookup[$value['target']][] = $value;
-                    }
-                    unset($value);
-
-                    $userCredential = self::getUserCredential($userClass = $config['class_mapping'][Entity\User::class]);
-
-                    if ($usernameLookup) {
-                        if (isset($usernameLookup[$userClass])) {
-                            throw new \LogicException(sprintf('Username lookup mapping for "%s" cannot be overwritten.', $userClass));
-                        }
-
-                        if (null !== $userCredential['username_field']) {
-                            $usernameLookup[$userClass][] = ['target' => $userClass, 'field' => $userCredential['username_field']];
-                        }
-
-                        if (isset($usernameLookup[Entity\Username::class])) {
-                            throw new \LogicException(sprintf('Username lookup mapping for "%s" is not applicable.', Entity\Username::class));
-                        }
-
-                        $config['class_mapping'][Entity\Username::class] = Entity\Username::class;
+                    if (isset($usernameLookup[$value['target']]) && in_array($value, $usernameLookup[$value['target']], true)) {
+                        throw new \LogicException(sprintf('Duplicate username lookup mapping for "%s".', $value['target']));
                     }
 
-                    $config['username_field'] = $userCredential['username_field'];
-                    $config['username_lookup'] = $usernameLookup;
-                    $config['commands'] += [
-                        Command\CreateUserCommand::class => true,
-                        Command\DeleteUserCommand::class => true,
-                    ];
+                    $usernameLookup[$value['target']][] = $value;
+                }
+                unset($value);
 
-                    if (null !== $userCredential['class']) {
-                        if (isset($config['class_mapping'][CredentialInterface::class])) {
-                            throw new \LogicException(sprintf('Class mapping for "%s" cannot be overwritten.', CredentialInterface::class));
-                        }
+                $userCredential = self::getUserCredential($userClass = $config['class_mapping'][Entity\User::class]);
 
-                        $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
-                        $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
+                if ($usernameLookup) {
+                    if (isset($usernameLookup[$userClass])) {
+                        throw new \LogicException(sprintf('Username lookup mapping for "%s" cannot be overwritten.', $userClass));
                     }
 
-                    ConfigHelper::resolveCommandMapping($config['class_mapping'], self::COMMAND_MAPPING, $config['commands']);
+                    if (null !== $userCredential['username_field']) {
+                        $usernameLookup[$userClass][] = ['target' => $userClass, 'field' => $userCredential['username_field']];
+                    }
 
-                    return $config;
-                })
-            ->end();
+                    if (isset($usernameLookup[Entity\Username::class])) {
+                        throw new \LogicException(sprintf('Username lookup mapping for "%s" is not applicable.', Entity\Username::class));
+                    }
+                }
+
+                $config['username_field'] = $userCredential['username_field'];
+                $config['username_lookup'] = $usernameLookup;
+                $config['commands'] += [
+                    Command\CreateUserCommand::class => true,
+                    Command\DeleteUserCommand::class => true,
+                ];
+
+                if (null !== $userCredential['class']) {
+                    $config['class_mapping'][CredentialInterface::class] = $userCredential['class'];
+                    $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
+                }
+
+                ConfigHelper::resolveCommandMapping($config['class_mapping'], self::COMMAND_MAPPING, $config['commands']);
+
+                return $config;
+            })
+        ->end();
 
         return $treeBuilder;
     }
