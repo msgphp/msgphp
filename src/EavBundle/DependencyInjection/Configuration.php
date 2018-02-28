@@ -55,8 +55,13 @@ final class Configuration implements ConfigurationInterface
                 ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
                 ->forceSubClassValues()
             ->end()
+            ->classMappingNode('id_type_mapping')->end()
             ->scalarNode('default_id_type')->cannotBeEmpty()->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)->end()
-        ->end();
+        ->end()
+        ->validate()->always(ConfigHelper::defaultBundleConfig(
+            self::DEFAULT_ID_CLASS_MAPPING,
+            array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_CLASS_MAPPING)
+        ));
 
         return $treeBuilder;
     }

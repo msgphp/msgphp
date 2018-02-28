@@ -119,12 +119,6 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         if (null === $this->prototype) {
             $this->prototype = ($this->builder ?? new NodeBuilder())->node(null, 'scalar');
             $this->prototype->setParent($this);
-            $this->prototype->cannotBeEmpty();
-            $this->prototype->validate()
-                ->ifTrue(function ($value): bool {
-                    return !is_string($value) || (!class_exists($value) && !interface_exists($value));
-                })
-                ->thenInvalid('Mapped class %s does not exists.');
         }
 
         return $this->prototype;

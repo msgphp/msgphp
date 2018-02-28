@@ -57,6 +57,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
+        dump($config);
+        die;
 
         ConfigHelper::resolveResolveDataTypeMapping($container, $config['data_type_mapping']);
         ConfigHelper::resolveClassMapping(Configuration::DATA_TYPE_MAPPING, $config['data_type_mapping'], $config['class_mapping']);

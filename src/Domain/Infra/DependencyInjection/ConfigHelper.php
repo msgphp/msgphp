@@ -76,6 +76,38 @@ final class ConfigHelper
         return $node;
     }
 
+    public static function defaultBundleConfig(array $defaultIdClassMapping, array $idClassMappingPerType): \Closure
+    {
+        return function (array $value) use ($defaultIdClassMapping, $idClassMappingPerType): array {
+            $defaultType = $value['default_id_type'] ?? ConfigHelper::DEFAULT_ID_TYPE;
+            unset($value['default_id_type']);
+
+            if (isset($value['id_type_mapping'])) {
+                foreach ($value['id_type_mapping'] as $class => $type) {
+                    if (isset($value['class_mapping'][$class])) {
+                        continue;
+                    }
+
+                    if (null === $mappedClass = $idClassMapping[$type][$class] ?? $defaultIdClassMapping[$class] ?? null) {
+                        throw new \LogicException(sprintf('Unknown ID class "%s" detected in "id_type_mapping" configuration.', $class));
+                    }
+
+                    $value['class_mapping'][$class] = $mappedClass;
+                }
+            }
+
+            if (isset($idClassMappingPerType[$defaultType])) {
+                $value['class_mapping'] += $idClassMappingPerType[$defaultType];
+                $value['id_type_mapping'] += array_fill_keys(array_keys($idClassMappingPerType[$defaultType]), $defaultType);
+            }
+
+            $value['class_mapping'] += $defaultIdClassMapping;
+            $value['id_type_mapping'] += array_fill_keys(array_keys($defaultIdClassMapping), $defaultType);
+
+            return $value;
+        };
+    }
+
     public static function resolveResolveDataTypeMapping(ContainerBuilder $container, array &$config): void
     {
         if (!$container->hasParameter('msgphp.default_data_type')) {
