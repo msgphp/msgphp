@@ -29,15 +29,20 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerEntityFactory($container);
         $this->registerMessageBus($container);
 
-        if (interface_exists(CacheWarmerInterface::class) && $container->hasParameter($param = 'msgphp.doctrine.mapping_files')) {
-            $mappingFiles = array_merge(...$container->getParameter($param));
-            $container->getParameterBag()->remove($param);
+        if (interface_exists(CacheWarmerInterface::class) && $container->hasParameter('msgphp.doctrine.mapping_files')) {
+            $mappingFiles = array_merge(...$container->getParameter('msgphp.doctrine.mapping_files'));
 
             self::register($container, DoctrineInfra\MappingCacheWarmer::class)
                 ->setArgument('$dirname', '%msgphp.doctrine.mapping_cache_dirname%')
                 ->setArgument('$mappingFiles', $mappingFiles)
                 ->addTag('kernel.cache_warmer', ['priority' => 100]);
         }
+
+        $params = $container->getParameterBag();
+        $params->remove('msgphp.doctrine.mapping_files');
+        $params->remove('msgphp.doctrine.identity_mapping');
+        $params->remove('msgphp.doctrine.class_mapping');
+        $params->remove('msgphp.doctrine.id_class_mapping');
     }
 
     private static function register(ContainerBuilder $container, string $class, string $id = null): Definition
@@ -52,12 +57,13 @@ final class ResolveDomainPass implements CompilerPassInterface
 
     private function registerIdentityMapping(ContainerBuilder $container): void
     {
-        $identityMapping = array_merge(...$container->getParameter($param = 'msgphp.domain.identity_mapping'));
-        $container->getParameterBag()->remove($param);
+        $identityMapping = array_merge(...$container->getParameter('msgphp.domain.identity_mapping'));
+        $classMapping = array_merge(...$container->getParameter('msgphp.domain.class_mapping'));
 
         if ($container->has(DoctrineEntityManager::class)) {
             self::register($container, $aliasId = DoctrineInfra\DomainIdentityMapping::class)
-                ->setAutowired(true);
+                ->setAutowired(true)
+                ->setArgument('$classMapping', $classMapping);
         } else {
             self::register($container, $aliasId = InMemoryInfra\DomainIdentityMapping::class)
                 ->setArgument('$mapping', $identityMapping)
@@ -73,11 +79,8 @@ final class ResolveDomainPass implements CompilerPassInterface
 
     private function registerEntityFactory(ContainerBuilder $container): void
     {
-        $classMapping = array_merge(...$container->getParameter($param = 'msgphp.domain.class_mapping'));
-        $container->getParameterBag()->remove($param);
-
-        $idClassMapping = array_merge(...$container->getParameter($param = 'msgphp.domain.id_class_mapping'));
-        $container->getParameterBag()->remove($param);
+        $classMapping = array_merge(...$container->getParameter('msgphp.domain.class_mapping'));
+        $idClassMapping = array_merge(...$container->getParameter('msgphp.domain.id_class_mapping'));
 
         self::register($container, Factory\DomainObjectFactory::class)
             ->addMethodCall('setNestedFactory', [new Reference(Factory\DomainObjectFactoryInterface::class)]);

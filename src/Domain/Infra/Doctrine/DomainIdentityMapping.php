@@ -15,10 +15,12 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 final class DomainIdentityMapping implements DomainIdentityMappingInterface
 {
     private $em;
+    private $classMapping;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, array $classMapping = [])
     {
         $this->em = $em;
+        $this->classMapping = $classMapping;
     }
 
     public function getIdentifierFieldNames(string $class): array
@@ -43,6 +45,8 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
 
     private function getMetadata(string $class): ClassMetadata
     {
+        $class = $this->classMapping[$class] ?? $class;
+
         if (!class_exists($class) || $this->em->getMetadataFactory()->isTransient($class)) {
             throw InvalidClassException::create($class);
         }
