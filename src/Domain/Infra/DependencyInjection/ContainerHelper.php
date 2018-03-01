@@ -87,7 +87,7 @@ final class ContainerHelper
     public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
         foreach ($identityMapping as $class => $mapping) {
-            if (isset($classMapping[$class])) {
+            if (isset($classMapping[$class]) && !isset($identityMapping[$classMapping[$class]])) {
                 $identityMapping[$classMapping[$class]] = $mapping;
             }
         }
@@ -101,7 +101,7 @@ final class ContainerHelper
     public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
     {
         foreach ($idClassMapping as $class => $idClass) {
-            if (isset($classMapping[$class])) {
+            if (isset($classMapping[$class]) && !isset($idClassMapping[$classMapping[$class]])) {
                 $idClassMapping[$classMapping[$class]] = $idClass;
             }
         }
