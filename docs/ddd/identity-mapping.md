@@ -22,6 +22,10 @@ identifier field name.
 
 Identity mapping based on a known in-memory mapping.
 
+- `__construct(array $mapping, ObjectFieldAccessor $accessor = null)`
+    - `$mapping`: The identity mapping to use
+    - `$accessor`: Custom object field accessor. See also [`ObjectFieldAccessor`][api-objectfieldaccessor].
+
 #### Basic example
 
 ```php
@@ -68,3 +72,5 @@ $mapping->getIdentity($compositeEntity); // ['name' => ..., 'year' => ...]
 A Doctrine tailored identity mapping.
 
 - [Read more](../infrastructure/doctrine-orm.md#domain-identity-mapping)
+
+[api-objectfieldaccessor]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/InMemory/ObjectFieldAccessor.html

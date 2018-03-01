@@ -7,11 +7,12 @@ An overview of available infrastructural code when using Doctrine's [Object Rela
 ## Domain identity mapping
 
 A Doctrine tailored [domain identity mapping](../ddd/identity-mapping.md) is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`. It uses Doctrine's [`EntityManagerInterface`][api-em] as
-underlying mapping.
+`MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`. It uses Doctrine's [`EntityManagerInterface`][api-em] to provide
+the identity mapping from its class metadata.
 
-- `__construct(EntityManagerInterface $em)`
+- `__construct(EntityManagerInterface $em, array $classMapping = [])`
     - `$em`: The entity manager to use
+    - `$classMapping`: The class mapping (`['SourceType' => 'TargetType']`)
 
 ### Basic example
 
@@ -107,9 +108,10 @@ A Doctrine tailored [entity aware factory](../ddd/factory/entity-aware.md) is pr
 [`EntityManagerInterface::getReference()`][api-em-getreference]) and handle an entity its discriminator map when working
 with [inheritance][orm-inheritance].
 
-- `__construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em)`
+- `__construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em, array $classMapping = [])`
     - `$factory`: The decorated factory
     - `$em`: The entity manager to use
+    - `$classMapping`: The class mapping (`['SourceType' => 'TargetType']`)
 
 ### Basic example
 

@@ -96,7 +96,8 @@ final class ResolveDomainPass implements CompilerPassInterface
             self::register($container, DoctrineInfra\EntityAwareFactory::class)
                 ->setAutowired(true)
                 ->setDecoratedService($entityAliasId)
-                ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'));
+                ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
+                ->setArgument('$classMapping', $classMapping);
         }
 
         self::alias($container, Factory\DomainObjectFactoryInterface::class, $aliasId);

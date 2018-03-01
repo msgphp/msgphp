@@ -16,25 +16,25 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $factory;
     private $em;
+    private $classMapping;
 
-    public function __construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em)
+    public function __construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em, array $classMapping = [])
     {
         $this->factory = $factory;
         $this->em = $em;
+        $this->classMapping = $classMapping;
     }
 
     public function create(string $class, array $context = [])
     {
-        return $this->factory->create($class, $context);
+        return $this->factory->create($this->classMapping[$class] ?? $class, $context);
     }
 
     public function reference(string $class, $id)
     {
-        if ($this->em->getMetadataFactory()->isTransient($class) || !class_exists($class)) {
-            throw InvalidClassException::create($class);
-        }
+        $class = $this->classMapping[$class] ?? $class;
 
-        if (null === $ref = $this->em->getReference($class, $id)) {
+        if (!class_exists($class) || $this->em->getMetadataFactory()->isTransient($class) || null === $ref = $this->em->getReference($class, $id)) {
             throw InvalidClassException::create($class);
         }
 
@@ -43,11 +43,11 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function identify(string $class, $value): DomainIdInterface
     {
-        return $this->factory->identify($class, $value);
+        return $this->factory->identify($this->classMapping[$class] ?? $class, $value);
     }
 
     public function nextIdentifier(string $class): DomainIdInterface
     {
-        return $this->factory->nextIdentifier($class);
+        return $this->factory->nextIdentifier($this->classMapping[$class] ?? $class);
     }
 }
