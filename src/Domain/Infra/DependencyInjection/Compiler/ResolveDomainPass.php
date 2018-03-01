@@ -56,17 +56,16 @@ final class ResolveDomainPass implements CompilerPassInterface
         $container->getParameterBag()->remove($param);
 
         if ($container->has(DoctrineEntityManager::class)) {
-            self::register($container, $alias = DoctrineInfra\DomainIdentityMapping::class)
+            self::register($container, $aliasId = DoctrineInfra\DomainIdentityMapping::class)
                 ->setAutowired(true);
         } else {
-            self::register($container, InMemoryInfra\ObjectFieldAccessor::class);
-
-            self::register($container, $alias = InMemoryInfra\DomainIdentityMapping::class)
+            self::register($container, $aliasId = InMemoryInfra\DomainIdentityMapping::class)
                 ->setArgument('$mapping', $identityMapping)
-                ->setArgument('$accessor', new Reference(InMemoryInfra\ObjectFieldAccessor::class));
+                ->setArgument('$accessor', self::register($container, InMemoryInfra\ObjectFieldAccessor::class)
+                    ->setAutowired(true));
         }
 
-        self::alias($container, DomainIdentityMappingInterface::class, $alias);
+        self::alias($container, DomainIdentityMappingInterface::class, $aliasId);
 
         self::register($container, DomainIdentityHelper::class)
             ->setAutowired(true);
