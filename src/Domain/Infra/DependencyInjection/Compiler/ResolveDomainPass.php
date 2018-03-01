@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, SimpleBus as SimpleBusInfra};
-use SimpleBus\Message\Bus\MessageBus as SimpleMessageBus;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -82,11 +81,11 @@ final class ResolveDomainPass implements CompilerPassInterface
         $classMapping = array_merge(...$container->getParameter('msgphp.domain.class_mapping'));
         $idClassMapping = array_merge(...$container->getParameter('msgphp.domain.id_class_mapping'));
 
-        self::register($container, Factory\DomainObjectFactory::class)
+        self::register($container, $aliasId = Factory\DomainObjectFactory::class)
             ->addMethodCall('setNestedFactory', [new Reference(Factory\DomainObjectFactoryInterface::class)]);
 
         self::register($container, Factory\ClassMappingObjectFactory::class)
-            ->setDecoratedService(Factory\DomainObjectFactory::class)
+            ->setDecoratedService($aliasId)
             ->setArgument('$factory', new Reference(Factory\ClassMappingObjectFactory::class.'.inner'))
             ->setArgument('$mapping', $classMapping);
 
@@ -100,24 +99,19 @@ final class ResolveDomainPass implements CompilerPassInterface
                 ->setArgument('$classMapping', $classMapping));
         }
 
-        self::alias($container, Factory\DomainObjectFactoryInterface::class, Factory\DomainObjectFactory::class);
+        self::alias($container, Factory\DomainObjectFactoryInterface::class, $aliasId);
         self::alias($container, Factory\EntityAwareFactoryInterface::class, Factory\EntityAwareFactory::class);
     }
 
     private function registerMessageBus(ContainerBuilder $container): void
     {
-        if (!($autowire = $container->has(SimpleMessageBus::class)) && !$container->has('simple_bus.command_bus')) {
+        if (!$container->has('simple_bus.command_bus')) {
             return;
         }
 
-        $definition = self::register($container, SimpleBusInfra\DomainMessageBus::class);
+        self::register($container, $aliasId = SimpleBusInfra\DomainMessageBus::class)
+            ->setArgument('$bus', new Reference('simple_bus.command_bus'));
 
-        if ($autowire) {
-            $definition->setAutowired(true);
-        } else {
-            $definition->setArgument('$bus', new Reference('simple_bus.command_bus'));
-        }
-
-        self::alias($container, Message\DomainMessageBusInterface::class, SimpleBusInfra\DomainMessageBus::class);
+        self::alias($container, Message\DomainMessageBusInterface::class, $aliasId);
     }
 }
