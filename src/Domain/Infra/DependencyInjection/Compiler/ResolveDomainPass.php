@@ -48,12 +48,6 @@ final class ResolveDomainPass implements CompilerPassInterface
         if ($container->hasDefinition(DoctrineInfra\Event\ObjectFieldMappingListener::class)) {
             ($definition = $container->getDefinition(DoctrineInfra\Event\ObjectFieldMappingListener::class))
                 ->setArgument('$mapping', self::processClassMapping($definition->getArgument('$mapping'), $classMapping));
-
-        }
-
-        if ($container->hasDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)) {
-            $container->getDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)
-                ->setArgument('$classMapping', $classMapping);
         }
 
         $params = $container->getParameterBag();
