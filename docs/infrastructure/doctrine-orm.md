@@ -104,7 +104,7 @@ if ($repository->exists($id = ['name' => ..., 'year' => ...])) {
 
 A Doctrine tailored [entity aware factory](../ddd/factory/entity-aware.md) is provided by
 `MsgPhp\Domain\Infra\Doctrine\EntityAwareFactory`. It decorates any entity aware factory and uses Doctrine's
-[`EntityManagerInterface`][api-em]. Its purpose is create lazy-loading references when using `reference()` (see 
+[`EntityManagerInterface`][api-em]. Its purpose is to create lazy-loading references when using `reference()` (see 
 [`EntityManagerInterface::getReference()`][api-em-getreference]) and handle an entity its discriminator map when working
 with [inheritance][orm-inheritance].
 
@@ -133,6 +133,9 @@ use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMapping, EntityAwareFactory};
  */
 class MyEntity
 {
+    public const TYPE_SELF = 'self';
+    public const TYPE_OTHER = 'other';
+
     /** @ORM\Id */
     public $id;
 }
@@ -154,9 +157,12 @@ $factory = new EntityAwareFactory(
 /** @var MyEntity $ref */
 $ref = $factory->reference(MyEntity::class, 1); // no database hit
 
+/** @var MyOtherEntity $ref */
+$otherRef = $factory->reference(MyEntity::class, ['id' => 1, 'discriminator' => MyEntity::TYPE_OTHER]);
+
 /** @var MyOtherEntity $otherEntity */
 $otherEntity = $factory->create(MyEntity::class, [
-    'discriminator' => 'other',
+    'discriminator' => MyEntity::TYPE_OTHER,
 ]);
 ```
 
