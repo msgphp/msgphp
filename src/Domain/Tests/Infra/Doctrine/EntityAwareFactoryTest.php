@@ -30,6 +30,18 @@ final class EntityAwareFactoryTest extends TestCase
         $this->assertSame($obj, $factory->create('alias', ['foo' => 'bar']));
     }
 
+    public function testCreateWithDiscriminator(): void
+    {
+        $innerFactory = $this->createMock(EntityAwareFactoryInterface::class);
+        $innerFactory->expects($this->once())
+            ->method('create')
+            ->with(Entities\TestChildEntity::class, ['foo' => 'bar', 'discriminator' => 'child'])
+            ->willReturn($obj = new \stdClass());
+        $factory = new EntityAwareFactory($innerFactory, self::$em);
+
+        $this->assertSame($obj, $factory->create(Entities\TestParentEntity::class, ['foo' => 'bar', 'discriminator' => 'child']));
+    }
+
     public function testCreateWithUnknownClass(): void
     {
         $factory = new EntityAwareFactory($this->createMock(EntityAwareFactoryInterface::class), self::$em);
@@ -52,10 +64,21 @@ final class EntityAwareFactoryTest extends TestCase
     {
         $factory = new EntityAwareFactory($this->createMock(EntityAwareFactoryInterface::class), self::$em, ['alias' => Entities\TestEntity::class]);
 
-        $this->assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, 1));
+        $this->assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, $id = $this->createMock(DomainIdInterface::class)));
         $this->assertInstanceOf(Entities\TestEntity::class, $ref);
-        $this->assertInstanceOf(Proxy::class, $ref = $factory->reference('alias', 1));
+        $this->assertSame($id, $ref->getId());
+        $this->assertInstanceOf(Proxy::class, $ref = $factory->reference('alias', $id));
         $this->assertInstanceOf(Entities\TestEntity::class, $ref);
+        $this->assertSame($id, $ref->getId());
+    }
+
+    public function testReferenceWithDiscriminator(): void
+    {
+        $factory = new EntityAwareFactory($this->createMock(EntityAwareFactoryInterface::class), self::$em);
+
+        $this->assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestParentEntity::class, ['id' => 'foo', 'discriminator' => 'child']));
+        $this->assertInstanceOf(Entities\TestChildEntity::class, $ref);
+        $this->assertSame('foo', $ref->id);
     }
 
     public function testReferenceWithUnknownClass(): void

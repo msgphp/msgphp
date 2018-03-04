@@ -31,13 +31,16 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
             throw InvalidClassException::create($class);
         }
 
-        return $this->factory->create($class, $context);
+        return $this->factory->create($this->getDiscriminatorClass($class, $context), $context);
     }
 
     public function reference(string $class, $id)
     {
         if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
             throw InvalidClassException::create($class);
+        }
+        if (is_array($id)) {
+            $class = $this->getDiscriminatorClass($class, $id, true);
         }
         if (null === $ref = $this->em->getReference($class, $id)) {
             throw InvalidClassException::create($class);
@@ -67,5 +70,22 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
     private function isManaged(string $class): bool
     {
         return class_exists($class) && !$this->em->getMetadataFactory()->isTransient($class);
+    }
+
+    private function getDiscriminatorClass(string $class, array &$context, bool $clear = false): string
+    {
+        $metadata = $this->em->getClassMetadata($class);
+
+        if (isset($metadata->discriminatorColumn['fieldName'], $context[$metadata->discriminatorColumn['fieldName']])) {
+            $class = $metadata->discriminatorMap[$context[$metadata->discriminatorColumn['fieldName']]] ?? $class;
+
+            if ($clear) {
+                unset($context[$metadata->discriminatorColumn['fieldName']]);
+            }
+        }
+
+        unset($context);
+
+        return $class;
     }
 }
