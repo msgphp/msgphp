@@ -27,14 +27,19 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function create(string $class, array $context = [])
     {
-        return $this->factory->create($this->classMapping[$class] ?? $class, $context);
+        if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
+            throw InvalidClassException::create($class);
+        }
+
+        return $this->factory->create($class, $context);
     }
 
     public function reference(string $class, $id)
     {
-        $class = $this->classMapping[$class] ?? $class;
-
-        if (!class_exists($class) || $this->em->getMetadataFactory()->isTransient($class) || null === $ref = $this->em->getReference($class, $id)) {
+        if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
+            throw InvalidClassException::create($class);
+        }
+        if (null === $ref = $this->em->getReference($class, $id)) {
             throw InvalidClassException::create($class);
         }
 
@@ -43,11 +48,24 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function identify(string $class, $value): DomainIdInterface
     {
-        return $this->factory->identify($this->classMapping[$class] ?? $class, $value);
+        if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
+            throw InvalidClassException::create($class);
+        }
+
+        return $this->factory->identify($class, $value);
     }
 
     public function nextIdentifier(string $class): DomainIdInterface
     {
-        return $this->factory->nextIdentifier($this->classMapping[$class] ?? $class);
+        if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
+            throw InvalidClassException::create($class);
+        }
+
+        return $this->factory->nextIdentifier($class);
+    }
+
+    private function isManaged(string $class): bool
+    {
+        return class_exists($class) && !$this->em->getMetadataFactory()->isTransient($class);
     }
 }
