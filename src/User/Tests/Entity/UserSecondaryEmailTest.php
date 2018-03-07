@@ -11,31 +11,42 @@ final class UserSecondaryEmailTest extends TestCase
 {
     public function testCreate(): void
     {
-        $userEmail = new UserSecondaryEmail($user = $this->createMock(User::class), 'foo@bar.baz');
+        $userSecondaryEmail = $this->createEntity($user = $this->createMock(User::class), 'foo@bar.baz', null);
 
-        $this->assertSame($user, $userEmail->getUser());
-        $this->assertSame('foo@bar.baz', $userEmail->getEmail());
-        $this->assertNotNull($userEmail->getConfirmationToken());
-        $this->assertNotSame((new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz'))->getConfirmationToken(), $userEmail->getConfirmationToken());
-        $this->assertFalse($userEmail->isPendingPrimary());
-        $this->assertNull($userEmail->getConfirmedAt());
+        $this->assertSame($user, $userSecondaryEmail->getUser());
+        $this->assertSame('foo@bar.baz', $userSecondaryEmail->getEmail());
+        $this->assertNotNull($userSecondaryEmail->getConfirmationToken());
+        $this->assertNotSame($userSecondaryEmail->getConfirmationToken(), $this->createEntity($user, 'foo@bar.baz', null)->getConfirmationToken());
+        $this->assertFalse($userSecondaryEmail->isPendingPrimary());
+        $this->assertNull($userSecondaryEmail->getConfirmedAt());
+    }
+
+    public function testCreateWithToken(): void
+    {
+        $this->assertSame('token', $this->createEntity($this->createMock(User::class), 'foo@bar.baz', 'token')->getConfirmationToken());
     }
 
     public function testMarkPendingPrimary(): void
     {
-        $userEmail = new UserSecondaryEmail($this->createMock(User::class), 'foo@bar.baz');
-        $userEmail->markPendingPrimary();
+        $userSecondaryEmail = $this->createEntity($this->createMock(User::class), 'foo@bar.baz', null);
+        $userSecondaryEmail->markPendingPrimary();
 
-        $this->assertTrue($userEmail->isPendingPrimary());
+        $this->assertTrue($userSecondaryEmail->isPendingPrimary());
 
-        $userEmail->markPendingPrimary(false);
+        $userSecondaryEmail->markPendingPrimary(false);
 
-        $this->assertFalse($userEmail->isPendingPrimary());
+        $this->assertFalse($userSecondaryEmail->isPendingPrimary());
 
-        $userEmail->confirm();
+        $userSecondaryEmail->confirm();
 
         $this->expectException(\LogicException::class);
 
-        $userEmail->markPendingPrimary();
+        $userSecondaryEmail->markPendingPrimary();
+    }
+
+    private function createEntity($user, $email, $token): UserSecondaryEmail
+    {
+        return new class($user, $email, $token) extends UserSecondaryEmail {
+        };
     }
 }

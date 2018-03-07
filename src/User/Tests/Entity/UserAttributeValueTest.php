@@ -12,9 +12,15 @@ final class UserAttributeValueTest extends TestCase
 {
     public function testCreate(): void
     {
-        $userAttributeValue = new UserAttributeValue($user = $this->createMock(User::class), $attributeValue = $this->createMock(AttributeValue::class));
+        $userAttributeValue = $this->createEntity($user = $this->createMock(User::class), $attributeValue = $this->createMock(AttributeValue::class));
 
         $this->assertSame($user, $userAttributeValue->getUser());
         $this->assertSame($attributeValue, $userAttributeValue->getAttributeValue());
+    }
+
+    private function createEntity($user, $attributeValue): UserAttributeValue
+    {
+        return new class($user, $attributeValue) extends UserAttributeValue {
+        };
     }
 }

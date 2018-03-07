@@ -10,11 +10,25 @@ use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase
 {
-    public function testCreate(): void
+    public function testGetCredential(): void
     {
-        $user = new User($id = $this->createMock(UserIdInterface::class));
+        $this->assertInstanceOf(Credential\Anonymous::class, $this->createEntity($this->createMock(UserIdInterface::class))->getCredential());
+    }
 
-        $this->assertSame($id, $user->getId());
-        $this->assertInstanceOf(Credential\Anonymous::class, $user->getCredential());
+    private function createEntity($id): User
+    {
+        return new class($id) extends User {
+            private $id;
+
+            public function __construct($id)
+            {
+                $this->id = $id;
+            }
+
+            public function getId(): UserIdInterface
+            {
+                return $this->id;
+            }
+        };
     }
 }
