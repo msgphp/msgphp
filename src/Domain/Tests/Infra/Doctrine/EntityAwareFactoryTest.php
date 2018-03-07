@@ -16,7 +16,7 @@ final class EntityAwareFactoryTest extends TestCase
 {
     use EntityManagerTrait;
 
-    private $createSchema = false;
+    private $createSchema = true;
 
     public function testCreate(): void
     {
@@ -42,22 +42,17 @@ final class EntityAwareFactoryTest extends TestCase
         $this->assertSame($obj, $factory->create(Entities\TestParentEntity::class, ['foo' => 'bar', 'discriminator' => 'child']));
     }
 
-    public function testCreateWithUnknownClass(): void
+    public function testCreateWithObject(): void
     {
-        $factory = new EntityAwareFactory($this->createMock(EntityAwareFactoryInterface::class), self::$em);
+        $innerFactory = $this->createMock(EntityAwareFactoryInterface::class);
+        $innerFactory->expects($this->once())
+            ->method('create')
+            ->with(\stdClass::class)
+            ->willReturn($obj = new \stdClass());
 
-        $this->expectException(InvalidClassException::class);
+        $factory = new EntityAwareFactory($innerFactory, self::$em);
 
-        $factory->create('foo');
-    }
-
-    public function testCreateWithUnknownEntity(): void
-    {
-        $factory = new EntityAwareFactory($this->createMock(EntityAwareFactoryInterface::class), self::$em);
-
-        $this->expectException(InvalidClassException::class);
-
-        $factory->create(\stdClass::class);
+        $this->assertSame($obj, $factory->create(\stdClass::class));
     }
 
     public function testReference(): void

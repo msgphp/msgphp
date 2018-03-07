@@ -27,11 +27,13 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function create(string $class, array $context = [])
     {
-        if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
-            throw InvalidClassException::create($class);
+        $class = $this->classMapping[$class] ?? $class;
+
+        if ($this->isManaged($class)) {
+            $class = $this->getDiscriminatorClass($class, $context);
         }
 
-        return $this->factory->create($this->getDiscriminatorClass($class, $context), $context);
+        return $this->factory->create($class, $context);
     }
 
     public function reference(string $class, $id)
