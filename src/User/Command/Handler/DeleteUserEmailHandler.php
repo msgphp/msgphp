@@ -8,7 +8,6 @@ use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\DeleteUserEmailCommand;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserEmailDeletedEvent;
 use MsgPhp\User\Repository\UserEmailRepositoryInterface;
 
@@ -31,7 +30,7 @@ final class DeleteUserEmailHandler
     public function __invoke(DeleteUserEmailCommand $command): void
     {
         try {
-            $userEmail = $this->repository->find($this->factory->identify(User::class, $command->userId), $command->email);
+            $userEmail = $this->repository->find($command->email);
         } catch (EntityNotFoundException $e) {
             return;
         }

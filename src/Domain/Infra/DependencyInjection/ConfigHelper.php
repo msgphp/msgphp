@@ -56,9 +56,11 @@ final class ConfigHelper
             $mappedClass = $classMapping[$commandClass] ?? $commandClass;
             $isEventHandler = is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
 
-            foreach ($features as $feature => $featureCommands) {
-                if (self::uses($mappedClass, $feature)) {
-                    $config += array_fill_keys($featureCommands, $isEventHandler);
+            foreach ($features as $feature => $featureInfo) {
+                if (!trait_exists($feature)) {
+                    $config[$feature] = $featureInfo;
+                } elseif (self::uses($mappedClass, $feature)) {
+                    $config += array_fill_keys($featureInfo, $isEventHandler);
                 }
             }
         }

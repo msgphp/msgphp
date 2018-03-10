@@ -27,24 +27,14 @@ final class UserEmailRepository implements UserEmailRepositoryInterface
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }
 
-    public function find(UserIdInterface $userId, string $email): UserEmail
+    public function find(string $email): UserEmail
     {
-        return $this->doFind(['user' => $userId, 'email' => $email]);
+        return $this->doFind($email);
     }
 
-    public function findByEmail(string $email): UserEmail
+    public function exists(string $email): bool
     {
-        return $this->doFindByFields(['email' => $email]);
-    }
-
-    public function findByConfirmationToken(string $token): UserEmail
-    {
-        return $this->doFindByFields(['confirmationToken' => $token]);
-    }
-
-    public function exists(UserIdInterface $userId, string $email): bool
-    {
-        return $this->doExists(['user' => $userId, 'email' => $email]);
+        return $this->doExists($email);
     }
 
     public function save(UserEmail $userEmail): void

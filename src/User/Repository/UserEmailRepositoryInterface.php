@@ -18,13 +18,9 @@ interface UserEmailRepositoryInterface
      */
     public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
-    public function find(UserIdInterface $userId, string $email): UserEmail;
+    public function find(string $email): UserEmail;
 
-    public function findByEmail(string $email): UserEmail;
-
-    public function findByConfirmationToken(string $token): UserEmail;
-
-    public function exists(UserIdInterface $userId, string $email): bool;
+    public function exists(string $email): bool;
 
     public function save(UserEmail $userEmail): void;
 

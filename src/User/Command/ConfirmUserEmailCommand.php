@@ -7,7 +7,7 @@ namespace MsgPhp\User\Command;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DeleteUserEmailCommand
+class ConfirmUserEmailCommand
 {
     public $email;
 
