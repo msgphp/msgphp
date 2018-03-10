@@ -136,6 +136,13 @@ final class Configuration implements ConfigurationInterface
                     $config['commands'][Command\ChangeUserCredentialCommand::class] = true;
                 }
 
+                if (isset($config['class_mapping'][Entity\UserEmail::class])) {
+                    $config['commands'] += [
+                        Command\CreateUserEmailCommand::class => true,
+                        Command\DeleteUserEmailCommand::class => true,
+                    ];
+                }
+
                 ConfigHelper::resolveCommandMappingConfig(self::COMMAND_MAPPING, $config['class_mapping'], $config['commands']);
 
                 return $config;
