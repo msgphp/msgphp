@@ -6,43 +6,38 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\UserSecondaryEmail;
-use MsgPhp\User\Repository\UserSecondaryEmailRepositoryInterface;
+use MsgPhp\User\Entity\UserEmail;
+use MsgPhp\User\Repository\UserEmailRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserSecondaryEmailRepository implements UserSecondaryEmailRepositoryInterface
+final class UserEmailRepository implements UserEmailRepositoryInterface
 {
     use DomainEntityRepositoryTrait;
 
-    private $alias = 'user_secondary_email';
+    private $alias = 'user_email';
 
     /**
-     * @return DomainCollectionInterface|UserSecondaryEmail[]
+     * @return DomainCollectionInterface|UserEmail[]
      */
     public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }
 
-    public function find(UserIdInterface $userId, string $email): UserSecondaryEmail
+    public function find(UserIdInterface $userId, string $email): UserEmail
     {
         return $this->doFind(['user' => $userId, 'email' => $email]);
     }
 
-    public function findPendingPrimary(UserIdInterface $userId): UserSecondaryEmail
-    {
-        return $this->doFindByFields(['user' => $userId, 'pendingPrimary' => true]);
-    }
-
-    public function findByEmail(string $email): UserSecondaryEmail
+    public function findByEmail(string $email): UserEmail
     {
         return $this->doFindByFields(['email' => $email]);
     }
 
-    public function findByConfirmationToken(string $token): UserSecondaryEmail
+    public function findByConfirmationToken(string $token): UserEmail
     {
         return $this->doFindByFields(['confirmationToken' => $token]);
     }
@@ -52,13 +47,13 @@ final class UserSecondaryEmailRepository implements UserSecondaryEmailRepository
         return $this->doExists(['user' => $userId, 'email' => $email]);
     }
 
-    public function save(UserSecondaryEmail $userSecondaryEmail): void
+    public function save(UserEmail $userEmail): void
     {
-        $this->doSave($userSecondaryEmail);
+        $this->doSave($userEmail);
     }
 
-    public function delete(UserSecondaryEmail $userSecondaryEmail): void
+    public function delete(UserEmail $userEmail): void
     {
-        $this->doDelete($userSecondaryEmail);
+        $this->doDelete($userEmail);
     }
 }

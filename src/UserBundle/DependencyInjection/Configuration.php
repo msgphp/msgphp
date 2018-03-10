@@ -27,7 +27,7 @@ final class Configuration implements ConfigurationInterface
         Entity\User::class => ['id'],
         Entity\Username::class => ['user', 'username'],
         Entity\UserRole::class => ['user', 'role'],
-        Entity\UserSecondaryEmail::class => ['user', 'email'],
+        Entity\UserEmail::class => ['user', 'email'],
     ];
     public const DEFAULT_ID_CLASS_MAPPING = [
         UserIdInterface::class => UserId::class,

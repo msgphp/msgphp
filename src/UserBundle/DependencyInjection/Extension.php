@@ -206,7 +206,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             DoctrineInfra\Repository\UsernameRepository::class => Entity\Username::class,
             DoctrineInfra\Repository\UserAttributeValueRepository::class => Entity\UserAttributeValue::class,
             DoctrineInfra\Repository\UserRoleRepository::class => Entity\UserRole::class,
-            DoctrineInfra\Repository\UserSecondaryEmailRepository::class => Entity\UserSecondaryEmail::class,
+            DoctrineInfra\Repository\UserEmailRepository::class => Entity\UserEmail::class,
         ]);
     }
 

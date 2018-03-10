@@ -10,13 +10,12 @@ use MsgPhp\User\Entity\Fields\UserField;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-abstract class UserSecondaryEmail
+abstract class UserEmail
 {
     use UserField;
     use CanBeConfirmed;
 
     private $email;
-    private $pendingPrimary = false;
 
     public function __construct(User $user, string $email, string $token = null)
     {
@@ -28,19 +27,5 @@ abstract class UserSecondaryEmail
     public function getEmail(): string
     {
         return $this->email;
-    }
-
-    public function isPendingPrimary(): bool
-    {
-        return $this->pendingPrimary;
-    }
-
-    public function markPendingPrimary(bool $flag = true): void
-    {
-        if ($flag && $this->confirmedAt) {
-            throw new \LogicException('Cannot mark user secondary e-mail a pending primary as it\'s already confirmed.');
-        }
-
-        $this->pendingPrimary = $flag;
     }
 }

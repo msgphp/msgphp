@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <mapped-superclass name="MsgPhp\User\Entity\UserSecondaryEmail">
+    <mapped-superclass name="MsgPhp\User\Entity\UserEmail">
         <unique-constraints>
             <unique-constraint columns="email" name="email_unique" />
         </unique-constraints>
@@ -11,7 +11,6 @@
         <id name="user" association-key="true" />
         <id name="email" />
 
-        <field name="pendingPrimary" type="boolean" />
         <field name="confirmationToken" unique="true" nullable="true" />
         <field name="confirmedAt" type="datetime" nullable="true" />
 
