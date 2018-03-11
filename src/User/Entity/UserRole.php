@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity;
 
-use MsgPhp\User\Entity\Fields\UserField;
+use MsgPhp\User\Entity\Fields\{RoleField, UserField};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -12,17 +12,11 @@ use MsgPhp\User\Entity\Fields\UserField;
 abstract class UserRole
 {
     use UserField;
+    use RoleField;
 
-    private $role;
-
-    public function __construct(User $user, string $role)
+    public function __construct(User $user, Role $role)
     {
         $this->user = $user;
         $this->role = $role;
-    }
-
-    public function getRole(): string
-    {
-        return $this->role;
     }
 }

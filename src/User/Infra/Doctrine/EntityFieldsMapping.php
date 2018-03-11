@@ -61,7 +61,7 @@ final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
                     'type' => self::TYPE_MANY_TO_ONE,
                     'targetEntity' => Role::class,
                     'joinColumns' => [
-                        ['nullable' => false],
+                        ['referencedColumnName' => 'name', 'nullable' => false],
                     ],
                 ],
             ],

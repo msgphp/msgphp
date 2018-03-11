@@ -5,10 +5,13 @@
 
     <mapped-superclass name="MsgPhp\User\Entity\UserRole">
         <id name="user" association-key="true" />
-        <id name="role" />
+        <id name="role" association-key="true" />
 
         <many-to-one field="user" target-entity="MsgPhp\User\Entity\User">
             <join-column on-delete="CASCADE" />
+        </many-to-one>
+        <many-to-one field="role" target-entity="MsgPhp\User\Entity\Role">
+            <join-column name="role_name" referenced-column-name="name" on-delete="CASCADE" />
         </many-to-one>
     </mapped-superclass>
 
