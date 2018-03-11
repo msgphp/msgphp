@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\ObjectFieldMappingProviderInterface;
-use MsgPhp\User\Entity\{Credential, Features, Fields, User, UserEmail};
+use MsgPhp\User\Entity\{Credential, Features, Fields, Role, User, UserEmail};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -54,6 +54,15 @@ final class EntityFieldsMapping implements ObjectFieldMappingProviderInterface
                     'targetEntity' => UserEmail::class,
                     'mappedBy' => 'user',
                     'indexBy' => 'email',
+                ],
+            ],
+            Fields\RoleField::class => [
+                'role' => [
+                    'type' => self::TYPE_MANY_TO_ONE,
+                    'targetEntity' => Role::class,
+                    'joinColumns' => [
+                        ['nullable' => false],
+                    ],
                 ],
             ],
             Fields\UserField::class => [
