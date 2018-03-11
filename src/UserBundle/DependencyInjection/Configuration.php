@@ -25,6 +25,7 @@ final class Configuration implements ConfigurationInterface
     public const OPTIONAL_AGGREGATE_ROOTS = [];
     public const AGGREGATE_ROOTS = self::REQUIRED_AGGREGATE_ROOTS + self::OPTIONAL_AGGREGATE_ROOTS;
     public const IDENTITY_MAPPING = [
+        Entity\Role::class => ['name'],
         Entity\UserAttributeValue::class => ['user', 'attributeValue'],
         Entity\User::class => ['id'],
         Entity\Username::class => ['user', 'username'],
