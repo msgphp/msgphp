@@ -6,15 +6,15 @@ namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
-use MsgPhp\User\Command\CreateUserEmailCommand;
+use MsgPhp\User\Command\AddUserEmailCommand;
 use MsgPhp\User\Entity\{User, UserEmail};
-use MsgPhp\User\Event\UserEmailCreatedEvent;
+use MsgPhp\User\Event\UserEmailAddedEvent;
 use MsgPhp\User\Repository\UserEmailRepositoryInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class CreateUserEmailHandler
+final class AddUserEmailHandler
 {
     use MessageDispatchingTrait;
 
@@ -27,7 +27,7 @@ final class CreateUserEmailHandler
         $this->repository = $repository;
     }
 
-    public function __invoke(CreateUserEmailCommand $command): void
+    public function __invoke(AddUserEmailCommand $command): void
     {
         $userId = $this->factory->identify(User::class, $command->userId);
         $userEmail = $this->factory->create(UserEmail::class, [
@@ -36,6 +36,6 @@ final class CreateUserEmailHandler
         ] + $command->context);
 
         $this->repository->save($userEmail);
-        $this->dispatch(UserEmailCreatedEvent::class, [$userEmail]);
+        $this->dispatch(UserEmailAddedEvent::class, [$userEmail]);
     }
 }

@@ -7,7 +7,7 @@ namespace MsgPhp\User\Command;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class CreateUserEmailCommand
+class AddUserEmailCommand
 {
     public $userId;
     public $email;

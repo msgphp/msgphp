@@ -9,7 +9,7 @@ use MsgPhp\User\Entity\UserEmail;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class UserEmailCreatedEvent
+class UserEmailAddedEvent
 {
     public $userEmail;
 

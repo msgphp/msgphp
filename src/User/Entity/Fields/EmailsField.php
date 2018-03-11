@@ -16,6 +16,9 @@ trait EmailsField
     /** @var UserEmail[] */
     private $emails = [];
 
+    /**
+     * @return DomainCollectionInterface|UserEmail[]
+     */
     public function getEmails(): DomainCollectionInterface
     {
         return $this->emails instanceof DomainCollectionInterface ? $this->emails : DomainCollectionFactory::create($this->emails);
