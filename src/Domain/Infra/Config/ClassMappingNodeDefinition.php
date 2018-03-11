@@ -32,7 +32,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
                 ->ifTrue(function (array $value) use ($class): bool {
                     return !isset($value[$class]);
                 })
-                ->thenInvalid(sprintf('Class mapping for "%s" must be configured.', $class));
+                ->thenInvalid(sprintf('Class "%s" must be configured.', $class));
         }
 
         if ($classes) {
@@ -49,8 +49,23 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
                 ->ifTrue(function (array $value) use ($class): bool {
                     return isset($value[$class]);
                 })
-                ->thenInvalid(sprintf('Class mapping for "%s" is not applicable.', $class));
+                ->thenInvalid(sprintf('Class "%s" is not applicable to be configured.', $class));
         }
+
+        return $this;
+    }
+
+    public function groupClasses(array $classes): self
+    {
+        $this->validate()->always(function (array $value) use ($classes): array {
+            if ($classes !== ($missing = array_diff($classes, array_keys($value))) && $missing) {
+                foreach (array_diff($classes, $missing) as $known) {
+                    throw new \LogicException(sprintf('Class "%s" requires "%s" to be configured.', $known, implode('", "', $missing)));
+                }
+            }
+
+            return $value;
+        });
 
         return $this;
     }
@@ -67,10 +82,10 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         $this->validate()->always(function (array $value): array {
             foreach ($value as $class => $mappedClass) {
                 if (!is_string($mappedClass)) {
-                    throw new \LogicException(sprintf('Mapped value for class "%s" must be a string, got "%s".', $class, gettype($mappedClass)));
+                    throw new \LogicException(sprintf('Class "%s" must be configured to a mapped sub class value, got type "%s".', $class, gettype($mappedClass)));
                 }
                 if (!is_subclass_of($mappedClass, $class)) {
-                    throw new \LogicException(sprintf('Mapped class "%s" must be a sub class of "%s".', $mappedClass, $class));
+                    throw new \LogicException(sprintf('Class "%s" must be configured to a mapped sub class value, got "%s".', $class, $mappedClass));
                 }
             }
 

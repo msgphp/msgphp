@@ -73,6 +73,7 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('class_mapping')
                 ->requireClasses(array_keys(self::REQUIRED_AGGREGATE_ROOTS))
                 ->disallowClasses([CredentialInterface::class, Entity\Username::class])
+                ->groupClasses([Entity\Role::class, Entity\UserRole::class])
                 ->subClassValues()
             ->end()
             ->classMappingNode('id_type_mapping')
