@@ -111,9 +111,20 @@ class MyCommand extends Command
 // $ bin/console my-command [--option=OPTION] [--] [<argument>]
 ```
 
+#### `MsgPhp\Domain\Infra\Console\Context\DoctrineEntityContextFactory`
+
+A [Doctrine](doctrine-orm.md) entity aware context factory. It decorates any context factory. Its purpose is to
+provide a discriminator value into the resulting context when working with [inheritance][orm-inheritance].
+
+- `__construct(ContextFactoryInterface $factory, EntityManagerInterface $em, string $class)`
+    - `$factory`: The decorated context factory
+    - `$em`: The entity manager to use
+    - `$class`: The entity class to use
+
 [console-project]: https://symfony.com/doc/current/components/console.html
 [symfony/console]: https://packagist.org/packages/symfony/console
 [api-inputdefinition]: https://api.symfony.com/master/Symfony/Component/Console/Input/InputDefinition.html
 [api-inputinterface]: https://api.symfony.com/master/Symfony/Component/Console/Input/InputInterface.html
 [api-styleinterface]: https://api.symfony.com/master/Symfony/Component/Console/Style/StyleInterface.html
 [api-contextelement]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/Console/ContextBuilder/ContextElement.html
+[orm-inheritance]: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html
