@@ -6,12 +6,14 @@ namespace MsgPhp\UserBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
+use Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\UserProviderWithPayloadSupportsInterface;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console as BaseConsoleInfra;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\{Command, CredentialInterface, Entity, Repository, UserIdInterface};
-use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra, Validator as ValidatorInfra};
+use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra, Validator as ValidatorInfra, Api as ApiInfra};
 use MsgPhp\UserBundle\Twig\GlobalVariables;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -101,6 +103,15 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 SecurityInfra\UserParamConverter::class,
                 SecurityInfra\UserValueResolver::class,
             ]);
+
+            // api infra
+            if (ContainerHelper::hasBundle($container, LexikJWTAuthenticationBundle::class)) {
+                $loader->load('api.php');
+
+//                ContainerHelper::removeIf($container, !$container->has(UserProviderWithPayloadSupportsInterface::class), [
+//                    ApiInfra\Security\ApiSecurityUserProvider::class,
+//                ]);
+            }
         }
 
         if (class_exists(Form::class)) {
