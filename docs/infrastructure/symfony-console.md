@@ -36,27 +36,32 @@ bin/console command --optional-argument [--] required-argument
 In both cases a value is optional, if the actual class method argument is required and no value is given it will be
 asked interactively. If interaction is not possible an exception will be thrown instead.
 
-- `__construct(string $class, string $method, iterable $elementProviders = [], array $classMapping = [], int $flags = 0)`
+- `__construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactoryInterface $elementFactory = null)`
     - `$class / $method`: The class method to resolve
-    - `$elementProviders`: Available context element providers (see [Providing context elements](#providing-context-elements))
     - `$classMapping`: Global class mapping. Usually used to map abstracts to concretes.
     - `$flags`: A bit mask value to toggle various flags
         - `ClassContextBuilder::ALWAYS_OPTIONAL`: Always map class method arguments to command options
         - `ClassContextBuilder::NO_DEFAULTS`: Leave out default values when calling `getContext()`
+        - `ClassContextBuilder::REUSE_DEFINITION`: Reuse the original input definition for matching class method
+           arguments
+    - `$elementFactory`: A custom element factory to use. See also [Customizing context elements](#customizing-context-elements).
 
-##### Providing context elements
+##### Customizing context elements
 
-Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\Context\ContextElementProviderInterface`.
+Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactoryInterface`.
 
-- `getElement(string $class, string $method, string $argument): ?ContextElement`
-    - Resolve a [`ContextElement`][api-contextelement] from a class/method/argument combination
+- `getElement(string $class, string $method, string $argument): ContextElement`
+    - Get a custom [`ContextElement`][api-contextelement] to apply to a specific class/method/argument pair
+
+A default implementation is provided by `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactory` which simply
+transforms argument names to human readable values so that `$argumentName` becomes `Argument Name`.
 
 ##### Basic example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Infra\Console\Context\{ClassContextBuilder, ContextElement, ContextElementProviderInterface};
+use MsgPhp\Domain\Infra\Console\Context\ClassContextFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -64,28 +69,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 // --- SETUP ---
 
-class MyClass
+class MyObject
 {
-    public function __construct(string $argument)
+    public function __construct(string $argument, $option = null)
     {
-    }
-}
-
-class MyContextElementProvider implements ContextElementProviderInterface
-{
-    public function getElement(string $class, string $method, string $argument): ?ContextElement
-    {
-        return new ContextElement(strtoupper($argument));
     }
 }
 
 class MyCommand extends Command
 {
-    private $contextBuilder;
+    private $contextFactory;
 
     public function __construct()
     {
-        $this->contextBuilder = new ClassContextBuilder(MyClass::class, '__construct', [new MyContextElementProvider()]);
+        $this->contextFactory = new ClassContextFactory(MyObject::class, '__construct');
 
         parent::__construct();
     }
@@ -93,14 +90,14 @@ class MyCommand extends Command
     protected function configure(): void
     {
        $this->setName('my-command');
-       $this->contextBuilder->configure($this->getDefinition());
+       $this->contextFactory->configure($this->getDefinition());
     }
 
     protected function execute(InputInterface $input,OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $context = $this->contextBuilder->getContext($input, $io);
-        $object = new MyClass(...array_values($context));
+        $context = $this->contextFactory->getContext($input, $io);
+        $object = new MyObject(...array_values($context));
 
         // do something
 
@@ -110,7 +107,7 @@ class MyCommand extends Command
 
 // --- USAGE ---
 
-// $ bin/console my-command
+// $ bin/console my-command [--option=OPTION] [--] [<argument>]
 ```
 
 [console-project]: https://symfony.com/doc/current/components/console.html

@@ -23,23 +23,20 @@ final class ClassContextFactory implements ContextFactoryInterface
 
     private $class;
     private $method;
-    private $elementProviders;
     private $classMapping;
     private $flags = 0;
+    private $elementFactory;
     private $resolved;
     private $fieldMapping = [];
     private $generatedValues = [];
 
-    /**
-     * @param ContextElementProviderInterface[] $elementProviders
-     */
-    public function __construct(string $class, string $method, iterable $elementProviders = [], array $classMapping = [], int $flags = 0)
+    public function __construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactoryInterface $elementFactory = null)
     {
         $this->class = $class;
         $this->method = $method;
-        $this->elementProviders = $elementProviders;
         $this->classMapping = $classMapping;
         $this->flags = $flags;
+        $this->elementFactory = $elementFactory ?? new ClassContextElementFactory();
     }
 
     public function configure(InputDefinition $definition): void
@@ -114,7 +111,7 @@ final class ClassContextFactory implements ContextFactoryInterface
 
             if (is_array($value) && self::isObject($type = $argument['type']) && ($required || $given)) {
                 $method = is_subclass_of($type, DomainCollectionInterface::class) || is_subclass_of($type, DomainIdInterface::class) ? 'fromValue' : '__construct';
-                $context[$key] = $this->getContext($input, $io, $values[$field] ?? [], array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
+                $context[$key] = $this->getContext($input, $io, [], array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
                     if (array_key_exists($argument['name'], $value)) {
                         $argument['value'] = $value[$argument['name']];
                     } elseif (array_key_exists($i, $value)) {
@@ -125,7 +122,7 @@ final class ClassContextFactory implements ContextFactoryInterface
                         $argument['value'] = [];
                     }
 
-                    $child = $this->getElement($type, $method, $argument['name']);
+                    $child = $this->elementFactory->getElement($type, $method, $argument['name']);
                     $child->label = $element->label.' > '.$child->label;
 
                     return ['element' => $child] + $argument;
@@ -209,23 +206,12 @@ final class ClassContextFactory implements ContextFactoryInterface
 
         foreach (ClassMethodResolver::resolve($class = $this->classMapping[$this->class] ?? $this->class, $this->method) as $argument) {
             $this->resolved[] = [
-                'element' => $this->getElement($class, $this->method, $argument['name']),
+                'element' => $this->elementFactory->getElement($class, $this->method, $argument['name']),
                 'type' => isset($argument['type']) ? ($this->classMapping[$argument['type']] ?? $argument['type']) : null,
             ] + $argument;
         }
 
         return $this->resolved;
-    }
-
-    private function getElement(string $class, string $method, string $argument): ContextElement
-    {
-        foreach ($this->elementProviders as $provider) {
-            if (null !== $element = $provider->getElement($class, $method, $argument)) {
-                return $element;
-            }
-        }
-
-        return new ContextElement(ucfirst(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1 \\2', '\\1 \\2'], $argument)));
     }
 
     private function askRequiredValue(StyleInterface $io, ContextElement $element, $default)

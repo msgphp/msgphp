@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Infra\Console\Context;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-interface ContextElementProviderInterface
+interface ClassContextElementFactoryInterface
 {
-    public function getElement(string $class, string $method, string $argument): ?ContextElement;
+    public function getElement(string $class, string $method, string $argument): ContextElement;
 }
