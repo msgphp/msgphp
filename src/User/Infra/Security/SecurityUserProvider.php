@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class SecurityUserProvider implements UserProviderInterface
+class SecurityUserProvider implements UserProviderInterface
 {
     private $repository;
     private $factory;
@@ -33,6 +33,17 @@ final class SecurityUserProvider implements UserProviderInterface
     {
         try {
             $user = $this->repository->findByUsername($username);
+        } catch (EntityNotFoundException $e) {
+            throw new UsernameNotFoundException($e->getMessage());
+        }
+
+        return $this->fromUser($user);
+    }
+
+    public function loadUserById(string $id): UserInterface
+    {
+        try {
+            $user = $this->repository->find($this->factory->identify(User::class, $id));
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
