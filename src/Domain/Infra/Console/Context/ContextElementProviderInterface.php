@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Console\ContextBuilder;
+namespace MsgPhp\Domain\Infra\Console\Context;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Console\ContextBuilder;
+namespace MsgPhp\Domain\Infra\Console\Context;
 
 use MsgPhp\Domain\{DomainCollectionInterface, DomainIdInterface};
 use MsgPhp\Domain\Factory\ClassMethodResolver;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ClassContextBuilder implements ContextBuilderInterface
+final class ClassContextFactory implements ContextFactoryInterface
 {
     public const ALWAYS_OPTIONAL = 1;
     public const NO_DEFAULTS = 2;

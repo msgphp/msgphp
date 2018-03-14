@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Console\ContextBuilder;
+namespace MsgPhp\Domain\Infra\Console\Context;
 
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\{DomainCollectionInterface, DomainIdInterface};
@@ -16,13 +16,13 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DoctrineContextBuilder implements ContextBuilderInterface
+final class DoctrineContextFactory implements ContextFactoryInterface
 {
     private $contextBuilder;
     private $em;
     private $class;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, EntityManagerInterface $em, string $class = null)
+    public function __construct(ContextFactoryInterface $contextBuilder, EntityManagerInterface $em, string $class = null)
     {
         $this->contextBuilder = $contextBuilder;
         $this->em = $em;

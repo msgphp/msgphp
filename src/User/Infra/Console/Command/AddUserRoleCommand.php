@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
-use MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface;
+use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\AddUserRoleCommand as AddUserRoleDomainCommand;
 use MsgPhp\User\Event\UserRoleAddedEvent;
@@ -26,7 +26,7 @@ final class AddUserRoleCommand extends UserRoleCommand
     private $io;
     private $contextBuilder;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextBuilderInterface $contextBuilder)
+    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextBuilder)
     {
         $this->contextBuilder = $contextBuilder;
 

@@ -4,16 +4,17 @@ An overview of available infrastructural code when using [Symfony Console][conso
 
 - Requires [symfony/console]
 
-## Context builder
+## Context factory
 
-A context builder is bound to `MsgPhp\Domain\Infra\Console\ContextBuilder\ContextBuilderInterface`. Its purpose is to
-(interactively) built an arbitrary array value (the context) from a CLI command.
+A context factory is bound to `MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface`. Its purpose is to leverage
+a CLI command in an effort to interactively built an arbitrary array value (the context).
 
 ### API
 
 #### `configure(InputDefinition $definition): void`
 
-Configure a command input definition. See also [`InputDefinition`][api-inputdefinition].
+Configure a command input definition. See also [`InputDefinition`][api-inputdefinition]. Should be called before using
+`getContext()`.
 
 ---
 
@@ -23,10 +24,10 @@ Resolve the actual context from the console IO. See also [`InputInterface`][api-
 
 ### Implementations
 
-#### `MsgPhp\Domain\Infra\Console\ContextBuilder\ClassContextBuilder`
+#### `MsgPhp\Domain\Infra\Console\Context\ClassContextFactory`
 
-Builds a context based on any class method signature. It configures the CLI signature by mapping required class method
-arguments to command arguments, whereas optional ones are mapped to command options.
+Factorizes a context based on any class method signature. It configures the CLI signature by mapping required class
+method arguments to command arguments, whereas optional ones are mapped to command options.
 
 ```bash
 bin/console command --optional-argument [--] required-argument
@@ -45,7 +46,7 @@ asked interactively. If interaction is not possible an exception will be thrown 
 
 ##### Providing context elements
 
-Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\ContextBuilder\ContextElementProviderInterface`.
+Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\Context\ContextElementProviderInterface`.
 
 - `getElement(string $class, string $method, string $argument): ?ContextElement`
     - Resolve a [`ContextElement`][api-contextelement] from a class/method/argument combination
@@ -55,7 +56,7 @@ Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra
 ```php
 <?php
 
-use MsgPhp\Domain\Infra\Console\ContextBuilder\{ClassContextBuilder, ContextElement, ContextElementProviderInterface};
+use MsgPhp\Domain\Infra\Console\Context\{ClassContextBuilder, ContextElement, ContextElementProviderInterface};
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

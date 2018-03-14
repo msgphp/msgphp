@@ -28,11 +28,11 @@ final class BundleHelper
             return;
         }
 
-        $container->registerForAutoconfiguration(ConsoleInfra\ContextBuilder\ContextElementProviderInterface::class)
+        $container->registerForAutoconfiguration(ConsoleInfra\Context\ContextElementProviderInterface::class)
             ->addTag('msgphp.console.context_element_provider');
 
         if (class_exists(ConsoleEvents::class)) {
-            $container->register(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)
+            $container->register(ConsoleInfra\Context\ClassContextFactory::class)
                 ->setPublic(false)
                 ->setAbstract(true)
                 ->setArgument('$method', '__construct')

@@ -31,8 +31,8 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerEntityFactory($container, $classMapping, $idClassMapping);
         $this->registerMessageBus($container);
 
-        if ($container->hasDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)) {
-            $container->getDefinition(ConsoleInfra\ContextBuilder\ClassContextBuilder::class)
+        if ($container->hasDefinition(ConsoleInfra\Context\ClassContextFactory::class)) {
+            $container->getDefinition(ConsoleInfra\Context\ClassContextFactory::class)
                 ->setArgument('$classMapping', $classMapping);
         }
 
