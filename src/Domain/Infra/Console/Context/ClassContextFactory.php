@@ -93,8 +93,8 @@ final class ClassContextFactory implements ContextFactoryInterface
                 $value = $argument['value'] ?? null;
             }
 
-            if (array_key_exists($field, $values)) {
-                $context[$key] = $values[$field];
+            if (array_key_exists($key, $values)) {
+                $context[$key] = $values[$key];
                 continue;
             }
 
@@ -103,10 +103,6 @@ final class ClassContextFactory implements ContextFactoryInterface
 
             /** @var ContextElement $element */
             $element = $argument['element'];
-            if (null !== $element->normalizer) {
-                $normalizers[$key] = $element->normalizer;
-            }
-
             $required = $argument['required'] && !($this->flags & self::ALWAYS_OPTIONAL);
 
             if (is_array($value) && self::isObject($type = $argument['type']) && ($required || $given)) {
@@ -131,11 +127,17 @@ final class ClassContextFactory implements ContextFactoryInterface
             }
 
             if (!$isEmpty) {
-                $context[$key] = $value;
+                $context[$key] = $element->normalize($value);
                 continue;
             }
 
-            if ($required || $given) {
+            if ($element->generate($io, $generated)) {
+                $this->generatedValues[] = [$element->label, json_encode($generated)];
+                $context[$key] = $element->normalize($generated);
+                continue;
+            }
+
+            if ($required) {
                 if (!$interactive) {
                     throw new \LogicException(sprintf('No value provided for "%s".', $field));
                 }
@@ -145,30 +147,16 @@ final class ClassContextFactory implements ContextFactoryInterface
             }
 
             if ($this->flags & self::NO_DEFAULTS) {
-                unset($normalizers[$key]);
                 continue;
             }
 
-            if ($this->generatedValue($element, $generated)) {
-                $context[$key] = $generated;
-                continue;
-            }
-
-            $context[$key] = $argument['default'];
+            $context[$key] = $element->normalize($argument['default']);
         }
 
-        foreach ($normalizers as $key => $normalizer) {
-            $context[$key] = $normalizer($context[$key], $context);
-        }
-
-        $generatedValues = [];
-        while (null !== $generatedValue = array_shift($this->generatedValues)) {
-            [$label, $value] = $generatedValue;
-            $generatedValues[] = [$label, json_encode($value)];
-        }
-        if ($generatedValues) {
+        if ($this->generatedValues) {
             $io->note('Generated values');
-            $io->table([], $generatedValues);
+            $io->table([], $this->generatedValues);
+            $this->generatedValues = [];
         }
 
         return $context;
@@ -214,64 +202,20 @@ final class ClassContextFactory implements ContextFactoryInterface
         return $this->resolved;
     }
 
-    private function askRequiredValue(StyleInterface $io, ContextElement $element, $default)
+    private function askRequiredValue(StyleInterface $io, ContextElement $element, $emptyValue)
     {
-        $label = $element->label;
-        $generated = null !== $element->generator;
-
-        if (null === $default) {
-            if ($generated) {
-                $label .= ' (leave blank to generate a value)';
-            }
-
-            do {
-                if (null === $value = $element->hidden ? $io->askHidden($label) : $io->ask($label)) {
-                    $this->generatedValue($element, $value);
-                }
-            } while (!$generated && null === $value);
-
-            return $value;
+        if (null === $emptyValue) {
+            return $element->askString($io);
         }
 
-        if ($generated && $io->confirm(sprintf('Generate value for "%s"?', $label))) {
-            $this->generatedValue($element, $value);
-
-            return $value;
+        if (false === $emptyValue) {
+            return $element->askBool($io);
         }
 
-        if (false === $default) {
-            return $io->confirm($label, false);
+        if ([] === $emptyValue) {
+            return $element->askIterable($io);
         }
 
-        if ([] === $default) {
-            $i = 0;
-            $value = [];
-            do {
-                $offsetLabel = $label.' ['.$i.']';
-                $value[] = $element->hidden ? $io->askHidden($offsetLabel) : $io->ask($offsetLabel);
-                ++$i;
-            } while ($io->confirm('Add another value?', false));
-
-            return $value;
-        }
-
-        return $default;
-    }
-
-    private function generatedValue(ContextElement $element, &$generated): bool
-    {
-        if (null === $element->generator) {
-            $generated = null;
-            $result = false;
-        } else {
-            $generated = ($element->generator)();
-            $result = true;
-
-            $this->generatedValues[] = [$element->label, $generated];
-        }
-
-        unset($generated);
-
-        return $result;
+        return $emptyValue;
     }
 }

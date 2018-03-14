@@ -18,9 +18,10 @@ Configure a command input definition. See also [`InputDefinition`][api-inputdefi
 
 ---
 
-#### `getContext(InputInterface $input, StyleInterface $io): array`
+#### `getContext(InputInterface $input, StyleInterface $io, array $values = []): array`
 
 Resolve the actual context from the console IO. See also [`InputInterface`][api-inputinterface] and [`StyleInterface`][api-styleinterface].
+Any element value provided by `$values` takes precedence and should be used as-is.
 
 ### Implementations
 
