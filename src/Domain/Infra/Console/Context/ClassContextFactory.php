@@ -30,6 +30,18 @@ final class ClassContextFactory implements ContextFactoryInterface
     private $fieldMapping = [];
     private $generatedValues = [];
 
+    public static function getUniqueFieldName(InputDefinition $definition, string $field, bool $isOption = true): string
+    {
+        $known = $isOption ? $definition->getOptions() : $definition->getArguments();
+        $base = $field;
+        $i = 1;
+        while (isset($known[$field])) {
+            $field = $base.++$i;
+        }
+
+        return $field;
+    }
+
     public function __construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactoryInterface $elementFactory = null)
     {
         $this->class = $class;
@@ -41,6 +53,8 @@ final class ClassContextFactory implements ContextFactoryInterface
 
     public function configure(InputDefinition $definition): void
     {
+        $this->fieldMapping = [];
+
         if ($this->flags & self::REUSE_DEFINITION) {
             $origOptions = $definition->getOptions();
             $origArgs = $definition->getArguments();
@@ -172,18 +186,6 @@ final class ClassContextFactory implements ContextFactoryInterface
         return null !== $type && (class_exists($type) || interface_exists($type));
     }
 
-    private static function getUniqueFieldName(InputDefinition $definition, string $field, bool $isOption = true): string
-    {
-        $known = $isOption ? $definition->getOptions() : $definition->getArguments();
-        $base = $field;
-        $i = 1;
-        while (isset($known[$field])) {
-            $field = $base.++$i;
-        }
-
-        return $field;
-    }
-
     private function resolve(): iterable
     {
         if (null !== $this->resolved) {
@@ -192,9 +194,9 @@ final class ClassContextFactory implements ContextFactoryInterface
 
         $this->resolved = [];
 
-        foreach (ClassMethodResolver::resolve($class = $this->classMapping[$this->class] ?? $this->class, $this->method) as $argument) {
+        foreach (ClassMethodResolver::resolve($this->class, $this->method) as $argument) {
             $this->resolved[] = [
-                'element' => $this->elementFactory->getElement($class, $this->method, $argument['name']),
+                'element' => $this->elementFactory->getElement($this->class, $this->method, $argument['name']),
                 'type' => isset($argument['type']) ? ($this->classMapping[$argument['type']] ?? $argument['type']) : null,
             ] + $argument;
         }
