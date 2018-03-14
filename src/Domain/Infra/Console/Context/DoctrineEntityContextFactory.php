@@ -27,9 +27,13 @@ final class DoctrineEntityContextFactory implements ContextFactoryInterface
 
     public function configure(InputDefinition $definition): void
     {
+        $this->factory->configure($definition);
     }
 
     public function getContext(InputInterface $input, StyleInterface $io, array $values = []): array
     {
+        dump(__CLASS__);
+
+        return $this->factory->getContext($input, $io, $values);
     }
 }

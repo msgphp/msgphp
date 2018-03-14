@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use MsgPhp\Domain\Infra\SimpleBus as SimpleBusInfra;
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Container;
@@ -82,6 +82,22 @@ final class ContainerHelper
         $definition->setPublic(false);
 
         return $container->setDefinition($class.'.'.ContainerBuilder::hash(__METHOD__.++self::$counter), $definition);
+    }
+
+    public static function registerConsoleClassContextFactory(ContainerBuilder $container, string $class, int $flags = 0): Definition
+    {
+        $definition = self::registerAnonymous($container, ConsoleInfra\Context\ClassContextFactory::class, true)
+            ->setArgument('$class', $class)
+            ->setArgument('$flags', $flags);
+
+        if (class_exists(DoctrineOrmVersion::class) && self::hasBundle($container, DoctrineBundle::class)) {
+            $definition = self::registerAnonymous($container, ConsoleInfra\Context\DoctrineEntityContextFactory::class)
+                ->setAutowired(true)
+                ->setArgument('$factory', $definition)
+                ->setArgument('$class', $class);
+        }
+
+        return $definition;
     }
 
     public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void

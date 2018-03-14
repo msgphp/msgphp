@@ -124,18 +124,24 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $loader->load('console.php');
 
             $container->getDefinition(ConsoleInfra\Command\AddUserRoleCommand::class)
-                ->setArgument('$contextFactory', ContainerHelper::registerAnonymous($container, BaseConsoleInfra\Context\ClassContextFactory::class, true)
-                    ->setArgument('$class', Entity\UserRole::class)
-                    ->setArgument('$flags', BaseConsoleInfra\Context\ClassContextFactory::REUSE_DEFINITION));
+                ->setArgument('$contextFactory', ContainerHelper::registerConsoleClassContextFactory(
+                    $container,
+                    $config['class_mapping'][Entity\UserRole::class] ?? Entity\UserRole::class,
+                    BaseConsoleInfra\Context\ClassContextFactory::REUSE_DEFINITION
+                ));
 
             $container->getDefinition(ConsoleInfra\Command\CreateUserCommand::class)
-                ->setArgument('$contextFactory', ContainerHelper::registerAnonymous($container, BaseConsoleInfra\Context\ClassContextFactory::class, true)
-                    ->setArgument('$class', Entity\User::class));
+                ->setArgument('$contextFactory', ContainerHelper::registerConsoleClassContextFactory(
+                    $container,
+                    $config['class_mapping'][Entity\User::class]
+                ));
 
             $container->getDefinition(ConsoleInfra\Command\ChangeUserCredentialCommand::class)
-                ->setArgument('$contextFactory', ContainerHelper::registerAnonymous($container, BaseConsoleInfra\Context\ClassContextFactory::class, true)
-                    ->setArgument('$class', CredentialInterface::class)
-                    ->setArgument('$flags', BaseConsoleInfra\Context\ClassContextFactory::ALWAYS_OPTIONAL | BaseConsoleInfra\Context\ClassContextFactory::NO_DEFAULTS));
+                ->setArgument('$contextFactory', ContainerHelper::registerConsoleClassContextFactory(
+                    $container,
+                    $config['class_mapping'][CredentialInterface::class],
+                    BaseConsoleInfra\Context\ClassContextFactory::ALWAYS_OPTIONAL | BaseConsoleInfra\Context\ClassContextFactory::NO_DEFAULTS
+                ));
 
             ContainerHelper::removeIf($container, !$container->has(Command\Handler\AddUserRoleHandler::class), [
                 ConsoleInfra\Command\AddUserRoleCommand::class,
