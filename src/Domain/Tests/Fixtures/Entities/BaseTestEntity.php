@@ -65,7 +65,7 @@ abstract class BaseTestEntity
 
             $subset = array_shift($set);
             $cartesianSubset = $cartesian($set);
-            $result = array();
+            $result = [];
             foreach ($subset as $value) {
                 foreach ($cartesianSubset as $p) {
                     array_unshift($p, $value);

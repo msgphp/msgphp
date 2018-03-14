@@ -13,6 +13,7 @@ $rules = [
     '@PHP71Migration:risky' => true,
     '@PHPUnit60Migration:risky' => true,
     'single_import_per_statement' => false,
+    'array_syntax' => ['syntax' => 'short'],
 ];
 
 if (!is_dir($cacheDir)) {
