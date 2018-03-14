@@ -24,16 +24,16 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
 
     protected static $defaultName = 'user:create';
 
-    private $contextBuilder;
+    private $contextFactory;
 
     /** @var StyleInterface */
     private $io;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ContextFactoryInterface $contextBuilder)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ContextFactoryInterface $contextFactory)
     {
         $this->factory = $factory;
         $this->bus = $bus;
-        $this->contextBuilder = $contextBuilder;
+        $this->contextFactory = $contextFactory;
 
         parent::__construct();
     }
@@ -53,13 +53,13 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
         parent::configure();
 
         $this->setDescription('Create a user');
-        $this->contextBuilder->configure($this->getDefinition());
+        $this->contextFactory->configure($this->getDefinition());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $context = $this->contextBuilder->getContext($input, $this->io);
+        $context = $this->contextFactory->getContext($input, $this->io);
 
         $this->dispatch(CreateUserDomainCommand::class, [$context]);
 

@@ -9,6 +9,7 @@ use Doctrine\ORM\Events as DoctrineOrmEvents;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra};
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -31,7 +32,13 @@ final class BundleHelper
             $container->register(ConsoleInfra\Context\ClassContextFactory::class)
                 ->setPublic(false)
                 ->setAbstract(true)
+                ->setAutowired(true)
                 ->setArgument('$method', '__construct');
+
+            $container->register(ConsoleInfra\Context\ClassContextElementFactory::class)
+                ->setPublic(false);
+
+            $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
         }
 
         if (class_exists(DoctrineOrmVersion::class)) {

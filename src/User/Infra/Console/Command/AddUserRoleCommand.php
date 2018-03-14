@@ -24,11 +24,11 @@ final class AddUserRoleCommand extends UserRoleCommand
 
     /** @var StyleInterface */
     private $io;
-    private $contextBuilder;
+    private $contextFactory;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextBuilder)
+    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
     {
-        $this->contextBuilder = $contextBuilder;
+        $this->contextFactory = $contextFactory;
 
         parent::__construct($factory, $bus, $userRepository, $roleRepository);
     }
@@ -45,7 +45,7 @@ final class AddUserRoleCommand extends UserRoleCommand
         parent::configure();
 
         $this->setDescription('Add a user role');
-        $this->contextBuilder->configure($this->getDefinition());
+        $this->contextFactory->configure($this->getDefinition());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -53,7 +53,7 @@ final class AddUserRoleCommand extends UserRoleCommand
         $this->io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $this->io);
         $role = $this->getRole($input, $this->io);
-        $context = $this->contextBuilder->getContext($input, $this->io, ['user' => $user, 'role' => $role]);
+        $context = $this->contextFactory->getContext($input, $this->io, ['user' => $user, 'role' => $role]);
 
         $this->dispatch(AddUserRoleDomainCommand::class, [$user->getId(), $role->getName(), $context]);
 
