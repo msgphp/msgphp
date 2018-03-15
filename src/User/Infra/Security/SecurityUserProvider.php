@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class SecurityUserProvider implements UserProviderInterface
+final class SecurityUserProvider implements UserProviderInterface
 {
     private $repository;
     private $factory;
