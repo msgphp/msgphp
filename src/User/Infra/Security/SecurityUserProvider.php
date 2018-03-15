@@ -40,17 +40,6 @@ final class SecurityUserProvider implements UserProviderInterface
         return $this->fromUser($user);
     }
 
-    public function loadUserById(string $id): UserInterface
-    {
-        try {
-            $user = $this->repository->find($this->factory->identify(User::class, $id));
-        } catch (EntityNotFoundException $e) {
-            throw new UsernameNotFoundException($e->getMessage());
-        }
-
-        return $this->fromUser($user);
-    }
-
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof SecurityUser) {
