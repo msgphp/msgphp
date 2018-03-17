@@ -29,21 +29,21 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameWithRoles(): void
     {
-        $roleProvider = $this->createMock(UserRolesProviderInterface::class);
-        $roleProvider->expects($this->any())
+        $rolesProvider = $this->createMock(UserRolesProviderInterface::class);
+        $rolesProvider->expects($this->any())
             ->method('getRoles')
-            ->willReturn(['ROLE_FOO']);
-        $user = (new SecurityUserProvider($this->createRepository($this->createUser()), $this->createFactory(), $roleProvider))->loadUserByUsername('username');
+            ->willReturn($roles = ['ROLE_FOO']);
+        $user = (new SecurityUserProvider($this->createRepository($this->createUser()), $this->createFactory(), $rolesProvider))->loadUserByUsername('username');
 
         $this->assertSame('id', $user->getUsername());
-        $this->assertSame(['ROLE_FOO'], $user->getRoles());
+        $this->assertSame($roles, $user->getRoles());
         $this->assertSame('', $user->getPassword());
         $this->assertNull($user->getSalt());
     }
 
     public function testLoadUserByUsernameWithUnknownUsername(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+        $provider = new SecurityUserProvider($this->createRepository(), $this->createMock(EntityAwareFactoryInterface::class));
 
         $this->expectException(UsernameNotFoundException::class);
 
@@ -70,7 +70,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithUnsupportedUser(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $this->createMock(EntityAwareFactoryInterface::class));
 
         $this->expectException(UnsupportedUserException::class);
 
@@ -79,10 +79,22 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testSupportsClass(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository(), $this->createFactory());
+        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $this->createMock(EntityAwareFactoryInterface::class));
 
         $this->assertTrue($provider->supportsClass(SecurityUser::class));
         $this->assertFalse($provider->supportsClass(UserInterface::class));
+    }
+
+    public function testFromUser(): void
+    {
+        $rolesProvider = $this->createMock(UserRolesProviderInterface::class);
+        $rolesProvider->expects($this->once())
+            ->method('getRoles')
+            ->willReturn($roles = ['ROLE_FOO']);
+        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $this->createMock(EntityAwareFactoryInterface::class), $rolesProvider);
+
+        $this->assertInstanceOf(SecurityUser::class, $user = $provider->fromUser($this->createMock(User::class)));
+        $this->assertSame($roles, $user->getRoles());
     }
 
     private function createFactory(): EntityAwareFactoryInterface
