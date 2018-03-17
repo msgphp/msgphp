@@ -8,9 +8,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Security\User\UserProviderWithPayloadSu
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
-use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Infra\Security\SecurityUserProvider as BaseSecurityUserProvider;
-use MsgPhp\User\Infra\Security\UserRolesProviderInterface;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -23,14 +21,12 @@ final class SecurityUserProvider implements UserProviderWithPayloadSupportsInter
     private $provider;
     private $repository;
     private $factory;
-    private $roleProvider;
 
-    public function __construct(BaseSecurityUserProvider $provider, UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory, UserRolesProviderInterface $roleProvider = null)
+    public function __construct(BaseSecurityUserProvider $provider, UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory)
     {
         $this->provider = $provider;
         $this->repository = $repository;
         $this->factory = $factory;
-        $this->roleProvider = $roleProvider;
     }
 
     public function loadUserByUsernameAndPayload($username, array $payload): UserInterface
@@ -41,7 +37,7 @@ final class SecurityUserProvider implements UserProviderWithPayloadSupportsInter
             throw new UsernameNotFoundException($e->getMessage());
         }
 
-        return $this->fromUser($user);
+        return $this->provider->fromUser($user);
     }
 
     public function loadUserByUsername($username): UserInterface
@@ -57,10 +53,5 @@ final class SecurityUserProvider implements UserProviderWithPayloadSupportsInter
     public function supportsClass($class): bool
     {
         return $this->provider->supportsClass($class);
-    }
-
-    private function fromUser(User $user): SecurityUser
-    {
-        return new SecurityUser($user, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
     }
 }

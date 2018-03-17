@@ -20,13 +20,13 @@ final class SecurityUserProvider implements UserProviderInterface
 {
     private $repository;
     private $factory;
-    private $roleProvider;
+    private $rolesProvider;
 
-    public function __construct(UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory, UserRolesProviderInterface $roleProvider = null)
+    public function __construct(UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory, UserRolesProviderInterface $rolesProvider = null)
     {
         $this->repository = $repository;
         $this->factory = $factory;
-        $this->roleProvider = $roleProvider;
+        $this->rolesProvider = $rolesProvider;
     }
 
     public function loadUserByUsername($username): UserInterface
@@ -43,7 +43,7 @@ final class SecurityUserProvider implements UserProviderInterface
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof SecurityUser) {
-            throw new UnsupportedUserException(sprintf('Unsupported user "%s"', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Unsupported user "%s".', get_class($user)));
         }
 
         try {
@@ -60,8 +60,8 @@ final class SecurityUserProvider implements UserProviderInterface
         return SecurityUser::class === $class;
     }
 
-    private function fromUser(User $user): SecurityUser
+    public function fromUser(User $user): SecurityUser
     {
-        return new SecurityUser($user, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
+        return new SecurityUser($user, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : []);
     }
 }
