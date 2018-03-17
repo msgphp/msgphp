@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class EmailsFieldTest extends TestCase
 {
-    public function testField(): void
+    public function testGetEmails(): void
     {
         $object = $this->getObject($emails = [$this->createMock(UserEmail::class)]);
 
