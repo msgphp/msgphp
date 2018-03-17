@@ -6,6 +6,7 @@
 
 # News
 
+- **`2018-03-18`** Added initial _cookbook_ chapter
 - **`2018-02-18`** Added initial _infrastructure_ chapter
 - **`2018-02-12`** Added [domain identities](ddd/identities.md) chapter
 - **`2018-01-27`** Added initial _message driven_ chapter

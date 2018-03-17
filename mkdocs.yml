@@ -39,11 +39,5 @@ pages:
     - Doctrine DBAL: infrastructure/doctrine-dbal.md
     - Doctrine ORM: infrastructure/doctrine-orm.md
     - Symfony Console: infrastructure/symfony-console.md
-- Domain layers:
-    - Architecture: domain/architecture.md
-    - User domain: domain/user.md
-    - EAV domain: domain/eav.md
-- Symfony bundles:
-    - Architecture: symfony-bundle/architecture.md
-    - User bundle: symfony-bundle/user.md
-    - EAV bundle: symfony-bundle/eav.md
+- Cookbook:
+    - Bundle installation: cookbook/bundle-installation.md

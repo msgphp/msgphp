@@ -34,6 +34,7 @@ final class Configuration implements ConfigurationInterface
         AttributeIdInterface::class => UuidInfra\AttributeId::class,
         AttributeValueIdInterface::class => UuidInfra\AttributeValueId::class,
     ];
+    private const COMMAND_MAPPING = [];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -48,6 +49,9 @@ final class Configuration implements ConfigurationInterface
             ->classMappingNode('id_type_mapping')
                 ->subClassKeys([DomainIdInterface::class])
             ->end()
+            ->classMappingNode('commands')
+                ->typeOfValues('boolean')
+            ->end()
             ->scalarNode('default_id_type')
                 ->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)
                 ->cannotBeEmpty()
@@ -58,6 +62,13 @@ final class Configuration implements ConfigurationInterface
                 self::DEFAULT_ID_CLASS_MAPPING,
                 array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_CLASS_MAPPING)
             ))
+        ->end()
+        ->validate()
+            ->always(function (array $config): array {
+                ConfigHelper::resolveCommandMappingConfig(self::COMMAND_MAPPING, $config['class_mapping'], $config['commands']);
+
+                return $config;
+            })
         ->end();
 
         return $treeBuilder;
