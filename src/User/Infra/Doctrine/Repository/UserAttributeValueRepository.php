@@ -64,14 +64,14 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
         return $this->createResultSet($qb->getQuery(), $offset, $limit);
     }
 
-    public function find(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): UserAttributeValue
+    public function find(AttributeValueIdInterface $attributeValueId): UserAttributeValue
     {
-        return $this->doFind(['user' => $userId, 'attributeValue' => $attributeValueId]);
+        return $this->doFind($attributeValueId);
     }
 
-    public function exists(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): bool
+    public function exists(AttributeValueIdInterface $attributeValueId): bool
     {
-        return $this->doExists(['user' => $userId, 'attributeValue' => $attributeValueId]);
+        return $this->doExists($attributeValueId);
     }
 
     public function save(UserAttributeValue $userAttributeValue): void

@@ -37,9 +37,9 @@ interface UserAttributeValueRepositoryInterface
      */
     public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
-    public function find(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): UserAttributeValue;
+    public function find(AttributeValueIdInterface $attributeValueId): UserAttributeValue;
 
-    public function exists(UserIdInterface $userId, AttributeValueIdInterface $attributeValueId): bool;
+    public function exists(AttributeValueIdInterface $attributeValueId): bool;
 
     public function save(UserAttributeValue $userAttributeValue): void;
 
