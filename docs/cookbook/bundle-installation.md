@@ -9,8 +9,10 @@ infrastructural services are created automatically.
 
 ## Available bundles
 
-- `msgphp/eav-bundle`: Provides basic entity-attribute-value management (the `Eav` domain)
-- `msgphp/user-bundle`: Provides basic user management (the `User` domain)
+<!--ref-start:available-bundles-->
+- `msgphp/eav-bundle`: Basic entity-attribute-value management (the `Eav` domain)
+- `msgphp/user-bundle`: Basic user management (the `User` domain)
+<!--ref-end:available-bundles-->
 
 ## Installation
 

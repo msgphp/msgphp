@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php
+
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+
+if (!is_file('vendor/autoload.php')) {
+    passthru('composer install --no-interaction --no-suggest', $return);
+    if (0 !== $return) {
+        exit($return);
+    }
+}
+
+require 'vendor/autoload.php';
+
+$getTemplate = function (string $file) {
+    $oldBaseDir = getcwd();
+    chdir(dirname(__DIR__));
+    $template = include $file;
+    chdir($oldBaseDir);
+
+    return $template;
+};
+$templates = $templateVars = [];
+
+foreach (glob('docs/.refs/*.php') as $reference) {
+    $vars = $getTemplate($reference);
+    $templates[$name = basename($reference, '.php')] = array_shift($vars);
+    $templateVars[$name] = $vars;
+}
+
+$twig = new Environment(new ArrayLoader($templates));
+$replacements = [];
+
+foreach (array_keys($templates) as $template) {
+    $from = '~'.preg_quote($start = '<!--ref-start:'.$template.'-->', '~').'.*'.preg_quote($end = '<!--ref-end:'.$template.'-->', '~').'~s';
+    $to = $start."\n".trim($twig->render($template, $templateVars[$template]))."\n".$end;
+    $replacements[$from] = $to;
+}
+foreach (glob('docs/{*,**/*}.md', \GLOB_BRACE) as $file) {
+    file_put_contents($file, preg_replace(array_keys($replacements), array_values($replacements), file_get_contents($file)));
+}
+
+echo "\e[34mCompiled templates\e[0m\n";
+echo ' > '.implode("\n > ", array_keys($templates))."\n";

@@ -2,7 +2,7 @@
     "name": "msgphp/eav-bundle",
     "type": "symfony-bundle",
     "license": "MIT",
-    "description": "Entity-Attribute-Value domain layer",
+    "description": "Basic entity-attribute-value management (the `Eav` domain)",
     "keywords": ["entity-attribute-value", "eav"],
     "authors": [
         {
