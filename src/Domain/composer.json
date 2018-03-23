@@ -21,8 +21,10 @@
         "php": "^7.1.0"
     },
     "require-dev": {
+        "api-platform/core": "^2.2",
         "doctrine/doctrine-bundle": "^1.8",
         "doctrine/orm": "^2.6",
+        "elasticsearch/elasticsearch": "^6.0",
         "psr/container": "^1.0",
         "ramsey/uuid": "^3.7",
         "ramsey/uuid-doctrine": "^1.4",

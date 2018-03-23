@@ -12,7 +12,7 @@ use MsgPhp\Domain\Projection\{DomainProjectionInterface, DomainProjectionReposit
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ProjectionDataProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
+final class DomainProjectionDataProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $typeRegistry;
     private $repository;

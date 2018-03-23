@@ -22,7 +22,7 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
 
     public function __construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)
     {
-        foreach ($mappings as $type =>  $mapping) {
+        foreach ($mappings as $type => $mapping) {
             if (!isset($mapping['properties']) || !is_array($mapping['properties'])) {
                 continue;
             }

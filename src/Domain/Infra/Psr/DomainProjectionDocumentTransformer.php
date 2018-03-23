@@ -32,7 +32,7 @@ final class DomainProjectionDocumentTransformer implements DomainProjectionDocum
         $document = $transformer($object);
 
         if (!$document instanceof DomainProjectionDocument) {
-            throw new \LogicException(sprintf('Projection document transformer for class "%s" must return an instance of "%s", got "%s".', $class, ProjectionDocument::class, is_object($document) ? get_class($document) : gettype($document)));
+            throw new \LogicException(sprintf('Projection document transformer for class "%s" must return an instance of "%s", got "%s".', $class, DomainProjectionDocument::class, is_object($document) ? get_class($document) : gettype($document)));
         }
 
         $document->source = $object;
