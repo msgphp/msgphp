@@ -26,6 +26,7 @@ pages:
         - Static factory: ddd/factory/static.md
     - Repositories: ddd/repositories.md
     - Entities: ddd/entities.md
+    - Projections: ddd/projections.md
 - Event sourcing:
     - Events: event-sourcing/events.md
     - Event handlers: event-sourcing/event-handlers.md
