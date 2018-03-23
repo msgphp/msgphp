@@ -9,7 +9,6 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use MsgPhp\Domain\Projection\{DomainProjectionInterface, DomainProjectionRepositoryInterface, DomainProjectionTypeRegistryInterface};
 
-
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */

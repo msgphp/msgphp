@@ -7,6 +7,9 @@ namespace MsgPhp\Domain\Infra\Psr;
 use Doctrine\Common\Util\ClassUtils;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @author Roland Franssen <franssen.roland@gmail.com>
+ */
 final class DoctrineAwareClassContainer implements ContainerInterface
 {
     private $container;
