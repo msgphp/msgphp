@@ -26,7 +26,6 @@ pages:
         - Static factory: ddd/factory/static.md
     - Repositories: ddd/repositories.md
     - Entities: ddd/entities.md
-    - Projections: ddd/projections.md
 - Event sourcing:
     - Events: event-sourcing/events.md
     - Event handlers: event-sourcing/event-handlers.md
@@ -34,12 +33,22 @@ pages:
     - Message bus: message-driven/message-bus.md
     - Message dispatcher: message-driven/message-dispatcher.md
     - CQRS: message-driven/cqrs.md
+- Projection:
+    - Models: projection/models.md
+    - Documents: projection/documents.md
+    - Document transformers: projection/document-transformers.md
+    - Type registry: projection/type-registry.md
+    - Repositories: projection/repositories.md
+    - Synchronization: projection/synchronization.md
 - Infrastructure:
-    - UUID: infrastructure/uuid.md
+    - API Platform: infrastructure/api-platform.md
     - Doctrine Collections: infrastructure/doctrine-collections.md
     - Doctrine DBAL: infrastructure/doctrine-dbal.md
     - Doctrine ORM: infrastructure/doctrine-orm.md
+    - Elasticsearch: infrastructure/elasticsearch.md
+    - PSR Container: infrastructure/psr-container.md
     - Symfony Console: infrastructure/symfony-console.md
+    - UUID: infrastructure/uuid.md
 - Cookbook:
     - Bundle installation: cookbook/bundle-installation.md
 - Reference:

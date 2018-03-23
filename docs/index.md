@@ -6,6 +6,7 @@
 
 # News
 
+- **`2018-03-24`** Added initial _projection_ chapter
 - **`2018-03-18`** Added initial _cookbook_ and _reference_ chapters
 - **`2018-02-18`** Added initial _infrastructure_ chapter
 - **`2018-02-12`** Added [domain identities](ddd/identities.md) chapter

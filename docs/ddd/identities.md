@@ -1,5 +1,8 @@
 # Identities
 
+`MsgPhp\Domain\DomainIdentityHelper` is a utility domain service. Its purpose is to ease working with domain identities
+and the [identity mapping](identity-mapping.md).
+
 A domain identity is a composite value (`array`) of one or more individual identifier values, indexed by an identifier
 field name. Its usage is to uniquely identify a domain object, thus qualifying it an entity object.
 
@@ -7,9 +10,6 @@ Identifier values can be of any type; a [domain identifier](identifiers.md), ano
 primitive value.
 
 A single identifier value might represent an actual identity in case it's composed by a single identifier field.
-
-`MsgPhp\Domain\DomainIdentityHelper` is a domain a helper service. Its purpose is to ease working with the
-[identity mapping](identity-mapping.md).
 
 ## API
 

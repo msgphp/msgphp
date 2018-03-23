@@ -1,3 +1,0 @@
-# User domain layer
-
-TODO

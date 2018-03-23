@@ -4,6 +4,28 @@ An overview of available infrastructural code when using [Symfony Console][conso
 
 - Requires [symfony/console]
 
+## Commands
+
+Various standard [console commands] are provided depending on used domain infrastructure. They are defined in the
+`MsgPhp\Domain\Infra\Console\Command\` namespace.
+
+### `InitializeDomainProjectionTypesCommand`
+
+Initializes a [projection type registry](../projection/type-registry.md).
+
+```bash
+bin/console domain:projection:initialize-types [--force]
+```
+
+### `SynchronizeDomainProjectionsCommand`
+
+Synchronizes domain objects and their [projections](../projection/models.md) using the [projection synchronization](../projection/synchronization.md)
+utility service.
+
+```bash
+bin/console domain:projection:synchronize
+```
+
 ## Context factory
 
 A context factory is bound to `MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface`. Its purpose is to leverage
@@ -123,8 +145,9 @@ provide a discriminator value into the resulting context when working with [inhe
 
 [console-project]: https://symfony.com/doc/current/components/console.html
 [symfony/console]: https://packagist.org/packages/symfony/console
+[console commands]: https://symfony.com/doc/current/console.html
 [api-inputdefinition]: https://api.symfony.com/master/Symfony/Component/Console/Input/InputDefinition.html
 [api-inputinterface]: https://api.symfony.com/master/Symfony/Component/Console/Input/InputInterface.html
 [api-styleinterface]: https://api.symfony.com/master/Symfony/Component/Console/Style/StyleInterface.html
-[api-contextelement]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/Console/ContextBuilder/ContextElement.html
+[api-contextelement]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/Console/Context/ContextElement.html
 [orm-inheritance]: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html

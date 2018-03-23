@@ -1,3 +1,0 @@
-# Domain layer architecture
-
-TODO
