@@ -220,7 +220,7 @@ final class ContainerHelper
         }
 
         foreach ($repositoryMapping as $repository => $class) {
-            if (null === $class || !isset($classMapping[$class])) {
+            if (!isset($classMapping[$class])) {
                 self::removeDefinitionWithAliases($container, $repository);
                 continue;
             }
