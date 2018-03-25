@@ -64,4 +64,9 @@ final class DomainProjectionDocument
 
         return $data;
     }
+
+    public function toProjection(): DomainProjectionInterface
+    {
+        return $this->getType()::fromDocument($this->getBody());
+    }
 }
