@@ -1,14 +1,39 @@
 # Projection Documents
 
 A projection document is a domain value object of type `MsgPhp\Domain\Projection\DomainProjectionDocument`. Its purpose
-is to hold a projection document its (meta)data and current state.
+is to hold a projection document its data and current state.
 
 ## API
 
-### `static create(string $type, string $id = null, array $body = []): DomainProjectionDocument`
+### Properties
 
-Creates a projection document for a known projection type. In case `$id` is not given it implies an auto-generated
-value. A projection `$type` usually refers to a known [projection](models.md) by class name.
+- `int $status`: The current document status. See also [default statuses][api-statuses].
+- `?\Exception $error`: An occurred error, if any
+- `?object $source`: The origin object source, if any
+
+---
+
+### `getType(): string`
+
+Gets the projection type. Always must refer to a [projection](models.md) class name.
+
+---
+
+### `getId(): ?string`
+
+Gets the document ID, if any. Otherwise an auto-generated value is implied.
+
+---
+
+### `getBody(): array`
+
+Gets the document body.
+
+---
+
+### `toProjection(): DomainProjectionInterface`
+
+Transforms the document into its projection model.
 
 ## Basic example
 
@@ -28,7 +53,12 @@ class MyProjection implements DomainProjectionInterface
     }
 }
 
-$document = DomainProjectionDocument::create(MyProjection::class, null, [
+$document = new DomainProjectionDocument(MyProjection::class, null, [
     'some_field' => 'value',
 ]);
+
+/** @var MyProjection $projection */
+$projection = $document->toProjection();
 ```
+
+[api-statuses]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/DomainProjectionDocument.html#page-content

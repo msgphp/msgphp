@@ -9,9 +9,6 @@ namespace MsgPhp\Domain\Projection;
  */
 final class DomainProjectionDocument
 {
-    private const DATA_TYPE_KEY = 'document_type';
-    private const DATA_ID_KEY = 'document_id';
-
     public const STATUS_UNKNOWN = 1;
     public const STATUS_VALID = 2;
     public const STATUS_FAILED_TRANSFORMATION = 3;
@@ -20,53 +17,48 @@ final class DomainProjectionDocument
     /** @var int */
     public $status = self::STATUS_UNKNOWN;
 
-    /** @var array */
-    public $data = [];
-
     /** @var object|null */
     public $source;
 
     /** @var \Exception|null $error */
     public $error;
 
-    public static function create(string $type, string $id = null, array $body = []): self
-    {
-        $document = new self();
-        $document->data[self::DATA_TYPE_KEY] = $type;
-        $document->data[self::DATA_ID_KEY] = $id;
-        $document->data += $body;
+    private $type;
+    private $id;
+    private $body = [];
 
-        return $document;
+    public function __construct(string $type = null, string $id = null, array $body = [])
+    {
+        $this->type = $type;
+        $this->id = $id;
+        $this->body = $body;
     }
 
     public function getType(): string
     {
-        if (!isset($this->data[self::DATA_TYPE_KEY])) {
+        if (null === $this->type) {
             throw new \LogicException('Document type not set.');
         }
 
-        if (!is_subclass_of($type = $this->data[self::DATA_TYPE_KEY], DomainProjectionInterface::class)) {
-            throw new \LogicException(sprintf('Document type must be a sub class of "%s", got "%s".', DomainProjectionInterface::class, $type));
+        if (!is_subclass_of($this->type, DomainProjectionInterface::class)) {
+            throw new \LogicException(sprintf('Document type must be a sub class of "%s", got "%s".', DomainProjectionInterface::class, $this->type));
         }
 
-        return $type;
+        return $this->type;
     }
 
     public function getId(): ?string
     {
-        return $this->data[self::DATA_ID_KEY] ?? null;
+        return $this->id;
     }
 
     public function getBody(): array
     {
-        $data = $this->data;
-        unset($data[self::DATA_TYPE_KEY], $data[self::DATA_ID_KEY]);
-
-        return $data;
+        return $this->body;
     }
 
     public function toProjection(): DomainProjectionInterface
     {
-        return $this->getType()::fromDocument($this->getBody());
+        return $this->getType()::fromDocument($this->body);
     }
 }

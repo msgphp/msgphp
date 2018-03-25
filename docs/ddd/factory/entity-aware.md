@@ -5,9 +5,9 @@ An entity aware factory is an [object factory](object.md) and additionally bound
 
 ## API
 
-### `create(string $class, array $context = []): object`
+### Extends
 
-Inherited from `MsgPhp\Domain\Factory\DomainObjectFactoryInterface::create()`.
+- [`DomainObjectFactoryInterface`](object.md)
 
 ---
 
