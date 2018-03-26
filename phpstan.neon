@@ -23,3 +23,7 @@ parameters:
 
     excludes_analyse:
         - '*/vendor/*'
+
+        # see https://github.com/phpstan/phpstan/issues/859
+        - src/UserBundle/Maker/UserMaker.php
+        - src/UserBundle/Resources/config/services.php

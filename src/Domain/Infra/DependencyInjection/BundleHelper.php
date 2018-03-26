@@ -33,7 +33,8 @@ final class BundleHelper
                 ->setPublic(false)
                 ->setAbstract(true)
                 ->setAutowired(true)
-                ->setArgument('$method', '__construct');
+                ->setArgument('$method', '__construct')
+                ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
 
             $container->register(ConsoleInfra\Context\ClassContextElementFactory::class)
                 ->setPublic(false);
@@ -44,15 +45,13 @@ final class BundleHelper
         if (class_exists(DoctrineOrmVersion::class)) {
             $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass());
 
-            $container->setParameter('msgphp.doctrine.mapping_cache_dirname', 'msgphp/doctrine-mapping');
-
             $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', [])
                 ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
 
             if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
-                @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/%msgphp.doctrine.mapping_cache_dirname%'), 0777, true);
+                @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/msgphp/doctrine-mapping'), 0777, true);
 
                 $container->prependExtensionConfig('doctrine', ['orm' => [
                     'hydrators' => [
