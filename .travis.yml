@@ -24,6 +24,7 @@ matrix:
         - CC=true
         - CS=true
         - SA=true
+        - SMOKE_TEST=true
     - php: 7.2
       env:
         - DEPS=low
@@ -46,7 +47,7 @@ before_install:
   - source .travis/tfold
 
 install:
-  - if [[ $DEPS != high || $TRAVIS_BRANCH != master ]] ; then travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n') ; fi
+  - if [[ $DEPS != high || $TRAVIS_PULL_REQUEST != false ]] ; then travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n') ; fi
   - if [[ ! $DEPS  ]] ; then travis_retry bin/composer install $COMPOSER_ARGS ; fi
   - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
   - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
@@ -58,6 +59,7 @@ script:
   - if [[ $CC = true ]] ; then bin/phpunit --coverage-clover=coverage.xml $PHPUNIT_ARGS ; fi
   - if [[ $CS = true ]] ; then bin/cs ; fi
   - if [[ $SA = true ]] ; then bin/sa ; fi
+  - if [[ $SMOKE_TEST = true ]] ; then .travis/smoke-test ; fi
 
 after_success:
   - if [[ $CC = true ]] ; then .travis/codecov ; fi

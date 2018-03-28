@@ -9,21 +9,19 @@ DIR="${1:-var/test-project/}"
 COMPONENTS="symfony/var-dumper "
 BUNDLES=""
 
-for PACKAGE in $(find src/*/composer.json -type f) ; do
+for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
     if [[ ! -z $PACKAGE_NAME ]] ; then
         PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
-        if [[ $PACKAGE_NAME = *-bundle ]] ; then
-            echo -en "\e[34mInstall \"msgphp/${PACKAGE_NAME}\"? [yN]\e[0m "
-            read answer
-            if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
-                BUNDLES="${BUNDLES}msgphp/${PACKAGE_NAME} "
-            fi
+        echo -en "\e[34mInstall \"msgphp/${PACKAGE_NAME}\"? [yN]\e[0m "
+        read answer
+        if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
+            BUNDLES="${BUNDLES}msgphp/${PACKAGE_NAME} "
         fi
     fi
 done
 
-composer create-project --prefer-dist symfony/skeleton "${DIR}"
+composer create-project --prefer-dist --no-progress symfony/skeleton "${DIR}"
 [[ $? -ne 0 ]] && exit 1
 
 pushd "${DIR}" &> /dev/null

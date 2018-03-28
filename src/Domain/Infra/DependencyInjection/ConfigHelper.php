@@ -54,7 +54,7 @@ final class ConfigHelper
     {
         foreach ($commandMapping as $commandClass => $features) {
             $mappedClass = $classMapping[$commandClass] ?? $commandClass;
-            $isEventHandler = is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
+            $isEventHandler = self::exists($mappedClass) && is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
 
             foreach ($features as $feature => $featureInfo) {
                 if (!trait_exists($feature)) {
@@ -63,6 +63,21 @@ final class ConfigHelper
                     $config += array_fill_keys($featureInfo, $isEventHandler);
                 }
             }
+        }
+    }
+
+    private static function exists(string $class): bool
+    {
+        spl_autoload_register($loader = function (): void {
+            throw new \LogicException();
+        });
+
+        try {
+            return class_exists($class) || interface_exists($class);
+        } catch (\LogicException $e) {
+            return false;
+        } finally {
+            spl_autoload_unregister($loader);
         }
     }
 

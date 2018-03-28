@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+if [[ ! $# -eq 0 ]] ; then
+    echo "Usage: $0"
+    exit 1
+fi
+
+BASE_DIR="$(pwd)"
+
+rm -rf var/smoke-test/bundles/*Bundle/
+if [[ ! -d var/smoke-test/bundles/base ]] ; then
+    mkdir -p var/smoke-test/bundles/base
+fi
+pushd var/smoke-test/bundles/base &> /dev/null
+if [[ -d vendor ]] ; then
+    composer update --prefer-dist --quiet
+else
+    composer create-project --prefer-dist --quiet symfony/skeleton . && \
+    composer config extra.symfony.allow-contrib true && \
+    composer config repositories.main composer "file://${BASE_DIR}/" && \
+    composer require --prefer-dist --quiet orm
+fi
+[[ $? -ne 0 ]] && exit 1
+popd &> /dev/null
+
+RETURN=0
+for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
+    PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
+    if [[ ! -z $PACKAGE_NAME ]] ; then
+        PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
+        DIR="var/smoke-test/bundles/$(basename $(dirname "${PACKAGE}"))"
+        cp -R var/smoke-test/bundles/base "${DIR}"
+        pushd "${DIR}" &> /dev/null
+        if [[ $TRAVIS_PULL_REQUEST != false ]] ; then
+            composer config repositories.bundle path "${BASE_DIR}/$(dirname $PACKAGE)/"
+            composer config minimum-stability dev
+        fi
+        composer require --no-progress --no-suggest -n "msgphp/${PACKAGE_NAME}"
+        LAST=$? ; [[ $LAST -ne 0 ]] && RETURN=${LAST}
+        popd &> /dev/null
+    fi
+done
+
+exit ${RETURN}
