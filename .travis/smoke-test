@@ -14,13 +14,20 @@ fi
 pushd var/smoke-test/bundles/base &> /dev/null
 if [[ -d vendor ]] ; then
     composer update --prefer-dist --quiet
+    [[ $? -ne 0 ]] && exit 1
 else
     composer create-project --prefer-dist --quiet symfony/skeleton . && \
-    composer config extra.symfony.allow-contrib true && \
-    composer config repositories.main composer "file://${BASE_DIR}/" && \
+    composer config extra.symfony.allow-contrib true
+    [[ $? -ne 0 ]] && exit 1
+
+    if [[ -f packages.json ]] ; then
+        composer config repositories.main composer "file://${BASE_DIR}/"
+        [[ $? -ne 0 ]] && exit 1
+    fi
+
     composer require --prefer-dist --quiet orm
+    [[ $? -ne 0 ]] && exit 1
 fi
-[[ $? -ne 0 ]] && exit 1
 popd &> /dev/null
 
 RETURN=0
@@ -32,10 +39,15 @@ for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
         cp -R var/smoke-test/bundles/base "${DIR}"
         pushd "${DIR}" &> /dev/null
         if [[ $TRAVIS_PULL_REQUEST != false ]] ; then
-            composer config repositories.bundle path "${BASE_DIR}/$(dirname $PACKAGE)/"
             composer config minimum-stability dev
         fi
-        composer require --no-progress --no-suggest -n "msgphp/${PACKAGE_NAME}"
+        CMD="composer require --no-progress --no-suggest --no-interaction msgphp/${PACKAGE_NAME}"
+        if [[ $TRAVIS = true ]] ; then
+            tfold "Testing ${PACKAGE_NAME}" "${CMD}"
+        else
+            echo -e "\e[34mTesting ${PACKAGE_NAME}\e[0m"
+            bash -xc "${CMD}" 2>&1
+        fi
         LAST=$? ; [[ $LAST -ne 0 ]] && RETURN=${LAST}
         popd &> /dev/null
     fi
