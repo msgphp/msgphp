@@ -15,21 +15,26 @@ fi
 pushd var/smoke-test/bundles/base &> /dev/null
 if [[ -d vendor ]] ; then
     composer update --prefer-dist --quiet
-    [[ $? -ne 0 ]] && exit 1
 else
     composer create-project --prefer-dist --quiet symfony/skeleton . && \
-    composer config extra.symfony.allow-contrib true
-    [[ $? -ne 0 ]] && exit 1
-
-    if [[ -f packages.json ]] ; then
-        composer config repositories.main composer "file://${BASE_DIR}/"
-        [[ $? -ne 0 ]] && exit 1
-    fi
-
+    composer config extra.symfony.allow-contrib true && \
     composer require --prefer-dist --quiet orm
-    [[ $? -ne 0 ]] && exit 1
 fi
+[[ $? -ne 0 ]] && exit 1
 popd &> /dev/null
+
+PACKAGER="composer config minimum-stability dev && "
+if [[ -f "${BASE_DIR}/packages.json" ]] ; then
+    PACKAGER="${PACKAGER}composer config repositories.main composer file://${BASE_DIR}/ && "
+elif [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_PULL_REQUEST = false ]] ) ; then
+    for PACKAGE in $(find src/*/composer.json -type f) ; do
+        PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
+        if [[ ! -z $PACKAGE_NAME ]] ; then
+            PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
+            PACKAGER="${PACKAGER}composer config repositories.${PACKAGE_NAME} path ${BASE_DIR}/$(dirname "${PACKAGE}") && "
+        fi
+    done
+fi
 
 RETURN=0
 for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
@@ -37,13 +42,12 @@ for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     if [[ ! -z $PACKAGE_NAME ]] ; then
         PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
         DIR="var/smoke-test/bundles/$(basename $(dirname "${PACKAGE}"))"
+        CMD="${PACKAGER}composer require --no-progress --no-suggest --no-interaction msgphp/${PACKAGE_NAME}:@dev \
+        && bin/console doctrine:schema:validate --skip-sync"
+
         cp -R var/smoke-test/bundles/base "${DIR}"
+
         pushd "${DIR}" &> /dev/null
-        composer config minimum-stability dev
-        if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_PULL_REQUEST = false ]] ) ; then
-            composer config repositories.bundle path "${BASE_DIR}/$(dirname "${PACKAGE}")/"
-        fi
-        CMD="composer require --no-progress --no-suggest --no-interaction msgphp/${PACKAGE_NAME}:@dev"
         if [[ $TRAVIS = true ]] ; then
             tfold "Testing ${PACKAGE_NAME}" "${CMD}"
         else
