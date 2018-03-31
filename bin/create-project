@@ -6,8 +6,7 @@ if [[ $# -gt 1 ]] ; then
 fi
 
 DIR="${1:-var/test-project/}"
-COMPONENTS="symfony/var-dumper "
-BUNDLES=""
+PACKAGES="symfony/var-dumper "
 
 for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
@@ -16,7 +15,7 @@ for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
         echo -en "\e[34mInstall \"msgphp/${PACKAGE_NAME}\"? [yN]\e[0m "
         read answer
         if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
-            BUNDLES="${BUNDLES}msgphp/${PACKAGE_NAME} "
+            PACKAGES="${PACKAGES}msgphp/${PACKAGE_NAME} "
         fi
     fi
 done
@@ -27,8 +26,8 @@ composer create-project --prefer-dist --no-progress symfony/skeleton "${DIR}"
 pushd "${DIR}" &> /dev/null
 
 echo -e "\e[34mInstalling dependencies...\e[0m"
-composer config extra.symfony.allow-contrib true
-composer require --prefer-dist --no-suggest ${COMPONENTS} ${BUNDLES}
+composer config extra.symfony.allow-contrib true && \
+composer require --prefer-dist --no-suggest ${PACKAGES}
 [[ $? -ne 0 ]] && exit 1
 
 popd &> /dev/null

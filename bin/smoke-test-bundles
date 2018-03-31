@@ -5,7 +5,7 @@ if [[ ! $# -eq 0 ]] ; then
     exit 1
 fi
 
-BASE_DIR="$(pwd)"
+BASE_DIR="$(cd $(dirname $(dirname "$0")) && pwd)"
 
 rm -rf var/smoke-test/bundles/*Bundle/
 if [[ ! -d var/smoke-test/bundles/base ]] ; then
@@ -23,15 +23,15 @@ fi
 [[ $? -ne 0 ]] && exit 1
 popd &> /dev/null
 
-PACKAGER="composer config minimum-stability dev && "
+PACKAGER=""
 if [[ -f "${BASE_DIR}/packages.json" ]] ; then
     PACKAGER="${PACKAGER}composer config repositories.main composer file://${BASE_DIR}/ && "
-elif [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_PULL_REQUEST = false ]] ) ; then
+elif [[ ! $TRAVIS ]] ; then
     for PACKAGE in $(find src/*/composer.json -type f) ; do
         PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
         if [[ ! -z $PACKAGE_NAME ]] ; then
             PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
-            PACKAGER="${PACKAGER}composer config repositories.${PACKAGE_NAME} path ${BASE_DIR}/$(dirname "${PACKAGE}") && "
+            PACKAGER="${PACKAGER}composer config repositories.${PACKAGE_NAME} path ${BASE_DIR}/$(dirname "${PACKAGE}")/ && "
         fi
     done
 fi
@@ -42,8 +42,12 @@ for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     if [[ ! -z $PACKAGE_NAME ]] ; then
         PACKAGE_NAME=$(echo "${PACKAGE_NAME}" | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")
         DIR="var/smoke-test/bundles/$(basename $(dirname "${PACKAGE}"))"
-        CMD="${PACKAGER}composer require --no-progress --no-suggest --no-interaction msgphp/${PACKAGE_NAME}:@dev \
-        && bin/console doctrine:schema:validate --skip-sync"
+        CMD="${PACKAGER}composer require --no-progress --no-suggest --no-interaction "
+        for DEP in $(composer show --name-only --working-dir="$(dirname "${PACKAGE}")" | grep msgphp/) ; do
+            CMD="${CMD}${DEP}:@dev "
+        done
+        CMD="${CMD}msgphp/${PACKAGE_NAME}:@dev && \
+        bin/console doctrine:schema:validate --skip-sync"
 
         cp -R var/smoke-test/bundles/base "${DIR}"
 

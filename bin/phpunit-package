@@ -5,10 +5,12 @@ if [[ $# -lt 1 ]] ; then
     exit 1
 fi
 
+BASE_DIR="$(cd $(dirname $(dirname "$0")) && pwd)"
+
 if [[ -d $1 ]] ; then
     PACKAGE_DIR="$1"
 else
-    PACKAGE_DIR="src/$(echo $1 | sed -r 's/(^|-)(\w)/\U\2/g')"
+    PACKAGE_DIR="${BASE_DIR}/src/$(echo "$1" | sed -r 's/(^|-)(\w)/\U\2/g')"
 fi
 shift;
 
@@ -25,15 +27,14 @@ if [[ ! -f "${PACKAGE_DIR}/${BIN}" ]] ; then
     [[ $? -ne 0 ]] && exit 1
 fi
 
-if [[ ! $TRAVIS ]] || ( [[ $DEPS = high && $TRAVIS_PULL_REQUEST = false ]] ) ; then
-    WORKING_DIR="$(dirname $(dirname "$0"))"
+if [[ ! $TRAVIS ]] ; then
     composer link -h &> /dev/null
     if [[ $? != 0 ]] ; then
-        composer update --prefer-dist --quiet --working-dir="${WORKING_DIR}"
+        composer update --prefer-dist --quiet --working-dir="${BASE_DIR}"
         [[ $? -ne 0 ]] && exit 1
     fi
 
-    composer link --working-dir="${WORKING_DIR}" "$(cd "${PACKAGE_DIR}" && pwd)"
+    composer link --working-dir="${BASE_DIR}" "${PACKAGE_DIR}"
     [[ $? -ne 0 ]] && exit 1
 fi
 

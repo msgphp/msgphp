@@ -47,7 +47,7 @@ before_install:
   - source .travis/tfold
 
 install:
-  - if [[ $DEPS != high || $TRAVIS_PULL_REQUEST != false ]] ; then travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n') ; fi
+  - travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
   - if [[ ! $DEPS  ]] ; then travis_retry bin/composer install $COMPOSER_ARGS ; fi
   - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
   - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
