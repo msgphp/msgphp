@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\Maker;
 
+use MsgPhp\Domain\Entity\Features\CanBeConfirmed;
+use MsgPhp\Domain\Entity\Features\CanBeEnabled;
+use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity;
 use MsgPhp\User\UserIdInterface;
@@ -17,6 +20,8 @@ use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class UserMaker implements MakerInterface
 {
@@ -51,36 +56,30 @@ final class UserMaker implements MakerInterface
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
         }
 
-        if (isset($this->classMapping[CredentialInterface::class]) && $io->confirm('Generate a built-in user credential?')) {
-            $this->generateCredential(new \ReflectionClass($this->classMapping[Entity\User::class]), $io);
-        }
+        $this->generateUser(new \ReflectionClass($this->classMapping[Entity\User::class]), $io);
 
         while ($write = array_pop($this->writes)) {
             [$fileName, $contents] = $write;
 
-            if ($io->confirm(sprintf('Write changes to "%s"?', $fileName))) {
-                dump($fileName, $contents);
+            switch ($io->choice(sprintf('Write changes to "%s"?', $fileName), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
+                case 'n':
+                    continue 2;
+                case 's':
+                    $io->writeln($contents);
+                    break;
+                case 'y':
+                default:
+                    file_put_contents($fileName, $contents);
+                    break;
             }
         }
     }
 
-    private function generateCredential(\ReflectionClass $targetClass, ConsoleStyle $io): void
+    private function generateUser(\ReflectionClass $class, ConsoleStyle $io): void
     {
-        $credentials = [];
-        foreach (glob(dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Entity/Credential/*.php') as $file) {
-            if ('Anonymous' === $credential = basename($file, '.php')) {
-                continue;
-            }
-            $credentials[] = $credential;
-        }
-        $credential = $io->choice('Select credential type', $credentials, 'EmailPassword');
-        $trait = 'MsgPhp\\User\\Entity\\Features\\'.$credential.'Credential';
-        $class = new \ReflectionClass('MsgPhp\\User\\Entity\\Credential\\'.$credential);
-
-        dump($trait, $class);
-
-        $lines = file($fileName = $targetClass->getFileName());
-        $write = false;
+        $lines = file($fileName = $class->getFileName());
+        $traits = array_flip($class->getTraitNames());
+        $implementors = array_flip($class->getInterfaceNames());
         $inClass = $inClassBody = $hasImplements = false;
         $useLine = $traitUseLine = $implementsLine = 0;
         $nl = null;
@@ -135,31 +134,85 @@ final class UserMaker implements MakerInterface
                 $traitUseLine = $token[2];
             }
         }
+
         $nl = $nl ?? \PHP_EOL;
+        $addUses = $addTraitUses = $addImplementors = [];
+        $write = false;
 
-        dump($nl, $useLine, $traitUseLine, $hasImplements, $implementsLine);
-
-        if (null !== $constructor = $targetClass->getConstructor()) {
-            $offset = $constructor->getStartLine() - 1;
-            $length = $constructor->getEndLine() - $offset;
-            $contents = preg_replace_callback_array([
-                '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match) use ($class): string {
-                    $signature = substr($match[0], 0, -1);
-                    if ('' !== $origin = self::getCredentialConstructorArgs($class)) {
-                        $signature .= ('(' !== substr(rtrim($signature), -1) ? ', ' : '').$origin;
-                    }
-
-                    return $signature.')';
-                },
-                '~\s*+}\s*+$~s' => function ($match) use ($nl, $credential): string {
-                    $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
-
-                    return $nl.$indent.'$this->credential = new '.$credential.'($email);'.$match[0];
+        if (!isset($this->classMapping[CredentialInterface::class]) && $io->confirm('Generate a user credential?')) {
+            $credentials = [];
+            foreach (glob(dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Entity/Credential/*.php') as $file) {
+                if ('Anonymous' === $credential = basename($file, '.php')) {
+                    continue;
                 }
-            ], implode('', array_slice($lines, $offset, $length)));
+                $credentials[] = $credential;
+            }
 
-            array_splice($lines, $offset, $length, $contents);
-            $write = true;
+            $credential = $io->choice('Select credential type:', $credentials, 'EmailPassword');
+            $credentialClass = 'MsgPhp\\User\\Entity\\Credential\\'.$credential;
+            $credentialTrait = 'MsgPhp\\User\\Entity\\Features\\'.($credentialName = $credential.'Credential');
+            $credentialSignature = self::getConstructorSignature(new \ReflectionClass($credentialClass));
+            $credentialInit = '$this->credential = new '.$credential.'('.self::getSignatureVariables($credentialSignature).');';
+
+            $addUses[] = $credentialClass;
+            if (!isset($traits[$credentialTrait])) {
+                $addUses[] = $credentialTrait;
+                $addTraitUses[] = $credentialName;
+            }
+
+            if (null !== $constructor = $class->getConstructor()) {
+                $offset = $constructor->getStartLine() - 1;
+                $length = $constructor->getEndLine() - $offset;
+                $contents = preg_replace_callback_array([
+                    '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match) use ($credentialSignature): string {
+                        $signature = substr($match[0], 0, -1);
+                        if ('' !== $credentialSignature) {
+                            $signature .= ('(' !== substr(rtrim($signature), -1) ? ', ' : '').$credentialSignature;
+                        }
+
+                        return $signature.')';
+                    },
+                    '~\s*+}\s*+$~s' => function ($match) use ($nl, $credential, $credentialInit): string {
+                        $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
+
+                        return $nl.$indent.$credentialInit.$match[0];
+                    },
+                ], $oldContents = implode('', array_slice($lines, $offset, $length)));
+
+                if ($contents !== $oldContents) {
+                    array_splice($lines, $offset, $length, $contents);
+                    $write = true;
+                }
+            } else {
+                // @todo
+            }
+        }
+
+        if (!isset($traits[Entity\Features\ResettablePassword::class]) && $io->confirm('Can users reset their password?')) {
+            $implementors[] = DomainEventHandlerInterface::class;
+            $addUses[] = Entity\Features\ResettablePassword::class;
+            $addTraitUses[] = 'ResettablePassword';
+            if (!isset($implementors[DomainEventHandlerInterface::class])) {
+                $addImplementors[] = DomainEventHandlerInterface::class;
+            }
+        }
+
+        if (!isset($traits[CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
+            $implementors[] = DomainEventHandlerInterface::class;
+            $addUses[] = CanBeEnabled::class;
+            $addTraitUses[] = 'CanBeEnabled';
+            if (!isset($implementors[DomainEventHandlerInterface::class])) {
+                $addImplementors[] = DomainEventHandlerInterface::class;
+            }
+        }
+
+        if (!isset($traits[CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
+            $implementors[] = DomainEventHandlerInterface::class;
+            $addUses[] = CanBeConfirmed::class;
+            $addTraitUses[] = 'CanBeConfirmed';
+            if (!isset($implementors[DomainEventHandlerInterface::class])) {
+                $addImplementors[] = DomainEventHandlerInterface::class;
+            }
         }
 
         if ($write) {
@@ -167,7 +220,7 @@ final class UserMaker implements MakerInterface
         }
     }
 
-    private static function getCredentialConstructorArgs(\ReflectionClass $class): string
+    private static function getConstructorSignature(\ReflectionClass $class): string
     {
         if (null === $constructor = $class->getConstructor()) {
             return '';
@@ -182,5 +235,12 @@ final class UserMaker implements MakerInterface
         }
 
         return '';
+    }
+
+    private static function getSignatureVariables(string $signature): string
+    {
+        preg_match_all('~(?:\.{3})?\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*~', $signature, $matches);
+
+        return isset($matches[0][0]) ? implode(', ', $matches[0]) : '';
     }
 }
