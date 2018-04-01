@@ -6,6 +6,7 @@ namespace MsgPhp\UserBundle\Maker;
 
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity;
+use MsgPhp\User\UserIdInterface;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -63,9 +64,22 @@ final class UserMaker implements MakerInterface
         }
     }
 
-    private function generateCredential(\ReflectionClass $class, ConsoleStyle $io): void
+    private function generateCredential(\ReflectionClass $targetClass, ConsoleStyle $io): void
     {
-        $lines = file($fileName = $class->getFileName());
+        $credentials = [];
+        foreach (glob(dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Entity/Credential/*.php') as $file) {
+            if ('Anonymous' === $credential = basename($file, '.php')) {
+                continue;
+            }
+            $credentials[] = $credential;
+        }
+        $credential = $io->choice('Select credential type', $credentials, 'EmailPassword');
+        $trait = 'MsgPhp\\User\\Entity\\Features\\'.$credential.'Credential';
+        $class = new \ReflectionClass('MsgPhp\\User\\Entity\\Credential\\'.$credential);
+
+        dump($trait, $class);
+
+        $lines = file($fileName = $targetClass->getFileName());
         $write = false;
         $inClass = $inClassBody = $hasImplements = false;
         $useLine = $traitUseLine = $implementsLine = 0;
@@ -125,32 +139,48 @@ final class UserMaker implements MakerInterface
 
         dump($nl, $useLine, $traitUseLine, $hasImplements, $implementsLine);
 
-        if (null !== $constructor = $class->getConstructor()) {
-            $start = $constructor->getStartLine() - 1;
-            $end = $constructor->getEndLine();
+        if (null !== $constructor = $targetClass->getConstructor()) {
+            $offset = $constructor->getStartLine() - 1;
+            $length = $constructor->getEndLine() - $offset;
             $contents = preg_replace_callback_array([
-                '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match): string {
+                '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match) use ($class): string {
                     $signature = substr($match[0], 0, -1);
-                    if ('(' !== substr(rtrim($signature), -1)) {
-                        $signature .= ', ';
+                    if ('' !== $origin = self::getCredentialConstructorArgs($class)) {
+                        $signature .= ('(' !== substr(rtrim($signature), -1) ? ', ' : '').$origin;
                     }
-                    $signature .= 'string $email';
 
                     return $signature.')';
                 },
-                '~\s*+}\s*+$~s' => function ($match) use ($nl): string {
+                '~\s*+}\s*+$~s' => function ($match) use ($nl, $credential): string {
                     $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
 
-                    return $nl.$indent.'$this->credential = new Email($email);'.$match[0];
+                    return $nl.$indent.'$this->credential = new '.$credential.'($email);'.$match[0];
                 }
-            ], implode('', array_slice($lines, $start, $end - $start)));
+            ], implode('', array_slice($lines, $offset, $length)));
 
-            array_splice($lines, $start, $end - $start, $contents);
+            array_splice($lines, $offset, $length, $contents);
             $write = true;
         }
 
         if ($write) {
             $this->writes[] = [$fileName, implode('', $lines)];
         }
+    }
+
+    private static function getCredentialConstructorArgs(\ReflectionClass $class): string
+    {
+        if (null === $constructor = $class->getConstructor()) {
+            return '';
+        }
+
+        $lines = file($class->getFileName());
+        $offset = $constructor->getStartLine() - 1;
+        $body = implode('', array_slice($lines, $offset, $constructor->getEndLine() - $offset));
+
+        if (preg_match('~^[^_]*+__construct\(([^\)]++)\)~i', $body, $matches)) {
+            return $matches[1];
+        }
+
+        return '';
     }
 }
