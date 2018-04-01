@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 final class UserMaker implements MakerInterface
 {
     private $classMapping;
+    private $writes = [];
 
     public function __construct(array $classMapping)
     {
@@ -49,35 +50,107 @@ final class UserMaker implements MakerInterface
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
         }
 
-        if (isset($this->classMapping[CredentialInterface::class])) {
-            $reflection = new \ReflectionClass($this->classMapping[Entity\User::class]);
-            $lines = file($fileName = $reflection->getFileName());
+        if (isset($this->classMapping[CredentialInterface::class]) && $io->confirm('Generate a built-in user credential?')) {
+            $this->generateCredential(new \ReflectionClass($this->classMapping[Entity\User::class]), $io);
+        }
 
-            if (null !== $constructor = $reflection->getConstructor()) {
-                $start = $constructor->getStartLine() - 1;
-                $end = $constructor->getEndLine();
-                $contents = preg_replace_callback_array([
-                    '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match): string {
-                        $signature = substr($match[0], 0, -1);
-                        if ('(' !== substr(rtrim($signature), -1)) {
-                            $signature .= ', ';
-                        }
-                        $signature .= 'string $email';
+        while ($write = array_pop($this->writes)) {
+            [$fileName, $contents] = $write;
 
-                        return $signature.')';
-                    },
-                    '~\s*+}\s*+$~s' => function ($match): string {
-                        $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
-
-                        return \PHP_EOL.$indent.'$this->credential = new Email($email);'.$match[0];
-                    }
-                ], implode('', array_slice($lines, $start, $end - $start)));
-                array_splice($lines, $start, $end - $start, $contents);
-
-                if ($io->confirm(sprintf('Write changes to %s?', $fileName))) {
-                    file_put_contents($fileName, implode('', $lines));
-                }
+            if ($io->confirm(sprintf('Write changes to "%s"?', $fileName))) {
+                dump($fileName, $contents);
             }
+        }
+    }
+
+    private function generateCredential(\ReflectionClass $class, ConsoleStyle $io): void
+    {
+        $lines = file($fileName = $class->getFileName());
+        $write = false;
+        $inClass = $inClassBody = $hasImplements = false;
+        $useLine = $traitUseLine = $implementsLine = 0;
+        $nl = null;
+
+        foreach ($tokens = token_get_all(implode('', $lines)) as $i => $token) {
+            if (!is_array($token)) {
+                if ('{' === $token && $inClass && !$inClassBody) {
+                    $inClassBody = true;
+                }
+                continue;
+            }
+            if (in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT, \T_WHITESPACE], true)) {
+                if (!$nl && \T_WHITESPACE === $token[0]) {
+                    $nl = in_array($nl = trim($token[1], ' '), ["\n", "\r", "\r\n"], true) ? $nl : null;
+                }
+                continue;
+            }
+            if (\T_NAMESPACE === $token[0] && !$useLine) {
+                $useLine = $token[2];
+            } elseif (\T_CLASS === $token[0] && !$inClass) {
+                $inClass = true;
+            } elseif (\T_USE === $token[0]) {
+                if (!$inClass) {
+                    $useLine = $token[2];
+                } else {
+                    $traitUseLine = $token[2];
+                }
+            } elseif (\T_EXTENDS === $token[0] && $inClass) {
+                $implementsLine = $tokens[2];
+                $j = $i + 1;
+                while (isset($tokens[$j])) {
+                    if (isset($tokens[$j][0]) && \T_STRING === $tokens[$j][0]) {
+                        $implementsLine = $tokens[$j][2];
+                    } elseif ('{' === $tokens[$j] || (isset($tokens[$j][0]) && \T_IMPLEMENTS === $tokens[$j][0])) {
+                        break;
+                    }
+                    ++$j;
+                }
+            } elseif (\T_IMPLEMENTS === $token[0] && $inClass) {
+                $hasImplements = true;
+                $implementsLine = $token[2];
+                $j = $i + 1;
+                while (isset($tokens[$j])) {
+                    if (is_array($tokens[$j]) && \T_STRING === $tokens[$j][0]) {
+                        $implementsLine = $tokens[$j][2];
+                    } elseif ('{' === $tokens[$j]) {
+                        break;
+                    }
+                    ++$j;
+                }
+            } elseif ($inClassBody && !$traitUseLine) {
+                $traitUseLine = $token[2];
+            }
+        }
+        $nl = $nl ?? \PHP_EOL;
+
+        dump($nl, $useLine, $traitUseLine, $hasImplements, $implementsLine);
+
+        if (null !== $constructor = $class->getConstructor()) {
+            $start = $constructor->getStartLine() - 1;
+            $end = $constructor->getEndLine();
+            $contents = preg_replace_callback_array([
+                '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match): string {
+                    $signature = substr($match[0], 0, -1);
+                    if ('(' !== substr(rtrim($signature), -1)) {
+                        $signature .= ', ';
+                    }
+                    $signature .= 'string $email';
+
+                    return $signature.')';
+                },
+                '~\s*+}\s*+$~s' => function ($match) use ($nl): string {
+                    $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
+
+                    return $nl.$indent.'$this->credential = new Email($email);'.$match[0];
+                }
+            ], implode('', array_slice($lines, $start, $end - $start)));
+
+            array_splice($lines, $start, $end - $start, $contents);
+            $write = true;
+        }
+
+        if ($write) {
+            $this->writes[] = [$fileName, implode('', $lines)];
         }
     }
 }
