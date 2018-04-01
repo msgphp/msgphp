@@ -7,6 +7,7 @@ namespace MsgPhp\UserBundle\Maker;
 use MsgPhp\Domain\Entity\Features\CanBeConfirmed;
 use MsgPhp\Domain\Entity\Features\CanBeEnabled;
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity;
 use MsgPhp\User\UserIdInterface;
@@ -80,7 +81,7 @@ final class UserMaker implements MakerInterface
         $lines = file($fileName = $class->getFileName());
         $traits = array_flip($class->getTraitNames());
         $implementors = array_flip($class->getInterfaceNames());
-        $inClass = $inClassBody = $hasImplements = false;
+        $inClass = $inClassBody = $hasUses = $hasTraitUses = $hasImplements = false;
         $useLine = $traitUseLine = $implementsLine = $constructorLine = 0;
         $nl = null;
         $indent = '';
@@ -92,6 +93,17 @@ final class UserMaker implements MakerInterface
                 }
                 continue;
             }
+
+            if ($inClassBody) {
+                if (!$traitUseLine) {
+                    $traitUseLine = $token[2];
+                }
+            } else {
+                if (!$useLine) {
+                    $useLine = $token[2];
+                }
+            }
+
             if (in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT, \T_WHITESPACE], true)) {
                 if (\T_WHITESPACE === $token[0]) {
                     if (!$nl) {
@@ -104,6 +116,7 @@ final class UserMaker implements MakerInterface
                 }
                 continue;
             }
+
             if (\T_NAMESPACE === $token[0] && !$useLine) {
                 $useLine = $token[2];
             } elseif (\T_CLASS === $token[0] && !$inClass) {
@@ -111,8 +124,10 @@ final class UserMaker implements MakerInterface
             } elseif (\T_USE === $token[0]) {
                 if (!$inClass) {
                     $useLine = $token[2];
+                    $hasUses = true;
                 } else {
                     $traitUseLine = $token[2];
+                    $hasTraitUses = true;
                 }
             } elseif (\T_EXTENDS === $token[0] && $inClass) {
                 $implementsLine = $tokens[2];
@@ -148,10 +163,6 @@ final class UserMaker implements MakerInterface
                     }
                     --$j;
                 }
-            } elseif ($inClassBody) {
-                if (!$traitUseLine) {
-                    $traitUseLine = $token[2];
-                }
             }
         }
         if (!$constructorLine) {
@@ -177,10 +188,14 @@ final class UserMaker implements MakerInterface
             $credentialSignature = self::getConstructorSignature(new \ReflectionClass($credentialClass));
             $credentialInit = '$this->credential = new '.$credential.'('.self::getSignatureVariables($credentialSignature).');';
 
-            $addUses[] = $credentialClass;
+            $addUses[$credentialClass] = true;
             if (!isset($traits[$credentialTrait])) {
-                $addUses[] = $credentialTrait;
-                $addTraitUses[] = $credentialName;
+                $addUses[$credentialTrait] = true;
+                $addUses[DomainEventHandlerInterface::class] = true;
+                $addUses[DomainEventHandlerTrait::class] = true;
+                $addImplementors['DomainEventHandlerInterface'] = true;
+                $addTraitUses[$credentialName] = true;
+                $addTraitUses['DomainEventHandlerTrait'] = true;
             }
 
             if (null !== $constructor = $class->getConstructor()) {
@@ -205,6 +220,9 @@ final class UserMaker implements MakerInterface
                 if ($contents !== $oldContents) {
                     array_splice($lines, $offset, $length, $contents);
                     $write = true;
+                    if ($traitUseLine > $offset + 1) {
+                        $traitUseLine += 1;
+                    }
                 }
             } else {
                 $constructor = array_map(function (string $line) use ($nl, $indent): string {
@@ -219,34 +237,77 @@ PHP
                 array_unshift($constructor, $nl);
                 array_splice($lines, $constructorLine, 0, $constructor);
                 $write = true;
+                if ($traitUseLine > $constructorLine) {
+                    $traitUseLine += 4;
+                }
             }
         }
 
         if (!isset($traits[Entity\Features\ResettablePassword::class]) && $io->confirm('Can users reset their password?')) {
-            $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[] = Entity\Features\ResettablePassword::class;
-            $addTraitUses[] = 'ResettablePassword';
+            $addUses[Entity\Features\ResettablePassword::class] = true;
+            $addTraitUses['ResettablePassword'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addImplementors[] = DomainEventHandlerInterface::class;
+                $addUses[DomainEventHandlerInterface::class] = true;
+                $addUses[DomainEventHandlerTrait::class] = true;
+                $addImplementors['DomainEventHandlerInterface'] = true;
+                $addTraitUses['DomainEventHandlerTrait'] = true;
             }
         }
 
         if (!isset($traits[CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
             $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[] = CanBeEnabled::class;
-            $addTraitUses[] = 'CanBeEnabled';
+            $addUses[CanBeEnabled::class] = true;
+            $addTraitUses['CanBeEnabled'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addImplementors[] = DomainEventHandlerInterface::class;
+                $addUses[DomainEventHandlerInterface::class] = true;
+                $addUses[DomainEventHandlerTrait::class] = true;
+                $addImplementors['DomainEventHandlerInterface'] = true;
+                $addTraitUses['DomainEventHandlerTrait'] = true;
             }
         }
 
         if (!isset($traits[CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
             $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[] = CanBeConfirmed::class;
-            $addTraitUses[] = 'CanBeConfirmed';
+            $addUses[CanBeConfirmed::class] = true;
+            $addTraitUses['CanBeConfirmed'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addImplementors[] = DomainEventHandlerInterface::class;
+                $addUses[DomainEventHandlerInterface::class] = true;
+                $addUses[DomainEventHandlerTrait::class] = true;
+                $addImplementors['DomainEventHandlerInterface'] = true;
+                $addTraitUses['DomainEventHandlerTrait'] = true;
             }
+        }
+
+        if ($numUses = count($addUses)) {
+            ksort($addUses);
+            $uses = array_map(function (string $use) use ($nl): string {
+                return 'use '.$use.';'.$nl;
+            }, array_keys($addUses));
+            if (!$hasUses) {
+                $uses[] = $nl;
+                ++$implementsLine;
+                ++$traitUseLine;
+            }
+            array_splice($lines, $useLine, 0, $uses);
+            $write = true;
+            $implementsLine += $numUses;
+            $traitUseLine += $numUses;
+        }
+
+        if ($numTraitUses = count($addTraitUses)) {
+            ksort($addTraitUses);
+            $traitUses = array_map(function (string $use) use ($nl, $indent): string {
+                return $indent.'use '.$use.';'.$nl;
+            }, array_keys($addTraitUses));
+            if (!$hasTraitUses) {
+                $traitUses[] = $nl;
+            }
+            array_splice($lines, $traitUseLine, 0, $traitUses);
+            $write = true;
+        }
+
+        if ($numImplementors = count($addImplementors)) {
+            ksort($addImplementors);
         }
 
         if ($write) {
