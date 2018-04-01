@@ -52,6 +52,13 @@ return function (ContainerConfigurator $container) {
 };
 ```
 
+### Feeling lazy?
+
+```bash
+composer require maker
+bin/console make:user
+```
+
 And be done.
 
 ## Usage

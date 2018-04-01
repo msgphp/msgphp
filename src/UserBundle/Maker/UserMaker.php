@@ -81,8 +81,9 @@ final class UserMaker implements MakerInterface
         $traits = array_flip($class->getTraitNames());
         $implementors = array_flip($class->getInterfaceNames());
         $inClass = $inClassBody = $hasImplements = false;
-        $useLine = $traitUseLine = $implementsLine = 0;
+        $useLine = $traitUseLine = $implementsLine = $constructorLine = 0;
         $nl = null;
+        $indent = '';
 
         foreach ($tokens = token_get_all(implode('', $lines)) as $i => $token) {
             if (!is_array($token)) {
@@ -92,8 +93,14 @@ final class UserMaker implements MakerInterface
                 continue;
             }
             if (in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT, \T_WHITESPACE], true)) {
-                if (!$nl && \T_WHITESPACE === $token[0]) {
-                    $nl = in_array($nl = trim($token[1], ' '), ["\n", "\r", "\r\n"], true) ? $nl : null;
+                if (\T_WHITESPACE === $token[0]) {
+                    if (!$nl) {
+                        $nl = in_array($nl = trim($token[1], ' '), ["\n", "\r", "\r\n"], true) ? $nl : null;
+                    }
+                    if (!$indent && $inClassBody && $nl) {
+                        $spaces = explode($nl, $token[1]);
+                        $indent = end($spaces);
+                    }
                 }
                 continue;
             }
@@ -130,9 +137,25 @@ final class UserMaker implements MakerInterface
                     }
                     ++$j;
                 }
-            } elseif ($inClassBody && !$traitUseLine) {
-                $traitUseLine = $token[2];
+            } elseif (\T_FUNCTION === $token[0]) {
+                $constructorLine = $token[2];
+                $j = $i - 1;
+                while (isset($tokens[$j])) {
+                    if(is_array($tokens[$j])) {
+                        $constructorLine = $tokens[$j][2];
+                    } elseif (';' === $tokens[$j] || '}' === $tokens[$j]) {
+                        break;
+                    }
+                    --$j;
+                }
+            } elseif ($inClassBody) {
+                if (!$traitUseLine) {
+                    $traitUseLine = $token[2];
+                }
             }
+        }
+        if (!$constructorLine) {
+            $constructorLine = $traitUseLine;
         }
 
         $nl = $nl ?? \PHP_EOL;
@@ -172,7 +195,7 @@ final class UserMaker implements MakerInterface
 
                         return $signature.')';
                     },
-                    '~\s*+}\s*+$~s' => function ($match) use ($nl, $credential, $credentialInit): string {
+                    '~\s*+}\s*+$~s' => function ($match) use ($nl, $indent, $credential, $credentialInit): string {
                         $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
 
                         return $nl.$indent.$credentialInit.$match[0];
@@ -184,7 +207,18 @@ final class UserMaker implements MakerInterface
                     $write = true;
                 }
             } else {
-                // @todo
+                $constructor = array_map(function (string $line) use ($nl, $indent): string {
+                    return $indent.$line.$nl;
+                }, explode("\n", <<<PHP
+public function __construct(${credentialSignature})
+{
+    ${credentialInit}
+}
+PHP
+                ));
+                array_unshift($constructor, $nl);
+                array_splice($lines, $constructorLine, 0, $constructor);
+                $write = true;
             }
         }
 
