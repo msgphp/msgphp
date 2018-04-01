@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Register</h1>
+
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.email, {label: 'E-mail', translation_domain: false}) }}
+        {{ form_row(form.password.password, {label: 'Password', translation_domain: false}) }}
+        {{ form_row(form.password.confirmation, {label: 'Confirm password', translation_domain: false}) }}
+
+        <div>
+            <input type="submit" value="Register" />
+        </div>
+    {{ form_end(form) }}
+
+    <p>Or register using:</p>
+    {% include 'partials/oauth_providers.html.twig' %}
+{% endblock %}
