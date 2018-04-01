@@ -38,7 +38,7 @@ composer require msgphp/user-bundle
 
 ```php
 <?php
-// config/packages/msgphp.php
+// config/packages/msgphp_user.php
 
 use MsgPhp\User\Entity\User;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -55,8 +55,10 @@ return function (ContainerConfigurator $container) {
 ### Feeling lazy?
 
 ```bash
-composer require maker
+composer require maker orm
+# configure DATABASE_URL in .env
 bin/console make:user
+bin/console doctrine:schema:validate --dump-sql
 ```
 
 And be done.

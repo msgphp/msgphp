@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\Maker;
 
-use MsgPhp\Domain\Entity\Features\CanBeConfirmed;
-use MsgPhp\Domain\Entity\Features\CanBeEnabled;
+use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 use MsgPhp\User\CredentialInterface;
@@ -156,7 +155,7 @@ final class UserMaker implements MakerInterface
                 $constructorLine = $token[2];
                 $j = $i - 1;
                 while (isset($tokens[$j])) {
-                    if(is_array($tokens[$j])) {
+                    if (is_array($tokens[$j])) {
                         $constructorLine = $tokens[$j][2];
                     } elseif (';' === $tokens[$j] || '}' === $tokens[$j]) {
                         break;
@@ -221,7 +220,7 @@ final class UserMaker implements MakerInterface
                     array_splice($lines, $offset, $length, $contents);
                     $write = true;
                     if ($traitUseLine > $offset + 1) {
-                        $traitUseLine += 1;
+                        ++$traitUseLine;
                     }
                 }
             } else {
@@ -243,7 +242,7 @@ PHP
             }
         }
 
-        if (!isset($traits[Entity\Features\ResettablePassword::class]) && $io->confirm('Can users reset their password?')) {
+        if (!isset($traits[Entity\Features\ResettablePassword::class]) && (!isset($credential) || false !== strpos($credential, 'Password')) && $io->confirm('Can users reset their password?')) {
             $addUses[Entity\Features\ResettablePassword::class] = true;
             $addTraitUses['ResettablePassword'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
@@ -254,9 +253,9 @@ PHP
             }
         }
 
-        if (!isset($traits[CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
+        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
             $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[CanBeEnabled::class] = true;
+            $addUses[Features\CanBeEnabled::class] = true;
             $addTraitUses['CanBeEnabled'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
                 $addUses[DomainEventHandlerInterface::class] = true;
@@ -266,9 +265,9 @@ PHP
             }
         }
 
-        if (!isset($traits[CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
+        if (!isset($traits[Features\CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
             $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[CanBeConfirmed::class] = true;
+            $addUses[Features\CanBeConfirmed::class] = true;
             $addTraitUses['CanBeConfirmed'] = true;
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
                 $addUses[DomainEventHandlerInterface::class] = true;
@@ -308,6 +307,9 @@ PHP
 
         if ($numImplementors = count($addImplementors)) {
             ksort($addImplementors);
+            $implements = ($hasImplements ? ', ' : ' implements ').implode(', ', array_keys($addImplementors));
+            $lines[$implementsLine - 1] = preg_replace('~(\s*+{?\s*+)$~', $implements.'\\1', $lines[$implementsLine - 1], 1);
+            $write = true;
         }
 
         if ($write) {
