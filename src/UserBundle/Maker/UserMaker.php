@@ -32,6 +32,7 @@ final class UserMaker implements MakerInterface
     private $classMapping;
     private $projectDir;
     private $credential;
+    private $passwordReset = false;
     private $configs = [];
     private $writes = [];
 
@@ -61,6 +62,7 @@ final class UserMaker implements MakerInterface
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $this->credential = null;
+        $this->passwordReset = false;
         $this->configs = $this->writes = [];
 
         if (!isset($this->classMapping[Entity\User::class])) {
@@ -198,6 +200,14 @@ final class UserMaker implements MakerInterface
         $nl = $nl ?? \PHP_EOL;
         $addUses = $addTraitUses = $addImplementors = [];
         $write = false;
+        $enableEventHandler = function () use ($implementors, &$addUses, &$addImplementors, &$addTraitUses) {
+            if (!isset($implementors[DomainEventHandlerInterface::class])) {
+                $addUses[DomainEventHandlerInterface::class] = true;
+                $addUses[DomainEventHandlerTrait::class] = true;
+                $addImplementors['DomainEventHandlerInterface'] = true;
+                $addTraitUses['DomainEventHandlerTrait'] = true;
+            }
+        };
 
         if (isset($this->classMapping[CredentialInterface::class])) {
             $this->credential = $this->classMapping[CredentialInterface::class];
@@ -219,11 +229,8 @@ final class UserMaker implements MakerInterface
             $addUses[$credentialClass] = true;
             if (!isset($traits[$credentialTrait])) {
                 $addUses[$credentialTrait] = true;
-                $addUses[DomainEventHandlerInterface::class] = true;
-                $addUses[DomainEventHandlerTrait::class] = true;
-                $addImplementors['DomainEventHandlerInterface'] = true;
                 $addTraitUses[$credentialName] = true;
-                $addTraitUses['DomainEventHandlerTrait'] = true;
+                $enableEventHandler();
             }
 
             if (null !== $constructor = $class->getConstructor()) {
@@ -271,14 +278,10 @@ PHP
             }
 
             if (!isset($traits[Entity\Features\ResettablePassword::class]) && $this->hasPassword() && $io->confirm('Can users reset their password?')) {
+                $this->passwordReset = true;
                 $addUses[Entity\Features\ResettablePassword::class] = true;
                 $addTraitUses['ResettablePassword'] = true;
-                if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                    $addUses[DomainEventHandlerInterface::class] = true;
-                    $addUses[DomainEventHandlerTrait::class] = true;
-                    $addImplementors['DomainEventHandlerInterface'] = true;
-                    $addTraitUses['DomainEventHandlerTrait'] = true;
-                }
+                $enableEventHandler();
             }
         }
 
@@ -286,24 +289,14 @@ PHP
             $implementors[] = DomainEventHandlerInterface::class;
             $addUses[Features\CanBeEnabled::class] = true;
             $addTraitUses['CanBeEnabled'] = true;
-            if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addUses[DomainEventHandlerInterface::class] = true;
-                $addUses[DomainEventHandlerTrait::class] = true;
-                $addImplementors['DomainEventHandlerInterface'] = true;
-                $addTraitUses['DomainEventHandlerTrait'] = true;
-            }
+            $enableEventHandler();
         }
 
         if (!isset($traits[Features\CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
             $implementors[] = DomainEventHandlerInterface::class;
             $addUses[Features\CanBeConfirmed::class] = true;
             $addTraitUses['CanBeConfirmed'] = true;
-            if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addUses[DomainEventHandlerInterface::class] = true;
-                $addUses[DomainEventHandlerTrait::class] = true;
-                $addImplementors['DomainEventHandlerInterface'] = true;
-                $addTraitUses['DomainEventHandlerTrait'] = true;
-            }
+            $enableEventHandler();
         }
 
         // Can users have roles?
@@ -387,15 +380,24 @@ PHP
             }
         }
 
+        $usernameField = $this->credential::getUsernameField();
+        $hasPassword = $this->hasPassword();
         $nsForm = trim($io->ask('Provide the form namespace', 'App\\Form\\User\\'), '\\');
         $nsController = trim($io->ask('Provide the controller namespace', 'App\\Controller\\User\\'), '\\');
         $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
         $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
-        $usernameField = $this->credential::getUsernameField();
-        $hasPassword = $this->hasPassword();
+        $hasRegistration = $io->confirm('Add a registration controller?');
+        $hasLogin = $hasPassword && $io->confirm('Add a login and profile controller?');
+        $hasForgotPassword = $this->passwordReset && $io->confirm('Add a forgot and reset password controller?');
 
-        if ($io->confirm('Add a registration controller?')) {
+        if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
+            $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
+                'fieldName' => $usernameField,
+            ])];
+        }
+
+        if ($hasRegistration) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
                 'ns' => $nsForm,
                 'hasPassword' => $hasPassword,
@@ -406,6 +408,7 @@ PHP
                 'formNs' => $nsForm,
                 'fieldName' => $usernameField,
                 'template' => $template = $templateDir.'/register.html.twig',
+                'redirect' => $hasLogin ? '/login' : '/',
             ])];
             $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/register.html.php', [
                 'base' => $baseTemplate,
@@ -415,11 +418,7 @@ PHP
             ])];
         }
 
-        if (!$hasPassword) {
-            return;
-        }
-
-        if ($io->confirm('Add a login controller?')) {
+        if ($hasLogin) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
                 'fieldName' => $usernameField,
@@ -428,22 +427,26 @@ PHP
                 'ns' => $nsController,
                 'formNs' => $nsForm,
                 'fieldName' => $usernameField,
-                'template' => $template = $templateDir.'/login.html.twig',
+                'template' => $templateLogin = $templateDir.'/login.html.twig',
             ])];
-            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/login.html.php', [
+            $this->writes[] = [$this->getClassFileName($nsController.'\\ProfileController'), self::getSkeleton('controller/ProfileController.php', [
+                'ns' => $nsController,
+                'template' => $templateProfile = $templateDir.'/profile.html.twig',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($templateLogin), self::getSkeleton('template/login.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $usernameField,
+                'hasForgotPassword' => $hasForgotPassword,
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($templateProfile), self::getSkeleton('template/profile.html.php', [
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
                 'fieldName' => $usernameField,
             ])];
-
-            if ($io->confirm('Add config/packages/security.yaml?')) {
-                $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
-                    'fieldName' => $usernameField,
-                ])];
-            }
         }
 
-        if ($io->confirm('Add a forgot / reset password controller?')) {
+        if ($hasForgotPassword) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\ForgotPasswordType'), self::getSkeleton('form/ForgotPasswordType.php', [
                 'ns' => $nsForm,
                 'fieldName' => $usernameField,

@@ -52,7 +52,7 @@ final class ForgotPasswordController
             \$bus->handle(new RequestUserPasswordCommand(\$user->getId()));
             \$flashBag->add('success', 'You\'re password is requested.');
 
-            return new RedirectResponse('/');
+            return new RedirectResponse('/login');
         }
 
         return new Response(\$twig->render('${template}', [

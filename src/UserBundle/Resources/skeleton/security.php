@@ -25,8 +25,9 @@ security:
 
             # https://symfony.com/doc/current/security/form_login_setup.html
             form_login:
-                login_path: login
-                check_path: login
+                login_path: /login
+                check_path: /login
+                default_target_path: /profile
                 username_parameter: ${fieldName}
                 password_parameter: password
 
@@ -34,6 +35,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/profile, roles: ROLE_USER }
 
 YAML;

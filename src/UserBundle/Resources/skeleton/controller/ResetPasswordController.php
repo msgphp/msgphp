@@ -59,7 +59,7 @@ final class ResetPasswordController
             \$bus->handle(new ChangeUserCredentialCommand(\$user->getId(), ['password' => \$form->get('password')->getData()]));
             \$flashBag->add('success', 'You\'re password is changed.');
 
-            return new RedirectResponse('/');
+            return new RedirectResponse('/login');
         }
 
         return new Response(\$twig->render('${template}', [

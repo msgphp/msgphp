@@ -46,7 +46,7 @@ final class RegisterController
             \$bus->handle(new CreateUserCommand(\$form->getData()));
             \$flashBag->add('success', 'You\'re successfully registered.');
 
-            return new RedirectResponse('/');
+            return new RedirectResponse('${redirect}');
         }
 
         return new Response(\$twig->render('${template}', [
