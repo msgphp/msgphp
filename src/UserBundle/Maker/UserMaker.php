@@ -394,36 +394,6 @@ PHP
         $usernameField = $this->credential::getUsernameField();
         $hasPassword = $this->hasPassword();
 
-        if ($io->confirm('Add a login controller?')) {
-            if (!class_exists(Security::class) && !$io->confirm('Symfony Security is not available. Continue anyway?')) {
-                return;
-            }
-
-            $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
-                'ns' => $nsForm,
-                'hasPassword' => $hasPassword,
-                'fieldName' => $usernameField,
-            ])];
-            $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
-                'ns' => $nsController,
-                'formNs' => $nsForm,
-                'fieldName' => $usernameField,
-                'template' => $template = $templateDir.'/login.html.twig',
-            ])];
-            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/login.html.php', [
-                'base' => $baseTemplate,
-                'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
-                'hasPassword' => $hasPassword,
-            ])];
-
-            if ($io->confirm('Add config/packages/security.yaml?')) {
-                $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
-                    'fieldName' => $usernameField,
-                ])];
-            }
-        }
-
         if ($io->confirm('Add a registration controller?')) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
                 'ns' => $nsForm,
@@ -444,7 +414,39 @@ PHP
             ])];
         }
 
-        if ($hasPassword && $io->confirm('Add a forgot / reset password controller?')) {
+        if (!$hasPassword) {
+            return;
+        }
+
+        if ($io->confirm('Add a login controller?')) {
+            if (!class_exists(Security::class) && !$io->confirm('Symfony Security is not available. Continue anyway?')) {
+                return;
+            }
+
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
+                'ns' => $nsForm,
+                'fieldName' => $usernameField,
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'fieldName' => $usernameField,
+                'template' => $template = $templateDir.'/login.html.twig',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/login.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $usernameField,
+            ])];
+
+            if ($io->confirm('Add config/packages/security.yaml?')) {
+                $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
+                    'fieldName' => $usernameField,
+                ])];
+            }
+        }
+
+        if ($io->confirm('Add a forgot / reset password controller?')) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\ForgotPasswordType'), self::getSkeleton('form/ForgotPasswordType.php', [
                 'ns' => $nsForm,
                 'fieldName' => $usernameField,

@@ -2,16 +2,6 @@
 
 declare(strict_types=1);
 
-$fields = <<<TWIG
-        {{ form_row(form.${fieldName}) }}
-TWIG;
-if ($hasPassword) {
-    $fields .= <<<TWIG
-
-        {{ form_row(form.password) }}
-TWIG;
-}
-
 return <<<TWIG
 {% extends '${base}' %}
 
@@ -20,7 +10,8 @@ return <<<TWIG
 
     {{ form_start(form) }}
         {{ form_errors(form) }}
-${fields}
+        {{ form_row(form.${fieldName}) }}
+        {{ form_row(form.password) }}
 
         <div>
             <input type="submit" value="Login" />
