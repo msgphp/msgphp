@@ -17,7 +17,7 @@ use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Twig\Environment;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -28,7 +28,8 @@ final class UserMaker implements MakerInterface
 {
     private $classMapping;
     private $projectDir;
-    private $config = [];
+    private $credential;
+    private $configs = [];
     private $writes = [];
 
     public function __construct(array $classMapping, string $projectDir)
@@ -56,7 +57,8 @@ final class UserMaker implements MakerInterface
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $this->config = $this->writes = [];
+        $this->credential = null;
+        $this->configs = $this->writes = [];
 
         if (!isset($this->classMapping[Entity\User::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
@@ -66,9 +68,11 @@ final class UserMaker implements MakerInterface
 
         $this->generateUser($userClass, $io);
         $this->generateRole($userClass, $io);
+        $this->generateControllers($io);
 
-        if ($config = array_merge_recursive(...$this->config)) {
-            $this->writes[] = [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', ['config' => var_export($config, true)])];
+        if ($this->configs) {
+            $this->writes[] = [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', ['config' => var_export(array_merge_recursive(...$this->configs), true)])];
+            $this->configs = [];
         }
 
         while ($write = array_shift($this->writes)) {
@@ -185,7 +189,9 @@ final class UserMaker implements MakerInterface
         $addUses = $addTraitUses = $addImplementors = [];
         $write = false;
 
-        if (!isset($this->classMapping[CredentialInterface::class]) && $io->confirm('Generate a user credential?')) {
+        if (isset($this->classMapping[CredentialInterface::class])) {
+            $this->credential = $this->classMapping[CredentialInterface::class];
+        } elseif ($io->confirm('Generate a user credential?')) {
             $credentials = [];
             foreach (glob(dirname((new \ReflectionClass(UserIdInterface::class))->getFileName()).'/Entity/Credential/*.php') as $file) {
                 if ('Anonymous' === $credential = basename($file, '.php')) {
@@ -195,7 +201,7 @@ final class UserMaker implements MakerInterface
             }
 
             $credential = $io->choice('Select credential type:', $credentials, 'EmailPassword');
-            $credentialClass = 'MsgPhp\\User\\Entity\\Credential\\'.$credential;
+            $credentialClass = $this->credential = 'MsgPhp\\User\\Entity\\Credential\\'.$credential;
             $credentialTrait = 'MsgPhp\\User\\Entity\\Features\\'.($credentialName = $credential.'Credential');
             $credentialSignature = self::getConstructorSignature(new \ReflectionClass($credentialClass));
             $credentialInit = '$this->credential = new '.$credential.'('.self::getSignatureVariables($credentialSignature).');';
@@ -341,10 +347,35 @@ PHP
 
         $this->writes[] = [$baseDir.'/Role.php', self::getSkeleton('entity/Role.php', $vars)];
         $this->writes[] = [$baseDir.'/UserRole.php', self::getSkeleton('entity/UserRole.php', $vars)];
-        $this->config[] = ['class_mapping' => [
+        $this->configs[] = ['class_mapping' => [
             Entity\Role::class => $ns.'\\Role',
             Entity\UserRole::class => $ns.'\\UserRole',
         ]];
+    }
+
+    private function generateControllers(ConsoleStyle $io): void
+    {
+        if (!$io->confirm('Generate controllers?')) {
+            return;
+        }
+
+        if(!interface_exists(FormInterface::class)) {
+            $io->note('Cannot generate controllers. Run `composer require form`');
+
+            return;
+        }
+
+        $nsForm = rtrim($io->ask('Provide a form namespace', 'App\\Form\\User'), '\\');
+        $nsController = rtrim($io->ask('Provide a controller namespace', 'App\\Controller\\User'), '\\');
+
+        if ($this->credential && $io->confirm('Add login controller?')) {
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
+                'ns' => $nsForm,
+                'hasPassword' => false !== strpos($this->credential, 'Password'),
+                'fieldName' => $this->credential::getUsernameField(),
+            ])];
+            //$this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', ['ns' => $nsForm])];
+        }
     }
 
     private static function getConstructorSignature(\ReflectionClass $class): string
@@ -378,5 +409,10 @@ PHP
 
             return require dirname(__DIR__).'/Resources/skeleton/'.$path;
         })();
+    }
+
+    private function getClassFileName(string $class): string
+    {
+        return $this->projectDir.'/'.str_replace('\\', '/', $class).'.php';
     }
 }

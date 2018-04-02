@@ -1,19 +1,27 @@
 <?php
 
-namespace App\Form\User;
+$typeUses = 'use Symfony\\Component\\Form\\Extension\\Core\\Type\\'.($fieldType = 'email' === $fieldName ? 'EmailType' : 'TextType').';';
+$fields = "\$builder->add('${fieldName}', ${fieldType}::class);";
+
+if ($hasPassword) {
+    $typeUses .= "\nuse Symfony\\Component\\Form\\Extension\\Core\\Type\\PasswordType;";
+    $fields .= "\n\$builder->add('password', PasswordType::class);";
+}
+
+return <<<PHP
+<?php
+
+namespace ${ns};
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+${typeUses}
 use Symfony\Component\Form\FormBuilderInterface;
 
 final class LoginType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface \$builder, array \$options)
     {
-        $builder->add('email', EmailType::class);
-        $builder->add('password', PasswordType::class);
-        $builder->add('remember_me', CheckboxType::class);
+        ${fields}
     }
 }
+PHP;
