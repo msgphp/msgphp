@@ -23,7 +23,7 @@
     "require-dev": {
         "doctrine/orm": "^2.6",
         "lexik/jwt-authentication-bundle": "dev-master",
-        "msgphp/eav": "^0.2",
+        "msgphp/eav": "^0.2|^1.0",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/console": "^3.4|^4.0",
         "symfony/form": "^3.4|^4.0",

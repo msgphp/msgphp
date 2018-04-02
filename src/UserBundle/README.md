@@ -55,11 +55,9 @@ return function (ContainerConfigurator $container) {
 ### Feeling lazy?
 
 ```bash
-composer require form twig security simple-bus/symfony-bridge orm
-composer require --dev maker
-# configure DATABASE_URL in .env
+composer require annot form validator twig security simple-bus/symfony-bridge orm
+composer require maker server --dev
 bin/console make:user
-bin/console doctrine:schema:update --dump-sql
 ```
 
 And be done.

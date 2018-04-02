@@ -139,7 +139,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 $container->getDefinition(ConsoleInfra\Command\AddUserRoleCommand::class)
                     ->setArgument('$contextFactory', ContainerHelper::registerConsoleClassContextFactory(
                         $container,
-                        $config['class_mapping'][Entity\UserRole::class] ?? Entity\UserRole::class,
+                        $config['class_mapping'][Entity\UserRole::class],
                         BaseConsoleInfra\Context\ClassContextFactory::REUSE_DEFINITION
                     ));
             } else {
