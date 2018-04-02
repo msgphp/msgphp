@@ -56,7 +56,7 @@ final class ResetPasswordController
         \$form->handleRequest(\$request);
 
         if (\$form->isSubmitted() && \$form->isValid()) {
-            \$bus->handle(new ChangeUserCredentialCommand(\$user->getId(), ['password' => \$form->get('password')->getData()]));
+            \$bus->handle(new ChangeUserCredentialCommand(\$user->getId(), ['password' => \$form->getData()['password']]));
             \$flashBag->add('success', 'You\'re password is changed.');
 
             return new RedirectResponse('/login');

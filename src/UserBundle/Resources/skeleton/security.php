@@ -35,6 +35,6 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/profile, roles: IS_AUTHENTICATED_FULLY }
 
 YAML;

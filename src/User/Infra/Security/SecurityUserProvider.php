@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class SecurityUserProvider implements UserProviderInterface
 {
+    public const DEFAULT_ROLE = 'ROLE_DEFAULT';
+
     private $repository;
     private $factory;
     private $rolesProvider;
@@ -62,6 +64,6 @@ final class SecurityUserProvider implements UserProviderInterface
 
     public function fromUser(User $user): SecurityUser
     {
-        return new SecurityUser($user, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : []);
+        return new SecurityUser($user, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : [self::DEFAULT_ROLE]);
     }
 }

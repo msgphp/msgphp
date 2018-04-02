@@ -200,7 +200,7 @@ final class UserMaker implements MakerInterface
         $nl = $nl ?? \PHP_EOL;
         $addUses = $addTraitUses = $addImplementors = [];
         $write = false;
-        $enableEventHandler = function () use ($implementors, &$addUses, &$addImplementors, &$addTraitUses) {
+        $enableEventHandler = function () use ($implementors, &$addUses, &$addImplementors, &$addTraitUses): void {
             if (!isset($implementors[DomainEventHandlerInterface::class])) {
                 $addUses[DomainEventHandlerInterface::class] = true;
                 $addUses[DomainEventHandlerTrait::class] = true;
