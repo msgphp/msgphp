@@ -60,4 +60,5 @@ final class ForgotPasswordController
         ]));
     }
 }
+
 PHP;

@@ -31,4 +31,5 @@ final class ResetPasswordType extends AbstractType
         ]);
     }
 }
+
 PHP;

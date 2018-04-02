@@ -35,4 +35,5 @@ final class ForgotPasswordType extends AbstractType
         ]);
     }
 }
+
 PHP;

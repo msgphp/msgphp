@@ -7,6 +7,7 @@ $uniqueValidator = 'Unique'.ucfirst($fieldName);
 $uses = [
     'use MsgPhp\\User\\Infra\\Validator\\UniqueUsername as '.$uniqueValidator.';',
     'use Symfony\\Component\\Form\\AbstractType;',
+    'use Symfony\\Component\\Form\\Extension\\Core\\Type\\'.$fieldType.';',
     'use Symfony\\Component\\Form\\FormBuilderInterface;',
     'use Symfony\\Component\\Validator\\Constraints\\NotBlank;',
 ];
@@ -55,4 +56,5 @@ final class RegisterType extends AbstractType
 ${fields}
     }
 }
+
 PHP;

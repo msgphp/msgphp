@@ -416,6 +416,12 @@ PHP
                 'fieldName' => $usernameField,
                 'hasPassword' => $hasPassword,
             ])];
+
+            if ($io->confirm('Add config/packages/security.yaml?')) {
+                $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
+                    'fieldName' => $usernameField,
+                ])];
+            }
         }
 
         if ($io->confirm('Add a registration controller?')) {

@@ -54,4 +54,5 @@ final class RegisterController
         ]));
     }
 }
+
 PHP;

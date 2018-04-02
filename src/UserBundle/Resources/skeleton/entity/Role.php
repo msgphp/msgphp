@@ -32,4 +32,5 @@ class Role extends BaseRole
         return \$this->name;
     }
 }
+
 PHP;

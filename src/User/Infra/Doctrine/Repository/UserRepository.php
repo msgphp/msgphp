@@ -77,7 +77,7 @@ final class UserRepository implements UserRepositoryInterface
         $qb = $this->createUsernameQueryBuilder($username);
 
         if (null === $qb) {
-            return $this->doExistsByFields(['username' => $username]);
+            return $this->doExistsByFields([$this->usernameField => $username]);
         }
 
         $qb->select('1');

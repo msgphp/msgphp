@@ -18,4 +18,5 @@ return <<<TWIG
         </div>
     {{ form_end(form) }}
 {% endblock %}
+
 TWIG;

@@ -67,4 +67,5 @@ final class ResetPasswordController
         ]));
     }
 }
+
 PHP;

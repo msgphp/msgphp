@@ -40,4 +40,5 @@ final class LoginType extends AbstractType
 ${fields}
     }
 }
+
 PHP;

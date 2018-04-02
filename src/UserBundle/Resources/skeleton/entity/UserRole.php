@@ -23,4 +23,5 @@ use MsgPhp\User\Entity\UserRole as BaseUserRole;
 class UserRole extends BaseUserRole
 {
 }
+
 PHP;

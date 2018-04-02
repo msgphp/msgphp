@@ -10,4 +10,5 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 return function (ContainerConfigurator \$container) {
     \$container->extension('msgphp_user', ${config});
 };
+
 PHP;
