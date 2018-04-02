@@ -297,6 +297,8 @@ PHP
             }
         }
 
+        // Can users have roles?
+
         if ($numUses = count($addUses)) {
             ksort($addUses);
             $uses = array_map(function (string $use) use ($nl): string {
@@ -361,7 +363,7 @@ PHP
         }
 
         if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class) || !interface_exists(EntityManagerInterface::class)) {
-            $io->note('Cannot generate controllers. Run `composer require form twig simple-bus/symfony-bridge orm`');
+            $io->note('Not all controller dependencies are met. Run `composer require form twig simple-bus/symfony-bridge orm`');
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
@@ -377,8 +379,8 @@ PHP
         $hasPassword = $this->hasPassword();
 
         if ($io->confirm('Add a login controller?')) {
-            if (!($hasSecurity = class_exists(Security::class)) && $io->confirm('Symfony Security is not available. Do you want to create a specialized login controller using it anyway?')) {
-                $hasSecurity = true;
+            if (!class_exists(Security::class) && !$io->confirm('Symfony Security is not available. Continue anyway?')) {
+                return;
             }
 
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
@@ -389,7 +391,6 @@ PHP
             $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
-                'hasSecurity' => $hasSecurity,
                 'fieldName' => $usernameField,
                 'template' => $template = $templateDir.'/login.html.twig',
             ])];
