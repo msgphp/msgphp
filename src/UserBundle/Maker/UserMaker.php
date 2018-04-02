@@ -27,11 +27,14 @@ use Twig\Environment;
 final class UserMaker implements MakerInterface
 {
     private $classMapping;
+    private $projectDir;
+    private $config = [];
     private $writes = [];
 
-    public function __construct(array $classMapping)
+    public function __construct(array $classMapping, string $projectDir)
     {
         $this->classMapping = $classMapping;
+        $this->projectDir = $projectDir;
     }
 
     public static function getCommandName(): string
@@ -53,6 +56,8 @@ final class UserMaker implements MakerInterface
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        $this->config = $this->writes = [];
+
         if (!isset($this->classMapping[Entity\User::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
         }
@@ -61,6 +66,10 @@ final class UserMaker implements MakerInterface
 
         $this->generateUser($userClass, $io);
         $this->generateRole($userClass, $io);
+
+        if ($config = array_merge_recursive(...$this->config)) {
+            $this->writes[] = [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', ['config' => var_export($config, true)])];
+        }
 
         while ($write = array_shift($this->writes)) {
             [$fileName, $contents] = $write;
@@ -328,10 +337,14 @@ PHP
         }
 
         $baseDir = dirname($userClass->getFileName());
-        $vars = ['ns' => $userClass->getNamespaceName()];
+        $vars = ['ns' => $ns = $userClass->getNamespaceName()];
 
         $this->writes[] = [$baseDir.'/Role.php', self::getSkeleton('entity/Role.php', $vars)];
         $this->writes[] = [$baseDir.'/UserRole.php', self::getSkeleton('entity/UserRole.php', $vars)];
+        $this->config[] = ['class_mapping' => [
+            Entity\Role::class => $ns.'\\Role',
+            Entity\UserRole::class => $ns.'\\UserRole',
+        ]];
     }
 
     private static function getConstructorSignature(\ReflectionClass $class): string

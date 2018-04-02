@@ -21,6 +21,7 @@ return function (ContainerConfigurator $container): void {
     if (interface_exists(MakerInterface::class)) {
         $services->set(Maker\UserMaker::class, Maker\UserMaker::class)
             ->arg('$classMapping', '%msgphp.domain.class_mapping%')
+            ->arg('$projectDir', '%kernel.project_dir%')
             ->tag('maker.command');
     }
 };
