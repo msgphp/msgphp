@@ -377,9 +377,10 @@ PHP
             !interface_exists(ValidatorInterface::class) ||
             !class_exists(Environment::class) ||
             !class_exists(CommandBus::class) ||
-            !interface_exists(EntityManagerInterface::class)
+            !interface_exists(EntityManagerInterface::class) ||
+            !class_exists(Security::class)
         ) {
-            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig simple-bus/symfony-bridge orm`');
+            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig simple-bus/symfony-bridge orm security`');
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
@@ -419,10 +420,6 @@ PHP
         }
 
         if ($io->confirm('Add a login controller?')) {
-            if (!class_exists(Security::class) && !$io->confirm('Symfony Security is not available. Continue anyway?')) {
-                return;
-            }
-
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
                 'fieldName' => $usernameField,
