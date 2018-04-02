@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\Maker;
 
+use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\Entity\Features;
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
-use MsgPhp\Domain\Event\DomainEventHandlerTrait;
-use MsgPhp\User\CredentialInterface;
-use MsgPhp\User\Entity;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
+use MsgPhp\User\{CredentialInterface, Entity, UserIdInterface};
 use SimpleBus\SymfonyBridge\Bus\CommandBus;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -81,7 +79,7 @@ final class UserMaker implements MakerInterface
         while ($write = array_shift($this->writes)) {
             [$fileName, $contents] = $write;
 
-            switch ($io->choice(sprintf('Write changes to "%s"?', $fileName), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
+            switch ($io->choice(sprintf('Write changes to %s?', preg_replace('~^'.preg_quote($this->projectDir.'/', '~').'~', './', $fileName)), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
                 case 'n':
                     continue 2;
                 case 's':
@@ -362,8 +360,8 @@ PHP
             return;
         }
 
-        if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class)) {
-            $io->note('Cannot generate controllers. Run `composer require form twig simple-bus/symfony-bridge`');
+        if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class) || !interface_exists(EntityManagerInterface::class)) {
+            $io->note('Cannot generate controllers. Run `composer require form twig simple-bus/symfony-bridge orm`');
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
@@ -412,7 +410,6 @@ PHP
             $this->writes[] = [$this->getClassFileName($nsController.'\\RegisterController'), self::getSkeleton('controller/RegisterController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
-                'hasSecurity' => $hasSecurity,
                 'fieldName' => $usernameField,
                 'template' => $template = $templateDir.'/register.html.twig',
             ])];
@@ -424,7 +421,37 @@ PHP
             ])];
         }
 
-        if ($io->confirm('Add a forgot / reset password controller?')) {
+        if ($hasPassword && $io->confirm('Add a forgot / reset password controller?')) {
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\ForgotPasswordType'), self::getSkeleton('form/ForgotPasswordType.php', [
+                'ns' => $nsForm,
+                'fieldName' => $usernameField,
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\ResetPasswordType'), self::getSkeleton('form/ResetPasswordType.php', [
+                'ns' => $nsForm,
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\ForgotPasswordController'), self::getSkeleton('controller/ForgotPasswordController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'fieldName' => $usernameField,
+                'userClass' => $this->classMapping[Entity\User::class],
+                'template' => $templateForgot = $templateDir.'/forgot_password.html.twig',
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\ResetPasswordController'), self::getSkeleton('controller/ResetPasswordController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'userClass' => $this->classMapping[Entity\User::class],
+                'template' => $templateReset = $templateDir.'/reset_password.html.twig',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($templateForgot), self::getSkeleton('template/forgot_password.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $usernameField,
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($templateReset), self::getSkeleton('template/reset_password.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $usernameField,
+            ])];
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $uses = [
     'use '.$formNs.'\\RegisterType;',
     'use MsgPhp\\User\\Command\\CreateUserCommand;',
@@ -16,6 +18,8 @@ $uses = implode("\n", $uses);
 
 return <<<PHP
 <?php
+
+declare(strict_types=1);
 
 namespace ${ns};
 

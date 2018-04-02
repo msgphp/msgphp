@@ -1,19 +1,41 @@
 <?php
 
-namespace App\Form\User;
+declare(strict_types=1);
 
-use MsgPhp\User\Infra\Validator\ExistingUsername as ExistingEmail;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
+$fieldType = 'email' === $fieldName ? 'EmailType' : 'TextType';
+$validators = ['new NotBlank()', 'new '.($existingValidator = 'Existing'.ucfirst($fieldName)).'()'];
+$uses = [
+    'use MsgPhp\\User\\Infra\\Validator\\ExistingUsername as '.$existingValidator.';',
+    'use Symfony\\Component\\Form\\AbstractType;',
+    'use Symfony\\Component\\Form\\Extension\\Core\\Type\\'.$fieldType.';',
+    'use Symfony\\Component\\Form\\FormBuilderInterface;',
+    'use Symfony\\Component\\Validator\\Constraints\\NotBlank;',
+];
+
+$constraints = implode(', ', $validators);
+$fields = <<<PHP
+        \$builder->add('${fieldName}', ${fieldType}::class);
+            'constraints' => [${constraints}],
+        ]);
+PHP;
+
+sort($uses);
+$uses = implode("\n", $uses);
+
+return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace ${ns};
+
+${uses}
 
 final class ForgotPasswordType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface \$builder, array \$options)
     {
-        $builder->add('email', EmailType::class, [
-            'constraints' => [new NotBlank(), new ExistingEmail()],
-        ]);
+${fields}
     }
 }
+PHP;

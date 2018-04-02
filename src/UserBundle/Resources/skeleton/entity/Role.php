@@ -1,5 +1,11 @@
-<?php return <<<PHP
 <?php
+
+declare(strict_types=1);
+
+return <<<PHP
+<?php
+
+declare(strict_types=1);
 
 namespace ${ns};
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $fieldType = 'email' === $fieldName ? 'EmailType' : 'TextType';
 $uses = [
     'use Symfony\\Component\\Form\\AbstractType;',
@@ -24,6 +26,8 @@ $uses = implode("\n", $uses);
 
 return <<<PHP
 <?php
+
+declare(strict_types=1);
 
 namespace ${ns};
 

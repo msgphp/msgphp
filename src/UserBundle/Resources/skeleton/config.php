@@ -1,4 +1,8 @@
-<?php return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+return <<<PHP
 <?php
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

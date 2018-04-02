@@ -1,47 +1,59 @@
 <?php
 
-namespace App\Controller\User;
+declare(strict_types=1);
 
-use App\Entity\User\User;
-use App\Form\User\ResetPasswordType;
-use MsgPhp\User\Command\ChangeUserCredentialCommand;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use SimpleBus\SymfonyBridge\Bus\CommandBus;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
+$uses = [
+    'use '.$userClass.';',
+    'use '.$formNs.'\\ResetPasswordType;',
+    'use MsgPhp\\User\\Command\\ChangeUserCredentialCommand;',
+    'use Doctrine\\ORM\\EntityManagerInterface;',
+    'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
+    'use Symfony\\Component\\Form\\FormFactoryInterface;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Twig\\Environment;',
+];
+
+$userShortName = false === ($i = strrpos($userClass, '\\')) ? $userClass : substr($userClass, $i + 1);
+
+sort($uses);
+$uses = implode("\n", $uses);
+
+return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace ${ns};
+
+${uses}
 
 final class ResetPasswordController
 {
-    /**
-     * @ParamConverter("user", converter="doctrine.orm", options={"mapping": {"token": "passwordResetToken"}})
-     */
     public function __invoke(
-        User $user,
-        Request $request,
-        FormFactoryInterface $formFactory,
-        FlashBagInterface $flashBag,
-        UrlGeneratorInterface $urlGenerator,
-        Environment $twig,
-        CommandBus $bus
-    ): Response
-    {
-        $form = $formFactory->createNamed('', ResetPasswordType::class);
-        $form->handleRequest($request);
+        string \$token,
+        Request \$request,
+        FormFactoryInterface \$formFactory,
+        FlashBagInterface \$flashBag,
+        Environment \$twig,
+        CommandBus \$bus,
+        EntityManagerInterface \$em
+    ): Response {
+        \$form = \$formFactory->createNamed('', ResetPasswordType::class);
+        \$form->handleRequest(\$request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $bus->handle(new ChangeUserCredentialCommand($user->getId(), ['password' => $form->getData()['password']]));
-            $flashBag->add('success', sprintf('Hi %s, we\'ve reset your password.', $user->getEmail()));
+        if (\$form->isSubmitted() && \$form->isValid()) {
+            \$user = \$em->getRepository(${userShortName}::class)->findOneBy(['passwordResetToken' => \$token]);
+            \$bus->handle(new ChangeUserCredentialCommand(\$user->getId(), ['password' => \$form->get('password')->getData()]));
+            \$flashBag->add('success', 'You\'re password is changed.');
 
-            return new RedirectResponse($urlGenerator->generate('index'));
+            return new RedirectResponse('/');
         }
 
-        return new Response($twig->render('user/reset_password.html.twig', [
-            'form' => $form->createView(),
+        return new Response(\$twig->render('${template}', [
+            'form' => \$form->createView(),
         ]));
     }
 }
+PHP;

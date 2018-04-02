@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $fields = <<<TWIG
         {{ form_row(form.${fieldName}) }}
 TWIG;

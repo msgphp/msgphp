@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $fieldType = 'email' === $fieldName ? 'EmailType' : 'TextType';
 $validators = ['new NotBlank()'];
 if ('EmailType' === $fieldType) {
@@ -38,6 +40,8 @@ $uses = implode("\n", $uses);
 
 return <<<PHP
 <?php
+
+declare(strict_types=1);
 
 namespace ${ns};
 

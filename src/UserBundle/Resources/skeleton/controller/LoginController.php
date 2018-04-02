@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $uses = [
     'use '.$formNs.'\\LoginType;',
     'use Symfony\\Component\\Form\\FormFactoryInterface;',
@@ -29,6 +31,8 @@ $uses = implode("\n", $uses);
 
 return <<<PHP
 <?php
+
+declare(strict_types=1);
 
 namespace ${ns};
 

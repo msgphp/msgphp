@@ -1,43 +1,58 @@
 <?php
 
-namespace App\Controller\User;
+declare(strict_types=1);
 
-use App\Form\User\ForgotPasswordType;
-use MsgPhp\User\Command\RequestUserPasswordCommand;
-use MsgPhp\User\Repository\UserRepositoryInterface;
-use SimpleBus\SymfonyBridge\Bus\CommandBus;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
+$uses = [
+    'use '.$userClass.';',
+    'use '.$formNs.'\\ForgotPasswordType;',
+    'use MsgPhp\\User\\Command\\RequestUserPasswordCommand;',
+    'use Doctrine\\ORM\\EntityManagerInterface;',
+    'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
+    'use Symfony\\Component\\Form\\FormFactoryInterface;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Twig\\Environment;',
+];
+
+$userShortName = false === ($i = strrpos($userClass, '\\')) ? $userClass : substr($userClass, $i + 1);
+
+sort($uses);
+$uses = implode("\n", $uses);
+
+return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace ${ns};
+
+${uses}
 
 final class ForgotPasswordController
 {
     public function __invoke(
-        Request $request,
-        FormFactoryInterface $formFactory,
-        FlashBagInterface $flashBag,
-        UrlGeneratorInterface $urlGenerator,
-        Environment $twig,
-        CommandBus $bus,
-        UserRepositoryInterface $repository
-    ): Response
-    {
-        $form = $formFactory->createNamed('', ForgotPasswordType::class);
-        $form->handleRequest($request);
+        Request \$request,
+        FormFactoryInterface \$formFactory,
+        FlashBagInterface \$flashBag,
+        Environment \$twig,
+        CommandBus \$bus,
+        EntityManagerInterface \$em
+    ): Response {
+        \$form = \$formFactory->createNamed('', ForgotPasswordType::class);
+        \$form->handleRequest(\$request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $bus->handle(new RequestUserPasswordCommand($repository->findByUsername($email = $form->getData()['email'])->getId()));
-            $flashBag->add('success', sprintf('Hi %s, we\'ve send you a password reset link.', $email));
+        if (\$form->isSubmitted() && \$form->isValid()) {
+            \$user = \$em->getRepository(${userShortName}::class)->findOneBy(['credential.${fieldName}' => \$form->get('${fieldName}')->getData()]);
+            \$bus->handle(new RequestUserPasswordCommand(\$user->getId()));
+            \$flashBag->add('success', 'You\'re password is requested.');
 
-            return new RedirectResponse($urlGenerator->generate('index'));
+            return new RedirectResponse('/');
         }
 
-        return new Response($twig->render('user/forgot_password.html.twig', [
-            'form' => $form->createView(),
+        return new Response(\$twig->render('${template}', [
+            'form' => \$form->createView(),
         ]));
     }
 }
+PHP;
