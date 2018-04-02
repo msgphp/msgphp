@@ -1,6 +1,7 @@
+<?php return <<<PHP
 <?php
 
-namespace App\Entity\User;
+namespace ${ns};
 
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\User\Entity\Role as BaseRole;
@@ -13,15 +14,16 @@ use MsgPhp\User\Entity\Role as BaseRole;
 class Role extends BaseRole
 {
     /** @ORM\Id() @ORM\Column() */
-    private $name;
+    private \$name;
 
-    public function __construct(string $name)
+    public function __construct(string \$name)
     {
-        $this->name = $name;
+        \$this->name = \$name;
     }
 
     public function getName(): string
     {
-        return $this->name;
+        return \$this->name;
     }
 }
+PHP;

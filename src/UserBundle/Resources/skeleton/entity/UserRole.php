@@ -1,6 +1,7 @@
+<?php return <<<PHP
 <?php
 
-namespace App\Entity\User;
+namespace ${ns};
 
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\User\Entity\UserRole as BaseUserRole;
@@ -16,3 +17,4 @@ use MsgPhp\User\Entity\UserRole as BaseUserRole;
 class UserRole extends BaseUserRole
 {
 }
+PHP;

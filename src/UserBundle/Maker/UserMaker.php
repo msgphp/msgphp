@@ -17,6 +17,7 @@ use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Twig\Environment;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -56,9 +57,12 @@ final class UserMaker implements MakerInterface
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
         }
 
-        $this->generateUser(new \ReflectionClass($this->classMapping[Entity\User::class]), $io);
+        $userClass = new \ReflectionClass($this->classMapping[Entity\User::class]);
 
-        while ($write = array_pop($this->writes)) {
+        $this->generateUser($userClass, $io);
+        $this->generateRole($userClass, $io);
+
+        while ($write = array_shift($this->writes)) {
             [$fileName, $contents] = $write;
 
             switch ($io->choice(sprintf('Write changes to "%s"?', $fileName), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
@@ -240,16 +244,16 @@ PHP
                     $traitUseLine += 4;
                 }
             }
-        }
 
-        if (!isset($traits[Entity\Features\ResettablePassword::class]) && (!isset($credential) || false !== strpos($credential, 'Password')) && $io->confirm('Can users reset their password?')) {
-            $addUses[Entity\Features\ResettablePassword::class] = true;
-            $addTraitUses['ResettablePassword'] = true;
-            if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addUses[DomainEventHandlerInterface::class] = true;
-                $addUses[DomainEventHandlerTrait::class] = true;
-                $addImplementors['DomainEventHandlerInterface'] = true;
-                $addTraitUses['DomainEventHandlerTrait'] = true;
+            if (!isset($traits[Entity\Features\ResettablePassword::class]) && false !== strpos($credential, 'Password') && $io->confirm('Can users reset their password?')) {
+                $addUses[Entity\Features\ResettablePassword::class] = true;
+                $addTraitUses['ResettablePassword'] = true;
+                if (!isset($implementors[DomainEventHandlerInterface::class])) {
+                    $addUses[DomainEventHandlerInterface::class] = true;
+                    $addUses[DomainEventHandlerTrait::class] = true;
+                    $addImplementors['DomainEventHandlerInterface'] = true;
+                    $addTraitUses['DomainEventHandlerTrait'] = true;
+                }
             }
         }
 
@@ -317,6 +321,19 @@ PHP
         }
     }
 
+    private function generateRole(\ReflectionClass $userClass, ConsoleStyle $io): void
+    {
+        if (isset($this->classMapping[Entity\Role::class]) || !$io->confirm('Enable user roles?')) {
+            return;
+        }
+
+        $baseDir = dirname($userClass->getFileName());
+        $vars = ['ns' => $userClass->getNamespaceName()];
+
+        $this->writes[] = [$baseDir.'/Role.php', self::getSkeleton('entity/Role.php', $vars)];
+        $this->writes[] = [$baseDir.'/UserRole.php', self::getSkeleton('entity/UserRole.php', $vars)];
+    }
+
     private static function getConstructorSignature(\ReflectionClass $class): string
     {
         if (null === $constructor = $class->getConstructor()) {
@@ -339,5 +356,14 @@ PHP
         preg_match_all('~(?:\.{3})?\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*~', $signature, $matches);
 
         return isset($matches[0][0]) ? implode(', ', $matches[0]) : '';
+    }
+
+    private static function getSkeleton(string $path, array $vars = [])
+    {
+        return (function () use ($path, $vars) {
+            extract($vars);
+
+            return require dirname(__DIR__).'/Resources/skeleton/'.$path;
+        })();
     }
 }
