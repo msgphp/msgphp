@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\Maker;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
 use MsgPhp\User\{CredentialInterface, Entity, UserIdInterface};
 use Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader;
@@ -285,21 +284,21 @@ PHP
             }
         }
 
-        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
-            $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[Features\CanBeEnabled::class] = true;
-            $addTraitUses['CanBeEnabled'] = true;
-            $enableEventHandler();
-        }
+//        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
+//            $implementors[] = DomainEventHandlerInterface::class;
+//            $addUses[Features\CanBeEnabled::class] = true;
+//            $addTraitUses['CanBeEnabled'] = true;
+//            $enableEventHandler();
+//        }
+//
+//        if (!isset($traits[Features\CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
+//            $implementors[] = DomainEventHandlerInterface::class;
+//            $addUses[Features\CanBeConfirmed::class] = true;
+//            $addTraitUses['CanBeConfirmed'] = true;
+//            $enableEventHandler();
+//        }
 
-        if (!isset($traits[Features\CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
-            $implementors[] = DomainEventHandlerInterface::class;
-            $addUses[Features\CanBeConfirmed::class] = true;
-            $addTraitUses['CanBeConfirmed'] = true;
-            $enableEventHandler();
-        }
-
-        // Can users have roles?
+        // @todo Can users have roles?
 
         if ($numUses = count($addUses)) {
             ksort($addUses);
