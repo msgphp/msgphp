@@ -5,7 +5,7 @@ $fields = "\$builder->add('${fieldName}', ${fieldType}::class);";
 
 if ($hasPassword) {
     $typeUses .= "\nuse Symfony\\Component\\Form\\Extension\\Core\\Type\\PasswordType;";
-    $fields .= "\n\$builder->add('password', PasswordType::class);";
+    $fields .= "\n        \$builder->add('password', PasswordType::class);";
 }
 
 return <<<PHP

@@ -372,19 +372,31 @@ PHP
         $nsController = trim($io->ask('Provide the controller namespace', 'App\\Controller\\User\\'), '\\');
         $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
+        $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
 
         if ($this->credential && $io->confirm('Add login controller?')) {
+            $hasPassword = $this->hasPassword();
+            if (!($hasSecurity = class_exists(Security::class)) && $io->confirm('Symfony Security is not available. Do you want to create a specialized login controller using it anyway?')) {
+                $hasSecurity = true;
+            }
+
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
-                'hasPassword' => $this->hasPassword(),
+                'hasPassword' => $hasPassword,
                 'fieldName' => $fieldName = $this->credential::getUsernameField(),
             ])];
             $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
-                'hasSecurity' => class_exists(Security::class),
+                'hasSecurity' => $hasSecurity,
                 'fieldName' => $fieldName,
-                'template' => $templateDir.'/login.html.twig',
+                'template' => $template = $templateDir.'/login.html.twig',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/login.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $fieldName,
+                'hasPassword' => $hasPassword,
             ])];
         }
     }
@@ -420,6 +432,11 @@ PHP
 
             return require dirname(__DIR__).'/Resources/skeleton/'.$path;
         })();
+    }
+
+    private function getTemplateFileName(string $path): string
+    {
+        return $this->projectDir.'/templates/'.$path;
     }
 
     private function getClassFileName(string $class): string

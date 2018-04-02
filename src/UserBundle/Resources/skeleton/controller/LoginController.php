@@ -7,7 +7,7 @@ if ($hasSecurity) {
     $body = <<<'PHP'
 
         if (null !== $error = $authenticationUtils->getLastAuthenticationError(true)) {
-            $form->addError(new FormError(\error->getMessage(), $error->getMessageKey(), $error->getMessageData()));
+            $form->addError(new FormError($error->getMessage(), $error->getMessageKey(), $error->getMessageData()));
         }
 PHP;
 } else {
@@ -33,8 +33,7 @@ final class LoginController
 {
     public function __invoke(
         Environment \$twig,
-        FormFactoryInterface \$formFactory,
-        UrlGeneratorInterface \$urlGenerator${securityDeps}
+        FormFactoryInterface \$formFactory${securityDeps}
     ): Response {
         \$form = \$formFactory->createNamed('', LoginType::class${formOptions});
 {$body}
