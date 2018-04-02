@@ -13,11 +13,6 @@ $uses = [
 ];
 
 $constraints = implode(', ', $validators);
-$fields = <<<PHP
-        \$builder->add('${fieldName}', ${fieldType}::class);
-            'constraints' => [${constraints}],
-        ]);
-PHP;
 
 sort($uses);
 $uses = implode("\n", $uses);
@@ -35,7 +30,9 @@ final class ForgotPasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface \$builder, array \$options)
     {
-${fields}
+        \$builder->add('${fieldName}', ${fieldType}::class, [
+            'constraints' => [${constraints}],
+        ]);
     }
 }
 PHP;

@@ -3,23 +3,24 @@
 declare(strict_types=1);
 
 $fieldType = 'email' === $fieldName ? 'EmailType' : 'TextType';
+$uniqueValidator = 'Unique'.ucfirst($fieldName);
+$uses = [
+    'use MsgPhp\\User\\Infra\\Validator\\UniqueUsername as '.$uniqueValidator.';',
+    'use Symfony\\Component\\Form\\AbstractType;',
+    'use Symfony\\Component\\Form\\FormBuilderInterface;',
+    'use Symfony\\Component\\Validator\\Constraints\\NotBlank;',
+];
+
 $validators = ['new NotBlank()'];
 if ('EmailType' === $fieldType) {
     $validators[] = 'new Email()';
     $uses[] = 'use Symfony\\Component\\Validator\\Constraints\\Email;';
 }
-$validators[] = 'new '.($uniqueValidator = 'Unique'.ucfirst($fieldName)).'()';
-$uses = [
-    'use MsgPhp\\User\\Infra\\Validator\\UniqueUsername as '.$uniqueValidator.';',
-    'use Symfony\\Component\\Form\\AbstractType;',
-    'use Symfony\\Component\\Form\\Extension\\Core\\Type\\'.$fieldType.';',
-    'use Symfony\\Component\\Form\\FormBuilderInterface;',
-    'use Symfony\\Component\\Validator\\Constraints\\NotBlank;',
-];
+$validators[] = 'new '.$uniqueValidator.'()';
 
 $constraints = implode(', ', $validators);
 $fields = <<<PHP
-        \$builder->add('${fieldName}', ${fieldType}::class);
+        \$builder->add('${fieldName}', ${fieldType}::class, [
             'constraints' => [${constraints}],
         ]);
 PHP;

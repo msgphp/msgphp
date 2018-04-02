@@ -9,9 +9,11 @@ $uses = [
     'use Doctrine\\ORM\\EntityManagerInterface;',
     'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
     'use Symfony\\Component\\Form\\FormFactoryInterface;',
-    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Request;',
+    'use Symfony\\Component\\HttpFoundation\\RedirectResponse;',
     'use Symfony\\Component\\HttpFoundation\\Response;',
     'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Symfony\\Component\\Routing\\Annotation\\Route;',
     'use Twig\\Environment;',
 ];
 
@@ -29,6 +31,9 @@ namespace ${ns};
 
 ${uses}
 
+/**
+ * @Route("/forgot-password", name="forgot_password")
+ */
 final class ForgotPasswordController
 {
     public function __invoke(

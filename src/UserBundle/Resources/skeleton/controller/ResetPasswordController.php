@@ -9,9 +9,12 @@ $uses = [
     'use Doctrine\\ORM\\EntityManagerInterface;',
     'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
     'use Symfony\\Component\\Form\\FormFactoryInterface;',
-    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Request;',
+    'use Symfony\\Component\\HttpFoundation\\RedirectResponse;',
     'use Symfony\\Component\\HttpFoundation\\Response;',
     'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException;',
+    'use Symfony\\Component\\Routing\\Annotation\\Route;',
     'use Twig\\Environment;',
 ];
 
@@ -29,6 +32,9 @@ namespace ${ns};
 
 ${uses}
 
+/**
+ * @Route("/reset-password/{token}", name="reset_password")
+ */
 final class ResetPasswordController
 {
     public function __invoke(
@@ -40,11 +46,16 @@ final class ResetPasswordController
         CommandBus \$bus,
         EntityManagerInterface \$em
     ): Response {
+        \$user = \$em->getRepository(${userShortName}::class)->findOneBy(['passwordResetToken' => \$token]);
+
+        if (!\$user instanceof ${userShortName}) {
+            throw new NotFoundHttpException();
+        }
+
         \$form = \$formFactory->createNamed('', ResetPasswordType::class);
         \$form->handleRequest(\$request);
 
         if (\$form->isSubmitted() && \$form->isValid()) {
-            \$user = \$em->getRepository(${userShortName}::class)->findOneBy(['passwordResetToken' => \$token]);
             \$bus->handle(new ChangeUserCredentialCommand(\$user->getId(), ['password' => \$form->get('password')->getData()]));
             \$flashBag->add('success', 'You\'re password is changed.');
 

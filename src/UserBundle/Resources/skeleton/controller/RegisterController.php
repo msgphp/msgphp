@@ -7,9 +7,11 @@ $uses = [
     'use MsgPhp\\User\\Command\\CreateUserCommand;',
     'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
     'use Symfony\\Component\\Form\\FormFactoryInterface;',
-    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Request;',
+    'use Symfony\\Component\\HttpFoundation\\RedirectResponse;',
     'use Symfony\\Component\\HttpFoundation\\Response;',
     'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Symfony\\Component\\Routing\\Annotation\\Route;',
     'use Twig\\Environment;',
 ];
 
@@ -25,6 +27,9 @@ namespace ${ns};
 
 ${uses}
 
+/**
+ * @Route("/register", name="register")
+ */
 final class RegisterController
 {
     public function __invoke(

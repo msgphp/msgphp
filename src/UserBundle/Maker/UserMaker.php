@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
 use MsgPhp\User\{CredentialInterface, Entity, UserIdInterface};
+use Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader;
 use SimpleBus\SymfonyBridge\Bus\CommandBus;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
 
 /**
@@ -76,10 +78,12 @@ final class UserMaker implements MakerInterface
             $this->configs = [];
         }
 
+        $writeAll = count($this->writes) > 1 && $io->confirm('Write all changes at once?');
+
         while ($write = array_shift($this->writes)) {
             [$fileName, $contents] = $write;
 
-            switch ($io->choice(sprintf('Write changes to %s?', preg_replace('~^'.preg_quote($this->projectDir.'/', '~').'~', './', $fileName)), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
+            switch ($writeAll ? 'y' : $io->choice(sprintf('Write changes to %s?', preg_replace('~^'.preg_quote($this->projectDir.'/', '~').'~', './', $fileName)), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
                 case 'n':
                     continue 2;
                 case 's':
@@ -87,10 +91,15 @@ final class UserMaker implements MakerInterface
                     break;
                 case 'y':
                 default:
+                    if (!is_dir($parent = dirname($fileName))) {
+                        mkdir($parent, 0777, true);
+                    }
                     file_put_contents($fileName, $contents);
                     break;
             }
         }
+
+        $io->success('Done!');
     }
 
     private function generateUser(\ReflectionClass $class, ConsoleStyle $io): void
@@ -362,8 +371,15 @@ PHP
             return;
         }
 
-        if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class) || !interface_exists(EntityManagerInterface::class)) {
-            $io->note('Not all controller dependencies are met. Run `composer require form twig simple-bus/symfony-bridge orm`');
+        if (
+            !class_exists(AnnotatedRouteControllerLoader::class) ||
+            !interface_exists(FormInterface::class) ||
+            !interface_exists(ValidatorInterface::class) ||
+            !class_exists(Environment::class) ||
+            !class_exists(CommandBus::class) ||
+            !interface_exists(EntityManagerInterface::class)
+        ) {
+            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig simple-bus/symfony-bridge orm`');
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
@@ -496,7 +512,11 @@ PHP
 
     private function getClassFileName(string $class): string
     {
-        return $this->projectDir.'/'.str_replace('\\', '/', $class).'.php';
+        if ('App\\' === substr($class, 0, 4)) {
+            $class = substr($class, 4);
+        }
+
+        return $this->projectDir.'/src/'.str_replace('\\', '/', $class).'.php';
     }
 
     private function hasPassword(): bool
