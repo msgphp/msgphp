@@ -1,7 +1,15 @@
 <?php
 
+$uses = [
+    'use '.$formNs.'\\LoginType;',
+    'use Symfony\\Component\\Form\\FormFactoryInterface;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Twig\\Environment;',
+];
+
 if ($hasSecurity) {
-    $securityUses = "\nuse Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationUtils;";
+    $uses[] = 'use Symfony\\Component\\Form\\FormError;';
+    $uses[] = 'use Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationUtils;';
     $securityDeps = ",\n        AuthenticationUtils \$authenticationUtils";
     $formOptions = ", ['${fieldName}' => \$authenticationUtils->getLastUsername()]";
     $body = <<<'PHP'
@@ -11,23 +19,20 @@ if ($hasSecurity) {
         }
 PHP;
 } else {
-    $securityUses = '';
     $securityDeps = '';
     $formOptions = '';
     $body = '';
 }
+
+sort($uses);
+$uses = implode("\n", $uses);
 
 return <<<PHP
 <?php
 
 namespace ${ns};
 
-use {$formNs}\LoginType;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;{$securityUses}
-use Twig\Environment;
+${uses}
 
 final class LoginController
 {

@@ -3,10 +3,12 @@
 $fields = <<<TWIG
         {{ form_row(form.${fieldName}) }}
 TWIG;
+
 if ($hasPassword) {
     $fields .= <<<TWIG
 
-        {{ form_row(form.password) }}
+        {{ form_row(form.password.password) }}
+        {{ form_row(form.password.confirmation) }}
 TWIG;
 }
 
@@ -14,15 +16,14 @@ return <<<TWIG
 {% extends '${base}' %}
 
 {% block ${block} %}
-    <h1>Login</h1>
+    <h1>Register</h1>
 
     {{ form_start(form) }}
         {{ form_errors(form) }}
 ${fields}
 
         <div>
-            <input type="submit" value="Login" />
-            {#<p><a href="{{ url('forgot_password') }}">Forgot password?</a></p>#}
+            <input type="submit" value="Register" />
         </div>
     {{ form_end(form) }}
 {% endblock %}

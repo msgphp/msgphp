@@ -358,14 +358,16 @@ PHP
 
     private function generateControllers(ConsoleStyle $io): void
     {
-        if (!$io->confirm('Generate controllers?')) {
+        if (!$this->credential || !$io->confirm('Generate controllers?')) {
             return;
         }
 
         if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class)) {
             $io->note('Cannot generate controllers. Run `composer require form twig simple-bus/symfony-bridge`');
 
-            return;
+            if (!$io->confirm('Continue anyway?')) {
+                return;
+            }
         }
 
         $nsForm = trim($io->ask('Provide the form namespace', 'App\\Form\\User\\'), '\\');
@@ -373,9 +375,10 @@ PHP
         $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
         $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
+        $usernameField = $this->credential::getUsernameField();
+        $hasPassword = $this->hasPassword();
 
-        if ($this->credential && $io->confirm('Add login controller?')) {
-            $hasPassword = $this->hasPassword();
+        if ($io->confirm('Add a login controller?')) {
             if (!($hasSecurity = class_exists(Security::class)) && $io->confirm('Symfony Security is not available. Do you want to create a specialized login controller using it anyway?')) {
                 $hasSecurity = true;
             }
@@ -383,21 +386,45 @@ PHP
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
                 'hasPassword' => $hasPassword,
-                'fieldName' => $fieldName = $this->credential::getUsernameField(),
+                'fieldName' => $usernameField,
             ])];
             $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
                 'hasSecurity' => $hasSecurity,
-                'fieldName' => $fieldName,
+                'fieldName' => $usernameField,
                 'template' => $template = $templateDir.'/login.html.twig',
             ])];
             $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/login.html.php', [
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
-                'fieldName' => $fieldName,
+                'fieldName' => $usernameField,
                 'hasPassword' => $hasPassword,
             ])];
+        }
+
+        if ($io->confirm('Add a registration controller?')) {
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
+                'ns' => $nsForm,
+                'hasPassword' => $hasPassword,
+                'fieldName' => $usernameField,
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\RegisterController'), self::getSkeleton('controller/RegisterController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'hasSecurity' => $hasSecurity,
+                'fieldName' => $usernameField,
+                'template' => $template = $templateDir.'/register.html.twig',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/register.html.php', [
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $usernameField,
+                'hasPassword' => $hasPassword,
+            ])];
+        }
+
+        if ($io->confirm('Add a forgot / reset password controller?')) {
         }
     }
 

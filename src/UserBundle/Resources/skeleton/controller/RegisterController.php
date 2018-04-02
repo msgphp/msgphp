@@ -1,41 +1,48 @@
 <?php
 
-namespace App\Controller\User;
+$uses = [
+    'use '.$formNs.'\\RegisterType;',
+    'use MsgPhp\\User\\Command\\CreateUserCommand;',
+    'use SimpleBus\\SymfonyBridge\\Bus\\CommandBus;',
+    'use Symfony\\Component\\Form\\FormFactoryInterface;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Response;',
+    'use Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface;',
+    'use Twig\\Environment;',
+];
 
-use App\Form\User\RegisterType;
-use MsgPhp\User\Command\CreateUserCommand;
-use SimpleBus\SymfonyBridge\Bus\CommandBus;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
+sort($uses);
+$uses = implode("\n", $uses);
+
+return <<<PHP
+<?php
+
+namespace ${ns};
+
+${uses}
 
 final class RegisterController
 {
     public function __invoke(
-        Request $request,
-        FormFactoryInterface $formFactory,
-        FlashBagInterface $flashBag,
-        UrlGeneratorInterface $urlGenerator,
-        Environment $twig,
-        CommandBus $bus
-    ): Response
-    {
-        $form = $formFactory->createNamed('', RegisterType::class);
-        $form->handleRequest($request);
+        Request \$request,
+        FormFactoryInterface \$formFactory,
+        FlashBagInterface \$flashBag,
+        Environment \$twig,
+        CommandBus \$bus
+    ): Response {
+        \$form = \$formFactory->createNamed('', RegisterType::class);
+        \$form->handleRequest(\$request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $bus->handle(new CreateUserCommand($data = $form->getData()));
-            $flashBag->add('success', sprintf('Hi %s, you\'re successfully registered. We\'ve send you a confirmation link.', $data['email']));
+        if (\$form->isSubmitted() && \$form->isValid()) {
+            \$bus->handle(new CreateUserCommand(\$form->getData()));
+            \$flashBag->add('success', 'You\'re successfully registered.');
 
-            return new RedirectResponse($urlGenerator->generate('index'));
+            return new RedirectResponse('/');
         }
 
-        return new Response($twig->render('user/register.html.twig', [
-            'form' => $form->createView(),
+        return new Response(\$twig->render('${template}', [
+            'form' => \$form->createView(),
         ]));
     }
 }
+PHP;
