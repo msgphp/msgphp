@@ -10,6 +10,7 @@ use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity;
 use MsgPhp\User\UserIdInterface;
+use SimpleBus\SymfonyBridge\Bus\CommandBus;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -18,6 +19,8 @@ use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Security;
+use Twig\Environment;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -260,7 +263,7 @@ PHP
                 }
             }
 
-            if (!isset($traits[Entity\Features\ResettablePassword::class]) && false !== strpos($credential, 'Password') && $io->confirm('Can users reset their password?')) {
+            if (!isset($traits[Entity\Features\ResettablePassword::class]) && $this->hasPassword() && $io->confirm('Can users reset their password?')) {
                 $addUses[Entity\Features\ResettablePassword::class] = true;
                 $addTraitUses['ResettablePassword'] = true;
                 if (!isset($implementors[DomainEventHandlerInterface::class])) {
@@ -359,22 +362,30 @@ PHP
             return;
         }
 
-        if(!interface_exists(FormInterface::class)) {
-            $io->note('Cannot generate controllers. Run `composer require form`');
+        if(!interface_exists(FormInterface::class) || !class_exists(Environment::class) || !class_exists(CommandBus::class)) {
+            $io->note('Cannot generate controllers. Run `composer require form twig simple-bus/symfony-bridge`');
 
             return;
         }
 
-        $nsForm = rtrim($io->ask('Provide a form namespace', 'App\\Form\\User'), '\\');
-        $nsController = rtrim($io->ask('Provide a controller namespace', 'App\\Controller\\User'), '\\');
+        $nsForm = trim($io->ask('Provide the form namespace', 'App\\Form\\User\\'), '\\');
+        $nsController = trim($io->ask('Provide the controller namespace', 'App\\Controller\\User\\'), '\\');
+        $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
+        $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
 
         if ($this->credential && $io->confirm('Add login controller?')) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
-                'hasPassword' => false !== strpos($this->credential, 'Password'),
-                'fieldName' => $this->credential::getUsernameField(),
+                'hasPassword' => $this->hasPassword(),
+                'fieldName' => $fieldName = $this->credential::getUsernameField(),
             ])];
-            //$this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', ['ns' => $nsForm])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'hasSecurity' => class_exists(Security::class),
+                'fieldName' => $fieldName,
+                'template' => $templateDir.'/login.html.twig',
+            ])];
         }
     }
 
@@ -414,5 +425,10 @@ PHP
     private function getClassFileName(string $class): string
     {
         return $this->projectDir.'/'.str_replace('\\', '/', $class).'.php';
+    }
+
+    private function hasPassword(): bool
+    {
+        return $this->credential && false !== strpos($this->credential, 'Password');
     }
 }
