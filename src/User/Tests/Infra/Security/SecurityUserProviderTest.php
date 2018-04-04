@@ -22,7 +22,7 @@ final class SecurityUserProviderTest extends TestCase
         $user = (new SecurityUserProvider($this->createRepository($this->createUser()), $this->createFactory()))->loadUserByUsername('username');
 
         $this->assertSame('id', $user->getUsername());
-        $this->assertSame([], $user->getRoles());
+        $this->assertSame(['ROLE_DEFAULT'], $user->getRoles());
         $this->assertSame('', $user->getPassword());
         $this->assertNull($user->getSalt());
     }

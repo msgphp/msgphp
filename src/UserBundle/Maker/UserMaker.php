@@ -71,7 +71,6 @@ final class UserMaker implements MakerInterface
         $userClass = new \ReflectionClass($this->classMapping[Entity\User::class]);
 
         $this->generateUser($userClass, $io);
-        $this->generateRole($userClass, $io);
         $this->generateControllers($io);
 
         if ($this->configs) {
@@ -284,6 +283,24 @@ PHP
             }
         }
 
+        if (!isset($this->classMapping[Entity\Role::class]) && $io->confirm('Enable user roles?')) {
+            $baseDir = dirname($class->getFileName());
+            $vars = ['ns' => $ns = $class->getNamespaceName()];
+
+            $addUses[Entity\Fields\RolesField::class] = true;
+            $addTraitUses['RolesField'] = true;
+
+            $this->writes[] = [$baseDir.'/Role.php', self::getSkeleton('entity/Role.php', $vars)];
+            $this->writes[] = [$baseDir.'/UserRole.php', self::getSkeleton('entity/UserRole.php', $vars)];
+            $this->configs[] = ['class_mapping' => [
+                Entity\Role::class => $ns.'\\Role',
+                Entity\UserRole::class => $ns.'\\UserRole',
+            ]];
+
+            $defaultRole = $io->ask('Provide a default role', 'ROLE_USER');
+            $rolesProviderClass = ltrim($io->ask('Provide a roles provider class', 'App\\Security\\UserRolesProvider'), '\\');
+        }
+
 //        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
 //            $implementors[] = DomainEventHandlerInterface::class;
 //            $addUses[Features\CanBeEnabled::class] = true;
@@ -338,23 +355,6 @@ PHP
         if ($write) {
             $this->writes[] = [$fileName, implode('', $lines)];
         }
-    }
-
-    private function generateRole(\ReflectionClass $userClass, ConsoleStyle $io): void
-    {
-        if (isset($this->classMapping[Entity\Role::class]) || !$io->confirm('Enable user roles?')) {
-            return;
-        }
-
-        $baseDir = dirname($userClass->getFileName());
-        $vars = ['ns' => $ns = $userClass->getNamespaceName()];
-
-        $this->writes[] = [$baseDir.'/Role.php', self::getSkeleton('entity/Role.php', $vars)];
-        $this->writes[] = [$baseDir.'/UserRole.php', self::getSkeleton('entity/UserRole.php', $vars)];
-        $this->configs[] = ['class_mapping' => [
-            Entity\Role::class => $ns.'\\Role',
-            Entity\UserRole::class => $ns.'\\UserRole',
-        ]];
     }
 
     private function generateControllers(ConsoleStyle $io): void
