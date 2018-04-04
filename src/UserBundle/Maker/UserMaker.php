@@ -532,7 +532,7 @@ PHP
 
     private static function splitClass(string $class): array
     {
-        $ns = '';
+        $ns = 'App';
 
         if (false !== $i = strrpos($class, '\\')) {
             $ns = substr($class, 0, $i);
