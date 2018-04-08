@@ -9,14 +9,12 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
-use Symfony\Component\Console\ConsoleEvents;
+use MsgPhp\Domain\Infra\Console as ConsoleInfra;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -257,32 +255,6 @@ final class ContainerHelper
 
         if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
             $configure('command_handler');
-        }
-    }
-
-    public static function configureEventMessages(ContainerBuilder $container, array $classMapping, array $events): void
-    {
-        if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-            return;
-        }
-
-        $definition = self::registerAnonymous($container, SimpleBusInfra\EventMessageHandler::class);
-        $definition
-            ->setPublic(true)
-            ->setArgument('$bus', new Reference('simple_bus.event_bus', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
-
-        if (class_exists(ConsoleEvents::class)) {
-            $definition
-                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onConsoleCommand'])
-                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onConsoleTerminate']);
-        }
-
-        foreach ($events as $event) {
-            $definition->addTag($tag = 'command_handler', [$attrName = 'handles' => $event]);
-
-            if (isset($classMapping[$event])) {
-                $definition->addTag($tag, [$attrName => $classMapping[$event]]);
-            }
         }
     }
 
