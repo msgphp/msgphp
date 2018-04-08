@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infra\Console;
+namespace MsgPhp\Domain\Infra\Console\Event;
 
 use MsgPhp\Domain\Message\MessageReceivingInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -20,17 +20,19 @@ final class MessageSubscriber
      */
     public function __invoke($message): void
     {
-        if (null !== $this->receiver) {
-            $this->receiver->onMessageReceived($message);
+        if (null === $this->receiver) {
+            return;
         }
+
+        $this->receiver->onMessageReceived($message);
     }
 
-    public function onConsoleCommand(ConsoleCommandEvent $event): void
+    public function onCommand(ConsoleCommandEvent $event): void
     {
         $this->receiver = ($command = $event->getCommand()) instanceof MessageReceivingInterface ? $command : null;
     }
 
-    public function onConsoleTerminate(): void
+    public function onTerminate(): void
     {
         $this->receiver = null;
     }

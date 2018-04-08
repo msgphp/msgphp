@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Messenger;
 
-use MsgPhp\Domain\Infra\Console\MessageSubscriber;
+use MsgPhp\Domain\Infra\Console\Event\MessageSubscriber;
 use Symfony\Component\Messenger\MiddlewareInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ConsoleSubscriberMiddleware implements MiddlewareInterface
+final class ConsoleMessageSubscriberMiddleware implements MiddlewareInterface
 {
     private $subscriber;
 

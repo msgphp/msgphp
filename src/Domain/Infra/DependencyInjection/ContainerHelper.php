@@ -230,7 +230,7 @@ final class ContainerHelper
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        $configure = function (string $tag) use ($container, $classMapping) {
+        $configure = function (string $tag) use ($container, $classMapping, $commands) {
             foreach ($container->findTaggedServiceIds($tag) as $id => $attr) {
                 foreach ($attr as $attr) {
                     if (!isset($attr[$attrName = 'handles'])) {

@@ -43,18 +43,22 @@ final class BundleHelper
 
             $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
 
-            $container->register(ConsoleInfra\MessageSubscriber::class)
-                ->setPublic(false);
+            $container->register(ConsoleInfra\Event\MessageSubscriber::class)
+                ->setPublic(false)
+                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
+                ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
             if (interface_exists(MiddlewareInterface::class)) {
-                $container->register(MessengerInfra\ConsoleSubscriberMiddleware::class)
+                $container->register(MessengerInfra\ConsoleMessageSubscriberMiddleware::class)
                     ->setPublic(false)
-                    ->addTag('message_bus_middleware', ['priority' => -100]);
+                    ->setAutowired(true)
+                    ->addTag('message_bus_middleware');
             }
             if (interface_exists(MessageBusMiddleware::class)) {
-                $container->register(SimpleBusInfra\ConsoleSubscriberMiddleware::class)
+                $container->register(SimpleBusInfra\ConsoleMessageSubscriberMiddleware::class)
                     ->setPublic(false)
-                    ->addTag('command_bus_middleware', ['priority' => -100])
-                    ->addTag('event_bus_middleware', ['priority' => -100]);
+                    ->setAutowired(true)
+                    ->addTag('command_bus_middleware')
+                    ->addTag('event_bus_middleware');
             }
         }
 
