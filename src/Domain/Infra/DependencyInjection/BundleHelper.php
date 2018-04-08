@@ -7,11 +7,13 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use SimpleBus\Message\Bus\Middleware\MessageBusMiddleware;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Messenger\MiddlewareInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -29,9 +31,6 @@ final class BundleHelper
         }
 
         if (class_exists(ConsoleEvents::class)) {
-            $container->register(ConsoleInfra\MessageSubscriber::class)
-                ->setPublic(false);
-
             $container->register(ConsoleInfra\Context\ClassContextFactory::class)
                 ->setPublic(false)
                 ->setAbstract(true)
@@ -43,6 +42,20 @@ final class BundleHelper
                 ->setPublic(false);
 
             $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
+
+            $container->register(ConsoleInfra\MessageSubscriber::class)
+                ->setPublic(false);
+            if (interface_exists(MiddlewareInterface::class)) {
+                $container->register(MessengerInfra\ConsoleSubscriberMiddleware::class)
+                    ->setPublic(false)
+                    ->addTag('message_bus_middleware', ['priority' => -100]);
+            }
+            if (interface_exists(MessageBusMiddleware::class)) {
+                $container->register(SimpleBusInfra\ConsoleSubscriberMiddleware::class)
+                    ->setPublic(false)
+                    ->addTag('command_bus_middleware', ['priority' => -100])
+                    ->addTag('event_bus_middleware', ['priority' => -100]);
+            }
         }
 
         if (class_exists(DoctrineOrmVersion::class)) {
