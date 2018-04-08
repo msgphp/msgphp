@@ -40,6 +40,11 @@ final class BundleHelper
                 ->setPublic(false);
 
             $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
+
+            $messageSubscriber = $container->register(ConsoleInfra\MessageSubscriber::class)
+                ->ad
+
+            if ()
         }
 
         if (class_exists(DoctrineOrmVersion::class)) {

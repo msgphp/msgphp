@@ -10,7 +10,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class MessageReceiverSubscriber
+final class MessageSubscriber
 {
     /** @var MessageReceivingInterface|null */
     private $receiver;
