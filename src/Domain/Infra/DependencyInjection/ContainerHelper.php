@@ -234,7 +234,7 @@ final class ContainerHelper
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        $configure = function (string $tag, string $attrName) use ($container, $classMapping, $commands) {
+        $configure = function (string $tag, string $attrName) use ($container, $classMapping, $commands): void {
             foreach ($container->findTaggedServiceIds($tag) as $id => $attr) {
                 foreach ($attr as $attr) {
                     if (!isset($attr[$attrName])) {
@@ -267,7 +267,7 @@ final class ContainerHelper
 
     public static function configureEventMessages(ContainerBuilder $container, array $classMapping, array $events): void
     {
-        $configure = function (Definition $handler, string $tag, string $attrName) use ($classMapping, $events) {
+        $configure = function (Definition $handler, string $tag, string $attrName) use ($classMapping, $events): void {
             foreach ($events as $event) {
                 $handler->addTag($tag, [$attrName => $event, 'priority' => -100]);
 
