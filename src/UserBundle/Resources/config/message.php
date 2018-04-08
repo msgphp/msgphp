@@ -23,11 +23,14 @@ return function (ContainerConfigurator $container) use ($reflector, $simpleComma
         ->load($ns = 'MsgPhp\\User\\Command\\Handler\\', $handlers = $baseDir.'/Command/Handler/*Handler.php')
     ;
 
-    if ($simpleCommandBusEnabled) {
-        foreach (glob($handlers) as $file) {
-            $services->get($handler = $ns.basename($file, '.php'))->tag('command_handler', [
-                'handles' => $reflector($handler)->getMethod('__invoke')->getParameters()[0]->getClass()->getName(),
-            ]);
+    foreach (glob($handlers) as $file) {
+        $service = $services->get($handler = $ns.basename($file, '.php'));
+        $handles = $reflector($handler)->getMethod('__invoke')->getParameters()[0]->getClass()->getName();
+
+        $service->tag('messenger.message_handler', ['handles' => $handles]);
+
+        if ($simpleCommandBusEnabled) {
+            $service->tag('command_handler', ['handles' => $handles]);
         }
     }
 };

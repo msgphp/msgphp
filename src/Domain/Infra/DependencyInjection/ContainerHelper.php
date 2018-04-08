@@ -232,27 +232,31 @@ final class ContainerHelper
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        if (!self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-            return;
-        }
-
-        foreach ($container->findTaggedServiceIds($tag = 'command_handler') as $id => $attr) {
-            foreach ($attr as $attr) {
-                if (!isset($attr[$attrName = 'handles'])) {
-                    continue;
-                }
-
-                if ($commands[$command = $attr[$attrName]] ?? false) {
-                    if (isset($classMapping[$command])) {
-                        $container->getDefinition($id)
-                            ->addTag($tag, [$attrName => $classMapping[$command]]);
+        $configure = function (string $tag) use ($container, $classMapping) {
+            foreach ($container->findTaggedServiceIds($tag) as $id => $attr) {
+                foreach ($attr as $attr) {
+                    if (!isset($attr[$attrName = 'handles'])) {
+                        continue;
                     }
 
-                    continue;
-                }
+                    if ($commands[$command = $attr[$attrName]] ?? false) {
+                        if (isset($classMapping[$command])) {
+                            $container->getDefinition($id)
+                                ->addTag($tag, [$attrName => $classMapping[$command]]);
+                        }
 
-                $container->removeDefinition($id);
+                        continue;
+                    }
+
+                    $container->removeDefinition($id);
+                }
             }
+        };
+
+        $configure('messenger.message_handler');
+
+        if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
+            $configure('command_handler');
         }
     }
 

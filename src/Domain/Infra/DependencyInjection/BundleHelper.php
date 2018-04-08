@@ -29,6 +29,9 @@ final class BundleHelper
         }
 
         if (class_exists(ConsoleEvents::class)) {
+            $container->register(ConsoleInfra\MessageSubscriber::class)
+                ->setPublic(false);
+
             $container->register(ConsoleInfra\Context\ClassContextFactory::class)
                 ->setPublic(false)
                 ->setAbstract(true)
@@ -40,11 +43,6 @@ final class BundleHelper
                 ->setPublic(false);
 
             $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
-
-            $messageSubscriber = $container->register(ConsoleInfra\MessageSubscriber::class)
-                ->ad
-
-            if ()
         }
 
         if (class_exists(DoctrineOrmVersion::class)) {
