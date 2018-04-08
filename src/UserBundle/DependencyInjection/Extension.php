@@ -93,6 +93,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 Command\Handler\DeleteUserRoleHandler::class,
             ]);
             ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
+            ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
+                return 'MsgPhp\\User\\Event\\'.basename($file, '.php');
+            }, glob(dirname(ContainerHelper::getClassReflection($container, UserIdInterface::class)->getFileName()).'/Event/*Event.php')));
         }
 
         // framework infra

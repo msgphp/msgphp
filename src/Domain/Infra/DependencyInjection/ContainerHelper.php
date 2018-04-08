@@ -7,14 +7,18 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
+use MsgPhp\Domain\Command\EventMessageCommandHandler;
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use MsgPhp\Domain\Infra\Console as ConsoleInfra;
+use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -230,31 +234,64 @@ final class ContainerHelper
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        $configure = function (string $tag) use ($container, $classMapping, $commands) {
+        $configure = function (string $tag, string $attrName) use ($container, $classMapping, $commands) {
             foreach ($container->findTaggedServiceIds($tag) as $id => $attr) {
                 foreach ($attr as $attr) {
-                    if (!isset($attr[$attrName = 'handles'])) {
+                    if (!isset($attr[$attrName])) {
                         continue;
                     }
 
-                    if ($commands[$command = $attr[$attrName]] ?? false) {
-                        if (isset($classMapping[$command])) {
-                            $container->getDefinition($id)
-                                ->addTag($tag, [$attrName => $classMapping[$command]]);
-                        }
+                    $enabled = $commands[$command = $attr[$attrName]] ?? false;
 
+                    if (!$enabled) {
+                        $container->removeDefinition($id);
                         continue;
                     }
 
-                    $container->removeDefinition($id);
+                    if (isset($classMapping[$command])) {
+                        $container->getDefinition($id)
+                            ->addTag($tag, [$attrName => $classMapping[$command], 'priority' => $attr['priority'] ?? 0]);
+                    }
                 }
             }
         };
 
-        $configure('messenger.message_handler');
+        if (interface_exists(MessageBusInterface::class)) {
+            $configure('messenger.message_handler', 'handles');
+        }
 
         if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-            $configure('command_handler');
+            $configure('command_handler', 'handles');
+        }
+    }
+
+    public static function configureEventMessages(ContainerBuilder $container, array $classMapping, array $events): void
+    {
+        $configure = function (Definition $handler, string $tag, string $attrName) use ($classMapping, $events) {
+            foreach ($events as $event) {
+                $handler->addTag($tag, [$attrName => $event, 'priority' => -100]);
+
+                if (isset($classMapping[$event])) {
+                    $handler->addTag($tag, [$attrName => $classMapping[$event], 'priority' => -100]);
+                }
+            }
+        };
+
+        if (interface_exists(MessageBusInterface::class)) {
+            $handler = self::registerAnonymous($container, EventMessageCommandHandler::class);
+
+            $configure($handler, 'messenger.message_handler', 'handles');
+        }
+
+        if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
+            $handler = self::registerAnonymous($container, EventMessageCommandHandler::class);
+            $handler->setPublic(true);
+            if (self::hasBundle($container, SimpleBusEventBusBundle::class)) {
+                $handler->setArgument('$eventBus', self::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class)
+                    ->setArgument('$bus', new Reference('simple_bus.event_bus')));
+            }
+
+            $configure($handler, 'command_handler', 'handles');
         }
     }
 

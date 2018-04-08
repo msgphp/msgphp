@@ -57,8 +57,7 @@ final class BundleHelper
                 $container->register(SimpleBusInfra\ConsoleMessageSubscriberMiddleware::class)
                     ->setPublic(false)
                     ->setAutowired(true)
-                    ->addTag('command_bus_middleware')
-                    ->addTag('event_bus_middleware');
+                    ->addTag('command_bus_middleware');
             }
         }
 
