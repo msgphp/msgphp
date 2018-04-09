@@ -282,13 +282,13 @@ PHP
                     $traitUseLine += 4;
                 }
             }
+        }
 
-            if (!isset($traits[Entity\Features\ResettablePassword::class]) && $this->hasPassword() && $io->confirm('Can users reset their password?')) {
-                $this->passwordReset = true;
-                $addUses[Entity\Features\ResettablePassword::class] = true;
-                $addTraitUses['ResettablePassword'] = true;
-                $enableEventHandler();
-            }
+        $this->passwordReset = isset($traits[Entity\Features\ResettablePassword::class]);
+        if (!$this->passwordReset && $this->hasPassword() && $io->confirm('Can users reset their password?')) {
+            $addUses[Entity\Features\ResettablePassword::class] = true;
+            $addTraitUses['ResettablePassword'] = true;
+            $enableEventHandler();
         }
 
         if (!isset($this->classMapping[Entity\Role::class]) && $io->confirm('Enable user roles?')) {

@@ -7,6 +7,7 @@ fi
 
 DIR="${1:-var/test-project/}"
 PACKAGES="symfony/var-dumper "
+DEV_PACKAGES="maker server "
 
 for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")
@@ -27,7 +28,8 @@ pushd "${DIR}" &> /dev/null
 
 echo -e "\e[34mInstalling dependencies...\e[0m"
 composer config extra.symfony.allow-contrib true && \
-composer require --prefer-dist --no-suggest ${PACKAGES}
+composer require --prefer-dist --no-suggest ${PACKAGES} && \
+composer require --prefer-dist --dev --no-suggest ${DEV_PACKAGES}
 [[ $? -ne 0 ]] && exit 1
 
 popd &> /dev/null
