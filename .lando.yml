@@ -1,0 +1,19 @@
+name: msgphp-ci
+recipe: custom
+
+services:
+  php:
+    type: php:7.1
+
+tooling:
+  php:
+    service: php
+    description: Run PHP commands
+    cmd:
+      - php
+  bash:
+    service: php
+    description: Run bash commands
+    cmd:
+      - bash
+      - -xc

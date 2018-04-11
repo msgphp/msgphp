@@ -60,3 +60,9 @@ To quickly see if CI is likely to pass use:
 bin/smoke-test
 bin/smoke-test-bundles
 ```
+
+## Using [Lando](https://docs.devwithlando.io)
+
+```bash
+lando bash 'bin/<cmd> <arg>'
+```
