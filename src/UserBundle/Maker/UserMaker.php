@@ -113,6 +113,7 @@ final class UserMaker implements MakerInterface
         }
 
         $io->success('Done!');
+        $io->note('Don\'t forget to update your database schema, if needed.');
     }
 
     private function generateUser(ConsoleStyle $io): void
@@ -521,9 +522,10 @@ PHP;
             'credentialShortClass' => self::splitClass($this->credential)[1],
         ])];
         $this->services[] = <<<PHP
-->set(${contextElementFactoryClass}::class)
+// non-FQCN service for decorating
+->set('app.console.class_context_element_factory', ${contextElementFactoryClass}::class)
     ->decorate(MsgPhp\\Domain\\Infra\\Console\\Context\\ClassContextElementFactoryInterface::class)
-    ->arg('\$factory', ref(${contextElementFactoryClass}::class.'.inner'))
+    ->arg('\$factory', ref('app.console.class_context_element_factory.inner'))
 PHP;
     }
 
