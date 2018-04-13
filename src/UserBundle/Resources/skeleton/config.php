@@ -36,8 +36,8 @@ PHP;
 return <<<PHP
 <?php
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref; 
+use Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\ContainerConfigurator;
+use function Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\ref;
 
 return function (ContainerConfigurator \$container) {
 ${extensionConfig}${serviceConfig}

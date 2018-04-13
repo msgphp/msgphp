@@ -75,14 +75,20 @@ final class UserMaker implements MakerInterface
         $this->user = new \ReflectionClass($this->classMapping[Entity\User::class]);
 
         $this->generateUser($io);
-        //$this->generateControllers($io);
+        $this->generateControllers($io);
         $this->generateConsole($io);
 
         if ($this->configs || $this->services) {
-            $this->writes[] = [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', [
+            $configFile = $this->projectDir.'/config/packages/msgphp_user.make.php';
+            $i = 0;
+            while (file_exists($configFile)) {
+                $configFile = $this->projectDir.'/config/packages/msgphp_user.make_'.++$i.'.php';
+            }
+
+            array_unshift($this->writes, [$configFile, self::getSkeleton('config.php', [
                 'config' => $this->configs ? var_export(array_merge_recursive(...$this->configs), true) : null,
                 'services' => $this->services,
-            ])];
+            ])]);
             $this->configs = $this->services = [];
         }
 
@@ -317,7 +323,7 @@ PHP
             ])];
             $this->services[] = <<<PHP
 ->set(${rolesProviderClass}::class)
-->alias(MsgPhp\User\Infra\Security\UserRolesProviderInterface::class, ${rolesProviderClass}::class)
+->alias(MsgPhp\\User\\Infra\\Security\\UserRolesProviderInterface::class, ${rolesProviderClass}::class)
 PHP;
         }
 
@@ -517,7 +523,7 @@ PHP;
         ])];
         $this->services[] = <<<PHP
 ->set(${contextElementFactoryClass}::class)
-    ->decorate(MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactoryInterface::class)
+    ->decorate(MsgPhp\\Domain\\Infra\\Console\\Context\\ClassContextElementFactoryInterface::class)
     ->arg('\$factory', ref(${contextElementFactoryClass}::class.'.inner'))
 PHP;
     }
