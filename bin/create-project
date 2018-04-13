@@ -6,8 +6,8 @@ if [[ $# -gt 1 ]] ; then
 fi
 
 DIR="${1:-var/test-project/}"
-PACKAGES="symfony/var-dumper "
-DEV_PACKAGES="maker server "
+PACKAGES="orm "
+DEV_PACKAGES="debug maker server "
 
 for PACKAGE in $(find src/*Bundle/composer.json -type f) ; do
     PACKAGE_NAME=$(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${PACKAGE}")

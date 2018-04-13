@@ -6,7 +6,6 @@ namespace MsgPhp\UserBundle\Maker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
-use MsgPhp\User\Infra\Security\UserRolesProviderInterface;
 use MsgPhp\User\{CredentialInterface, Entity, UserIdInterface};
 use Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader;
 use SimpleBus\SymfonyBridge\Bus\CommandBus;
@@ -76,11 +75,12 @@ final class UserMaker implements MakerInterface
         $this->user = new \ReflectionClass($this->classMapping[Entity\User::class]);
 
         $this->generateUser($io);
-        $this->generateControllers($io);
+        //$this->generateControllers($io);
+        $this->generateConsole($io);
 
         if ($this->configs || $this->services) {
             $this->writes[] = [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', [
-                'config' => var_export($this->configs ? array_merge_recursive(...$this->configs) : [], true),
+                'config' => $this->configs ? var_export(array_merge_recursive(...$this->configs), true) : null,
                 'services' => $this->services,
             ])];
             $this->configs = $this->services = [];
@@ -306,8 +306,7 @@ PHP
             ]];
 
             $defaultRole = $io->ask('Provide a default role', 'ROLE_USER');
-            $rolesProviderClass = ltrim($io->ask('Provide the roles provider class', 'App\\Security\\UserRolesProvider'), '\\');
-            [$rolesProviderNs, $rolesProviderShortClass] = self::splitClass($rolesProviderClass);
+            [$rolesProviderNs, $rolesProviderShortClass] = self::splitClass($rolesProviderClass = 'App\\Security\\UserRolesProvider');
 
             $this->writes[] = [$this->getClassFileName($rolesProviderClass), self::getSkeleton('service/UserRolesProvider.php', [
                 'ns' => $rolesProviderNs,
@@ -316,7 +315,10 @@ PHP
                 'userRoleClass' => $userRoleClass,
                 'defaultRole' => $defaultRole,
             ])];
-            $this->services[$rolesProviderClass] = UserRolesProviderInterface::class;
+            $this->services[] = <<<PHP
+->set(${rolesProviderClass}::class)
+->alias(MsgPhp\User\Infra\Security\UserRolesProviderInterface::class, ${rolesProviderClass}::class)
+PHP;
         }
 
 //        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
@@ -495,6 +497,29 @@ PHP
                 'fieldName' => $usernameField,
             ])];
         }
+    }
+
+    private function generateConsole(ConsoleStyle $io): void
+    {
+        if (!$this->hasPassword()) {
+            return;
+        }
+
+        [$contextElementFactoryNs, $contextElementFactoryShortClass] = self::splitClass($contextElementFactoryClass = 'App\\Console\\ClassContextElementFactory');
+
+        $this->writes[] = [$this->getClassFileName($contextElementFactoryClass), self::getSkeleton('service/ClassContextElementFactory.php', [
+            'ns' => $contextElementFactoryNs,
+            'class' => $contextElementFactoryShortClass,
+            'userClass' => $this->user->getName(),
+            'userShortClass' => $this->user->getShortName(),
+            'credentialClass' => $this->credential,
+            'credentialShortClass' => self::splitClass($this->credential)[1],
+        ])];
+        $this->services[] = <<<PHP
+->set(${contextElementFactoryClass}::class)
+    ->decorate(MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactoryInterface::class)
+    ->arg('\$factory', ref(${contextElementFactoryClass}::class.'.inner'))
+PHP;
     }
 
     private static function getConstructorSignature(\ReflectionClass $class): string
