@@ -145,18 +145,17 @@ final class ClassContextFactory implements ContextFactoryInterface
                 continue;
             }
 
-            if ($element->generate($io, $generated)) {
-                $this->generatedValues[] = [$element->label, json_encode($generated)];
-                $context[$key] = $element->normalize($generated);
-                continue;
-            }
-
-            if ($required) {
+            if ($required || $given) {
                 if (!$interactive) {
                     throw new \LogicException(sprintf('No value provided for "%s".', $field));
                 }
 
-                $context[$key] = $this->askRequiredValue($io, $element, $value);
+                if ($element->generate($io, $generated)) {
+                    $this->generatedValues[] = [$element->label, json_encode($generated)];
+                    $context[$key] = $element->normalize($generated);
+                } else {
+                    $context[$key] = $this->askRequiredValue($io, $element, $value);
+                }
                 continue;
             }
 
