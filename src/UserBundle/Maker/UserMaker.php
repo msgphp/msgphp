@@ -84,7 +84,6 @@ final class UserMaker implements MakerInterface
             while (file_exists($configFile)) {
                 $configFile = $this->projectDir.'/config/packages/msgphp_user.make_'.++$i.'.php';
             }
-
             array_unshift($this->writes, [$configFile, self::getSkeleton('config.php', [
                 'config' => $this->configs ? var_export(array_merge_recursive(...$this->configs), true) : null,
                 'services' => $this->services,
