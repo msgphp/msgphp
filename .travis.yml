@@ -6,7 +6,6 @@ language: php
 php:
   - 7.1
   - 7.2
-  - nightly
 
 env:
   global:
@@ -17,9 +16,6 @@ matrix:
   include:
     - php: 7.1
       env:
-        - DEPS=low
-    - php: 7.1
-      env:
         - DEPS=high
         - CC=true
         - CS=true
@@ -28,15 +24,7 @@ matrix:
     - php: 7.2
       env:
         - DEPS=low
-    - php: 7.2
-      env:
-        - DEPS=high
-
-allow_failures:
-- php:
-    - nightly
-
-fast_finish: true
+  fast_finish: true
 
 before_script:
   - if [[ $CC != true ]] ; then phpenv config-rm xdebug.ini || true ; fi
@@ -48,8 +36,7 @@ before_install:
 
 install:
   - travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
-  - if [[ ! $DEPS  ]] ; then travis_retry bin/composer install $COMPOSER_ARGS ; fi
-  - if [[ $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable ; fi
+  - if [[ ! $DEPS || $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS ; fi
   - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
   - bin/phpunit install
   - if [[ $CS = true || $SA = true ]] ; then composer install $COMPOSER_ARGS ; fi
