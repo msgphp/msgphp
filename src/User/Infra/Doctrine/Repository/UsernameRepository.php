@@ -51,26 +51,20 @@ final class UsernameRepository implements UsernameRepositoryInterface
             throw new \LogicException('No username mapping available.');
         }
 
-        $qb = $this->em->createQueryBuilder();
-        $targets = $aliases = [];
+        $results = $targets = [];
         foreach ($this->targetMapping as $class => $mappings) {
+            $qb = $this->em->createQueryBuilder();
             $metadata = $this->em->getClassMetadata($class);
-            $alias = $aliases[$class] ?? ($aliases[$class] = 'target'.count($aliases));
+            $fields = array_flip($idFields = $metadata->getIdentifierFieldNames());
 
             foreach ($mappings as $field => $mappedBy) {
-                $fields = array_flip($idFields = $metadata->getIdentifierFieldNames());
+                $targets[$class][$field] = $mappedBy;
                 $fields[$field] = true;
 
                 if (null !== $mappedBy) {
                     $fields[$mappedBy] = true;
                 }
-
-                $qb->addSelect(sprintf('partial %s.{%s}', $alias, implode(', ', array_keys($fields))));
-                $qb->from($class, $alias);
-
-                $targets[$class][$field] = $mappedBy;
             }
-
             foreach ((array) $metadata->discriminatorMap as $discriminatorClass) {
                 if (isset($targets[$discriminatorClass])) {
                     $targets[$discriminatorClass] += $targets[$class];
@@ -78,24 +72,29 @@ final class UsernameRepository implements UsernameRepositoryInterface
                     $targets[$discriminatorClass] = $targets[$class];
                 }
             }
+
+            $qb->addSelect(sprintf('partial e.{%s}', implode(', ', array_keys($fields))));
+            $qb->from($class, 'e');
+
+            $results[] = $qb->getQuery()->getResult();
         }
 
         $result = [];
-        foreach ($qb->getQuery()->getResult() as $targetEntity) {
-            $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(get_class($targetEntity)));
+        foreach ($results ? array_merge(...$results) : [] as $target) {
+            $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(get_class($target)));
 
             foreach ($targets[$class] as $field => $mappedBy) {
-                $user = null === $mappedBy ? $targetEntity : $metadata->getFieldValue($targetEntity, $mappedBy);
+                $user = null === $mappedBy ? $target : $metadata->getFieldValue($target, $mappedBy);
 
                 if (null === $user) {
                     continue;
                 }
 
                 if (!$user instanceof User) {
-                    throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $field, get_class($targetEntity), is_object($user) ? get_class($user) : gettype($user)));
+                    throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $field, get_class($target), is_object($user) ? get_class($user) : gettype($user)));
                 }
 
-                if (null !== $username = $metadata->getFieldValue($targetEntity, $field)) {
+                if (null !== $username = $metadata->getFieldValue($target, $field)) {
                     $result[] = new $this->class($user, $username);
                 }
             }

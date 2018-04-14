@@ -106,10 +106,14 @@ final class UsernameListener
 
         $em = $event->getEntityManager();
 
-        /** @var Username[] $usernames */
-        $usernames = $em->getRepository(Username::class)->findBy(['username' => array_keys($this->updateUsernames)]);
+        $qb = $em->createQueryBuilder();
+        $qb->select('u');
+        $qb->from(Username::class, 'u');
+        $qb->where($qb->expr()->in('u.username', ':usernames'));
+        $qb->setParameter('usernames', array_keys($this->updateUsernames));
 
-        foreach ($usernames as $username) {
+        foreach ($qb->getQuery()->getResult() as $username) {
+            /* @var Username $username */
             $em->remove($username);
 
             if (isset($this->updateUsernames[$usernameValue = (string) $username])) {
