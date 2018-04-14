@@ -40,9 +40,19 @@ final class ResolveDomainPass implements CompilerPassInterface
                 ->addTag('kernel.cache_warmer', ['priority' => 100]);
         }
 
-        if ($container->hasDefinition(DoctrineInfra\Event\ObjectFieldMappingListener::class)) {
-            ($definition = $container->getDefinition(DoctrineInfra\Event\ObjectFieldMappingListener::class))
-                ->setArgument('$mapping', self::processClassMapping($definition->getArgument('$mapping'), $classMapping));
+        foreach ($container->findTaggedServiceIds('msgphp.domain.process_class_mapping') as $id => $attr) {
+            $definition = $container->getDefinition($id);
+
+            foreach ($attr as $attr) {
+                if (!isset($attr['argument'])) {
+                    continue;
+                }
+
+                $value = $definition->getArgument($attr['argument']);
+                $definition->setArgument($attr['argument'], self::processClassMapping($value, $classMapping, !empty($attr['array_keys'])));
+            }
+
+            $definition->clearTag('msgphp.domain.process_class_mapping');
         }
 
         $params = $container->getParameterBag();
@@ -61,16 +71,26 @@ final class ResolveDomainPass implements CompilerPassInterface
         $container->setAlias($alias, new Alias($id, false));
     }
 
-    private static function processClassMapping($value, array $classMapping)
+    private static function processClassMapping($value, array $classMapping, bool $arrayKeys = false)
     {
         if (is_string($value) && isset($classMapping[$value])) {
             return $classMapping[$value];
         }
 
         if (is_array($value)) {
-            array_walk_recursive($value, function (&$value) use ($classMapping): void {
-                $value = self::processClassMapping($value, $classMapping);
-            });
+            foreach ($value as $k => &$v) {
+                $v = self::processClassMapping($v, $classMapping, $arrayKeys);
+
+                if ($arrayKeys && $k !== $newKey = self::processClassMapping($k, $classMapping)) {
+                    if (!isset($value[$newKey])) {
+                        $value[$newKey] = $v;
+                    } else {
+                        $value[$newKey] = array_merge(is_array($v) ? $v : [$v], is_array($value[$newKey]) ? $value[$newKey] : [$value[$newKey]]);
+                    }
+                    unset($value[$k]);
+                }
+            }
+            unset($v);
         }
 
         return $value;

@@ -10,6 +10,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\MappingException;
 use MsgPhp\User\Entity\Username;
 
 /**
@@ -27,13 +28,19 @@ final class UsernameListener
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        if (!isset($this->mapping[($metadata = $event->getClassMetadata())->getName()])) {
+        $metadata = $event->getClassMetadata();
+
+        if (!isset($this->mapping[$metadata->getName()])) {
             return;
         }
 
-        $metadata->addEntityListener('prePersist', self::class, 'add');
-        $metadata->addEntityListener('preUpdate', self::class, 'update');
-        $metadata->addEntityListener('preRemove', self::class, 'remove');
+        try {
+            $metadata->addEntityListener('prePersist', self::class, 'add');
+            $metadata->addEntityListener('preUpdate', self::class, 'update');
+            $metadata->addEntityListener('preRemove', self::class, 'remove');
+        } catch (MappingException $e) {
+            // duplicate
+        }
     }
 
     /**
@@ -53,12 +60,24 @@ final class UsernameListener
      */
     public function update($entity, PreUpdateEventArgs $event): void
     {
-        foreach ($this->getMapping($entity, $event->getEntityManager()) as $mapping) {
-            if (!$event->hasChangedField($mapping['field'])) {
+        $em = $event->getEntityManager();
+
+        foreach ($this->getMapping($entity, $event->getEntityManager()) as $field => $mappedBy) {
+            if (!$event->hasChangedField($field)) {
                 continue;
             }
 
-            $this->updateUsernames[$event->getOldValue($mapping['field'])] = $event->getNewValue($mapping['field']);
+            if (null !== $username = $event->getOldValue($field)) {
+                $this->updateUsernames[$username] = $event->getNewValue($field);
+            } elseif (null !== $username = $event->getNewValue($field)) {
+                $user = null === $mappedBy ? $entity : $em->getClassMetadata(get_class($entity))->getFieldValue($entity, $mappedBy);
+
+                if (null === $user) {
+                    continue;
+                }
+
+                $em->persist(new Username($user, $username));
+            }
         }
     }
 
@@ -70,12 +89,12 @@ final class UsernameListener
         $em = $event->getEntityManager();
         $metadata = $em->getClassMetadata(get_class($entity));
 
-        foreach ($this->getMapping($entity, $em) as $mapping) {
-            if (!isset($mapping['mapped_by'])) {
+        foreach (array_keys($this->getMapping($entity, $em)) as $field) {
+            if (null === $username = $metadata->getFieldValue($entity, $field)) {
                 continue;
             }
 
-            $this->updateUsernames[$metadata->getFieldValue($entity, $mapping['field'])] = null;
+            $this->updateUsernames[$username] = null;
         }
     }
 
@@ -112,10 +131,14 @@ final class UsernameListener
     {
         $metadata = $em->getClassMetadata(get_class($entity));
 
-        foreach ($this->getMapping($entity, $em) as $mapping) {
-            $user = isset($mapping['mapped_by']) ? $metadata->getFieldValue($entity, $mapping['mapped_by']) : $entity;
+        foreach ($this->getMapping($entity, $em) as $field => $mappedBy) {
+            $user = null === $mappedBy ? $entity : $metadata->getFieldValue($entity, $mappedBy);
 
-            yield new Username($user, $metadata->getFieldValue($entity, $mapping['field']));
+            if (null === $user || null === $username = $metadata->getFieldValue($entity, $field)) {
+                continue;
+            }
+
+            yield new Username($user, $username);
         }
     }
 

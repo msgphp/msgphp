@@ -52,39 +52,30 @@ final class UsernameRepository implements UsernameRepositoryInterface
         }
 
         $qb = $this->em->createQueryBuilder();
-        $targetInfo = $aliases = [];
+        $targets = $aliases = [];
         foreach ($this->targetMapping as $class => $mappings) {
             $metadata = $this->em->getClassMetadata($class);
             $alias = $aliases[$class] ?? ($aliases[$class] = 'target'.count($aliases));
 
-            foreach ($mappings as $mapping) {
+            foreach ($mappings as $field => $mappedBy) {
                 $fields = array_flip($idFields = $metadata->getIdentifierFieldNames());
+                $fields[$field] = true;
 
-                if (!isset($fields[$mapping['field']])) {
-                    $fields[$mapping['field']] = true;
-                }
-
-                if (isset($mapping['mapped_by'])) {
-                    if (!isset($fields[$mapping['mapped_by']])) {
-                        $fields[$mapping['mapped_by']] = true;
-                    }
-
-                    $userField = $mapping['mapped_by'];
-                } else {
-                    $userField = null;
+                if (null !== $mappedBy) {
+                    $fields[$mappedBy] = true;
                 }
 
                 $qb->addSelect(sprintf('partial %s.{%s}', $alias, implode(', ', array_keys($fields))));
-                $qb->from($mapping['target'], $alias);
+                $qb->from($class, $alias);
 
-                $targetInfo[$class][] = ['user_field' => $userField, 'username_field' => $mapping['field']];
+                $targets[$class][$field] = $mappedBy;
+            }
 
-                foreach ((array) $metadata->discriminatorMap as $discriminatorClass) {
-                    if (isset($targetInfo[$discriminatorClass]) || isset($this->targetMapping[$discriminatorClass])) {
-                        continue;
-                    }
-
-                    $targetInfo[$discriminatorClass] = $targetInfo[$class];
+            foreach ((array) $metadata->discriminatorMap as $discriminatorClass) {
+                if (isset($targets[$discriminatorClass])) {
+                    $targets[$discriminatorClass] += $targets[$class];
+                } else {
+                    $targets[$discriminatorClass] = $targets[$class];
                 }
             }
         }
@@ -93,28 +84,20 @@ final class UsernameRepository implements UsernameRepositoryInterface
         foreach ($qb->getQuery()->getResult() as $targetEntity) {
             $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(get_class($targetEntity)));
 
-            foreach ($targetInfo[$class] as $info) {
-                if ($targetEntity instanceof User) {
-                    $user = $targetEntity;
-                } elseif (isset($info['user_field'])) {
-                    $user = $metadata->getFieldValue($targetEntity, $info['user_field']);
+            foreach ($targets[$class] as $field => $mappedBy) {
+                $user = null === $mappedBy ? $targetEntity : $metadata->getFieldValue($targetEntity, $mappedBy);
 
-                    if (null === $user) {
-                        continue;
-                    }
-
-                    if (!$user instanceof User) {
-                        throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $info['user_field'], User::class, is_object($user) ? get_class($user) : gettype($user)));
-                    }
-                } else {
-                    throw new \LogicException(sprintf('No user field mapped for entity "%s".', $class));
-                }
-
-                if (null === $username = $metadata->getFieldValue($targetEntity, $info['username_field'])) {
+                if (null === $user) {
                     continue;
                 }
 
-                $result[] = new $this->class($user, $username);
+                if (!$user instanceof User) {
+                    throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $field, get_class($targetEntity), is_object($user) ? get_class($user) : gettype($user)));
+                }
+
+                if (null !== $username = $metadata->getFieldValue($targetEntity, $field)) {
+                    $result[] = new $this->class($user, $username);
+                }
             }
         }
 

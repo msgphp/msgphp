@@ -48,7 +48,8 @@ final class BundleHelper
             $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', [])
-                ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
+                ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])
+                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$mapping']);
 
             if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
                 @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/msgphp/doctrine-mapping'), 0777, true);
