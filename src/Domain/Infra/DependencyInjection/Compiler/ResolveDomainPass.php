@@ -6,7 +6,8 @@ namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
-use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -158,6 +159,13 @@ final class ResolveDomainPass implements CompilerPassInterface
 
         if (null !== $aliasId) {
             self::alias($container, Message\DomainMessageBusInterface::class, $aliasId);
+
+            if (class_exists(ConsoleEvents::class)) {
+                self::register($container, ConsoleInfra\DomainMessageBus::class)
+                    ->setArgument('$bus', new Reference(ConsoleInfra\DomainMessageBus::class.'.inner'))
+                    ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
+                    ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
+            }
         }
     }
 }

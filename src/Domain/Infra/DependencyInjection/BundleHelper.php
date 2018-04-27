@@ -69,11 +69,6 @@ final class BundleHelper
             ->setPublic(false);
 
         $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
-
-        $container->register(ConsoleInfra\Event\MessageSubscriber::class)
-            ->setPublic(false)
-            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
-            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
     }
 
     private static function initDoctrineOrm(ContainerBuilder $container): void
