@@ -234,34 +234,35 @@ final class ContainerHelper
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        $configure = function (string $tag, string $attrName) use ($container, $classMapping, $commands): void {
-            foreach ($container->findTaggedServiceIds($tag) as $id => $attr) {
-                foreach ($attr as $attr) {
-                    if (!isset($attr[$attrName])) {
-                        continue;
-                    }
+        $messengerEnabled = interface_exists(MessageBusInterface::class);
+        $simpleBusEnabled = self::hasBundle($container, SimpleBusCommandBusBundle::class);
 
-                    $enabled = $commands[$command = $attr[$attrName]] ?? false;
+        foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
+            $definition = $container->getDefinition($id);
+            $command = self::getClassReflection($container, $definition->getClass())->getMethod('__invoke')->getParameters()[0]->getClass()->getName();
 
-                    if (!$enabled) {
-                        $container->removeDefinition($id);
-                        continue;
-                    }
+            if (empty($commands[$command])) {
+                $container->removeDefinition($id);
+                continue;
+            }
 
-                    if (isset($classMapping[$command])) {
-                        $container->getDefinition($id)
-                            ->addTag($tag, [$attrName => $classMapping[$command], 'priority' => $attr['priority'] ?? 0]);
-                    }
+            $definition->clearTag($tag);
+
+            if ($messengerEnabled) {
+                $definition->addTag('messenger.message_handler', ['handles' => $command]);
+                if (isset($classMapping[$command])) {
+                    $definition->addTag('messenger.message_handler', ['handles' => $classMapping[$command]]);
                 }
             }
-        };
 
-        if (interface_exists(MessageBusInterface::class)) {
-            $configure('messenger.message_handler', 'handles');
-        }
-
-        if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-            $configure('command_handler', 'handles');
+            if ($simpleBusEnabled) {
+                $definition
+                    ->setPublic(true)
+                    ->addTag('command_handler', ['handles' => $command]);
+                if (isset($classMapping[$command])) {
+                    $definition->addTag('command_handler', ['handles' => $classMapping[$command]]);
+                }
+            }
         }
     }
 
