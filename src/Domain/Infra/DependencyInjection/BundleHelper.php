@@ -7,7 +7,8 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, SimpleBus as SimpleBusInfra};
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
@@ -69,6 +70,18 @@ final class BundleHelper
             ->setPublic(false);
 
         $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
+
+        $container->register(ConsoleInfra\MessageReceiver::class)
+            ->setPublic(false)
+            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
+            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
+
+        if (ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)) {
+            $container->register(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
+                ->setPublic(false)
+                ->setAutowired(true)
+                ->addTag('command_bus_middleware');
+        }
     }
 
     private static function initDoctrineOrm(ContainerBuilder $container): void

@@ -155,17 +155,18 @@ final class ResolveDomainPass implements CompilerPassInterface
         if ($container->has(MessageBusInterface::class)) {
             self::register($container, $aliasId = MessengerInfra\DomainMessageBus::class)
                 ->setAutowired(true);
+
+            if (class_exists(ConsoleEvents::class)) {
+                foreach ($container->findTaggedServiceIds('messenger.bus') as $id => $attr) {
+                    self::register($container, MessengerInfra\ConsoleMessageReceiverBus::class, MessengerInfra\ConsoleMessageReceiverBus::class.'.'.$id)
+                        ->setDecoratedService($id)
+                        ->setArgument('$bus', MessengerInfra\ConsoleMessageReceiverBus::class.'.'.$id.'.inner');
+                }
+            }
         }
 
         if (null !== $aliasId) {
             self::alias($container, Message\DomainMessageBusInterface::class, $aliasId);
-
-            if (class_exists(ConsoleEvents::class)) {
-                self::register($container, ConsoleInfra\DomainMessageBus::class)
-                    ->setArgument('$bus', new Reference(Message\DomainMessageBusInterface::class))
-                    ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
-                    ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
-            }
         }
     }
 }

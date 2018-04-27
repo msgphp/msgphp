@@ -4,44 +4,31 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Console;
 
-use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageReceivingInterface};
+use MsgPhp\Domain\Message\MessageReceivingInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainMessageBus implements DomainMessageBusInterface
+final class MessageReceiver
 {
-    private $bus;
-
     /** @var MessageReceivingInterface|null */
     private $receiver;
 
-    public function __construct(DomainMessageBusInterface $bus)
+    public function receive($message): void
     {
-        $this->bus = $bus;
-    }
-
-    public function dispatch($message)
-    {
-        if (null !== $this->receiver) {
-            $this->receiver->onMessageReceived($message);
+        if (null === $this->receiver) {
+            return;
         }
 
-        return $this->bus->dispatch($message);
+        $this->receiver->onMessageReceived($message);
     }
 
-    /**
-     * @internal
-     */
     public function onCommand(ConsoleCommandEvent $event): void
     {
         $this->receiver = ($command = $event->getCommand()) instanceof MessageReceivingInterface ? $command : null;
     }
 
-    /**
-     * @internal
-     */
     public function onTerminate(): void
     {
         $this->receiver = null;
