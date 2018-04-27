@@ -7,8 +7,8 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use MsgPhp\Domain\Command\EventMessageCommandHandler;
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Message\FallbackMessageHandler;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
@@ -246,12 +246,14 @@ final class ContainerHelper
                 continue;
             }
 
+            $mappedCommand = $classMapping[$command] ?? null;
+
             $definition->clearTag($tag);
 
             if ($messengerEnabled) {
                 $definition->addTag('messenger.message_handler', ['handles' => $command]);
-                if (isset($classMapping[$command])) {
-                    $definition->addTag('messenger.message_handler', ['handles' => $classMapping[$command]]);
+                if (null !== $mappedCommand) {
+                    $definition->addTag('messenger.message_handler', ['handles' => $mappedCommand]);
                 }
             }
 
@@ -259,8 +261,8 @@ final class ContainerHelper
                 $definition
                     ->setPublic(true)
                     ->addTag('command_handler', ['handles' => $command]);
-                if (isset($classMapping[$command])) {
-                    $definition->addTag('command_handler', ['handles' => $classMapping[$command]]);
+                if (null !== $mappedCommand) {
+                    $definition->addTag('command_handler', ['handles' => $mappedCommand]);
                 }
             }
         }
@@ -268,31 +270,35 @@ final class ContainerHelper
 
     public static function configureEventMessages(ContainerBuilder $container, array $classMapping, array $events): void
     {
-        $configure = function (Definition $handler, string $tag, string $attrName) use ($classMapping, $events): void {
-            foreach ($events as $event) {
-                $handler->addTag($tag, [$attrName => $event, 'priority' => -100]);
-
-                if (isset($classMapping[$event])) {
-                    $handler->addTag($tag, [$attrName => $classMapping[$event], 'priority' => -100]);
-                }
-            }
-        };
-
+        $messengerHandler = $simpleBusHandler = null;
         if (interface_exists(MessageBusInterface::class)) {
-            $handler = self::registerAnonymous($container, EventMessageCommandHandler::class);
-
-            $configure($handler, 'messenger.message_handler', 'handles');
+            $messengerHandler = self::registerAnonymous($container, FallbackMessageHandler::class);
         }
-
         if (self::hasBundle($container, SimpleBusCommandBusBundle::class)) {
-            $handler = self::registerAnonymous($container, EventMessageCommandHandler::class);
-            $handler->setPublic(true);
+            $simpleBusHandler = self::registerAnonymous($container, FallbackMessageHandler::class);
+            $simpleBusHandler->setPublic(true);
             if (self::hasBundle($container, SimpleBusEventBusBundle::class)) {
-                $handler->setArgument('$eventBus', self::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class)
+                $simpleBusHandler->setArgument('$bus', self::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class)
                     ->setArgument('$bus', new Reference('simple_bus.event_bus')));
             }
+        }
 
-            $configure($handler, 'command_handler', 'handles');
+        foreach ($events as $event) {
+            $mappedEvent = $classMapping[$event] ?? null;
+
+            if (null !== $messengerHandler) {
+                $messengerHandler->addTag('messenger.message_handler', ['handles' => $event]);
+                if (null !== $mappedEvent) {
+                    $messengerHandler->addTag('messenger.message_handler', ['handles' => $mappedEvent]);
+                }
+            }
+
+            if (null !== $simpleBusHandler) {
+                $simpleBusHandler->addTag('command_handler', ['handles' => $event]);
+                if (null !== $mappedEvent) {
+                    $messengerHandler->addTag('command_handler', ['handles' => $mappedEvent]);
+                }
+            }
         }
     }
 

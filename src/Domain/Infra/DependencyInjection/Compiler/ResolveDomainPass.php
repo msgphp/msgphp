@@ -162,7 +162,7 @@ final class ResolveDomainPass implements CompilerPassInterface
 
             if (class_exists(ConsoleEvents::class)) {
                 self::register($container, ConsoleInfra\DomainMessageBus::class)
-                    ->setArgument('$bus', new Reference(ConsoleInfra\DomainMessageBus::class.'.inner'))
+                    ->setArgument('$bus', new Reference(Message\DomainMessageBusInterface::class))
                     ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
                     ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
             }
