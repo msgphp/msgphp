@@ -239,7 +239,7 @@ final class ContainerHelper
 
         foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
-            $command = self::getClassReflection($container, $definition->getClass())->getMethod('__invoke')->getParameters()[0]->getClass()->getName();
+            $command = self::getClassReflection($container, $definition->getClass() ?? $id)->getMethod('__invoke')->getParameters()[0]->getClass()->getName();
 
             if (empty($commands[$command])) {
                 $container->removeDefinition($id);
@@ -296,7 +296,7 @@ final class ContainerHelper
             if (null !== $simpleBusHandler) {
                 $simpleBusHandler->addTag('command_handler', ['handles' => $event]);
                 if (null !== $mappedEvent) {
-                    $messengerHandler->addTag('command_handler', ['handles' => $mappedEvent]);
+                    $simpleBusHandler->addTag('command_handler', ['handles' => $mappedEvent]);
                 }
             }
         }
