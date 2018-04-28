@@ -17,7 +17,7 @@ final class MsgPhpEavBundle extends Bundle
 {
     public function boot(): void
     {
-        BundleHelper::initDoctrineTypes($this->container);
+        BundleHelper::boot($this->container);
     }
 
     public function build(ContainerBuilder $container): void

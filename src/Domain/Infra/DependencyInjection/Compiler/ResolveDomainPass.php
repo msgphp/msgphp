@@ -34,11 +34,9 @@ final class ResolveDomainPass implements CompilerPassInterface
         $this->registerMessageBus($container);
 
         if (interface_exists(CacheWarmerInterface::class) && $container->hasParameter('msgphp.doctrine.mapping_files')) {
-            $mappingFiles = array_merge(...$container->getParameter('msgphp.doctrine.mapping_files'));
-
             self::register($container, DoctrineInfra\MappingCacheWarmer::class)
                 ->setArgument('$dirName', 'msgphp/doctrine-mapping')
-                ->setArgument('$mappingFiles', $mappingFiles)
+                ->setArgument('$mappingFiles', array_merge(...$container->getParameter('msgphp.doctrine.mapping_files')))
                 ->addTag('kernel.cache_warmer', ['priority' => 100]);
         }
 
@@ -79,23 +77,22 @@ final class ResolveDomainPass implements CompilerPassInterface
             return $classMapping[$value];
         }
 
-        if (is_array($value)) {
-            foreach ($value as $k => &$v) {
-                $v = self::processClassMapping($v, $classMapping, $arrayKeys);
-
-                if ($arrayKeys && $k !== $newKey = self::processClassMapping($k, $classMapping)) {
-                    if (!isset($value[$newKey])) {
-                        $value[$newKey] = $v;
-                    } else {
-                        $value[$newKey] = array_merge(is_array($v) ? $v : [$v], is_array($value[$newKey]) ? $value[$newKey] : [$value[$newKey]]);
-                    }
-                    unset($value[$k]);
-                }
-            }
-            unset($v);
+        if (!is_array($value)) {
+            return $value;
         }
 
-        return $value;
+        $result = [];
+
+        foreach ($value as $k => $v) {
+            $v = self::processClassMapping($v, $classMapping, $arrayKeys);
+            if ($arrayKeys) {
+                $k = self::processClassMapping($k, $classMapping);
+            }
+
+            $result[$k] = $v;
+        }
+
+        return $result;
     }
 
     private function registerIdentityMapping(ContainerBuilder $container, array $identityMapping): void

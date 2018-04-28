@@ -12,6 +12,7 @@ use MsgPhp\Domain\Message\FallbackMessageHandler;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,9 +56,10 @@ final class ContainerHelper
         return $reflection;
     }
 
-    public static function removeDefinitionWithAliases(ContainerBuilder $container, string $id): void
+    public static function removeId(ContainerBuilder $container, string $id): void
     {
         $container->removeDefinition($id);
+        $container->removeAlias($id);
 
         foreach ($container->getAliases() as $aliasId => $alias) {
             if ($id === (string) $alias) {
@@ -73,8 +75,7 @@ final class ContainerHelper
         }
 
         foreach ($ids as $id) {
-            self::removeDefinitionWithAliases($container, $id);
-            $container->removeAlias($id);
+            self::removeId($container, $id);
         }
     }
 
@@ -135,7 +136,7 @@ final class ContainerHelper
         $container->setParameter($param, $values);
     }
 
-    public static function configureDoctrineTypes(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping): void
+    public static function configureDoctrineDbalTypes(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping): void
     {
         if (!class_exists(DoctrineType::class)) {
             return;
@@ -179,7 +180,10 @@ final class ContainerHelper
             $container->setParameter($param, $typeConfig);
 
             if (self::hasBundle($container, DoctrineBundle::class)) {
-                $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => $dbalTypes, 'mapping_types' => $mappingTypes]]);
+                $container->prependExtensionConfig('doctrine', ['dbal' => [
+                    'types' => $dbalTypes,
+                    'mapping_types' => $mappingTypes,
+                ]]);
             }
         }
     }
@@ -217,18 +221,20 @@ final class ContainerHelper
 
     public static function configureDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryMapping): void
     {
-        if (!class_exists(DoctrineOrmVersion::class)) {
-            return;
-        }
-
         foreach ($repositoryMapping as $repository => $class) {
             if (!isset($classMapping[$class])) {
-                self::removeDefinitionWithAliases($container, $repository);
+                $container->removeDefinition($repository);
                 continue;
             }
 
-            $container->getDefinition($repository)
+            ($definition = $container->getDefinition($repository))
                 ->setArgument('$class', $classMapping[$class]);
+
+            foreach (self::getClassReflection($container, $definition->getClass() ?? $repository)->getInterfaceNames() as $interface) {
+                if (!$container->has($interface)) {
+                    $container->setAlias($interface, new Alias($repository, false));
+                }
+            }
         }
     }
 

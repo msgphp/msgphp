@@ -12,8 +12,8 @@ use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -38,7 +38,7 @@ final class BundleHelper
         $initialized = true;
     }
 
-    public static function initDoctrineTypes(Container $container): void
+    public static function boot(ContainerInterface $container): void
     {
         if ($initialized = &self::getInitialized($container, __FUNCTION__)) {
             return;
@@ -119,7 +119,7 @@ final class BundleHelper
         }
     }
 
-    private static function &getInitialized(Container $container, string $key)
+    private static function &getInitialized(ContainerInterface $container, string $key)
     {
         if (!isset(self::$initialized[$hash = spl_object_hash($container)."\0".$key])) {
             self::$initialized[$hash] = false;
