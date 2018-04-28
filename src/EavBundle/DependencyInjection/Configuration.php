@@ -36,6 +36,17 @@ final class Configuration implements ConfigurationInterface
     ];
     private const COMMAND_MAPPING = [];
 
+    public static function getPackageDir(): string
+    {
+        static $path;
+
+        if (null === $path) {
+            $path = dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName());
+        }
+
+        return $path;
+    }
+
     public function getConfigTreeBuilder(): TreeBuilder
     {
         /** @var NodeBuilder $children */

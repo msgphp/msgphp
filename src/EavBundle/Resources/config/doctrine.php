@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
-use MsgPhp\Eav\AttributeIdInterface;
+use MsgPhp\EavBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -12,13 +12,12 @@ $container = $container ?? (function (): ContainerBuilder { throw new \LogicExce
 $reflector = ContainerHelper::getClassReflector($container);
 
 return function (ContainerConfigurator $container) use ($reflector): void {
-    $baseDir = dirname($reflector(AttributeIdInterface::class)->getFileName());
     $services = $container->services()
         ->defaults()
             ->autowire()
             ->private()
 
-        ->load($ns = 'MsgPhp\\Eav\\Infra\\Doctrine\\Repository\\', $repositories = $baseDir.'/Infra/Doctrine/Repository/*Repository.php')
+        ->load($ns = 'MsgPhp\\Eav\\Infra\\Doctrine\\Repository\\', $repositories = Configuration::getPackageDir().'/Infra/Doctrine/Repository/*Repository.php')
     ;
 
     foreach (glob($repositories) as $file) {
