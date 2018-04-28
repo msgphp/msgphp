@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManager;
+use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -30,7 +33,8 @@ final class ResolveDomainPass implements CompilerPassInterface
         $identityMapping = array_merge(...$container->getParameter('msgphp.domain.identity_mapping'));
 
         $this->registerIdentityMapping($container, $identityMapping);
-        $this->registerEntityFactory($container, $idClassMapping);
+        $this->registerObjectFactory($container);
+        $this->registerEntityAwareFactory($container, $idClassMapping);
         $this->registerMessageBus($container);
 
         if (interface_exists(CacheWarmerInterface::class) && $container->hasParameter('msgphp.doctrine.mapping_files')) {
@@ -97,7 +101,7 @@ final class ResolveDomainPass implements CompilerPassInterface
 
     private function registerIdentityMapping(ContainerBuilder $container, array $identityMapping): void
     {
-        if ($container->has(DoctrineEntityManager::class)) {
+        if (ContainerHelper::hasBundle($container, DoctrineBundle::class) && $container->has(DoctrineEntityManager::class)) {
             self::register($container, $aliasId = DoctrineInfra\DomainIdentityMapping::class)
                 ->setAutowired(true)
                 ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
@@ -114,8 +118,12 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setAutowired(true);
     }
 
-    private function registerEntityFactory(ContainerBuilder $container, array $idClassMapping): void
+    private function registerObjectFactory(ContainerBuilder $container): void
     {
+        if ($container->has($id = Factory\DomainObjectFactoryInterface::class)) {
+            return;
+        }
+
         self::register($container, $aliasId = Factory\DomainObjectFactory::class)
             ->addMethodCall('setNestedFactory', [new Reference(Factory\DomainObjectFactoryInterface::class)]);
 
@@ -124,27 +132,39 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setArgument('$factory', new Reference(Factory\ClassMappingObjectFactory::class.'.inner'))
             ->setArgument('$mapping', '%msgphp.domain.class_mapping%');
 
-        self::register($container, $entityAliasId = Factory\EntityAwareFactory::class)
+        self::alias($container, $id, $aliasId);
+    }
+
+    private function registerEntityAwareFactory(ContainerBuilder $container, array $idClassMapping): void
+    {
+        if ($container->has($id = Factory\EntityAwareFactoryInterface::class)) {
+            return;
+        }
+
+        self::register($container, $aliasId = Factory\EntityAwareFactory::class)
             ->setAutowired(true)
             ->setArgument('$identifierMapping', $idClassMapping);
 
-        if ($container->has(DoctrineEntityManager::class)) {
+        if (ContainerHelper::hasBundle($container, DoctrineBundle::class) && $container->has(DoctrineEntityManager::class)) {
             self::register($container, DoctrineInfra\EntityAwareFactory::class)
                 ->setAutowired(true)
-                ->setDecoratedService($entityAliasId)
+                ->setDecoratedService($aliasId)
                 ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
                 ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
         }
 
-        self::alias($container, Factory\DomainObjectFactoryInterface::class, $aliasId);
-        self::alias($container, Factory\EntityAwareFactoryInterface::class, $entityAliasId);
+        self::alias($container, $id, $aliasId);
     }
 
     private function registerMessageBus(ContainerBuilder $container): void
     {
+        if ($container->has($id = Message\DomainMessageBusInterface::class)) {
+            return;
+        }
+
         $aliasId = null;
 
-        if ($container->has('simple_bus.command_bus')) {
+        if (ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class)) {
             self::register($container, $aliasId = SimpleBusInfra\DomainMessageBus::class)
                 ->setArgument('$bus', new Reference('simple_bus.command_bus'));
         }
@@ -162,8 +182,14 @@ final class ResolveDomainPass implements CompilerPassInterface
             }
         }
 
-        if (null !== $aliasId) {
-            self::alias($container, Message\DomainMessageBusInterface::class, $aliasId);
+        if (null === $aliasId) {
+            foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
+                $container->removeDefinition($id);
+            }
+
+            return;
         }
+
+        self::alias($container, $id, $aliasId);
     }
 }

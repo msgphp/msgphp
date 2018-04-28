@@ -190,10 +190,6 @@ final class ContainerHelper
 
     public static function configureDoctrineOrmMapping(ContainerBuilder $container, array $mappingFiles, array $objectFieldMappings = []): void
     {
-        if (!class_exists(DoctrineOrmVersion::class)) {
-            return;
-        }
-
         $values = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
         $values[] = $mappingFiles;
 
@@ -219,16 +215,16 @@ final class ContainerHelper
         ]);
     }
 
-    public static function configureDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryMapping): void
+    public static function configureDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
     {
-        foreach ($repositoryMapping as $repository => $class) {
-            if (!isset($classMapping[$class])) {
+        foreach ($repositoryEntityMapping as $repository => $entity) {
+            if (!isset($classMapping[$entity])) {
                 $container->removeDefinition($repository);
                 continue;
             }
 
             ($definition = $container->getDefinition($repository))
-                ->setArgument('$class', $classMapping[$class]);
+                ->setArgument('$class', $classMapping[$entity]);
 
             foreach (self::getClassReflection($container, $definition->getClass() ?? $repository)->getInterfaceNames() as $interface) {
                 if (!$container->has($interface)) {
@@ -243,7 +239,7 @@ final class ContainerHelper
         $messengerEnabled = interface_exists(MessageBusInterface::class);
         $simpleBusEnabled = self::hasBundle($container, SimpleBusCommandBusBundle::class);
 
-        foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
+        foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
             $command = self::getClassReflection($container, $definition->getClass() ?? $id)->getMethod('__invoke')->getParameters()[0]->getClass()->getName();
 
@@ -253,8 +249,6 @@ final class ContainerHelper
             }
 
             $mappedCommand = $classMapping[$command] ?? null;
-
-            $definition->clearTag($tag);
 
             if ($messengerEnabled) {
                 $definition->addTag('messenger.message_handler', ['handles' => $command]);
