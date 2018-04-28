@@ -11,5 +11,14 @@ Dispatches the given message object. The bus can return a value coming from hand
 
 ## Implementations
 
-- `MsgPhp\Domain\Infra\SimpleBus\DomainMessageBus`
-    - Requires [`simple-bus/message-bus`](https://packagist.org/packages/simple-bus/message-bus)
+### `MsgPhp\Domain\Infra\Messenger\DomainMessageBus`
+
+A Symfony Messenger tailored domain message bus.
+
+- [Read more](../infrastructure/symfony-messenger.md#domain-message-bus)
+
+### `MsgPhp\Domain\Infra\SimpleBus\DomainMessageBus`
+
+A SimpleBus tailored domain message bus.
+
+- [Read more](../infrastructure/simple-bus.md#domain-message-bus)

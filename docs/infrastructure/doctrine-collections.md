@@ -7,10 +7,10 @@ An overview of available infrastructural code when using Doctrine's [Collections
 ## Domain Collection
 
 A Doctrine tailored [domain collection](../ddd/collections.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainCollection`.
-It leverages type `Doctrine\Common\Collections\Collection` as underlying data type.
+It decorates any `Doctrine\Common\Collections\Collection` type.
 
 - `__construct(Collection $collection)`
-    - `$collection`: The underlying collection
+    - `$collection`: The decorated collection
 
 ### Basic example
 
