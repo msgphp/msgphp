@@ -18,12 +18,12 @@ trait EntityAttributeValueRepositoryTrait
 
     private function addAttributeCriteria(QueryBuilder $qb, AttributeIdInterface $attributeId, $value = null, string $alias = null): void
     {
-        $alias = $this->alias ?? $alias;
+        $field = ($this->alias ?? $alias).'.'.$this->attributeValueField;
 
         if (3 === func_num_args()) {
-            $qb->join($alias.'.attributeValue', 'attribute_value', Join::WITH, 'attribute_value.checksum = '.$this->addFieldParameter($qb, 'attributeValue', md5(serialize($value))));
+            $qb->join($field, 'attribute_value', Join::WITH, 'attribute_value.checksum = '.$this->addFieldParameter($qb, $this->attributeValueField, md5(serialize($value))));
         } else {
-            $qb->join($alias.'.attributeValue', 'attribute_value');
+            $qb->join($field, 'attribute_value');
         }
 
         $qb->join('attribute_value.attribute', 'attribute', Join::WITH, 'attribute.id = '.$this->addFieldParameter($qb, 'attribute', $attributeId));
