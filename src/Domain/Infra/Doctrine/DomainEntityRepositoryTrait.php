@@ -168,7 +168,7 @@ trait DomainEntityRepositoryTrait
 
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
-        $alias = $alias ?? $qb->getAllAliases()[0] ?? $this->alias;
+        $alias = $alias ?? $this->alias;
         $idFields = array_flip($this->identityHelper->getIdentifierFieldNames($this->class));
         $associations = $this->em->getClassMetadata($this->class)->getAssociationMappings();
 

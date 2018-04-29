@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface};
+use MsgPhp\Eav\Infra\Doctrine\Repository\EntityAttributeValueRepositoryTrait;
 use MsgPhp\User\Entity\UserAttributeValue;
 use MsgPhp\User\Repository\UserAttributeValueRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 final class UserAttributeValueRepository implements UserAttributeValueRepositoryInterface
 {
-    use DomainEntityRepositoryTrait;
+    use EntityAttributeValueRepositoryTrait;
 
     private $alias = 'user_attribute_value';
 
@@ -82,20 +80,5 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
     public function delete(UserAttributeValue $userAttributeValue): void
     {
         $this->doDelete($userAttributeValue);
-    }
-
-    private function addAttributeCriteria(QueryBuilder $qb, AttributeIdInterface $attributeId, $value = null): void
-    {
-        if (3 === func_num_args()) {
-            $param = $this->addFieldParameter($qb, 'attributeValue', md5(serialize($value)));
-
-            $qb->join($this->alias.'.attributeValue', 'attribute_value', Join::WITH, 'attribute_value.checksum = '.$param);
-        } else {
-            $qb->join($this->alias.'.attributeValue', 'attribute_value');
-        }
-
-        $param = $this->addFieldParameter($qb, 'attribute', $attributeId);
-
-        $qb->join('attribute_value.attribute', 'attribute', Join::WITH, 'attribute.id = '.$param);
     }
 }
