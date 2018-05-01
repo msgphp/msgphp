@@ -29,11 +29,7 @@ final class CreateUserHandler
 
     public function __invoke(CreateUserCommand $command): void
     {
-        $context = $command->context;
-        if (!isset($context['id'])) {
-            $context['id'] = $this->factory->nextIdentifier(User::class);
-        }
-        $user = $this->factory->create(User::class, $context);
+        $user = $this->factory->create(User::class, $command->context + ['id' => $this->factory->nextIdentifier(User::class)]);
 
         $this->repository->save($user);
         $this->dispatch(UserCreatedEvent::class, [$user]);

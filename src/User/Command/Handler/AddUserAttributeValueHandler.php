@@ -31,10 +31,7 @@ final class AddUserAttributeValueHandler
     public function __invoke(AddUserAttributeValueCommand $command): void
     {
         $attributeValueContext = $command->context['attributeValue'] ?? $command->context['attribute_value'] ?? [];
-        if (!isset($attributeValueContext['id'])) {
-            $attributeValueContext['id'] = $this->factory->nextIdentifier(AttributeValue::class);
-        }
-
+        $attributeValueContext += ['id' => $this->factory->nextIdentifier(AttributeValue::class)];
         $userAttributeValue = $this->factory->create(UserAttributeValue::class, [
             'user' => $this->factory->reference(User::class, $this->factory->identify(User::class, $command->userId)),
             'attributeValue' => [
