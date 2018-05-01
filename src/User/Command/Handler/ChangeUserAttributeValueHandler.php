@@ -29,13 +29,14 @@ final class ChangeUserAttributeValueHandler
 
     public function __invoke(ChangeUserAttributeValueCommand $command): void
     {
-        $userAttributeValue = $this->repository->find($this->factory->identify(AttributeValue::class, $command->attributeValueId));
+        // @fixme configure factory to handle `UserAttributeValue::class` as well
+        $userAttributeValue = $this->repository->find($this->factory->identify(AttributeValue::class, $command->id));
 
         if ($command->value === $oldValue = $userAttributeValue->getValue()) {
             return;
         }
 
-        $userAttributeValue->getAttributeValue()->changeValue($command->value);
+        $userAttributeValue->changeValue($command->value);
 
         $this->repository->save($userAttributeValue);
         $this->dispatch(UserAttributeValueChangedEvent::class, [$userAttributeValue, $oldValue, $command->value]);

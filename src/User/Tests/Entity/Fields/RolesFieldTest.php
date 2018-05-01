@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RolesFieldTest extends TestCase
 {
-    public function testGetRoles(): void
+    public function testField(): void
     {
         $object = $this->getObject($roles = [$this->createMock(UserRole::class)]);
 

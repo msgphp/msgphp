@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Entity;
 
 use MsgPhp\Eav\Entity\AttributeValue;
-use MsgPhp\Eav\Entity\Fields\AttributeValueField;
+use MsgPhp\Eav\Entity\Features\EntityAttributeValue;
 use MsgPhp\User\Entity\Fields\UserField;
 
 /**
@@ -14,7 +14,7 @@ use MsgPhp\User\Entity\Fields\UserField;
 abstract class UserAttributeValue
 {
     use UserField;
-    use AttributeValueField;
+    use EntityAttributeValue;
 
     public function __construct(User $user, AttributeValue $attributeValue)
     {

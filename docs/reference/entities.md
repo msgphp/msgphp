@@ -27,12 +27,11 @@ Class | Abstract
 
 ### Entity Fields
 
-- `MsgPhp\Eav\Entity\Fields\AttributeValueField`
 - `MsgPhp\Eav\Entity\Fields\AttributesField`
 
 ### Entity Features
 
-- No features available
+- `MsgPhp\Eav\Entity\Features\EntityAttributeValue`
 
 ## `msgphp/user`
 

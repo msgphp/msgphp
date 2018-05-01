@@ -9,12 +9,12 @@ namespace MsgPhp\User\Command;
  */
 class ChangeUserAttributeValueCommand
 {
-    public $attributeValueId;
+    public $id;
     public $value;
 
-    final public function __construct($attributeValueId, $value)
+    final public function __construct($id, $value)
     {
-        $this->attributeValueId = $attributeValueId;
+        $this->id = $id;
         $this->value = $value;
     }
 }

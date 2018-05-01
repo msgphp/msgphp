@@ -9,10 +9,10 @@ namespace MsgPhp\User\Command;
  */
 class DeleteUserAttributeValueCommand
 {
-    public $attributeValueId;
+    public $id;
 
-    final public function __construct($attributeValueId)
+    final public function __construct($id)
     {
-        $this->attributeValueId = $attributeValueId;
+        $this->id = $id;
     }
 }

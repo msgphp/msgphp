@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RoleFieldTest extends TestCase
 {
-    public function testGetRole(): void
+    public function testField(): void
     {
         $value = $this->createMock(Role::class);
         $value->expects($this->any())

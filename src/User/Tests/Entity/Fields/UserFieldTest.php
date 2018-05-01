@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class UserFieldTest extends TestCase
 {
-    public function testGetUser(): void
+    public function testField(): void
     {
         $value = $this->createMock(User::class);
         $value->expects($this->any())

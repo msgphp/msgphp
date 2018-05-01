@@ -31,7 +31,7 @@ final class DeleteUserAttributeValueHandler
     public function __invoke(DeleteUserAttributeValueCommand $command): void
     {
         try {
-            $userAttributeValue = $this->repository->find($this->factory->identify(AttributeValue::class, $command->attributeValueId));
+            $userAttributeValue = $this->repository->find($this->factory->identify(AttributeValue::class, $command->id));
         } catch (EntityNotFoundException $e) {
             return;
         }

@@ -1,5 +1,18 @@
 # UPGRADE FROM 0.3 to 0.4
 
+## Eav
+
+- Refactored `Entity\Fields\AttributeValueField` into `Entity\Features\EntityAttributeValue`
+- Added `Infra\Doctrine\Repository\EntityAttributeValueRepositoryTrait`
+
+## User
+
+- Renamed `UserAttributeValue::getAttributeValueId()` to `getId()`
+- Added `UserAttributeValue::changeValue()`
+- Deleted `UserAttributeValue::getAttributeValue()`
+- Renamed `ChangeUserAttributeValueCommand::$attributeValueId` to `$id`
+- Renamed `DeleteUserAttributeValueCommand::$attributeValueId` to `$id`
+
 ## UserBundle
 
 - Added support for Symfony Messenger and is favored over SimpleBus by default
