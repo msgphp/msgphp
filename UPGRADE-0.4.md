@@ -4,6 +4,7 @@
 
 - Refactored `Entity\Fields\AttributeValueField` into `Entity\Features\EntityAttributeValue`
 - Added `Infra\Doctrine\Repository\EntityAttributeValueRepositoryTrait`
+- Added default domain messages (`Command\` and `Event\`)
 
 ## User
 

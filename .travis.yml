@@ -56,6 +56,9 @@ cache:
     - $HOME/.composer/cache/files/
     - var/cache/
 
+before_cache:
+  - rm -rf $HOME/.composer/cache/files/msgphp
+
 branches:
   only:
     - master
