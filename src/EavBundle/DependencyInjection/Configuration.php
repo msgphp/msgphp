@@ -7,7 +7,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilder};
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
-use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Entity};
+use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Command, Entity};
 use MsgPhp\Eav\Infra\Uuid as UuidInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -34,7 +34,12 @@ final class Configuration implements ConfigurationInterface
         AttributeIdInterface::class => UuidInfra\AttributeId::class,
         AttributeValueIdInterface::class => UuidInfra\AttributeValueId::class,
     ];
-    private const COMMAND_MAPPING = [];
+    private const COMMAND_MAPPING = [
+        Entity\Attribute::class => [
+            Command\CreateAttributeCommand::class => true,
+            Command\DeleteAttributeCommand::class => true,
+        ],
+    ];
 
     public static function getPackageDir(): string
     {

@@ -45,6 +45,14 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ContainerHelper::configureIdentityMapping($container, $config['class_mapping'], Configuration::IDENTITY_MAPPING);
         ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
 
+        // message infra
+        $loader->load('message.php');
+
+        ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
+        ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
+            return 'MsgPhp\\Eav\\Event\\'.basename($file, '.php');
+        }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
+
         // persistence infra
         if (class_exists(DoctrineOrmVersion::class)) {
             $this->loadDoctrineOrm($config, $loader, $container);
