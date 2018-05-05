@@ -46,7 +46,6 @@ pages:
     - Doctrine DBAL: infrastructure/doctrine-dbal.md
     - Doctrine ORM: infrastructure/doctrine-orm.md
     - Elasticsearch: infrastructure/elasticsearch.md
-    - PSR Container: infrastructure/psr-container.md
     - SimpleBus: infrastructure/simple-bus.md
     - Symfony Console: infrastructure/symfony-console.md
     - Symfony Messenger: infrastructure/symfony-messenger.md
