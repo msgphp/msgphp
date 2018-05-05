@@ -10,7 +10,7 @@ namespace MsgPhp\Domain\Projection;
 final class DomainProjectionDocument
 {
     public const STATUS_UNKNOWN = 1;
-    public const STATUS_VALID = 2;
+    public const STATUS_SYNCHRONIZED = 2;
     public const STATUS_FAILED_TRANSFORMATION = 3;
     public const STATUS_FAILED_SAVING = 4;
 
