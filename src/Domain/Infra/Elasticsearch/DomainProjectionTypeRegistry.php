@@ -21,12 +21,13 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
     private $settings;
     private $logger;
     private $types;
+    private $indexParams;
 
     public function __construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)
     {
         $this->client = $client;
         $this->index = $index;
-        $this->mappings = [];
+        $this->mappings = $mappings;
         $this->settings = $settings;
         $this->logger = $logger;
     }
@@ -36,7 +37,7 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
      */
     public function all(): array
     {
-        return $this->types ?? ($this->types = array_keys($this->mappings));
+        return $this->types ?? ($this->types = array_keys($this->getIndexParams()['body']['mappings'] ?? []));
     }
 
     public function initialize(): void
@@ -71,6 +72,10 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
 
     private function getIndexParams(): array
     {
+        if (null !== $this->indexParams) {
+            return $this->indexParams;
+        }
+
         $params = [];
 
         if ($this->settings) {
@@ -89,7 +94,7 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
             }
         }
 
-        return $params;
+        return $this->indexParams = $params;
     }
 
     private function provideMappings(): iterable
@@ -101,13 +106,9 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
                 }
 
                 yield from $mapping::provideDocumentMappings();
+            } else {
+                yield $type => $mapping;
             }
-
-            if (!is_array($mapping)) {
-                throw new \LogicException(sprintf('Property mapping for type "%s" must be an array or string, got "%s".', $type, gettype($mapping)));
-            }
-
-            yield $type => $mapping;
         }
     }
 }

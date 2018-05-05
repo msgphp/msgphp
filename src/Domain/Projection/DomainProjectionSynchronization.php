@@ -14,7 +14,7 @@ final class DomainProjectionSynchronization
     private $documentProvider;
 
     /**
-     * @param DomainProjectionDocument[] $provider
+     * @param DomainProjectionDocument[] $documentProvider
      */
     public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository, iterable $documentProvider)
     {

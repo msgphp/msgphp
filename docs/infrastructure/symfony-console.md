@@ -14,7 +14,7 @@ Various standard [console commands] are provided depending on used domain infras
 Initializes a [projection type registry](../projection/type-registry.md).
 
 ```bash
-bin/console domain:projection:initialize-types [--force]
+bin/console projection:initialize-types [--force]
 ```
 
 ### `SynchronizeDomainProjectionsCommand`
@@ -23,7 +23,7 @@ Synchronizes domain objects and their [projections](../projection/models.md) usi
 utility service.
 
 ```bash
-bin/console domain:projection:synchronize
+bin/console projection:synchronize
 ```
 
 ## Context Factory

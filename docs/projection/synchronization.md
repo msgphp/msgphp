@@ -54,7 +54,7 @@ $synchronization = new DomainProjectionSynchronization($typeRegistry, $repositor
 // --- USAGE ---
 
 foreach ($synchronization->synchronize() as $document) {
-    if (DomainProjectionDocument::STATUS_VALID === $document->status) {
+    if (DomainProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
         echo 'Synchronized projection for '.get_class($document->source).' with ID '.$document->source->id.PHP_EOL;
         continue;
     }

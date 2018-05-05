@@ -33,7 +33,7 @@ class MyProjection implements DomainProjectionInterface
 
     public static function fromDocument(array $document): DomainProjectionInterface
     {
-        $projection = new self();
+        $projection = new static();
         $projection->someField = $document['some_field'] ?? null;
 
         return $projection;

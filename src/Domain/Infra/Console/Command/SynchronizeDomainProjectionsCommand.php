@@ -41,7 +41,7 @@ final class SynchronizeDomainProjectionsCommand extends Command
         $succeed = $failed = 0;
 
         foreach ($this->synchronization->synchronize() as $document) {
-            if (DomainProjectionDocument::STATUS_VALID === $document->status) {
+            if (DomainProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
                 ++$succeed;
             } else {
                 ++$failed;

@@ -28,6 +28,9 @@ use MsgPhp\Domain\Projection\DomainProjectionInterface;
 
 class MyProjection implements DomainProjectionInterface
 {
+    public $someField;
+    public $otherField;
+
     public static function fromDocument(array $document): DomainProjectionInterface
     {
         // ...
@@ -38,12 +41,50 @@ class MyProjection implements DomainProjectionInterface
 $client = ...;
 $typeRegistry = new DomainProjectionTypeRegistry($client, 'some_index', [
     MyProjection::class => [
-        'some_field' => null, // defaults to ['type' => 'text']
-        'other_field' => 'some', // defaults to ['type' => 'some']
-        'other_field2' => [
+        'some_field' => 'some_type', // defaults to ['type' => 'some_type']
+        'other_field' => [ // defaults to ['type' => 'text', ...]
             // ...
         ],
     ],
+]);
+```
+
+### Advanced mapping example
+
+```php
+<?php
+
+use Elasticsearch\Client;
+use MsgPhp\Domain\Infra\Elasticsearch\DocumentMappingProviderInterface;
+use MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionTypeRegistry;
+use MsgPhp\Domain\Projection\DomainProjectionInterface;
+
+// --- SETUP ---
+
+class MyProjection implements DomainProjectionInterface, DocumentMappingProviderInterface
+{
+    // ...
+
+    public static function fromDocument(array $document): DomainProjectionInterface
+    {
+        // ...
+    }
+
+    public static function provideDocumentMappings(): iterable
+    {
+        yield static::class => [
+            'some_field' => 'some_type',
+            'other_field' => [
+                // ...
+            ],
+        ];
+    }
+}
+
+/** @var Client $client */
+$client = ...;
+$typeRegistry = new DomainProjectionTypeRegistry($client, 'some_index', [
+    MyProjection::class,
 ]);
 ```
 

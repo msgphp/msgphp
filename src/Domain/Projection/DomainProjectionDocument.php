@@ -20,7 +20,7 @@ final class DomainProjectionDocument
     /** @var object|null */
     public $source;
 
-    /** @var \Exception|null $error */
+    /** @var \Throwable|null $error */
     public $error;
 
     private $type;
