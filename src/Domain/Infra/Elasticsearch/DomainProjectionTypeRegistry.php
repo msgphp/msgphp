@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Projection\{DomainProjectionInterface, DomainProjectionTypeRegistryInterface};
+use MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -29,22 +29,6 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
         $this->mappings = [];
         $this->settings = $settings;
         $this->logger = $logger;
-
-        foreach ($mappings as $type => $propertyMapping) {
-            if (!is_array($propertyMapping)) {
-                throw new \LogicException(sprintf('Property mapping for type "%s" must be an array, got "%s".', $type, gettype($propertyMapping)));
-            }
-
-            foreach ($propertyMapping as $property => $mapping) {
-                if (!is_array($mapping)) {
-                    $mapping = ['type' => $mapping ?? self::DEFAULT_PROPERTY_TYPE];
-                } elseif (!isset($info['type'])) {
-                    $mapping['type'] = self::DEFAULT_PROPERTY_TYPE;
-                }
-
-                $this->mappings[$type]['properties'][$property] = $mapping;
-            }
-        }
     }
 
     /**
@@ -63,14 +47,7 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
             return;
         }
 
-        if ($this->settings) {
-            $params['body']['settings'] = $this->settings;
-        }
-        if ($this->mappings) {
-            $params['body']['mappings'] = $this->mappings;
-        }
-
-        $indices->create($params);
+        $indices->create($params + $this->getIndexParams());
 
         if (null !== $this->logger) {
             $this->logger->info('Initialized Elasticsearch index "{index}".', ['index' => $this->index]);
@@ -89,6 +66,48 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
 
         if (null !== $this->logger) {
             $this->logger->info('Destroyed Elasticsearch index "{index}".', ['index' => $this->index]);
+        }
+    }
+
+    private function getIndexParams(): array
+    {
+        $params = [];
+
+        if ($this->settings) {
+            $params['body']['settings'] = $this->settings;
+        }
+
+        foreach ($this->provideMappings() as $type => $mapping) {
+            foreach ($mapping as $property => $propertyMapping) {
+                if (!is_array($propertyMapping)) {
+                    $propertyMapping = ['type' => $propertyMapping];
+                } elseif (!isset($propertyMapping['type'])) {
+                    $propertyMapping['type'] = self::DEFAULT_PROPERTY_TYPE;
+                }
+
+                $params['body']['mappings'][$type]['properties'][$property] = $propertyMapping;
+            }
+        }
+
+        return $params;
+    }
+
+    private function provideMappings(): iterable
+    {
+        foreach ($this->mappings as $type => $mapping) {
+            if (is_string($mapping)) {
+                if (!class_exists($mapping) || !is_subclass_of($mapping, DocumentMappingProviderInterface::class)) {
+                    throw new \LogicException(sprintf('The class "%s" does not exists or is not a sub class of "%s".', $mapping, DocumentMappingProviderInterface::class));
+                }
+
+                yield from $mapping::provideDocumentMappings();
+            }
+
+            if (!is_array($mapping)) {
+                throw new \LogicException(sprintf('Property mapping for type "%s" must be an array or string, got "%s".', $type, gettype($mapping)));
+            }
+
+            yield $type => $mapping;
         }
     }
 }
