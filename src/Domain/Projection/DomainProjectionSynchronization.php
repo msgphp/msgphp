@@ -11,16 +11,16 @@ final class DomainProjectionSynchronization
 {
     private $typeRegistry;
     private $repository;
-    private $provider;
+    private $documentProvider;
 
     /**
      * @param DomainProjectionDocument[] $provider
      */
-    public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository, iterable $provider)
+    public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository, iterable $documentProvider)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;
-        $this->provider = $provider;
+        $this->documentProvider = $documentProvider;
     }
 
     /**
@@ -32,7 +32,7 @@ final class DomainProjectionSynchronization
             $this->repository->clear($type);
         }
 
-        foreach ($this->provider as $document) {
+        foreach ($this->documentProvider as $document) {
             if (DomainProjectionDocument::STATUS_UNKNOWN !== $document->status) {
                 continue;
             }

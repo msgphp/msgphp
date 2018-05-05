@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class InitializeDomainProjectionTypesCommand extends Command
 {
-    protected static $defaultName = 'domain:projection:initialize-types';
+    protected static $defaultName = 'projection:initialize-types';
 
     private $typeRegistry;
 
