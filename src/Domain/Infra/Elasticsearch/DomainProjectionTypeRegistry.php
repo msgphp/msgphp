@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
  */
 final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistryInterface
 {
+    private const DEFAULT_PROPERTY_TYPE = 'text';
+
     private $client;
     private $index;
     private $mappings;
@@ -22,25 +24,27 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
 
     public function __construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)
     {
-        foreach ($mappings as $type => $mapping) {
-            if (!isset($mapping['properties']) || !is_array($mapping['properties'])) {
-                continue;
-            }
-
-            foreach ($mapping['properties'] as $property => $info) {
-                if (!is_array($info)) {
-                    $info = ['type' => $info ?? 'text'];
-                }
-
-                $mappings[$type]['properties'][$property] = $info + ['type' => 'text'];
-            }
-        }
-
         $this->client = $client;
         $this->index = $index;
-        $this->mappings = $mappings;
+        $this->mappings = [];
         $this->settings = $settings;
         $this->logger = $logger;
+
+        foreach ($mappings as $type => $propertyMapping) {
+            if (!is_array($propertyMapping)) {
+                throw new \LogicException(sprintf('Property mapping for type "%s" must be an array, got "%s".', $type, gettype($propertyMapping)));
+            }
+
+            foreach ($propertyMapping as $property => $mapping) {
+                if (!is_array($mapping)) {
+                    $mapping = ['type' => $mapping ?? self::DEFAULT_PROPERTY_TYPE];
+                } elseif (!isset($info['type'])) {
+                    $mapping['type'] = self::DEFAULT_PROPERTY_TYPE;
+                }
+
+                $this->mappings[$type]['properties'][$property] = $mapping;
+            }
+        }
     }
 
     /**
@@ -48,16 +52,7 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
      */
     public function all(): array
     {
-        if (null === $this->types) {
-            $this->types = [];
-            foreach (array_keys($this->mappings) as $type) {
-                if (is_subclass_of($type, DomainProjectionInterface::class)) {
-                    $this->types[] = $type;
-                }
-            }
-        }
-
-        return $this->types;
+        return $this->types ?? ($this->types = array_keys($this->mappings));
     }
 
     public function initialize(): void
@@ -71,7 +66,6 @@ final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistry
         if ($this->settings) {
             $params['body']['settings'] = $this->settings;
         }
-
         if ($this->mappings) {
             $params['body']['mappings'] = $this->mappings;
         }

@@ -5,7 +5,7 @@ Its purpose is to manage all available [projection](models.md) type information.
 
 ## API
 
-### `all(): array`
+### `all(): string[]`
 
 Returns all available projection types for this registry.
 
