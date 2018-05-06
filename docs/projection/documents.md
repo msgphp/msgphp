@@ -40,8 +40,8 @@ Transforms the document into its projection model.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
 use MsgPhp\Domain\Projection\DomainProjectionDocument;
+use MsgPhp\Domain\Projection\DomainProjectionInterface;
 
 // --- SETUP ---
 
