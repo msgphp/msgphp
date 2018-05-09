@@ -6,12 +6,14 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\DomainIdentityHelper;
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Message\{DomainMessageBus, DomainMessageBusInterface};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -33,6 +35,8 @@ final class BundleHelper
         $container->register(DomainIdentityHelper::class)
             ->setPublic(false)
             ->setAutowired(true);
+
+        self::initMessageBus($container);
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             self::initDoctrineOrm($container);
@@ -58,6 +62,42 @@ final class BundleHelper
         }
 
         $initialized = true;
+    }
+
+    private static function initMessageBus(ContainerBuilder $container): void
+    {
+        if (FeatureDetection::isMessengerAvailable($container)) {
+            $container->setAlias('msgphp.messenger.bus', new Alias('message_bus', false));
+            $container->setAlias('msgphp.messenger.event_bus', new Alias('msgphp.messenger.bus', false));
+
+            $defaultBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class);
+            $defaultBus->setArgument('$bus', new Reference('msgphp.messenger.bus'));
+            $eventBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class);
+            $eventBus->setArgument('$bus', new Reference('msgphp.messenger.event_bus'));
+        } elseif (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
+            $container->setAlias('msgphp.simple_bus.bus', new Alias('simple_bus.command_bus', false));
+            $container->setAlias('msgphp.simple_bus.event_bus', new Alias(FeatureDetection::hasSimpleBusEventBusBundle($container) ? 'simple_bus.event_bus' : 'msgphp.simple_bus.bus', false));
+
+            $defaultBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
+            $defaultBus->setArgument('$bus', new Reference('msgphp.simple_bus.bus'));
+            $eventBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
+            $eventBus->setArgument('$bus', new Reference('msgphp.simple_bus.event_bus'));
+
+            if (FeatureDetection::isConsoleAvailable($container)) {
+                $container->register(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
+                    ->setPublic(false)
+                    ->setAutowired(true)
+                    ->addTag('command_bus_middleware');
+            }
+        } else {
+            return;
+        }
+
+        $container->register(DomainMessageBus::class)
+            ->setPublic(false)
+            ->setArgument('$bus', $defaultBus)
+            ->setArgument('$eventBus', $eventBus);
+        $container->setAlias(DomainMessageBusInterface::class, new Alias(DomainMessageBus::class, false));
     }
 
     private static function initDoctrineOrm(ContainerBuilder $container): void
@@ -110,13 +150,6 @@ final class BundleHelper
             ->setPublic(false)
             ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
             ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate']);
-
-        if (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
-            $container->register(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
-                ->setPublic(false)
-                ->setAutowired(true)
-                ->addTag('command_bus_middleware');
-        }
     }
 
     private static function &getInitialized(ContainerInterface $container, string $key)

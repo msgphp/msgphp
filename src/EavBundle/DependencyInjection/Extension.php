@@ -75,6 +75,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
     }
 
+    private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
+    {
+        $baseDir = Configuration::getPackageDir().'/Infra/Doctrine/Resources/dist-mapping';
+
+        return glob($baseDir.'/*.orm.xml');
+    }
+
     private function loadDoctrineOrm(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
         $loader->load('doctrine.php');
@@ -82,12 +89,5 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         ExtensionHelper::prepareDoctrineOrmRepositories($container, $config['class_mapping'], [
             DoctrineInfra\Repository\AttributeRepository::class => Entity\Attribute::class,
         ]);
-    }
-
-    private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
-    {
-        $baseDir = Configuration::getPackageDir().'/Infra/Doctrine/Resources/dist-mapping';
-
-        return glob($baseDir.'/*.orm.xml');
     }
 }

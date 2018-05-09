@@ -69,6 +69,23 @@ final class ContainerHelper
         return $container->setDefinition($class.'.'.ContainerBuilder::hash(__METHOD__.++self::$counter), $definition);
     }
 
+    public static function tagMessageHandler(ContainerBuilder $container, Definition $handler, array $handles): void
+    {
+        $messengerEnabled = FeatureDetection::isMessengerAvailable($container);
+        $simpleBusEnabled = FeatureDetection::hasSimpleBusCommandBusBundle($container);
+
+        foreach ($handles as $class) {
+            if ($messengerEnabled) {
+                $handler->addTag('messenger.message_handler', ['handles' => $class]);
+            }
+            if ($simpleBusEnabled) {
+                $handler
+                    ->setPublic(true)
+                    ->addTag('command_handler', ['handles' => $class]);
+            }
+        }
+    }
+
     private function __construct()
     {
     }

@@ -99,9 +99,6 @@ final class ExtensionHelper
 
     public static function prepareCommandHandlers(ContainerBuilder $container, array $classMapping, array $commands): void
     {
-        $messengerEnabled = FeatureDetection::isMessengerAvailable($container);
-        $simpleBusEnabled = FeatureDetection::hasSimpleBusCommandBusBundle($container);
-
         foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
             $command = (new \ReflectionMethod($definition->getClass() ?? $id, '__invoke'))->getParameters()[0]->getClass()->getName();
@@ -111,23 +108,12 @@ final class ExtensionHelper
                 continue;
             }
 
-            $mappedCommand = $classMapping[$command] ?? null;
-
-            if ($messengerEnabled) {
-                $definition->addTag('messenger.message_handler', ['handles' => $command]);
-                if (null !== $mappedCommand) {
-                    $definition->addTag('messenger.message_handler', ['handles' => $mappedCommand]);
-                }
+            $handles = [$command];
+            if (isset($classMapping[$command])) {
+                $handles[] = $classMapping[$command];
             }
 
-            if ($simpleBusEnabled) {
-                $definition
-                    ->setPublic(true)
-                    ->addTag('command_handler', ['handles' => $command]);
-                if (null !== $mappedCommand) {
-                    $definition->addTag('command_handler', ['handles' => $mappedCommand]);
-                }
-            }
+            ContainerHelper::tagMessageHandler($container, $definition, $handles);
 
             $definition->addTag('msgphp.domain.message_aware');
         }
