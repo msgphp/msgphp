@@ -19,11 +19,11 @@ final class NicknameSaltedPassword implements CredentialInterface, PasswordProte
     use NicknameAsUsername;
     use PasswordWithSaltProtected;
 
-    public function __construct(string $nickname, string $password, string $passwordSalt)
+    public function __construct(string $nickname, string $password, string $passwordSalt = null)
     {
         $this->nickname = $nickname;
         $this->password = $password;
-        $this->passwordSalt = $passwordSalt;
+        $this->passwordSalt = $passwordSalt ?? bin2hex(random_bytes(32));
     }
 
     public function withNickname(string $nickname): self
