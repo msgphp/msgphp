@@ -41,15 +41,11 @@ final class Configuration implements ConfigurationInterface
         ],
     ];
 
+    private static $packageDir;
+
     public static function getPackageDir(): string
     {
-        static $path;
-
-        if (null === $path) {
-            $path = dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName());
-        }
-
-        return $path;
+        return self::$packageDir ?? (self::$packageDir = dirname((new \ReflectionClass(AttributeIdInterface::class))->getFileName()));
     }
 
     public function getConfigTreeBuilder(): TreeBuilder

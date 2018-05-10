@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\UserBundle\DependencyInjection;
 
-use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console as BaseConsoleInfra;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Domain\Message\MessageReceivingInterface;
 use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\{CredentialInterface, Entity, Repository, UserIdInterface};
@@ -68,7 +68,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
 
         // persistence infra
-        if (class_exists(DoctrineOrmVersion::class)) {
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $this->loadDoctrineOrm($config, $loader, $container);
         }
 

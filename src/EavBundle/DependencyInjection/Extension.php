@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -54,7 +54,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
 
         // persistence infra
-        if (class_exists(DoctrineOrmVersion::class)) {
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $this->loadDoctrineOrm($config, $loader, $container);
         }
     }
