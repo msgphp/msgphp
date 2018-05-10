@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra};
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use MsgPhp\Domain\Message\{FallbackMessageHandler, MessageReceivingInterface};
+use MsgPhp\Domain\Message\{MessageReceivingInterface, NoopMessageHandler};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -119,38 +119,15 @@ final class ExtensionHelper
         }
     }
 
-    public static function prepareEventHandler(ContainerBuilder $container, array $classMapping, array $events): void
+    public static function prepareEventHandler(ContainerBuilder $container, array $classMapping, array $handles): void
     {
-        $messengerHandler = $simpleBusHandler = null;
-        if (FeatureDetection::isMessengerAvailable($container)) {
-            $messengerHandler = ContainerHelper::registerAnonymous($container, FallbackMessageHandler::class);
-        }
-        if (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
-            $simpleBusHandler = ContainerHelper::registerAnonymous($container, FallbackMessageHandler::class);
-            $simpleBusHandler->setPublic(true);
-            if (FeatureDetection::hasSimpleBusEventBusBundle($container)) {
-                $simpleBusHandler->setArgument('$bus', ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class)
-                    ->setArgument('$bus', new Reference('simple_bus.event_bus')));
+        foreach ($handles as $class) {
+            if (isset($classMapping[$class])) {
+                $handles[] = $classMapping[$class];
             }
         }
 
-        foreach ($events as $event) {
-            $mappedEvent = $classMapping[$event] ?? null;
-
-            if (null !== $messengerHandler) {
-                $messengerHandler->addTag('messenger.message_handler', ['handles' => $event]);
-                if (null !== $mappedEvent) {
-                    $messengerHandler->addTag('messenger.message_handler', ['handles' => $mappedEvent]);
-                }
-            }
-
-            if (null !== $simpleBusHandler) {
-                $simpleBusHandler->addTag('command_handler', ['handles' => $event]);
-                if (null !== $mappedEvent) {
-                    $simpleBusHandler->addTag('command_handler', ['handles' => $mappedEvent]);
-                }
-            }
-        }
+        ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $handles);
     }
 
     public static function prepareConsoleCommands(ContainerBuilder $container): void
