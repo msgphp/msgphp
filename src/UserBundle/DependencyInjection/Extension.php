@@ -172,7 +172,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         } else {
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
-
     }
 
     private function loadConsole(array $config, LoaderInterface $loader, ContainerBuilder $container): void

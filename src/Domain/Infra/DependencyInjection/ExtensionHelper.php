@@ -10,6 +10,7 @@ use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -126,8 +127,8 @@ final class ExtensionHelper
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $definition = ContainerHelper::registerAnonymous($container, ConsoleInfra\Context\DoctrineEntityContextFactory::class)
-                ->setAutowired(true)
                 ->setArgument('$factory', $definition)
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
                 ->setArgument('$class', $class);
         }
 

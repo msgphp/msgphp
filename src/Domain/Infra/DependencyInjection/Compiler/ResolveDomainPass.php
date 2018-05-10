@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
-use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface, Factory, Message};
+use MsgPhp\Domain\{DomainIdentityMappingInterface, Factory, Message};
+use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Domain\Infra\{Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use Symfony\Component\Console\ConsoleEvents;
@@ -100,9 +100,13 @@ final class ResolveDomainPass implements CompilerPassInterface
 
     private function registerIdentityMapping(ContainerBuilder $container, array $identityMapping): void
     {
-        if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
+        if ($container->has($id = DomainIdentityMappingInterface::class)) {
+            return;
+        }
+
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             self::register($container, $aliasId = DoctrineInfra\DomainIdentityMapping::class)
-                ->setAutowired(true)
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
                 ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
         } else {
             self::register($container, $aliasId = InMemoryInfra\DomainIdentityMapping::class)
@@ -111,10 +115,7 @@ final class ResolveDomainPass implements CompilerPassInterface
                     ->setAutowired(true));
         }
 
-        self::alias($container, DomainIdentityMappingInterface::class, $aliasId);
-
-        self::register($container, DomainIdentityHelper::class)
-            ->setAutowired(true);
+        self::alias($container, $id, $aliasId);
     }
 
     private function registerObjectFactory(ContainerBuilder $container): void
@@ -144,11 +145,11 @@ final class ResolveDomainPass implements CompilerPassInterface
             ->setAutowired(true)
             ->setArgument('$identifierMapping', $idClassMapping);
 
-        if (ContainerHelper::hasBundle($container, DoctrineBundle::class)) {
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             self::register($container, DoctrineInfra\EntityAwareFactory::class)
-                ->setAutowired(true)
                 ->setDecoratedService($aliasId)
                 ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
                 ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
         }
 

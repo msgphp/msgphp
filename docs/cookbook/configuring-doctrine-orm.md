@@ -212,6 +212,19 @@ bin/console doctrine:database:create
 bin/console doctrine:schema:update --force
 ```
 
+## Changing The Entity Manager
+
+To change the default entity manager used by MsgPHP, override its alias service:
+
+```yaml
+# config/services.yaml
+
+services:
+    # ...
+
+    msgphp.doctrine.entity_manager: '@doctrine.orm.some_entity_manager'
+```
+
 [recipe configuration]: https://github.com/symfony/recipes/blob/master/doctrine/doctrine-bundle/1.6/config/packages/doctrine.yaml
 [doctrine-bundle-mapping-config]: https://symfony.com/doc/master/bundles/DoctrineBundle/configuration.html#mapping-configuration
 [mapped superclasses]: https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html#mapped-superclasses

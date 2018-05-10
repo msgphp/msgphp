@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
+use MsgPhp\Domain\DomainIdentityHelper;
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, SimpleBus as SimpleBusInfra};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
@@ -28,6 +29,10 @@ final class BundleHelper
         }
 
         $container->addCompilerPass(new Compiler\ResolveDomainPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
+
+        $container->register(DomainIdentityHelper::class)
+            ->setPublic(false)
+            ->setAutowired(true);
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             self::initDoctrineOrm($container);
@@ -75,6 +80,8 @@ final class BundleHelper
         ]]);
 
         $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
+
+        $container->setAlias('msgphp.doctrine.entity_manager', new Alias('doctrine.orm.entity_manager', false));
 
         $container->register(DoctrineInfra\ObjectFieldMappings::class)
             ->setPublic(false)
