@@ -14,7 +14,6 @@ use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\{CredentialInterface, Entity, Repository, UserIdInterface};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra};
 use MsgPhp\UserBundle\Twig;
-use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -182,7 +181,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
 
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\EntityFieldsMapping::class]);
+        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\ObjectFieldMappings::class]);
         ContainerHelper::configureDoctrineOrmRepositories($container, $config['class_mapping'], [
             DoctrineInfra\Repository\RoleRepository::class => Entity\Role::class,
             DoctrineInfra\Repository\UserRepository::class => Entity\User::class,

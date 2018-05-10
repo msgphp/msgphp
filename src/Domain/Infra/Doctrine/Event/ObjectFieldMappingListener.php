@@ -13,19 +13,19 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 final class ObjectFieldMappingListener
 {
-    private $mapping;
+    private $mappings;
 
     /** @var ClassMetadataFactory|null */
     private $metadataFactory;
 
-    public function __construct(array $mapping)
+    public function __construct(array $mappings)
     {
-        $this->mapping = $mapping;
+        $this->mappings = $mappings;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        if (!$this->mapping) {
+        if (!$this->mappings) {
             return;
         }
 
@@ -40,8 +40,8 @@ final class ObjectFieldMappingListener
     {
         $class = $class ?? $metadata->getReflectionClass();
 
-        if (isset($this->mapping[$name = $class->getName()])) {
-            $this->processFieldMapping($metadata, $this->mapping[$name]);
+        if (isset($this->mappings[$name = $class->getName()])) {
+            $this->processFieldMapping($metadata, $this->mappings[$name]);
         }
 
         foreach ($class->getTraits() as $trait) {
@@ -49,21 +49,21 @@ final class ObjectFieldMappingListener
         }
     }
 
-    private function processFieldMapping(ClassMetadataInfo $metadata, array $fields): void
+    private function processFieldMapping(ClassMetadataInfo $metadata, array $mapping): void
     {
-        foreach ($fields as $field => $mapping) {
+        foreach ($mapping as $field => $info) {
             if ($metadata->hasField($field) || $metadata->hasAssociation($field)) {
                 continue;
             }
 
-            $mapping = ['fieldName' => $field] + $mapping;
+            $info = ['fieldName' => $field] + $info;
 
-            if (isset($mapping['type']) && method_exists($metadata, $method = 'map'.ucfirst($mapping['type']))) {
-                unset($mapping['type']);
-                $metadata->$method($mapping);
+            if (isset($info['type']) && method_exists($metadata, $method = 'map'.ucfirst($info['type']))) {
+                unset($info['type']);
+                $metadata->$method($info);
 
                 if ('mapEmbedded' === $method) {
-                    $embeddableMetadata = $this->getMetadata($mapping['class']);
+                    $embeddableMetadata = $this->getMetadata($info['class']);
 
                     if ($embeddableMetadata->isEmbeddedClass) {
                         $this->addNestedEmbeddedClasses($embeddableMetadata, $metadata, $field);
@@ -78,7 +78,7 @@ final class ObjectFieldMappingListener
                     $metadata->inlineEmbeddable($field, $embeddableMetadata);
                 }
             } else {
-                $metadata->mapField($mapping);
+                $metadata->mapField($info);
             }
         }
     }

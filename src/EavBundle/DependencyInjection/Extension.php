@@ -78,7 +78,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader->load('doctrine.php');
 
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\EntityFieldsMapping::class]);
+        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\ObjectFieldMappings::class]);
         ContainerHelper::configureDoctrineOrmRepositories($container, $config['class_mapping'], [
             DoctrineInfra\Repository\AttributeRepository::class => Entity\Attribute::class,
         ]);

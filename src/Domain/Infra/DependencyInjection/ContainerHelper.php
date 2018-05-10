@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\DBAL\Types\Type as DoctrineType;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
 use MsgPhp\Domain\Message\FallbackMessageHandler;
-use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Component\DependencyInjection\Alias;

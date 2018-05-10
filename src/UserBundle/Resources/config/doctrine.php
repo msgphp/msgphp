@@ -15,6 +15,9 @@ return function (ContainerConfigurator $container): void {
 
         ->load('MsgPhp\\User\\Infra\\Doctrine\\Repository\\', Configuration::getPackageDir().'/Infra/Doctrine/Repository/*Repository.php')
 
+        ->set(Doctrine\ObjectFieldMappings::class)
+            ->tag('msgphp.doctrine.object_field_mappings', ['priority' => -100])
+
         ->set(Doctrine\Event\UsernameListener::class)
             ->tag('doctrine.orm.entity_listener')
             ->tag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])

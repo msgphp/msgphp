@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Doctrine;
 
 use MsgPhp\User\Entity\Features;
-use MsgPhp\User\Infra\Doctrine\EntityFieldsMapping;
+use MsgPhp\User\Infra\Doctrine\ObjectFieldMappings;
 use PHPUnit\Framework\TestCase;
 
-final class EntityFieldsMappingTest extends TestCase
+final class ObjectFieldMappingsTest extends TestCase
 {
     public function testMapping(): void
     {
@@ -21,9 +21,10 @@ final class EntityFieldsMappingTest extends TestCase
             $available[Features\AbstractSaltedPasswordCredential::class]
         );
 
-        $mapping = array_keys(EntityFieldsMapping::getObjectFieldMapping());
-        sort($mapping);
+        $mappings = ObjectFieldMappings::provideObjectFieldMappings();
+        $mappings = array_keys($mappings instanceof \Traversable ? iterator_to_array($mappings) : $mappings);
+        sort($mappings);
 
-        $this->assertSame(array_keys($available), $mapping);
+        $this->assertSame(array_keys($available), $mappings);
     }
 }

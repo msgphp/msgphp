@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use MsgPhp\Domain\Entity\Features;
-use MsgPhp\Domain\Infra\Doctrine\EntityFieldsMapping;
+use MsgPhp\Domain\Infra\Doctrine\ObjectFieldMappings;
 use PHPUnit\Framework\TestCase;
 
-final class EntityFieldsMappingTest extends TestCase
+final class ObjectFieldMappingsTest extends TestCase
 {
     public function testMapping(): void
     {
@@ -17,9 +17,10 @@ final class EntityFieldsMappingTest extends TestCase
         }, glob(dirname(dirname(dirname(__DIR__))).'/Entity/{Features,Fields}/*.php', \GLOB_BRACE)));
         unset($available[Features\CanBeEnabled::class]);
 
-        $mapping = array_keys(EntityFieldsMapping::getObjectFieldMapping());
-        sort($mapping);
+        $mappings = ObjectFieldMappings::provideObjectFieldMappings();
+        $mappings = array_keys($mappings instanceof \Traversable ? iterator_to_array($mappings) : $mappings);
+        sort($mappings);
 
-        $this->assertSame(array_keys($available), $mapping);
+        $this->assertSame(array_keys($available), $mappings);
     }
 }
