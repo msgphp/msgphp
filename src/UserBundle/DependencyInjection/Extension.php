@@ -7,6 +7,7 @@ namespace MsgPhp\UserBundle\DependencyInjection;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console as BaseConsoleInfra;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Domain\Message\MessageReceivingInterface;
 use MsgPhp\EavBundle\MsgPhpEavBundle;
@@ -55,13 +56,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         // default infra
         $loader->load('services.php');
-
-        ContainerHelper::configureIdentityMapping($container, $config['class_mapping'], Configuration::IDENTITY_MAPPING);
-        ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
+        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
 
         // message infra
         $loader->load('message.php');
-
         ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
         ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
             return 'MsgPhp\\User\\Event\\'.basename($file, '.php');
@@ -138,12 +136,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
 
-        ContainerHelper::configureDoctrineDbalTypes($container, $config['class_mapping'], $config['id_type_mapping'], [
-            UserIdInterface::class => DoctrineInfra\Type\UserIdType::class,
-        ]);
-        ContainerHelper::configureDoctrineOrmTargetEntities($container, $config['class_mapping']);
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            ExtensionHelper::configureDoctrineOrm($container, $config['class_mapping'], $config['id_type_mapping'], [
+                UserIdInterface::class => DoctrineInfra\Type\UserIdType::class,
+            ]);
+        }
 
-        if (ContainerHelper::hasBundle($container, TwigBundle::class)) {
+        if (FeatureDetection::hasTwigBundle($container)) {
             $container->prependExtensionConfig('twig', [
                 'globals' => [
                     Twig\GlobalVariable::NAME => '@'.Twig\GlobalVariable::class,

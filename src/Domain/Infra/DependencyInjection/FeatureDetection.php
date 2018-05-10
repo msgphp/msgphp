@@ -23,39 +23,34 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 final class FeatureDetection
 {
-    public static function hasBundle(ContainerInterface $container, string $class): bool
-    {
-        return in_array($class, $container->getParameter('kernel.bundles'), true);
-    }
-
     public static function hasFrameworkBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, FrameworkBundle::class);
+        return ContainerHelper::hasBundle($container, FrameworkBundle::class);
     }
 
     public static function hasSecurityBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, SecurityBundle::class);
+        return ContainerHelper::hasBundle($container, SecurityBundle::class);
     }
 
     public static function hasTwigBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, TwigBundle::class);
+        return ContainerHelper::hasBundle($container, TwigBundle::class);
     }
 
     public static function hasDoctrineBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, DoctrineBundle::class);
+        return ContainerHelper::hasBundle($container, DoctrineBundle::class);
     }
 
     public static function hasSimpleBusCommandBusBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, SimpleBusCommandBusBundle::class);
+        return ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class);
     }
 
     public static function hasSimpleBusEventBusBundle(ContainerInterface $container): bool
     {
-        return self::hasBundle($container, SimpleBusEventBusBundle::class);
+        return ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class);
     }
 
     public static function isFormAvailable(ContainerInterface $container): bool

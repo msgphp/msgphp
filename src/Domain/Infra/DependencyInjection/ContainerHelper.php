@@ -14,8 +14,8 @@ use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -30,12 +30,12 @@ final class ContainerHelper
 {
     private static $counter = 0;
 
-    public static function hasBundle(Container $container, string $class): bool
+    public static function hasBundle(ContainerInterface $container, string $class): bool
     {
         return in_array($class, $container->getParameter('kernel.bundles'), true);
     }
 
-    public static function getBundles(Container $container): array
+    public static function getBundles(ContainerInterface $container): array
     {
         return array_flip($container->getParameter('kernel.bundles'));
     }
@@ -96,91 +96,6 @@ final class ContainerHelper
         return $definition;
     }
 
-    public static function configureIdentityMapping(ContainerBuilder $container, array $classMapping, array $identityMapping): void
-    {
-        foreach ($identityMapping as $class => $mapping) {
-            if (isset($classMapping[$class]) && !isset($identityMapping[$classMapping[$class]])) {
-                $identityMapping[$classMapping[$class]] = $mapping;
-            }
-        }
-
-        $values = $container->hasParameter($param = 'msgphp.domain.identity_mapping') ? $container->getParameter($param) : [];
-        $values[] = $identityMapping;
-
-        $container->setParameter($param, $values);
-    }
-
-    public static function configureEntityFactory(ContainerBuilder $container, array $classMapping, array $idClassMapping): void
-    {
-        foreach ($idClassMapping as $class => $idClass) {
-            if (isset($classMapping[$class]) && !isset($idClassMapping[$classMapping[$class]])) {
-                $idClassMapping[$classMapping[$class]] = $idClass;
-            }
-        }
-
-        $values = $container->hasParameter($param = 'msgphp.domain.class_mapping') ? $container->getParameter($param) : [];
-        $values[] = $classMapping;
-
-        $container->setParameter($param, $values);
-
-        $values = $container->hasParameter($param = 'msgphp.domain.id_class_mapping') ? $container->getParameter($param) : [];
-        $values[] = $idClassMapping;
-
-        $container->setParameter($param, $values);
-    }
-
-    public static function configureDoctrineDbalTypes(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping): void
-    {
-        if (!class_exists(DoctrineType::class)) {
-            return;
-        }
-
-        $dbalTypes = $mappingTypes = $typeConfig = [];
-        $uuidMapping = [
-            'uuid' => DoctrineUuid\UuidType::class,
-            'uuid_binary' => DoctrineUuid\UuidBinaryType::class,
-            'uuid_binary_ordered_time' => DoctrineUuid\UuidBinaryOrderedTimeType::class,
-        ];
-
-        foreach ($typeClassMapping as $idClass => $typeClass) {
-            $type = $idTypeMapping[$idClass] ?? DoctrineType::INTEGER;
-
-            if (isset($uuidMapping[$type])) {
-                if (!class_exists($uuidClass = $uuidMapping[$type])) {
-                    throw new \LogicException(sprintf('Type "%s" for identifier "%s" requires "ramsey/uuid-doctrine".', $type, $idClass));
-                }
-
-                $dbalTypes[$uuidClass::NAME] = $uuidClass;
-
-                if ('uuid_binary' === $type || 'uuid_binary_ordered_time' === $type) {
-                    $mappingTypes[$type] = 'binary';
-                }
-            }
-
-            if (!defined($typeClass.'::NAME')) {
-                throw new \LogicException(sprintf('Type class "%s" for identifier "%s" requires a "NAME" constant.', $typeClass, $idClass));
-            }
-
-            $dbalTypes[$typeClass::NAME] = $typeClass;
-            $typeConfig[$typeClass::NAME] = ['class' => $classMapping[$idClass] ?? $idClass, 'type' => $type, 'type_class' => $typeClass];
-        }
-
-        if ($dbalTypes || $mappingTypes) {
-            if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
-                $typeConfig += $container->getParameter($param);
-            }
-
-            $container->setParameter($param, $typeConfig);
-
-            if (self::hasBundle($container, DoctrineBundle::class)) {
-                $container->prependExtensionConfig('doctrine', ['dbal' => [
-                    'types' => $dbalTypes,
-                    'mapping_types' => $mappingTypes,
-                ]]);
-            }
-        }
-    }
-
     public static function configureDoctrineOrmMapping(ContainerBuilder $container, array $mappingFiles, array $objectFieldMappings = []): void
     {
         $values = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
@@ -193,19 +108,6 @@ final class ContainerHelper
                 ->setPublic(false)
                 ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
         }
-    }
-
-    public static function configureDoctrineOrmTargetEntities(ContainerBuilder $container, array $classMapping): void
-    {
-        if (!class_exists(DoctrineOrmVersion::class) || !self::hasBundle($container, DoctrineBundle::class)) {
-            return;
-        }
-
-        $container->prependExtensionConfig('doctrine', [
-            'orm' => [
-                'resolve_target_entities' => $classMapping,
-            ],
-        ]);
     }
 
     public static function configureDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void

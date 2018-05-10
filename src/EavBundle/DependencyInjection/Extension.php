@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
@@ -42,12 +43,10 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         // default infra
-        ContainerHelper::configureIdentityMapping($container, $config['class_mapping'], Configuration::IDENTITY_MAPPING);
-        ContainerHelper::configureEntityFactory($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS);
+        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
 
         // message infra
         $loader->load('message.php');
-
         ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
         ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
             return 'MsgPhp\\Eav\\Event\\'.basename($file, '.php');
@@ -63,11 +62,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
 
-        ContainerHelper::configureDoctrineDbalTypes($container, $config['class_mapping'], $config['id_type_mapping'], [
-            AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
-            AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
-        ]);
-        ContainerHelper::configureDoctrineOrmTargetEntities($container, $config['class_mapping']);
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            ExtensionHelper::configureDoctrineOrm($container, $config['class_mapping'], $config['id_type_mapping'], [
+                AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
+                AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
+            ]);
+        }
     }
 
     public function process(ContainerBuilder $container): void
