@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
+use MsgPhp\EavBundle\MsgPhpEavBundle;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -52,6 +53,11 @@ final class FeatureDetection
     public static function hasSimpleBusEventBusBundle(ContainerInterface $container): bool
     {
         return ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class);
+    }
+
+    public static function hasMsgPhpEavBundle(ContainerInterface $container): bool
+    {
+        return ContainerHelper::hasBundle($container, MsgPhpEavBundle::class);
     }
 
     public static function isFormAvailable(ContainerInterface $container): bool

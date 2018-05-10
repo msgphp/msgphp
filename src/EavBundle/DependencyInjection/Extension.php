@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Eav\Entity;
@@ -42,13 +41,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        // default infra
         ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
 
         // message infra
         $loader->load('message.php');
-        ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
-        ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
+        ExtensionHelper::prepareCommandHandlers($container, $config['class_mapping'], $config['commands']);
+        ExtensionHelper::prepareEventHandler($container, $config['class_mapping'], array_map(function (string $file): string {
             return 'MsgPhp\\Eav\\Event\\'.basename($file, '.php');
         }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
 

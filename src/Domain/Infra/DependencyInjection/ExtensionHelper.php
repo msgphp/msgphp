@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
-use MsgPhp\Domain\Infra\Console as ConsoleInfra;
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
 use Doctrine\DBAL\Types\Type as DoctrineType;
+use MsgPhp\Domain\Message\{FallbackMessageHandler, MessageReceivingInterface};
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -96,15 +97,92 @@ final class ExtensionHelper
         ]);
     }
 
+    public static function prepareCommandHandlers(ContainerBuilder $container, array $classMapping, array $commands): void
+    {
+        $messengerEnabled = FeatureDetection::isMessengerAvailable($container);
+        $simpleBusEnabled = FeatureDetection::hasSimpleBusCommandBusBundle($container);
+
+        foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
+            $definition = $container->getDefinition($id);
+            $command = (new \ReflectionMethod($definition->getClass() ?? $id, '__invoke'))->getParameters()[0]->getClass()->getName();
+
+            if (empty($commands[$command])) {
+                $container->removeDefinition($id);
+                continue;
+            }
+
+            $mappedCommand = $classMapping[$command] ?? null;
+
+            if ($messengerEnabled) {
+                $definition->addTag('messenger.message_handler', ['handles' => $command]);
+                if (null !== $mappedCommand) {
+                    $definition->addTag('messenger.message_handler', ['handles' => $mappedCommand]);
+                }
+            }
+
+            if ($simpleBusEnabled) {
+                $definition
+                    ->setPublic(true)
+                    ->addTag('command_handler', ['handles' => $command]);
+                if (null !== $mappedCommand) {
+                    $definition->addTag('command_handler', ['handles' => $mappedCommand]);
+                }
+            }
+
+            $definition->addTag('msgphp.domain.message_aware');
+        }
+    }
+
+    public static function prepareEventHandler(ContainerBuilder $container, array $classMapping, array $events): void
+    {
+        $messengerHandler = $simpleBusHandler = null;
+        if (FeatureDetection::isMessengerAvailable($container)) {
+            $messengerHandler = ContainerHelper::registerAnonymous($container, FallbackMessageHandler::class);
+        }
+        if (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
+            $simpleBusHandler = ContainerHelper::registerAnonymous($container, FallbackMessageHandler::class);
+            $simpleBusHandler->setPublic(true);
+            if (FeatureDetection::hasSimpleBusEventBusBundle($container)) {
+                $simpleBusHandler->setArgument('$bus', ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class)
+                    ->setArgument('$bus', new Reference('simple_bus.event_bus')));
+            }
+        }
+
+        foreach ($events as $event) {
+            $mappedEvent = $classMapping[$event] ?? null;
+
+            if (null !== $messengerHandler) {
+                $messengerHandler->addTag('messenger.message_handler', ['handles' => $event]);
+                if (null !== $mappedEvent) {
+                    $messengerHandler->addTag('messenger.message_handler', ['handles' => $mappedEvent]);
+                }
+            }
+
+            if (null !== $simpleBusHandler) {
+                $simpleBusHandler->addTag('command_handler', ['handles' => $event]);
+                if (null !== $mappedEvent) {
+                    $simpleBusHandler->addTag('command_handler', ['handles' => $mappedEvent]);
+                }
+            }
+        }
+    }
+
+    public static function prepareConsoleCommands(ContainerBuilder $container): void
+    {
+        foreach ($container->findTaggedServiceIds('msgphp.domain.console_command') as $id => $attr) {
+            $definition = $container->getDefinition($id);
+
+            if (is_subclass_of($definition->getClass() ?? $id, MessageReceivingInterface::class)) {
+                $definition->addTag('msgphp.domain.message_aware');
+            }
+        }
+    }
+
     public static function prepareDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
     {
         foreach ($repositoryEntityMapping as $repository => $entity) {
             if (!isset($classMapping[$entity])) {
                 $container->removeDefinition($repository);
-                continue;
-            }
-
-            if (!$container->hasDefinition($repository)) {
                 continue;
             }
 

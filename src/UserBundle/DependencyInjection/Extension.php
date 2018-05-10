@@ -6,11 +6,8 @@ namespace MsgPhp\UserBundle\DependencyInjection;
 
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ClassContextFactory as ConsoleClassContextFactory;
-use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
-use MsgPhp\Domain\Message\MessageReceivingInterface;
-use MsgPhp\EavBundle\MsgPhpEavBundle;
 use MsgPhp\User\{CredentialInterface, Entity, Repository};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra};
 use MsgPhp\UserBundle\Twig;
@@ -48,14 +45,15 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
+        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
+
         // default infra
         $loader->load('services.php');
-        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
 
         // message infra
         $loader->load('message.php');
-        ContainerHelper::configureCommandMessages($container, $config['class_mapping'], $config['commands']);
-        ContainerHelper::configureEventMessages($container, $config['class_mapping'], array_map(function (string $file): string {
+        ExtensionHelper::prepareCommandHandlers($container, $config['class_mapping'], $config['commands']);
+        ExtensionHelper::prepareEventHandler($container, $config['class_mapping'], array_map(function (string $file): string {
             return 'MsgPhp\\User\\Event\\'.basename($file, '.php');
         }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
 
@@ -136,7 +134,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             unset($files[$baseDir.'/User.Entity.Username.orm.xml']);
         }
 
-        if (!ContainerHelper::hasBundle($container, MsgPhpEavBundle::class)) {
+        if (!FeatureDetection::hasMsgPhpEavBundle($container)) {
             unset($files[$baseDir.'/User.Entity.UserAttributeValue.orm.xml']);
         }
 
@@ -178,15 +176,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader->load('console.php');
 
-        foreach (glob(Configuration::getPackageDir().'/Infra/Console/Command/*Command.php') as $file) {
-            if (!$container->hasDefinition($id = 'MsgPhp\\User\\Infra\\Console\\Command\\'.basename($file, '.php'))) {
-                continue;
-            }
-            $definition = $container->getDefinition($id);
-            if (is_subclass_of($definition->getClass() ?? $id, MessageReceivingInterface::class)) {
-                $definition->addTag('msgphp.domain.message_aware');
-            }
-        }
+        ExtensionHelper::prepareConsoleCommands($container);
 
         $container->getDefinition(ConsoleInfra\Command\CreateUserCommand::class)
             ->setArgument('$contextFactory', ExtensionHelper::registerConsoleClassContextFactory(
