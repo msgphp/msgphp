@@ -21,7 +21,7 @@ final class BundleHelper
 {
     private static $initialized = [];
 
-    public static function initDomain(ContainerBuilder $container): void
+    public static function build(ContainerBuilder $container): void
     {
         if ($initialized = &self::getInitialized($container, __FUNCTION__)) {
             return;
@@ -97,7 +97,6 @@ final class BundleHelper
 
         $container->register(ConsoleInfra\Context\ClassContextElementFactory::class)
             ->setPublic(false);
-
         $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
 
         $container->register(ConsoleInfra\MessageReceiver::class)

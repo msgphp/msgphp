@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
+use MsgPhp\Domain\Infra\Console as ConsoleInfra;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -114,6 +116,22 @@ final class ExtensionHelper
                 }
             }
         }
+    }
+
+    public static function registerConsoleClassContextFactory(ContainerBuilder $container, string $class, int $flags = 0): Definition
+    {
+        $definition = ContainerHelper::registerAnonymous($container, ConsoleInfra\Context\ClassContextFactory::class, true)
+            ->setArgument('$class', $class)
+            ->setArgument('$flags', $flags);
+
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            $definition = ContainerHelper::registerAnonymous($container, ConsoleInfra\Context\DoctrineEntityContextFactory::class)
+                ->setAutowired(true)
+                ->setArgument('$factory', $definition)
+                ->setArgument('$class', $class);
+        }
+
+        return $definition;
     }
 
     private function __construct()

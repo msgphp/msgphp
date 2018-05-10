@@ -15,6 +15,7 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -56,6 +57,11 @@ final class FeatureDetection
     public static function isFormAvailable(ContainerInterface $container): bool
     {
         return self::hasFrameworkBundle($container) && interface_exists(FormInterface::class);
+    }
+
+    public static function isValidatorAvailable(ContainerInterface $container): bool
+    {
+        return self::hasFrameworkBundle($container) && interface_exists(ValidatorInterface::class);
     }
 
     public static function isConsoleAvailable(ContainerInterface $container): bool
