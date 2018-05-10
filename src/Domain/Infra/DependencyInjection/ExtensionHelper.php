@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -41,7 +42,7 @@ final class ExtensionHelper
         $container->setParameter($param, $values);
     }
 
-    public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping): void
+    public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping, array $mappingFiles): void
     {
         $dbalTypes = $dbalMappingTypes = $typeConfig = [];
         $uuidMapping = [
@@ -73,10 +74,13 @@ final class ExtensionHelper
             $typeConfig[$typeClass::NAME] = ['class' => $classMapping[$idClass] ?? $idClass, 'type' => $type, 'type_class' => $typeClass];
         }
 
-        if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
-            $typeConfig += $container->getParameter($param);
-        }
-        $container->setParameter($param, $typeConfig);
+        $typeConfigValues = $container->hasParameter($param = 'msgphp.doctrine.type_config') ? $container->getParameter($param) : [];
+        $typeConfigValues += $typeConfig;
+        $container->setParameter($param, $typeConfigValues);
+
+        $mappingFileValues = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
+        $mappingFileValues[] = $mappingFiles;
+        $container->setParameter($param, $mappingFileValues);
 
         $container->prependExtensionConfig('doctrine', [
             'dbal' => [
@@ -87,6 +91,29 @@ final class ExtensionHelper
                 'resolve_target_entities' => $classMapping,
             ],
         ]);
+    }
+
+    public static function prepareDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
+    {
+        foreach ($repositoryEntityMapping as $repository => $entity) {
+            if (!isset($classMapping[$entity])) {
+                $container->removeDefinition($repository);
+                continue;
+            }
+
+            if (!$container->hasDefinition($repository)) {
+                continue;
+            }
+
+            ($definition = $container->getDefinition($repository))
+                ->setArgument('$class', $classMapping[$entity]);
+
+            foreach (class_implements($definition->getClass() ?? $repository) as $interface) {
+                if (!$container->has($interface)) {
+                    $container->setAlias($interface, new Alias($repository, false));
+                }
+            }
+        }
     }
 
     private function __construct()

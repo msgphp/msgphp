@@ -11,7 +11,7 @@ use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Domain\Message\MessageReceivingInterface;
 use MsgPhp\EavBundle\MsgPhpEavBundle;
-use MsgPhp\User\{CredentialInterface, Entity, Repository, UserIdInterface};
+use MsgPhp\User\{CredentialInterface, Entity, Repository};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Security as SecurityInfra};
 use MsgPhp\UserBundle\Twig;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -136,9 +136,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
-            ExtensionHelper::configureDoctrineOrm($container, $config['class_mapping'], $config['id_type_mapping'], [
-                UserIdInterface::class => DoctrineInfra\Type\UserIdType::class,
-            ]);
+            ExtensionHelper::configureDoctrineOrm(
+                $container,
+                $config['class_mapping'],
+                $config['id_type_mapping'],
+                Configuration::DOCTRINE_TYPE_MAPPING,
+                self::getDoctrineMappingFiles($config, $container)
+            );
         }
 
         if (FeatureDetection::hasTwigBundle($container)) {
@@ -181,8 +185,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
 
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\ObjectFieldMappings::class]);
-        ContainerHelper::configureDoctrineOrmRepositories($container, $config['class_mapping'], [
+        ExtensionHelper::prepareDoctrineOrmRepositories($container, $config['class_mapping'], [
             DoctrineInfra\Repository\RoleRepository::class => Entity\Role::class,
             DoctrineInfra\Repository\UserRepository::class => Entity\User::class,
             DoctrineInfra\Repository\UsernameRepository::class => Entity\Username::class,

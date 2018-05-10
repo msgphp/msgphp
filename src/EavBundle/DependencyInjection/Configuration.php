@@ -8,7 +8,7 @@ use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilder};
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Command, Entity};
-use MsgPhp\Eav\Infra\Uuid as UuidInfra;
+use MsgPhp\Eav\Infra\{Doctrine as DoctrineInfra, Uuid as UuidInfra};
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
@@ -33,6 +33,10 @@ final class Configuration implements ConfigurationInterface
     public const UUID_CLASS_MAPPING = [
         AttributeIdInterface::class => UuidInfra\AttributeId::class,
         AttributeValueIdInterface::class => UuidInfra\AttributeValueId::class,
+    ];
+    public const DOCTRINE_TYPE_MAPPING = [
+        AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
+        AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
     ];
     private const COMMAND_MAPPING = [
         Entity\Attribute::class => [

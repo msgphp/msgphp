@@ -10,7 +10,6 @@ use MsgPhp\Domain\Infra\{Console as ConsoleInfra, SimpleBus as SimpleBusInfra};
 use MsgPhp\Domain\Message\FallbackMessageHandler;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -92,39 +91,6 @@ final class ContainerHelper
         }
 
         return $definition;
-    }
-
-    public static function configureDoctrineOrmMapping(ContainerBuilder $container, array $mappingFiles, array $objectFieldMappings = []): void
-    {
-        $values = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
-        $values[] = $mappingFiles;
-
-        $container->setParameter($param, $values);
-
-        foreach ($objectFieldMappings as $class) {
-            $container->register($class)
-                ->setPublic(false)
-                ->addTag('msgphp.doctrine.object_field_mapping', ['priority' => -100]);
-        }
-    }
-
-    public static function configureDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
-    {
-        foreach ($repositoryEntityMapping as $repository => $entity) {
-            if (!isset($classMapping[$entity])) {
-                $container->removeDefinition($repository);
-                continue;
-            }
-
-            ($definition = $container->getDefinition($repository))
-                ->setArgument('$class', $classMapping[$entity]);
-
-            foreach (self::getClassReflection($container, $definition->getClass() ?? $repository)->getInterfaceNames() as $interface) {
-                if (!$container->has($interface)) {
-                    $container->setAlias($interface, new Alias($repository, false));
-                }
-            }
-        }
     }
 
     public static function configureCommandMessages(ContainerBuilder $container, array $classMapping, array $commands): void

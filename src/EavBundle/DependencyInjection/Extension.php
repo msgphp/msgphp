@@ -7,7 +7,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
-use MsgPhp\Eav\{AttributeIdInterface, AttributeValueIdInterface, Entity};
+use MsgPhp\Eav\Entity;
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -63,10 +63,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $config = $this->processConfiguration($this->getConfiguration($configs = $container->getExtensionConfig($this->getAlias()), $container), $configs);
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
-            ExtensionHelper::configureDoctrineOrm($container, $config['class_mapping'], $config['id_type_mapping'], [
-                AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
-                AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
-            ]);
+            ExtensionHelper::configureDoctrineOrm(
+                $container,
+                $config['class_mapping'],
+                $config['id_type_mapping'],
+                Configuration::DOCTRINE_TYPE_MAPPING,
+                self::getDoctrineMappingFiles($config, $container)
+            );
         }
     }
 
@@ -78,8 +81,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader->load('doctrine.php');
 
-        ContainerHelper::configureDoctrineOrmMapping($container, self::getDoctrineMappingFiles($config, $container), [DoctrineInfra\ObjectFieldMappings::class]);
-        ContainerHelper::configureDoctrineOrmRepositories($container, $config['class_mapping'], [
+        ExtensionHelper::prepareDoctrineOrmRepositories($container, $config['class_mapping'], [
             DoctrineInfra\Repository\AttributeRepository::class => Entity\Attribute::class,
         ]);
     }
