@@ -18,7 +18,9 @@ final class ResolveDomainPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         if (!$container->has(DomainMessageBusInterface::class)) {
-            throw new \LogicException(sprintf('No message bus registered, the service "%s" must be registered / aliased manually.', DomainMessageBusInterface::class));
+            foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {
+                $container->removeDefinition($id);
+            }
         }
 
         $classMapping = $container->getParameter('msgphp.domain.class_mapping');

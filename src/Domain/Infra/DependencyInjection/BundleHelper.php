@@ -11,6 +11,7 @@ use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InM
 use MsgPhp\Domain\Message\{DomainMessageBus, DomainMessageBusInterface};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -41,7 +42,7 @@ final class BundleHelper
             self::initConsole($container);
         }
 
-        $container->addCompilerPass(new Compiler\ResolveDomainPass());
+        $container->addCompilerPass(new Compiler\ResolveDomainPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
 
         $initialized = true;
     }
@@ -71,7 +72,7 @@ final class BundleHelper
                 ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
             $container->setAlias(DomainIdentityMappingInterface::class, new Alias(DoctrineInfra\DomainIdentityMapping::class, false));
         } else {
-            $container->register($aliasId = InMemoryInfra\DomainIdentityMapping::class)
+            $container->register(InMemoryInfra\DomainIdentityMapping::class)
                 ->setPublic(false)
                 ->setArgument('$mapping', '%msgphp.domain.identity_mapping%')
                 ->setArgument('$accessor', $container->autowire(InMemoryInfra\ObjectFieldAccessor::class));
@@ -156,7 +157,7 @@ final class BundleHelper
     {
         @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/msgphp/doctrine-mapping'), 0777, true);
 
-        $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass());
+        $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
 
         $container->prependExtensionConfig('doctrine', ['orm' => [
             'hydrators' => [

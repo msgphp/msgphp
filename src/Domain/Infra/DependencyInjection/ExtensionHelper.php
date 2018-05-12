@@ -88,8 +88,9 @@ final class ExtensionHelper
     {
         foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
-            $command = (new \ReflectionMethod($definition->getClass() ?? $id, '__invoke'))->getParameters()[0]->getClass()->getName();
+            $definition->addTag('msgphp.domain.message_aware');
 
+            $command = (new \ReflectionMethod($definition->getClass() ?? $id, '__invoke'))->getParameters()[0]->getClass()->getName();
             if (empty($commands[$command])) {
                 $container->removeDefinition($id);
                 continue;
@@ -109,9 +110,11 @@ final class ExtensionHelper
             }
         }
 
-        ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $events);
-
         $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
+
+        $definition = ContainerHelper::registerAnonymous($container, NoopMessageHandler::class);
+        $definition->addTag('msgphp.domain.message_aware');
+        ContainerHelper::tagMessageHandler($container, $definition, $events);
     }
 
     public static function finalizeDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $entityRepositoryMapping): void
@@ -138,12 +141,18 @@ final class ExtensionHelper
     public static function finalizeConsoleCommands(ContainerBuilder $container, array $commands, array $consoleDomainCommandsMapping): void
     {
         foreach ($consoleDomainCommandsMapping as $domainCommand => $consoleCommands) {
-            if (!empty($commands[$domainCommand])) {
-                continue;
-            }
-
             foreach ($consoleCommands as $consoleCommand) {
-                $container->removeDefinition($consoleCommand);
+                if (!$container->hasDefinition($consoleCommand)) {
+                    continue;
+                }
+
+                if (empty($commands[$domainCommand])) {
+                    $container->removeDefinition($consoleCommand);
+                    continue;
+                }
+
+                $container->getDefinition($consoleCommand)
+                    ->addTag('msgphp.domain.message_aware');
             }
         }
     }

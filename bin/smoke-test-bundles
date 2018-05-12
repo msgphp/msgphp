@@ -13,12 +13,12 @@ if [[ ! -d var/smoke-test/bundles/base ]] ; then
 fi
 
 pushd var/smoke-test/bundles/base &> /dev/null
-if [[ -d vendor ]] ; then
+if [[ -f composer.lock ]] ; then
     composer update --prefer-dist --quiet
 else
     composer create-project --prefer-dist --quiet symfony/skeleton . && \
     composer config extra.symfony.allow-contrib true && \
-    composer require --prefer-dist --quiet orm
+    composer require --prefer-dist --quiet orm symfony/messenger:@dev
 fi
 [[ $? -ne 0 ]] && exit 1
 popd &> /dev/null

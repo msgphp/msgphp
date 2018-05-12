@@ -13,9 +13,9 @@ return function (ContainerConfigurator $container): void {
         ->defaults()
             ->autowire()
             ->private()
-            ->bind(EntityManagerInterface::class, ref('msgphp.doctrine.entity_manager'))
 
         ->load('MsgPhp\\Eav\\Infra\\Doctrine\\Repository\\', Configuration::getPackageDir().'/Infra/Doctrine/Repository/*Repository.php')
+            ->bind(EntityManagerInterface::class, ref('msgphp.doctrine.entity_manager'))
 
         ->set(Doctrine\ObjectFieldMappings::class)
             ->tag('msgphp.doctrine.object_field_mappings', ['priority' => -100])
