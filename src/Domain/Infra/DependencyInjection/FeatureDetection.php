@@ -10,7 +10,6 @@ use MsgPhp\EavBundle\MsgPhpEavBundle;
 use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
 use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FullStack;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Console\ConsoleEvents;
@@ -30,7 +29,7 @@ final class FeatureDetection
 {
     public static function isSymfonyFullStack(): bool
     {
-        return class_exists(FullStack::class);
+        return class_exists('Symfony\Bundle\FullStack');
     }
 
     public static function hasFrameworkBundle(ContainerInterface $container): bool

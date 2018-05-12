@@ -33,17 +33,9 @@ final class ExtensionHelper
             }
         }
 
-        $values = $container->hasParameter($param = 'msgphp.domain.class_mapping') ? $container->getParameter($param) : [];
-        $values[] = $classMapping;
-        $container->setParameter($param, $values);
-
-        $values = $container->hasParameter($param = 'msgphp.domain.id_class_mapping') ? $container->getParameter($param) : [];
-        $values[] = $idClassMapping;
-        $container->setParameter($param, $values);
-
-        $values = $container->hasParameter($param = 'msgphp.domain.identity_mapping') ? $container->getParameter($param) : [];
-        $values[] = $identityMapping;
-        $container->setParameter($param, $values);
+        $container->setParameter($param = 'msgphp.domain.class_mapping', $container->hasParameter($param) ? $classMapping + $container->getParameter($param) : $classMapping);
+        $container->setParameter($param = 'msgphp.domain.id_class_mapping', $container->hasParameter($param) ? $idClassMapping + $container->getParameter($param) : $idClassMapping);
+        $container->setParameter($param = 'msgphp.domain.identity_mapping', $container->hasParameter($param) ? $identityMapping + $container->getParameter($param) : $identityMapping);
     }
 
     public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping, array $mappingFiles): void
@@ -78,13 +70,8 @@ final class ExtensionHelper
             $typeConfig[$typeClass::NAME] = ['class' => $classMapping[$idClass] ?? $idClass, 'type' => $type, 'type_class' => $typeClass];
         }
 
-        $typeConfigValues = $container->hasParameter($param = 'msgphp.doctrine.type_config') ? $container->getParameter($param) : [];
-        $typeConfigValues += $typeConfig;
-        $container->setParameter($param, $typeConfigValues);
-
-        $mappingFileValues = $container->hasParameter($param = 'msgphp.doctrine.mapping_files') ? $container->getParameter($param) : [];
-        $mappingFileValues[] = $mappingFiles;
-        $container->setParameter($param, $mappingFileValues);
+        $container->setParameter($param = 'msgphp.doctrine.type_config', $container->hasParameter($param) ? $typeConfig + $container->getParameter($param) : $typeConfig);
+        $container->setParameter($param = 'msgphp.doctrine.mapping_files', $container->hasParameter($param) ? array_merge($container->getParameter($param), $mappingFiles) : $mappingFiles);
 
         $container->prependExtensionConfig('doctrine', [
             'dbal' => [
@@ -128,6 +115,8 @@ final class ExtensionHelper
         }
 
         ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $handles);
+
+        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $handles) : $handles);
     }
 
     public static function prepareConsoleCommands(ContainerBuilder $container): void

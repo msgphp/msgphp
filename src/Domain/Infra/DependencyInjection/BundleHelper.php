@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
-use MsgPhp\Domain\DomainIdentityHelper;
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
+use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface};
+use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, DomainObjectFactory, DomainObjectFactoryInterface, EntityAwareFactory, EntityAwareFactoryInterface};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
 use MsgPhp\Domain\Message\{DomainMessageBus, DomainMessageBusInterface};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
@@ -32,10 +33,8 @@ final class BundleHelper
 
         $container->addCompilerPass(new Compiler\ResolveDomainPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
 
-        $container->register(DomainIdentityHelper::class)
-            ->setPublic(false)
-            ->setAutowired(true);
-
+        self::initIdentityMapping($container);
+        self::initObjectFactory($container);
         self::initMessageBus($container);
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
@@ -64,6 +63,50 @@ final class BundleHelper
         $initialized = true;
     }
 
+    private static function initIdentityMapping(ContainerBuilder $container): void
+    {
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            $container->register(DoctrineInfra\DomainIdentityMapping::class)
+                ->setPublic(false)
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
+                ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
+            $container->setAlias(DomainIdentityMappingInterface::class, DoctrineInfra\DomainIdentityMapping::class);
+        } else {
+            $container->register($aliasId = InMemoryInfra\DomainIdentityMapping::class)
+                ->setPublic(false)
+                ->setArgument('$mapping', '%msgphp.domain.identity_mapping%')
+                ->setArgument('$accessor', $container->autowire(InMemoryInfra\ObjectFieldAccessor::class));
+            $container->setAlias(DomainIdentityMappingInterface::class, InMemoryInfra\DomainIdentityMapping::class);
+        }
+
+        $container->autowire(DomainIdentityHelper::class)
+            ->setPublic(false);
+    }
+
+    private static function initObjectFactory(ContainerBuilder $container): void
+    {
+        $container->register(DomainObjectFactory::class)
+            ->addMethodCall('setNestedFactory', [new Reference(DomainObjectFactoryInterface::class)]);
+        $container->setAlias(DomainObjectFactoryInterface::class, DomainObjectFactory::class);
+
+        $container->register(ClassMappingObjectFactory::class)
+            ->setDecoratedService(DomainObjectFactory::class)
+            ->setArgument('$factory', new Reference(ClassMappingObjectFactory::class.'.inner'))
+            ->setArgument('$mapping', '%msgphp.domain.class_mapping%');
+
+        $container->autowire(EntityAwareFactory::class)
+            ->setArgument('$identifierMapping', '%msgphp.domain.id_class_mapping%');
+        $container->setAlias(EntityAwareFactoryInterface::class, EntityAwareFactory::class);
+
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            $container->register(DoctrineInfra\EntityAwareFactory::class)
+                ->setDecoratedService(EntityAwareFactory::class)
+                ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
+                ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
+        }
+    }
+
     private static function initMessageBus(ContainerBuilder $container): void
     {
         if (FeatureDetection::isMessengerAvailable($container)) {
@@ -74,9 +117,13 @@ final class BundleHelper
             $defaultBus->setArgument('$bus', new Reference('msgphp.messenger.bus'));
             $eventBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class);
             $eventBus->setArgument('$bus', new Reference('msgphp.messenger.event_bus'));
+
+            if (FeatureDetection::isConsoleAvailable($container)) {
+                $container->autowire('msgphp.messenger.console_message_receiver', MessengerInfra\Middleware\ConsoleMessageReceiverMiddleware::class);
+            }
         } elseif (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
-            $container->setAlias('msgphp.simple_bus.bus', new Alias('simple_bus.command_bus', false));
-            $container->setAlias('msgphp.simple_bus.event_bus', new Alias(FeatureDetection::hasSimpleBusEventBusBundle($container) ? 'simple_bus.event_bus' : 'msgphp.simple_bus.bus', false));
+            $container->setAlias('msgphp.simple_bus.bus', 'simple_bus.command_bus');
+            $container->setAlias('msgphp.simple_bus.event_bus', FeatureDetection::hasSimpleBusEventBusBundle($container) ? 'simple_bus.event_bus' : 'msgphp.simple_bus.bus');
 
             $defaultBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
             $defaultBus->setArgument('$bus', new Reference('msgphp.simple_bus.bus'));
@@ -84,9 +131,8 @@ final class BundleHelper
             $eventBus->setArgument('$bus', new Reference('msgphp.simple_bus.event_bus'));
 
             if (FeatureDetection::isConsoleAvailable($container)) {
-                $container->register(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
+                $container->autowire(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
                     ->setPublic(false)
-                    ->setAutowired(true)
                     ->addTag('command_bus_middleware')
                     ->addTag('event_bus_middleware');
             }
@@ -97,8 +143,9 @@ final class BundleHelper
         $container->register(DomainMessageBus::class)
             ->setPublic(false)
             ->setArgument('$bus', $defaultBus)
-            ->setArgument('$eventBus', $eventBus);
-        $container->setAlias(DomainMessageBusInterface::class, new Alias(DomainMessageBus::class, false));
+            ->setArgument('$eventBus', $eventBus)
+            ->setArgument('$eventClasses', '%msgphp.domain.events%');
+        $container->setAlias(DomainMessageBusInterface::class, DomainMessageBus::class);
     }
 
     private static function initDoctrineOrm(ContainerBuilder $container): void
@@ -122,7 +169,7 @@ final class BundleHelper
 
         $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
 
-        $container->setAlias('msgphp.doctrine.entity_manager', new Alias('doctrine.orm.entity_manager', false));
+        $container->setAlias('msgphp.doctrine.entity_manager', 'doctrine.orm.entity_manager');
 
         $container->register(DoctrineInfra\ObjectFieldMappings::class)
             ->setPublic(false)
@@ -132,20 +179,27 @@ final class BundleHelper
             ->setPublic(false)
             ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$mappings'])
             ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
+
+        if (FeatureDetection::hasFrameworkBundle($container)) {
+            $container->register(DoctrineInfra\MappingCacheWarmer::class)
+                ->setPublic(false)
+                ->setArgument('$dirName', 'msgphp/doctrine-mapping')
+                ->setArgument('$mappingFiles', '%msgphp.doctrine.mapping_files%')
+                ->addTag('kernel.cache_warmer', ['priority' => 100]);
+        }
     }
 
     private static function initConsole(ContainerBuilder $container): void
     {
-        $container->register(ConsoleInfra\Context\ClassContextFactory::class)
+        $container->autowire(ConsoleInfra\Context\ClassContextFactory::class)
             ->setPublic(false)
             ->setAbstract(true)
-            ->setAutowired(true)
             ->setArgument('$method', '__construct')
             ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
 
         $container->register(ConsoleInfra\Context\ClassContextElementFactory::class)
             ->setPublic(false);
-        $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfra\Context\ClassContextElementFactory::class, false));
+        $container->setAlias(ConsoleInfra\Context\ClassContextElementFactoryInterface::class, ConsoleInfra\Context\ClassContextElementFactory::class);
 
         $container->register(ConsoleInfra\MessageReceiver::class)
             ->setPublic(false)
