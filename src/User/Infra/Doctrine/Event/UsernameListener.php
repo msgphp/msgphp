@@ -18,19 +18,19 @@ use MsgPhp\User\Entity\Username;
  */
 final class UsernameListener
 {
-    private $mapping;
+    private $targetMappings;
     private $updateUsernames = [];
 
-    public function __construct(array $mapping)
+    public function __construct(array $targetMappings)
     {
-        $this->mapping = $mapping;
+        $this->targetMappings = $targetMappings;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
         $metadata = $event->getClassMetadata();
 
-        if (!isset($this->mapping[$metadata->getName()])) {
+        if (!isset($this->targetMappings[$metadata->getName()])) {
             return;
         }
 
@@ -62,7 +62,7 @@ final class UsernameListener
     {
         $em = $event->getEntityManager();
 
-        foreach ($this->getMapping($entity, $event->getEntityManager()) as $field => $mappedBy) {
+        foreach ($this->getTargetMapping($entity, $event->getEntityManager()) as $field => $mappedBy) {
             if (!$event->hasChangedField($field)) {
                 continue;
             }
@@ -89,7 +89,7 @@ final class UsernameListener
         $em = $event->getEntityManager();
         $metadata = $em->getClassMetadata(get_class($entity));
 
-        foreach (array_keys($this->getMapping($entity, $em)) as $field) {
+        foreach (array_keys($this->getTargetMapping($entity, $em)) as $field) {
             if (null === $username = $metadata->getFieldValue($entity, $field)) {
                 continue;
             }
@@ -135,7 +135,7 @@ final class UsernameListener
     {
         $metadata = $em->getClassMetadata(get_class($entity));
 
-        foreach ($this->getMapping($entity, $em) as $field => $mappedBy) {
+        foreach ($this->getTargetMapping($entity, $em) as $field => $mappedBy) {
             $user = null === $mappedBy ? $entity : $metadata->getFieldValue($entity, $mappedBy);
 
             if (null === $user || null === $username = $metadata->getFieldValue($entity, $field)) {
@@ -146,15 +146,15 @@ final class UsernameListener
         }
     }
 
-    private function getMapping($entity, EntityManagerInterface $em): array
+    private function getTargetMapping($entity, EntityManagerInterface $em): array
     {
-        if (isset($this->mapping[$class = ClassUtils::getClass($entity)])) {
-            return $this->mapping[$class];
+        if (isset($this->targetMappings[$class = ClassUtils::getClass($entity)])) {
+            return $this->targetMappings[$class];
         }
 
         foreach ($em->getClassMetadata($class)->parentClasses as $parent) {
-            if (isset($this->mapping[$parent])) {
-                return $this->mapping[$parent];
+            if (isset($this->targetMappings[$parent])) {
+                return $this->targetMappings[$parent];
             }
         }
 

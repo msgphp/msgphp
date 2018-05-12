@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
-use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,6 +17,10 @@ final class ResolveDomainPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->has(DomainMessageBusInterface::class)) {
+            throw new \LogicException(sprintf('No message bus registered, the service "%s" must be registered / aliased manually.', DomainMessageBusInterface::class));
+        }
+
         $classMapping = $container->getParameter('msgphp.domain.class_mapping');
         foreach ($container->findTaggedServiceIds('msgphp.domain.process_class_mapping') as $id => $attr) {
             $definition = $container->getDefinition($id);
@@ -32,12 +35,6 @@ final class ResolveDomainPass implements CompilerPassInterface
             }
 
             $definition->clearTag('msgphp.domain.process_class_mapping');
-        }
-
-        if (!$container->has(DomainMessageBusInterface::class)) {
-            foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {
-                ContainerHelper::removeId($container, $id);
-            }
         }
     }
 

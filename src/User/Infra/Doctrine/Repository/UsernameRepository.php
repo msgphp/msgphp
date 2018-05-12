@@ -22,13 +22,13 @@ final class UsernameRepository implements UsernameRepositoryInterface
     }
 
     private $alias = 'username';
-    private $targetMapping;
+    private $targetMappings;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $targetMapping = [], DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, EntityManagerInterface $em, array $targetMappings = [], DomainIdentityHelper $identityHelper = null)
     {
         $this->__parent_construct($class, $em, $identityHelper);
 
-        $this->targetMapping = $targetMapping;
+        $this->targetMappings = $targetMappings;
     }
 
     /**
@@ -47,17 +47,17 @@ final class UsernameRepository implements UsernameRepositoryInterface
      */
     public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        if (!$this->targetMapping) {
-            throw new \LogicException('No username mapping available.');
+        if (!$this->targetMappings) {
+            throw new \LogicException('No username mappings available.');
         }
 
         $results = $targets = [];
-        foreach ($this->targetMapping as $class => $mappings) {
+        foreach ($this->targetMappings as $class => $mapping) {
             $qb = $this->em->createQueryBuilder();
             $metadata = $this->em->getClassMetadata($class);
             $fields = array_flip($idFields = $metadata->getIdentifierFieldNames());
 
-            foreach ($mappings as $field => $mappedBy) {
+            foreach ($mapping as $field => $mappedBy) {
                 $targets[$class][$field] = $mappedBy;
                 $fields[$field] = true;
 

@@ -161,12 +161,12 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         if ($config['username_lookup']) {
             $container->getDefinition(DoctrineInfra\Event\UsernameListener::class)
-                ->setArgument('$mapping', $config['username_lookup'])
-                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$mapping', 'array_keys' => true]);
+                ->setArgument('$targetMappings', $config['username_lookup'])
+                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true]);
 
             $container->getDefinition(DoctrineInfra\Repository\UsernameRepository::class)
-                ->setArgument('$targetMapping', $config['username_lookup'])
-                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMapping', 'array_keys' => true]);
+                ->setArgument('$targetMappings', $config['username_lookup'])
+                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true]);
         } else {
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
@@ -175,8 +175,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     private function loadConsole(array $config, LoaderInterface $loader, ContainerBuilder $container): void
     {
         $loader->load('console.php');
-
-        ExtensionHelper::prepareConsoleCommands($container);
 
         $container->getDefinition(ConsoleInfra\Command\CreateUserCommand::class)
             ->setArgument('$contextFactory', ExtensionHelper::registerConsoleClassContextFactory(

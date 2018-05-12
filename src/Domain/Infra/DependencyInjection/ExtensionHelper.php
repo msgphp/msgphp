@@ -101,8 +101,6 @@ final class ExtensionHelper
             }
 
             ContainerHelper::tagMessageHandler($container, $definition, $handles);
-
-            $definition->addTag('msgphp.domain.message_aware');
         }
     }
 
@@ -117,17 +115,6 @@ final class ExtensionHelper
         ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $handles);
 
         $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $handles) : $handles);
-    }
-
-    public static function prepareConsoleCommands(ContainerBuilder $container): void
-    {
-        foreach ($container->findTaggedServiceIds('msgphp.domain.console_command') as $id => $attr) {
-            $definition = $container->getDefinition($id);
-
-            if (is_subclass_of($definition->getClass() ?? $id, MessageReceivingInterface::class)) {
-                $definition->addTag('msgphp.domain.message_aware');
-            }
-        }
     }
 
     public static function prepareDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
