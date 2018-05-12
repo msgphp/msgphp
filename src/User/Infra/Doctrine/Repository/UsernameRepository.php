@@ -24,7 +24,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
     private $alias = 'username';
     private $targetMappings;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $targetMappings = [], DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, EntityManagerInterface $em, array $targetMappings, DomainIdentityHelper $identityHelper = null)
     {
         $this->__parent_construct($class, $em, $identityHelper);
 
@@ -47,10 +47,6 @@ final class UsernameRepository implements UsernameRepositoryInterface
      */
     public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        if (!$this->targetMappings) {
-            throw new \LogicException('No username mappings available.');
-        }
-
         $results = $targets = [];
         foreach ($this->targetMappings as $class => $mapping) {
             $qb = $this->em->createQueryBuilder();

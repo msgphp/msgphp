@@ -6,8 +6,6 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
-use MsgPhp\Eav\Entity;
-use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -45,8 +43,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         // message infra
         $loader->load('message.php');
-        ExtensionHelper::prepareCommandHandlers($container, $config['class_mapping'], $config['commands']);
-        ExtensionHelper::prepareEventHandler($container, $config['class_mapping'], array_map(function (string $file): string {
+        ExtensionHelper::finalizeCommandHandlers($container, $config['class_mapping'], $config['commands'], array_map(function (string $file): string {
             return 'MsgPhp\\Eav\\Event\\'.basename($file, '.php');
         }, glob(Configuration::getPackageDir().'/Event/*Event.php')));
 
@@ -86,8 +83,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
     {
         $loader->load('doctrine.php');
 
-        ExtensionHelper::prepareDoctrineOrmRepositories($container, $config['class_mapping'], [
-            DoctrineInfra\Repository\AttributeRepository::class => Entity\Attribute::class,
-        ]);
+        ExtensionHelper::finalizeDoctrineOrmRepositories($container, $config['class_mapping'], Configuration::DOCTRINE_REPOSITORY_MAPPING);
     }
 }

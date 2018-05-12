@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra};
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use MsgPhp\Domain\Message\{MessageReceivingInterface, NoopMessageHandler};
+use MsgPhp\Domain\Message\NoopMessageHandler;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -84,7 +84,7 @@ final class ExtensionHelper
         ]);
     }
 
-    public static function prepareCommandHandlers(ContainerBuilder $container, array $classMapping, array $commands): void
+    public static function finalizeCommandHandlers(ContainerBuilder $container, array $classMapping, array $commands, array $events): void
     {
         foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
@@ -102,24 +102,25 @@ final class ExtensionHelper
 
             ContainerHelper::tagMessageHandler($container, $definition, $handles);
         }
-    }
 
-    public static function prepareEventHandler(ContainerBuilder $container, array $classMapping, array $handles): void
-    {
-        foreach ($handles as $class) {
+        foreach ($events as $class) {
             if (isset($classMapping[$class])) {
-                $handles[] = $classMapping[$class];
+                $events[] = $classMapping[$class];
             }
         }
 
-        ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $handles);
+        ContainerHelper::tagMessageHandler($container, ContainerHelper::registerAnonymous($container, NoopMessageHandler::class), $events);
 
-        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $handles) : $handles);
+        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
     }
 
-    public static function prepareDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $repositoryEntityMapping): void
+    public static function finalizeDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $entityRepositoryMapping): void
     {
-        foreach ($repositoryEntityMapping as $repository => $entity) {
+        foreach ($entityRepositoryMapping as $entity => $repository) {
+            if (!$container->hasDefinition($repository)) {
+                continue;
+            }
+
             if (!isset($classMapping[$entity])) {
                 $container->removeDefinition($repository);
                 continue;
@@ -129,9 +130,20 @@ final class ExtensionHelper
                 ->setArgument('$class', $classMapping[$entity]);
 
             foreach (class_implements($definition->getClass() ?? $repository) as $interface) {
-                if (!$container->has($interface)) {
-                    $container->setAlias($interface, new Alias($repository, false));
-                }
+                $container->setAlias($interface, new Alias($repository, false));
+            }
+        }
+    }
+
+    public static function finalizeConsoleCommands(ContainerBuilder $container, array $commands, array $consoleDomainCommandsMapping): void
+    {
+        foreach ($consoleDomainCommandsMapping as $domainCommand => $consoleCommands) {
+            if (!empty($commands[$domainCommand])) {
+                continue;
+            }
+
+            foreach ($consoleCommands as $consoleCommand) {
+                $container->removeDefinition($consoleCommand);
             }
         }
     }

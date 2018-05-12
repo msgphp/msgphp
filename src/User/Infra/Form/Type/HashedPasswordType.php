@@ -46,12 +46,16 @@ final class HashedPasswordType extends AbstractType
 
         if ($options['password_confirm_current']) {
             if (!class_exists(Callback::class)) {
-                throw new \LogicException('Password validation requires "symfony/validator".');
+                throw new \LogicException('Current password confirmation requires "symfony/validator".');
+            }
+            if (null === $this->tokenStorage) {
+                throw new \LogicException('Current password confirmation requires "symfony/security".');
             }
 
             $passwordOptions = self::withConstraint($passwordOptions, new Callback(function (?string $value, ExecutionContextInterface $context) use ($algorithm, $passwordOptions, &$plainPassword): void {
-                $valid = true;
-                if (null === $value || '' === $value || null === $this->tokenStorage || null === ($token = $this->tokenStorage->getToken()) || !($user = $token->getUser()) instanceof UserInterface) {
+                $token = $this->tokenStorage->getToken();
+
+                if (null === $value || '' === $value || null === $token || !($user = $token->getUser()) instanceof UserInterface) {
                     $valid = false;
                 } else {
                     $algorithm = null === $algorithm && null !== ($salt = $user->getSalt())
@@ -78,7 +82,7 @@ final class HashedPasswordType extends AbstractType
 
         if ($options['password_confirm']) {
             if (!class_exists(Callback::class)) {
-                throw new \LogicException('Password validation requires "symfony/validator".');
+                throw new \LogicException('Password confirmation requires "symfony/validator".');
             }
 
             $passwordConfirmOptions = ['mapped' => false] + $options['password_confirm_options'] + $defaultOptions;

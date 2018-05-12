@@ -52,32 +52,17 @@ final class ConfigHelper
 
     public static function resolveCommandMappingConfig(array $commandMapping, array $classMapping, array &$config): void
     {
-        foreach ($commandMapping as $commandClass => $features) {
-            $mappedClass = $classMapping[$commandClass] ?? $commandClass;
-            $isEventHandler = self::exists($mappedClass) && is_subclass_of($mappedClass, DomainEventHandlerInterface::class);
+        foreach ($commandMapping as $class => $features) {
+            $available = isset($classMapping[$class]);
+            $handlerAvailable = $available && is_subclass_of($classMapping[$class], DomainEventHandlerInterface::class);
 
-            foreach ($features as $feature => $featureInfo) {
-                if (!trait_exists($feature)) {
-                    $config[$feature] = $featureInfo;
-                } elseif (self::uses($mappedClass, $feature)) {
-                    $config += array_fill_keys($featureInfo, $isEventHandler);
+            foreach ($features as $feature => $info) {
+                if (!is_array($info)) {
+                    $config[$info] = $available;
+                } else {
+                    $config += array_fill_keys($info, $available && self::uses($classMapping[$class], $feature) ? $handlerAvailable : false);
                 }
             }
-        }
-    }
-
-    private static function exists(string $class): bool
-    {
-        spl_autoload_register($loader = function (): void {
-            throw new \LogicException();
-        });
-
-        try {
-            return class_exists($class) || interface_exists($class, false);
-        } catch (\LogicException $e) {
-            return false;
-        } finally {
-            spl_autoload_unregister($loader);
         }
     }
 

@@ -27,7 +27,7 @@ final class UserRepository implements UserRepositoryInterface
     private $alias = 'user';
     private $usernameField;
 
-    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null, DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, ?string $usernameField, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
     {
         $this->__parent_construct($class, $em, $identityHelper);
 
@@ -49,22 +49,17 @@ final class UserRepository implements UserRepositoryInterface
 
     public function findByUsername(string $username): User
     {
-        if (null === $this->usernameField) {
-            throw new \LogicException('Cannot find users by username without a username field name.');
-        }
-
         $qb = $this->createUsernameQueryBuilder($username);
-        $criteria = [$this->usernameField => $username];
 
-        if (null === $qb) {
-            return $this->doFindByFields($criteria);
+        if (null !== $qb) {
+            try {
+                return $qb->getQuery()->getSingleResult();
+            } catch (NoResultException $e) {
+                throw EntityNotFoundException::createForFields($this->class, ['username' => $username]);
+            }
         }
 
-        try {
-            return $qb->getQuery()->getSingleResult();
-        } catch (NoResultException $e) {
-            throw EntityNotFoundException::createForFields($this->class, $criteria);
-        }
+        return $this->doFindByFields($this->getUsernameCriteria($username));
     }
 
     public function exists(UserIdInterface $id): bool
@@ -76,13 +71,13 @@ final class UserRepository implements UserRepositoryInterface
     {
         $qb = $this->createUsernameQueryBuilder($username);
 
-        if (null === $qb) {
-            return $this->doExistsByFields([$this->usernameField => $username]);
+        if (null !== $qb) {
+            $qb->select('1');
+
+            return (bool) $qb->getQuery()->getScalarResult();
         }
 
-        $qb->select('1');
-
-        return (bool) $qb->getQuery()->getScalarResult();
+        return $this->doExistsByFields($this->getUsernameCriteria($username));
     }
 
     public function save(User $user): void
@@ -93,6 +88,15 @@ final class UserRepository implements UserRepositoryInterface
     public function delete(User $user): void
     {
         $this->doDelete($user);
+    }
+
+    private function getUsernameCriteria(string $username): array
+    {
+        if (null === $this->usernameField) {
+            throw new \LogicException(sprintf('No username field available for entity "%s".', $this->class));
+        }
+
+        return [$this->usernameField => $username];
     }
 
     private function createUsernameQueryBuilder(string $username): ?QueryBuilder

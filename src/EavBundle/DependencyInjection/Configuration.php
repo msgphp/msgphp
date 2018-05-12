@@ -38,6 +38,10 @@ final class Configuration implements ConfigurationInterface
         AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
         AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
     ];
+    public const DOCTRINE_REPOSITORY_MAPPING = [
+        Entity\Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
+    ];
+    public const CONSOLE_COMMAND_MAPPING = [];
     private const COMMAND_MAPPING = [
         Entity\Attribute::class => [
             Command\CreateAttributeCommand::class => true,
