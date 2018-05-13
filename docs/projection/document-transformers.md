@@ -5,7 +5,7 @@ Its purpose is to transform domain objects into [projection documents](documents
 
 ## API
 
-### `transform(object $object): DomainProjectionDocument`
+### `transform(object $object): ProjectionDocument`
 
 Transforms the domain object into a projection document.
 
@@ -14,9 +14,9 @@ Transforms the domain object into a projection document.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionDocument;
 use MsgPhp\Domain\Projection\DomainProjectionDocumentTransformerInterface;
 use MsgPhp\Domain\Projection\DomainProjectionInterface;
+use MsgPhp\Domain\Projection\ProjectionDocument;
 
 // --- SETUP ---
 
@@ -48,10 +48,10 @@ class MyProjection implements DomainProjectionInterface
 
 class MyTransformer implements DomainProjectionDocumentTransformerInterface
 {
-    public function transform($object): DomainProjectionDocument
+    public function transform($object): ProjectionDocument
     {
         if ($object instanceof MyEntity) {
-            return new DomainProjectionDocument(MyProjection::class, $object->id, [
+            return new ProjectionDocument(MyProjection::class, $object->id, [
                 'id' => $object->id,
                 'some_field' => $object->someField,
             ]);

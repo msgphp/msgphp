@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use MsgPhp\Domain\Event\DomainEventInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
@@ -49,6 +50,19 @@ $msgphpGlobal = function(): array {
             'repositories' => array_map(function (string $file): string {
                 return 'MsgPhp\\'.str_replace('/', '\\', substr($file, 4, -4));
             }, glob(dirname($file).'/Repository/*RepositoryInterface.php')),
+            'commands' => array_map(function (string $file): string {
+                return 'MsgPhp\\'.str_replace('/', '\\', substr($file, 4, -4));
+            }, glob(dirname($file).'/Command/*Command.php')),
+            'events' => array_filter(array_map(function (string $file): string {
+                return 'MsgPhp\\'.str_replace('/', '\\', substr($file, 4, -4));
+            }, glob(dirname($file).'/Event/*Event.php')), function (string $class): bool {
+                return !is_subclass_of($class, DomainEventInterface::class);
+            }),
+            'domain_events' => array_filter(array_map(function (string $file): string {
+                return 'MsgPhp\\'.str_replace('/', '\\', substr($file, 4, -4));
+            }, glob(dirname($file).'/Event/{*,Domain/*}Event.php', \GLOB_BRACE)), function (string $class): bool {
+                return is_subclass_of($class, DomainEventInterface::class);
+            }),
         ];
     }
 

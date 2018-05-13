@@ -1,4 +1,4 @@
-# Domain Identifiers
+# Identifiers
 
 Reference of available [identifiers](../ddd/identifiers.md) per domain.
 

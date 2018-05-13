@@ -3,6 +3,9 @@
 A domain message bus is bound to `MsgPhp\Domain\Message\DomainMessageBusInterface`. Its purpose is to dispatch any type
 of message object and helps you to use [CQRS](cqrs.md) and [event sourcing](../event-sourcing/event-handlers.md).
 
+!!! note
+    See the [reference](../reference/messages.md) page for all available messages provided per domain
+
 ## API
 
 ### `dispatch(object $message): mixed`

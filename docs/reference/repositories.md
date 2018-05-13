@@ -1,4 +1,4 @@
-# Domain Repositories
+# Repositories
 
 Reference of available [repositories](../ddd/repositories.md) per domain.
 

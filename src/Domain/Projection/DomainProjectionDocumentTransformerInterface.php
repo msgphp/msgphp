@@ -12,5 +12,5 @@ interface DomainProjectionDocumentTransformerInterface
     /**
      * @param object $object
      */
-    public function transform($object): DomainProjectionDocument;
+    public function transform($object): ProjectionDocument;
 }

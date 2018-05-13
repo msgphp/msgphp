@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Command\Handler;
 
-use MsgPhp\Domain\Command\DeleteDomainProjectionDocumentCommand;
-use MsgPhp\Domain\Event\DomainProjectionDocumentDeletedEvent;
+use MsgPhp\Domain\Command\DeleteProjectionDocumentCommand;
+use MsgPhp\Domain\Event\ProjectionDocumentDeletedEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface;
@@ -13,7 +13,7 @@ use MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DeleteDomainProjectionDocumentHandler
+final class DeleteProjectionDocumentHandler
 {
     use MessageDispatchingTrait;
 
@@ -26,13 +26,13 @@ final class DeleteDomainProjectionDocumentHandler
         $this->repository = $repository;
     }
 
-    public function __invoke(DeleteDomainProjectionDocumentCommand $command): void
+    public function __invoke(DeleteProjectionDocumentCommand $command): void
     {
         if (null === $document = $this->repository->find($command->type, $command->id)) {
             return;
         }
 
         $this->repository->delete($command->type, $command->id);
-        $this->dispatch(DomainProjectionDocumentDeletedEvent::class, [$document]);
+        $this->dispatch(ProjectionDocumentDeletedEvent::class, [$document]);
     }
 }

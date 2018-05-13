@@ -7,14 +7,14 @@ namespace MsgPhp\Domain\Projection;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionSynchronization
+final class ProjectionSynchronization
 {
     private $typeRegistry;
     private $repository;
     private $documentProvider;
 
     /**
-     * @param DomainProjectionDocument[] $documentProvider
+     * @param ProjectionDocument[] $documentProvider
      */
     public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository, iterable $documentProvider)
     {
@@ -24,7 +24,7 @@ final class DomainProjectionSynchronization
     }
 
     /**
-     * @return DomainProjectionDocument[]
+     * @return ProjectionDocument[]
      */
     public function synchronize(): iterable
     {
@@ -33,16 +33,16 @@ final class DomainProjectionSynchronization
         }
 
         foreach ($this->documentProvider as $document) {
-            if (DomainProjectionDocument::STATUS_UNKNOWN !== $document->status) {
+            if (ProjectionDocument::STATUS_UNKNOWN !== $document->status) {
                 continue;
             }
 
             try {
-                $document->status = DomainProjectionDocument::STATUS_SYNCHRONIZED;
+                $document->status = ProjectionDocument::STATUS_SYNCHRONIZED;
 
                 $this->repository->save($document);
             } catch (\Throwable $e) {
-                $document->status = DomainProjectionDocument::STATUS_FAILED_SAVING;
+                $document->status = ProjectionDocument::STATUS_FAILED_SAVING;
                 $document->error = $e;
             }
 

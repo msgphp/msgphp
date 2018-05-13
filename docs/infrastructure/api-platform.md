@@ -15,6 +15,15 @@ It uses any [projection repository](../projection/repositories.md) in an effort 
 api_platform:
     resource_class_directories:
         - '%kernel.project_dir%/src/Api/Projection'
+
+    # ...
+
+services:
+    MsgPhp\Domain\Infra\ApiPlatform\DomainProjectionDataProvider:
+        tags: [api_platform.collection_data_provider]
+        autowire: true
+
+    # ...
 ```
 
 !!! note

@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Projection;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionDocument
+final class ProjectionDocument
 {
     public const STATUS_UNKNOWN = 1;
     public const STATUS_SYNCHRONIZED = 2;

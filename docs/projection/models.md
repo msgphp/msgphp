@@ -6,8 +6,8 @@ to convert raw model data (a document) into a projection.
 The document is usually a transformation from a domain object (e.g. an entity) and therefor projections should be
 considered read-only and disposable, as they can be re-created / synchronized at any time from a source of truth.
 
-A practical use case for domain projections are APIs, where each API resource is a so called projection from a
-corresponding entity. It enables decoupling and thus optimized API responses.
+A practical use case for projections are APIs, where each API resource is a so called projection from a corresponding
+entity. It enables decoupling and thus optimized API responses.
 
 !!! info
     For integration with [API Platform] see the [domain projection data provider](../infrastructure/api-platform.md#domain-projection-data-provider)

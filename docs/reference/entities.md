@@ -1,4 +1,4 @@
-# Domain Entities
+# Entities
 
 Reference of available [entities](../ddd/entities.md) per domain.
 

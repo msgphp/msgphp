@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Projection;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionDocumentProvider implements \IteratorAggregate
+final class ProjectionDocumentProvider implements \IteratorAggregate
 {
     private $transformer;
     private $dataProviders;
@@ -28,8 +28,8 @@ final class DomainProjectionDocumentProvider implements \IteratorAggregate
                 try {
                     $document = $this->transformer->transform($object);
                 } catch (\Throwable $e) {
-                    $document = new DomainProjectionDocument();
-                    $document->status = DomainProjectionDocument::STATUS_FAILED_TRANSFORMATION;
+                    $document = new ProjectionDocument();
+                    $document->status = ProjectionDocument::STATUS_FAILED_TRANSFORMATION;
                     $document->source = $object;
                     $document->error = $e;
                 }

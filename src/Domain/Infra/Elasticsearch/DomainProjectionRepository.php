@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use MsgPhp\Domain\Projection\{DomainProjectionDocument, DomainProjectionInterface, DomainProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionInterface, DomainProjectionRepositoryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -73,7 +73,7 @@ final class DomainProjectionRepository implements DomainProjectionRepositoryInte
         ]);
     }
 
-    public function save(DomainProjectionDocument $document): void
+    public function save(ProjectionDocument $document): void
     {
         $params = ['index' => $this->index, 'type' => $document->getType(), 'body' => $document->getBody()];
         if (null !== $id = $document->getId()) {

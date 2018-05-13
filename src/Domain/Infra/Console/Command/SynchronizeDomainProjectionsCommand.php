@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Console\Command;
 
-use MsgPhp\Domain\Projection\{DomainProjectionDocument, DomainProjectionSynchronization};
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionSynchronization};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +21,7 @@ final class SynchronizeDomainProjectionsCommand extends Command
     private $synchronization;
     private $logger;
 
-    public function __construct(DomainProjectionSynchronization $synchronization, LoggerInterface $logger = null)
+    public function __construct(ProjectionSynchronization $synchronization, LoggerInterface $logger = null)
     {
         $this->synchronization = $synchronization;
         $this->logger = $logger;
@@ -41,7 +41,7 @@ final class SynchronizeDomainProjectionsCommand extends Command
         $succeed = $failed = 0;
 
         foreach ($this->synchronization->synchronize() as $document) {
-            if (DomainProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
+            if (ProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
                 ++$succeed;
             } else {
                 ++$failed;

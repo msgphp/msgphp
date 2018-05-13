@@ -14,12 +14,12 @@ Yields all projection documents attempted to be synchronized. The actual documen
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionDocument;
-use MsgPhp\Domain\Projection\DomainProjectionDocumentProvider;
 use MsgPhp\Domain\Projection\DomainProjectionDocumentTransformerInterface;
 use MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface;
-use MsgPhp\Domain\Projection\DomainProjectionSynchronization;
 use MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\ProjectionSynchronization;
+use MsgPhp\Domain\Projection\ProjectionDocumentProvider;
 
 // --- SETUP ---
 
@@ -39,18 +39,18 @@ $typeRegistry = ...;
 $repository = ...;
 /** @var DomainProjectionDocumentTransformerInterface $transformer */
 $transformer = ...;
-$provider = new DomainProjectionDocumentProvider($transformer, [
+$provider = new ProjectionDocumentProvider($transformer, [
     function (): iterable {
         yield new MyEntity(1);
         yield new MyEntity(2);
     },
 ]);
-$synchronization = new DomainProjectionSynchronization($typeRegistry, $repository, $provider);
+$synchronization = new ProjectionSynchronization($typeRegistry, $repository, $provider);
 
 // --- USAGE ---
 
 foreach ($synchronization->synchronize() as $document) {
-    if (DomainProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
+    if (ProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
         echo 'Synchronized projection for '.get_class($document->source).' with ID '.$document->source->id.PHP_EOL;
         continue;
     }
@@ -70,4 +70,4 @@ A synchronization can be ran using the CLI when working with Symfony Console.
 
 - [Read more](../infrastructure/symfony-console.md#synchronizedomainprojectionscommand)
 
-[api-projection-document-status]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/DomainProjectionDocument.html#property_status
+[api-projection-document-status]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/ProjectionDocument.html#property_status

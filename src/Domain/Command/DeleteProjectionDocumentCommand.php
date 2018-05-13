@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Command;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DeleteDomainProjectionDocumentCommand
+class DeleteProjectionDocumentCommand
 {
     public $type;
     public $id;

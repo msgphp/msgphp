@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Command\Handler;
 
-use MsgPhp\Domain\Command\SaveDomainProjectionDocumentCommand;
-use MsgPhp\Domain\Event\DomainProjectionDocumentSavedEvent;
+use MsgPhp\Domain\Command\SaveProjectionDocumentCommand;
+use MsgPhp\Domain\Event\ProjectionDocumentSavedEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
-use MsgPhp\Domain\Projection\{DomainProjectionDocument, DomainProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionRepositoryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class SaveDomainProjectionDocumentHandler
+final class SaveProjectionDocumentHandler
 {
     use MessageDispatchingTrait;
 
@@ -26,11 +26,11 @@ final class SaveDomainProjectionDocumentHandler
         $this->repository = $repository;
     }
 
-    public function __invoke(SaveDomainProjectionDocumentCommand $command): void
+    public function __invoke(SaveProjectionDocumentCommand $command): void
     {
-        $document = new DomainProjectionDocument($command->type, $command->id, $command->body);
+        $document = new ProjectionDocument($command->type, $command->id, $command->body);
 
         $this->repository->save($document);
-        $this->dispatch(DomainProjectionDocumentSavedEvent::class, [$document]);
+        $this->dispatch(ProjectionDocumentSavedEvent::class, [$document]);
     }
 }

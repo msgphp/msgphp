@@ -54,7 +54,9 @@ pages:
     - Bundle Installation: cookbook/bundle-installation.md
     - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
 - Reference:
-    - Domain Identifiers: reference/identifiers.md
-    - Domain Entities: reference/entities.md
-    - Domain Repositories: reference/repositories.md
+    - Identifiers: reference/identifiers.md
+    - Entities: reference/entities.md
+    - Repositories: reference/repositories.md
+    - Messages: reference/messages.md
+    - Domain Events: reference/domain-events.md
     - Doctrine Identifier Types: reference/doctrine-identifier-types.md

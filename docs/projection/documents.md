@@ -1,7 +1,7 @@
 # Projection Documents
 
-A projection document is a domain value object of type `MsgPhp\Domain\Projection\DomainProjectionDocument`. Its purpose
-is to hold a projection document its data and current state.
+A projection document is a value object of type `MsgPhp\Domain\Projection\ProjectionDocument`. Its purpose is to hold a
+projection document its data and current state.
 
 ## API
 
@@ -40,8 +40,8 @@ Transforms the document into its projection model.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionDocument;
 use MsgPhp\Domain\Projection\DomainProjectionInterface;
+use MsgPhp\Domain\Projection\ProjectionDocument;
 
 // --- SETUP ---
 
@@ -53,7 +53,7 @@ class MyProjection implements DomainProjectionInterface
     }
 }
 
-$document = new DomainProjectionDocument(MyProjection::class, null, [
+$document = new ProjectionDocument(MyProjection::class, null, [
     'some_field' => 'value',
 ]);
 
@@ -61,4 +61,4 @@ $document = new DomainProjectionDocument(MyProjection::class, null, [
 $projection = $document->toProjection();
 ```
 
-[api-statuses]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/DomainProjectionDocument.html#page-content
+[api-statuses]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/ProjectionDocument.html#page-content
