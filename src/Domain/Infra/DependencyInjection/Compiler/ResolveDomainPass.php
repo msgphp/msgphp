@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
+use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,6 +18,13 @@ final class ResolveDomainPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        $defaultEvents = array_values(array_filter(array_map(function (string $file) {
+            return 'MsgPhp\\Domain\\Event\\'.basename($file, '.php');
+        }, glob(dirname(dirname(dirname(__DIR__))).'/Event/*Event.php')), function (string $class): bool {
+            return !is_subclass_of($class, DomainEventInterface::class);
+        }));
+        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $defaultEvents) : $defaultEvents);
+
         if (!$container->has(DomainMessageBusInterface::class)) {
             foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {
                 $container->removeDefinition($id);
