@@ -33,11 +33,15 @@ final class DomainProjectionDataProvider implements CollectionDataProviderInterf
      */
     public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
-        return $this->repository->findAll($resourceClass);
+        foreach ($this->repository->findAll($resourceClass) as $document) {
+            yield $document->toProjection();
+        }
     }
 
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?DomainProjectionInterface
     {
-        return $this->repository->find($resourceClass, $id);
+        $document = $this->repository->find($resourceClass, $id);
+
+        return null === $document ? null : $document->toProjection();
     }
 }

@@ -10,11 +10,11 @@ namespace MsgPhp\Domain\Projection;
 interface DomainProjectionRepositoryInterface
 {
     /**
-     * @return DomainProjectionInterface[]
+     * @return ProjectionDocument[]
      */
     public function findAll(string $type, int $offset = 0, int $limit = 0): iterable;
 
-    public function find(string $type, string $id): ?DomainProjectionInterface;
+    public function find(string $type, string $id): ?ProjectionDocument;
 
     public function clear(string $type): void;
 

@@ -5,15 +5,15 @@ is to store and query [projection documents](documents.md).
 
 ## API
 
-### `findAll(string $type, int $offset = 0, int $limit = 0): iterable`
+### `findAll(string $type, int $offset = 0, int $limit = 0): ProjectionDocument[]`
 
-Finds all [projections](models.md) by type.
+Finds all projection documents by type.
 
 ---
 
-### `find(string $type, string $id): ?DomainProjectionInterface`
+### `find(string $type, string $id): ?ProjectionDocument`
 
-Finds a single [projection](models.md) by type and ID. In case its document cannot be found `null` should be returned.
+Finds a single projection document by type and ID. In case its document cannot be found `null` should be returned.
 
 ---
 
@@ -66,14 +66,12 @@ $repository = ...;
 // --- USAGE ---
 
 $id = ...;
-$projection = $repository->find(MyProjection::class, $id);
+$document = $repository->find(MyProjection::class, $id);
 
 if (null === $projection) {
     $document = ProjectionDocument::create(MyProjection::class, $id, [
         'some_field' => 'value',
     ]);
     $repository->save($document);
-
-    $projection = $document->toProjection();
 }
 ```

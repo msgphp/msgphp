@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionInterface, DomainProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionRepositoryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -23,7 +23,7 @@ final class DomainProjectionRepository implements DomainProjectionRepositoryInte
     }
 
     /**
-     * @return DomainProjectionInterface[]
+     * @return ProjectionDocument[]
      */
     public function findAll(string $type, int $offset = 0, int $limit = 0): iterable
     {
@@ -43,11 +43,11 @@ final class DomainProjectionRepository implements DomainProjectionRepositoryInte
         $documents = $this->client->search($params);
 
         foreach ($documents['hits']['hits'] ?? [] as $document) {
-            yield $document['_type']::fromDocument($document['_source']);
+            yield $this->createDocument($document);
         }
     }
 
-    public function find(string $type, string $id): ?DomainProjectionInterface
+    public function find(string $type, string $id): ?ProjectionDocument
     {
         try {
             $document = $this->client->get([
@@ -55,11 +55,11 @@ final class DomainProjectionRepository implements DomainProjectionRepositoryInte
                 'type' => $type,
                 'id' => $id,
             ]);
-
-            return $document['_type']::fromDocument($document['_source']);
         } catch (Missing404Exception $e) {
             return null;
         }
+
+        return $this->createDocument($document);
     }
 
     public function clear(string $type): void
@@ -90,5 +90,10 @@ final class DomainProjectionRepository implements DomainProjectionRepositoryInte
             'type' => $type,
             'id' => $id,
         ]);
+    }
+
+    private function createDocument(array $data): ProjectionDocument
+    {
+        return new ProjectionDocument($data['_type'] ?? null, $data['_id'] ?? null, $data['_source'] ?? []);
     }
 }
