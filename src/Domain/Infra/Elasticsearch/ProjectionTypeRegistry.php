@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionTypeRegistry implements DomainProjectionTypeRegistryInterface
+final class ProjectionTypeRegistry implements ProjectionTypeRegistryInterface
 {
     private const DEFAULT_PROPERTY_TYPE = 'text';
 

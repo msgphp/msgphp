@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class SynchronizeDomainProjectionsCommand extends Command
+final class SynchronizeProjectionsCommand extends Command
 {
     protected static $defaultName = 'projection:synchronize';
 

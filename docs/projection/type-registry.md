@@ -1,7 +1,7 @@
 # Projection Type Registry
 
-A projection type registry is bound to `MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface`.
-Its purpose is to manage all available [projection](models.md) type information.
+A projection type registry is bound to `MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface`. Its purpose is to
+manage all available [projection](models.md) type information.
 
 ## API
 
@@ -24,22 +24,22 @@ Destroys the type registry and thus requires to be re-initialized after.
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionTypeRegistry`
+### `MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry`
 
 An Elasticsearch tailored projection type registry.
 
-- [Read more](../infrastructure/elasticsearch.md#domain-projection-type-registry)
+- [Read more](../infrastructure/elasticsearch.md#projection-type-registry)
 
 ## Basic example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
 
 // --- SETUP ---
 
-/** @var DomainProjectionTypeRegistryInterface $typeRegistry */
+/** @var ProjectionTypeRegistryInterface $typeRegistry */
 $typeRegistry = ...;
 
 // --- USAGE ---
@@ -54,4 +54,4 @@ echo 'Initialized types: '.implode(', ', $typeRegistry->all());
 
 The type registry can be initialized using the CLI when working with Symfony Console.
 
-- [Read more](../infrastructure/symfony-console.md#initializedomainprojectiontypescommand)
+- [Read more](../infrastructure/symfony-console.md#initializeprojectiontypescommand)

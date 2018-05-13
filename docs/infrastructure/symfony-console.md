@@ -9,7 +9,7 @@ An overview of available infrastructural code when using [Symfony Console][conso
 Various standard [console commands] are available and can be used depending on implemented domain infrastructure. They
 are defined in the `MsgPhp\Domain\Infra\Console\Command\` namespace.
 
-### `InitializeDomainProjectionTypesCommand`
+### `InitializeProjectionTypesCommand`
 
 Initializes the [projection type registry](../projection/type-registry.md).
 
@@ -17,7 +17,7 @@ Initializes the [projection type registry](../projection/type-registry.md).
 bin/console projection:initialize-types [--force]
 ```
 
-### `SynchronizeDomainProjectionsCommand`
+### `SynchronizeProjectionsCommand`
 
 Synchronizes domain objects and their [projections](../projection/models.md) using the [projection synchronization](../projection/synchronization.md)
 utility service.

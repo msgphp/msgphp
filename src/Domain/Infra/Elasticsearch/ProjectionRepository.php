@@ -6,12 +6,12 @@ namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionRepositoryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionRepository implements DomainProjectionRepositoryInterface
+final class ProjectionRepository implements ProjectionRepositoryInterface
 {
     private $client;
     private $index;

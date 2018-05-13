@@ -1,7 +1,7 @@
 # Projection Document Transformers
 
-A projection document transformer is bound to `MsgPhp\Domain\Projection\DomainProjectionDocumentTransformerInterface`.
-Its purpose is to transform domain objects into [projection documents](documents.md).
+A projection document transformer is bound to `MsgPhp\Domain\Projection\ProjectionDocumentTransformerInterface`. Its
+purpose is to transform arbitrary objects into [projection documents](documents.md).
 
 ## API
 
@@ -14,9 +14,7 @@ Transforms the domain object into a projection document.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionDocumentTransformerInterface;
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
-use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionDocumentTransformerInterface, ProjectionInterface};
 
 // --- SETUP ---
 
@@ -31,12 +29,12 @@ class MyEntity
     }
 }
 
-class MyProjection implements DomainProjectionInterface
+class MyProjection implements ProjectionInterface
 {
     public $id;
     public $someField;
 
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         $projection = new static();
         $projection->id = $document['id'] ?? null;
@@ -46,7 +44,7 @@ class MyProjection implements DomainProjectionInterface
     }
 }
 
-class MyTransformer implements DomainProjectionDocumentTransformerInterface
+class MyTransformer implements ProjectionDocumentTransformerInterface
 {
     public function transform($object): ProjectionDocument
     {

@@ -2,9 +2,13 @@
 
 ## Domain
 
+- Renamed `DomainProjectionInterface` to `ProjectionInterface`
 - Renamed `DomainProjectionDocument` to `ProjectionDocument`
 - Renamed `DomainProjectionDocumentProvider` to `ProjectionDocumentProvider`
-- Renamed `DomainProjectionSynchronization` to `ProjectionSynchronization`
+- Renamed `DomainProjectionDocumentTransformerInterface` to `ProjectionDocumentTransformerInterface`
 - Updated `DomainProjectionRepositoryInterface::findAll(): DomainProjectionInterface[]` to `findAll(): ProjectionDocument[]`
 - Updated `DomainProjectionRepositoryInterface::find(): ?DomainProjectionInterface` to `find(): ?ProjectionDocument`
-- Added default domain projection messages (`Command\` and `Event\`)
+- Renamed `DomainProjectionRepositoryInterface` to `ProjectionRepositoryInterface`
+- Renamed `DomainProjectionSynchronization` to `ProjectionSynchronization`
+- Renamed `DomainProjectionTypeRegistryInterface` to `ProjectionTypeRegistryInterface`
+- Added default projection messages (`Command\` and `Event\`)

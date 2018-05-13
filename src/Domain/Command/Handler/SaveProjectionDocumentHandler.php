@@ -8,7 +8,7 @@ use MsgPhp\Domain\Command\SaveProjectionDocumentCommand;
 use MsgPhp\Domain\Event\ProjectionDocumentSavedEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
-use MsgPhp\Domain\Projection\{ProjectionDocument, DomainProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionRepositoryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -19,7 +19,7 @@ final class SaveProjectionDocumentHandler
 
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, DomainProjectionRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ProjectionRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;

@@ -49,14 +49,14 @@ final class ProjectionDocument
         return $this->body;
     }
 
-    public function toProjection(): DomainProjectionInterface
+    public function toProjection(): ProjectionInterface
     {
         if (null === $this->type) {
             throw new \LogicException('Document type not set.');
         }
 
-        if (!is_subclass_of($this->type, DomainProjectionInterface::class)) {
-            throw new \LogicException(sprintf('Document type must be a sub class of "%s", got "%s".', DomainProjectionInterface::class, $this->type));
+        if (!is_subclass_of($this->type, ProjectionInterface::class)) {
+            throw new \LogicException(sprintf('Document type must be a sub class of "%s", got "%s".', ProjectionInterface::class, $this->type));
         }
 
         return $this->type::fromDocument($this->body);

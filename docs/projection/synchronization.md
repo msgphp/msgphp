@@ -14,12 +14,7 @@ Yields all projection documents attempted to be synchronized. The actual documen
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionDocumentTransformerInterface;
-use MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface;
-use MsgPhp\Domain\Projection\DomainProjectionTypeRegistryInterface;
-use MsgPhp\Domain\Projection\ProjectionDocument;
-use MsgPhp\Domain\Projection\ProjectionSynchronization;
-use MsgPhp\Domain\Projection\ProjectionDocumentProvider;
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionDocumentProvider, ProjectionDocumentTransformerInterface, ProjectionRepositoryInterface, ProjectionSynchronization, ProjectionTypeRegistryInterface};
 
 // --- SETUP ---
 
@@ -33,11 +28,11 @@ class MyEntity
     }
 }
 
-/** @var DomainProjectionTypeRegistryInterface $typeRegistry */
+/** @var ProjectionTypeRegistryInterface $typeRegistry */
 $typeRegistry = ...;
-/** @var DomainProjectionRepositoryInterface $repository */
+/** @var ProjectionRepositoryInterface $repository */
 $repository = ...;
-/** @var DomainProjectionDocumentTransformerInterface $transformer */
+/** @var ProjectionDocumentTransformerInterface $transformer */
 $transformer = ...;
 $provider = new ProjectionDocumentProvider($transformer, [
     function (): iterable {
@@ -68,6 +63,6 @@ foreach ($synchronization->synchronize() as $document) {
 
 A synchronization can be ran using the CLI when working with Symfony Console.
 
-- [Read more](../infrastructure/symfony-console.md#synchronizedomainprojectionscommand)
+- [Read more](../infrastructure/symfony-console.md#synchronizeprojectionscommand)
 
 [api-projection-document-status]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/ProjectionDocument.html#property_status

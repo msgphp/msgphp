@@ -7,17 +7,17 @@ namespace MsgPhp\Domain\Infra\ApiPlatform;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use MsgPhp\Domain\Projection\{DomainProjectionInterface, DomainProjectionRepositoryInterface, DomainProjectionTypeRegistryInterface};
+use MsgPhp\Domain\Projection\{ProjectionInterface, ProjectionRepositoryInterface, ProjectionTypeRegistryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainProjectionDataProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
+final class ProjectionDataProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $typeRegistry;
     private $repository;
 
-    public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository)
+    public function __construct(ProjectionTypeRegistryInterface $typeRegistry, ProjectionRepositoryInterface $repository)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;
@@ -29,7 +29,7 @@ final class DomainProjectionDataProvider implements CollectionDataProviderInterf
     }
 
     /**
-     * @return DomainProjectionInterface[]
+     * @return ProjectionInterface[]
      */
     public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
@@ -38,7 +38,7 @@ final class DomainProjectionDataProvider implements CollectionDataProviderInterf
         }
     }
 
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?DomainProjectionInterface
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?ProjectionInterface
     {
         $document = $this->repository->find($resourceClass, $id);
 

@@ -1,7 +1,7 @@
 # Projection Repositories
 
-A domain projection repository is bound to `MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface`. Its purpose
-is to store and query [projection documents](documents.md).
+A projection repository is bound to `MsgPhp\Domain\Projection\ProjectionRepositoryInterface`. Its purpose is to store
+and query [projection documents](documents.md).
 
 ## API
 
@@ -35,32 +35,30 @@ Deletes a projection document by type and ID. The document will be unavailable o
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionRepository`
+### `MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository`
 
 An Elasticsearch tailored projection repository.
 
-- [Read more](../infrastructure/elasticsearch.md#domain-projection-repository)
+- [Read more](../infrastructure/elasticsearch.md#projection-repository)
 
 ## Basic example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
-use MsgPhp\Domain\Projection\DomainProjectionRepositoryInterface;
-use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionInterface, ProjectionRepositoryInterface};
 
 // --- SETUP ---
 
-class MyProjection implements DomainProjectionInterface
+class MyProjection implements ProjectionInterface
 {
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         // ...
     }
 }
 
-/** @var DomainProjectionRepositoryInterface $repository */
+/** @var ProjectionRepositoryInterface $repository */
 $repository = ...;
 
 // --- USAGE ---

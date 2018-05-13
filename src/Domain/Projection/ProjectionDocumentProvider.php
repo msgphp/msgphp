@@ -15,7 +15,7 @@ final class ProjectionDocumentProvider implements \IteratorAggregate
     /**
      * @param callable[] $dataProviders
      */
-    public function __construct(DomainProjectionDocumentTransformerInterface $transformer, iterable $dataProviders)
+    public function __construct(ProjectionDocumentTransformerInterface $transformer, iterable $dataProviders)
     {
         $this->transformer = $transformer;
         $this->dataProviders = $dataProviders;

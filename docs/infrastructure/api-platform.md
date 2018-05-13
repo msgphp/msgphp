@@ -4,9 +4,9 @@ An overview of available infrastructural code when using [API Platform].
 
 - Requires [api-platform/core]
 
-## Domain Projection Data Provider
+## Projection Data Provider
 
-When working with [projections](../projection/models.md) an [API Data Provider] is provided by `MsgPhp\Domain\Infra\ApiPlatform\DomainProjectionDataProvider`.
+When working with [projections](../projection/models.md) an [API Data Provider] is provided by `MsgPhp\Domain\Infra\ApiPlatform\ProjectionDataProvider`.
 It uses any [projection repository](../projection/repositories.md) in an effort to provide API resources. 
 
 ### Minimal configuration
@@ -19,7 +19,7 @@ api_platform:
     # ...
 
 services:
-    MsgPhp\Domain\Infra\ApiPlatform\DomainProjectionDataProvider:
+    MsgPhp\Domain\Infra\ApiPlatform\ProjectionDataProvider:
         tags: [api_platform.collection_data_provider]
         autowire: true
 
@@ -38,19 +38,19 @@ namespace App\Api\Projection;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
+use MsgPhp\Domain\Projection\ProjectionInterface;
 
 /**
  * @ApiResource(shortName="Some")
  */
-class SomeProjection implements DomainProjectionInterface
+class SomeProjection implements ProjectionInterface
 {
     /**
      * @ApiProperty(identifier=true)
      */
     public $id;
 
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         $projection = new self();
         $projection->id = $document['id'] ?? null;

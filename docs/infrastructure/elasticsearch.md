@@ -4,9 +4,9 @@ An overview of available infrastructural code when using Elasticsearch's [PHP Ap
 
 - Requires [elasticsearch/elasticsearch]
 
-## Domain Projection Type Registry
+## Projection Type Registry
 
-An Elasticsearch tailored [domain projection type registry](../projection/type-registry.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionTypeRegistry`.
+An Elasticsearch tailored [projection type registry](../projection/type-registry.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry`.
 It works directly with any [`Client`][api-client] and a known configuration of type information.
 
 - `__construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)`
@@ -21,17 +21,17 @@ It works directly with any [`Client`][api-client] and a known configuration of t
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionTypeRegistry;
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
+use MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry;
+use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---
 
-class MyProjection implements DomainProjectionInterface
+class MyProjection implements ProjectionInterface
 {
     public $someField;
     public $otherField;
 
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         $projection = new static();
         $projection->someField = $document['some_field'] ?? null;
@@ -43,7 +43,7 @@ class MyProjection implements DomainProjectionInterface
 
 /** @var Client $client */
 $client = ...;
-$typeRegistry = new DomainProjectionTypeRegistry($client, 'some_index', [
+$typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
     MyProjection::class => [
         'some_field' => 'some_type', // defaults to ['type' => 'some_type']
         'other_field' => [ // defaults to ['type' => 'text', ...]
@@ -59,17 +59,16 @@ $typeRegistry = new DomainProjectionTypeRegistry($client, 'some_index', [
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\DocumentMappingProviderInterface;
-use MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionTypeRegistry;
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
+use MsgPhp\Domain\Infra\Elasticsearch\{DocumentMappingProviderInterface, ProjectionTypeRegistry};
+use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---
 
-class MyProjection implements DomainProjectionInterface, DocumentMappingProviderInterface
+class MyProjection implements ProjectionInterface, DocumentMappingProviderInterface
 {
     // ...
 
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         // ...
     }
@@ -87,14 +86,14 @@ class MyProjection implements DomainProjectionInterface, DocumentMappingProvider
 
 /** @var Client $client */
 $client = ...;
-$typeRegistry = new DomainProjectionTypeRegistry($client, 'some_index', [
+$typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
     MyProjection::class,
 ]);
 ```
 
-## Domain Projection Repository
+## Projection Repository
 
-An Elasticsearch tailored [domain projection repository](../projection/repositories.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionRepository`.
+An Elasticsearch tailored [projection repository](../projection/repositories.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository`.
 It works directly with any [`Client`][api-client].
 
 - `__construct(Client $client, string $index)`
@@ -107,13 +106,13 @@ It works directly with any [`Client`][api-client].
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\DomainProjectionRepository;
+use MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository;
 
 // --- SETUP ---
 
 /** @var Client $client */
 $client = ...;
-$repository = new DomainProjectionRepository($client, 'some_index');
+$repository = new ProjectionRepository($client, 'some_index');
 ```
 
 [elasticsearch-project]: https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/index.html

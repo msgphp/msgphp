@@ -16,7 +16,7 @@ final class ProjectionSynchronization
     /**
      * @param ProjectionDocument[] $documentProvider
      */
-    public function __construct(DomainProjectionTypeRegistryInterface $typeRegistry, DomainProjectionRepositoryInterface $repository, iterable $documentProvider)
+    public function __construct(ProjectionTypeRegistryInterface $typeRegistry, ProjectionRepositoryInterface $repository, iterable $documentProvider)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;

@@ -31,7 +31,7 @@ Gets the document data.
 
 ---
 
-### `toProjection(): DomainProjectionInterface`
+### `toProjection(): ProjectionInterface`
 
 Transforms the document into its projection model.
 
@@ -40,14 +40,13 @@ Transforms the document into its projection model.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\DomainProjectionInterface;
-use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionInterface};
 
 // --- SETUP ---
 
-class MyProjection implements DomainProjectionInterface
+class MyProjection implements ProjectionInterface
 {
-    public static function fromDocument(array $document): DomainProjectionInterface
+    public static function fromDocument(array $document): ProjectionInterface
     {
         // ...
     }
