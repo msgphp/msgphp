@@ -11,7 +11,6 @@ class DeleteDomainProjectionDocumentCommand
 {
     public $type;
     public $id;
-    public $body;
 
     final public function __construct(string $type, string $id)
     {
