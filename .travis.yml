@@ -55,6 +55,7 @@ cache:
   directories:
     - $HOME/.composer/cache/files/
     - var/cache/
+    - var/smoke-test/bundles/base/
 
 before_cache:
   - rm -rf $HOME/.composer/cache/files/msgphp
