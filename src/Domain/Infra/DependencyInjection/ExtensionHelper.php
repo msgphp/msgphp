@@ -90,7 +90,7 @@ final class ExtensionHelper
             $definition = $container->getDefinition($id);
             $definition->addTag('msgphp.domain.message_aware');
 
-            $command = (new \ReflectionMethod($definition->getClass() ?? $id, '__invoke'))->getParameters()[0]->getClass()->getName();
+            $command = (new \ReflectionMethod($definition->getClass() ?? (string) $id, '__invoke'))->getParameters()[0]->getClass()->getName();
             if (empty($commands[$command])) {
                 $container->removeDefinition($id);
                 continue;

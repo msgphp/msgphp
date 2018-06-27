@@ -13,7 +13,7 @@ use MsgPhp\User\Entity\UserEmail;
  */
 trait EmailsField
 {
-    /** @var UserEmail[] */
+    /** @var iterable|UserEmail[] */
     private $emails = [];
 
     /**

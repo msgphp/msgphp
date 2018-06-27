@@ -43,7 +43,7 @@ final class ClassMethodResolverTest extends TestCase
 
     public function testResolveWithUnknownMethod(): void
     {
-        $object = new class('foo', null, null) {
+        $object = new class() {
         };
 
         $this->expectException(InvalidClassException::class);
@@ -54,7 +54,7 @@ final class ClassMethodResolverTest extends TestCase
 
 class TestClass
 {
-    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, SELF $bar = null, array $baz = [1], iterable $qux)
+    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, self $bar = null, array $baz = [1], iterable $qux)
     {
         $fooBar;
         $foo_bar;

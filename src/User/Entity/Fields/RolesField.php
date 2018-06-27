@@ -13,8 +13,8 @@ use MsgPhp\User\Entity\UserRole;
  */
 trait RolesField
 {
-    /** @var UserRole[] */
-    private $roles;
+    /** @var iterable|UserRole[] */
+    private $roles = [];
 
     /**
      * @return DomainCollectionInterface|UserRole[]

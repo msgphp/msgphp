@@ -1,27 +1,35 @@
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
-    - vendor/phpstan/phpstan-phpunit/strictRules.neon
 
 parameters:
+    level: max
+
     ignoreErrors:
         - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'
         - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject\.#'
         - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
+        - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\.+Test::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
         - '#Class MsgPhp\\Domain\\Tests\\Factory\\WrongCase referenced with incorrect case: MsgPhp\\Domain\\Tests\\Factory\\wrongcase\.#'
 
-        # forward compatibility
-        - '#Class MsgPhp\\Domain\\Infra\\Config\\ClassMappingNode constructor invoked with 3 parameters, 1\-2 required\.#'
-        - '#Access to an undefined property MsgPhp\\Domain\\Infra\\Config\\ClassMappingNodeDefinition::\$pathSeparator#'
+        # generics
+        - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'
+        - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Handler)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
+        - '#Access to undefined constant string::.+\.#'
 
-        # symfony fluent config
-        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface::classMappingNode\(\)\.#'
-        - '#Calling method classMappingNode\(\) on possibly null value of type Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
+        # phpstan
+        - '#Instanceof between array\|null and (Doctrine\\Common\\Collections\\Collection|Traversable) will always evaluate to false\.#'
+        - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
+        - '#Call to an undefined method ReflectionType::getName\(\)\.#'
+
+        # doctrine
+        - '#Parameter \#1 \$hydrationMode of method Doctrine\\ORM\\AbstractQuery::getResult\(\) expects int, string given\.#'
+        - '#Parameter \#1 \$hydrationMode of method Doctrine\\ORM\\AbstractQuery::getSingleResult\(\) expects int\|null, string given\.#'
+
+        # symfony
+        - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
 
     excludes_analyse:
         - '*/vendor/*'
         - src/UserBundle/Resources/skeleton/
-
-        # see https://github.com/phpstan/phpstan/issues/859
         - src/UserBundle/Maker/UserMaker.php
-        - src/UserBundle/Resources/config/services.php

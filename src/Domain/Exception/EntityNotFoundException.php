@@ -11,11 +11,11 @@ final class EntityNotFoundException extends \RuntimeException implements DomainE
 {
     public static function createForId(string $class, $id): self
     {
-        return new self(sprintf('Entity "%s" with identifier %s cannot be found.', $class, json_encode($id)));
+        return new self(sprintf('Entity "%s" with identifier %s cannot be found.', $class, (string) json_encode($id)));
     }
 
     public static function createForFields(string $class, array $fields): self
     {
-        return new self(sprintf('Entity "%s" with fields matching %s cannot be found.', $class, json_encode($fields)));
+        return new self(sprintf('Entity "%s" with fields matching %s cannot be found.', $class, (string) json_encode($fields)));
     }
 }

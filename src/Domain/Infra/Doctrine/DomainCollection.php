@@ -24,7 +24,11 @@ final class DomainCollection implements DomainCollectionInterface
             return new self($value);
         }
 
-        return new self(new ArrayCollection($value instanceof \Traversable ? iterator_to_array($value) : $value ?? []));
+        if ($value instanceof \Traversable) {
+            $value = iterator_to_array($value);
+        }
+
+        return new self(new ArrayCollection($value ?? []));
     }
 
     public function __construct(Collection $collection)

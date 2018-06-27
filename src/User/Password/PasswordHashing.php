@@ -23,7 +23,13 @@ final class PasswordHashing implements PasswordHashingInterface
         $algorithm = $algorithm ?? $this->defaultAlgorithm;
 
         if (!$algorithm->legacy) {
-            return password_hash($plainPassword, $algorithm->type, $algorithm->options);
+            $hash = password_hash($plainPassword, $algorithm->type, $algorithm->options);
+
+            if (false === $hash) {
+                throw new \RuntimeException(sprintf('Unable to hash password with algorithm "%s".', $algorithm->type));
+            }
+
+            return $hash;
         }
 
         if ($this->deprecateLegacyApi) {

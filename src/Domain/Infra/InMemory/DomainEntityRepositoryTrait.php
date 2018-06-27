@@ -157,7 +157,11 @@ trait DomainEntityRepositoryTrait
             $knownValue = $this->identityHelper->normalizeIdentifier($this->accessor->getValue($entity, $field));
 
             if (is_array($value)) {
-                if (!in_array($knownValue, array_map([$this->identityHelper, 'normalizeIdentifier'], $value)) || in_array(null, $value, true)) {
+                $value = array_map(function ($v) {
+                    return $this->identityHelper->normalizeIdentifier($v);
+                }, $value);
+
+                if (null === $knownValue || !in_array($knownValue, $value)) {
                     return false;
                 }
 

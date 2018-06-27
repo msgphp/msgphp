@@ -35,7 +35,9 @@ trait EntityManagerTrait
 
     public static function tearDownAfterClass(): void
     {
-        if (null !== ($proxyDir = self::$em->getConfiguration()->getProxyDir()) && is_dir($proxyDir)) {
+        $proxyDir = self::$em->getConfiguration()->getProxyDir();
+
+        if (null !== $proxyDir && is_dir($proxyDir)) {
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($proxyDir, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
                 @($file->isDir() ? 'rmdir' : 'unlink')($file->getRealPath());
             }

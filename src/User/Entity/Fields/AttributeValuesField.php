@@ -16,7 +16,7 @@ trait AttributeValuesField
 {
     use AttributesField;
 
-    /** @var UserAttributeValue[] */
+    /** @var iterable|UserAttributeValue[] */
     private $attributeValues = [];
 
     /**

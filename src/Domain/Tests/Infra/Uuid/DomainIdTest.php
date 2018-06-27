@@ -69,7 +69,7 @@ final class DomainIdTest extends TestCase
     {
         $id = new DomainId(Uuid::fromString('00000000-0000-0000-0000-000000000000'));
 
-        $this->assertSame($id->toString(), json_decode(json_encode($id)));
+        $this->assertSame($id->toString(), json_decode((string) json_encode($id)));
     }
 }
 

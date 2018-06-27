@@ -65,7 +65,7 @@ final class DomainIdTest extends TestCase
      */
     public function testJsonSerialize(DomainId $id): void
     {
-        $this->assertSame($id->isEmpty() ? null : $id->toString(), json_decode(json_encode($id)));
+        $this->assertSame($id->isEmpty() ? null : $id->toString(), json_decode((string) json_encode($id)));
     }
 
     public function provideIds(): iterable

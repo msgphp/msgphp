@@ -40,10 +40,6 @@ final class ObjectFieldMappingListener
     {
         $class = $class ?? $metadata->getReflectionClass();
 
-        if (null === $class) {
-            return;
-        }
-
         if (isset($this->mappings[$name = $class->getName()])) {
             $this->processFieldMapping($metadata, $this->mappings[$name]);
         }
@@ -118,7 +114,7 @@ final class ObjectFieldMappingListener
             $class->setIdGeneratorType($parent->generatorType);
         }
 
-        if ($parent->idGenerator) {
+        if (!empty($parent->idGenerator)) {
             $class->setIdGenerator($parent->idGenerator);
         }
     }
