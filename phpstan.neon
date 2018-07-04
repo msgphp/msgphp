@@ -15,12 +15,9 @@ parameters:
         # generics
         - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'
         - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Handler)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
-        - '#Access to undefined constant string::.+\.#'
 
         # phpstan
-        - '#Instanceof between array\|null and (Doctrine\\Common\\Collections\\Collection|Traversable) will always evaluate to false\.#'
         - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
-        - '#Call to an undefined method ReflectionType::getName\(\)\.#'
 
         # doctrine
         - '#Parameter \#1 \$hydrationMode of method Doctrine\\ORM\\AbstractQuery::getResult\(\) expects int, string given\.#'

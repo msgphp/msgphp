@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security\Jwt;
 
-use Lexik\Bundle\JWTAuthenticationBundle\Security\User\UserProviderWithPayloadSupportsInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @author Damien Merchier <damien.merchier@gmail.com>
  */
-final class SecurityUserProvider implements UserProviderWithPayloadSupportsInterface
+final class SecurityUserProvider implements PayloadAwareUserProviderInterface
 {
     private $provider;
     private $repository;
