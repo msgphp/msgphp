@@ -19,11 +19,11 @@ final class EmailSaltedPassword implements CredentialInterface, PasswordProtecte
     use EmailAsUsername;
     use PasswordWithSaltProtected;
 
-    public function __construct(string $email, string $password, string $passwordSalt = null)
+    public function __construct(string $email, string $password, string $passwordSalt)
     {
         $this->email = $email;
         $this->password = $password;
-        $this->passwordSalt = $passwordSalt ?? bin2hex(random_bytes(32));
+        $this->passwordSalt = $passwordSalt;
     }
 
     public function withEmail(string $email): self
