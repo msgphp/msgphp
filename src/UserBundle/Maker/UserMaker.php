@@ -93,6 +93,8 @@ final class UserMaker implements MakerInterface
             $this->configs = $this->services = [];
         }
 
+        $io->success('All questions answered! We\'re almost done.');
+
         $writeAll = count($this->writes) > 1 && $io->confirm('Write all changes at once?');
 
         while ($write = array_shift($this->writes)) {
@@ -518,10 +520,6 @@ PHP;
 
     private function generateConsole(ConsoleStyle $io): void
     {
-        if (!$this->hasPassword()) {
-            return;
-        }
-
         [$contextElementFactoryNs, $contextElementFactoryShortClass] = self::splitClass($contextElementFactoryClass = 'App\\Console\\ClassContextElementFactory');
 
         $this->writes[] = [$this->getClassFileName($contextElementFactoryClass), self::getSkeleton('service/ClassContextElementFactory.php', [
@@ -533,9 +531,8 @@ PHP;
             'credentialShortClass' => self::splitClass($this->credential)[1],
         ])];
         $this->services[] = <<<PHP
-->set('app.console.class_context_element_factory', ${contextElementFactoryClass}::class)
-    ->decorate(MsgPhp\\Domain\\Infra\\Console\\Context\\ClassContextElementFactoryInterface::class)
-    ->arg('\$factory', ref('app.console.class_context_element_factory.inner'))
+->set(${contextElementFactoryClass}::class)
+->alias(MsgPhp\\Domain\\Infra\\Console\\Context\\ClassContextElementFactoryInterface::class, ${contextElementFactoryClass}::class)
 PHP;
     }
 

@@ -39,7 +39,7 @@ final class ResolveDomainPass implements CompilerPassInterface
             }
 
             foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
-                ContainerHelper::tagCommandHandler($container, $id, explode(',', $attr[0]['handles']), $commandBusId);
+                ContainerHelper::tagCommandHandler($container, $id, explode(',', $attr[0]['handles']), (string) $commandBusId);
             }
         } else {
             foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return <<<YAML
+# see https://github.com/symfony/recipes/blob/master/symfony/messenger/4.1/config/packages/messenger.yaml
 framework:
     messenger:
         transports:
@@ -15,8 +16,12 @@ framework:
 
         default_bus: command_bus
         buses:
-            command_bus: ~
+            command_bus:
+                middleware:
+                    - msgphp.messenger.console_message_receiver
             event_bus:
-                middleware: [allow_no_handler]
+                middleware:
+                    - msgphp.messenger.console_message_receiver
+                    - allow_no_handler
 
 YAML;
