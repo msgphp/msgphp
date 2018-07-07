@@ -12,3 +12,8 @@
 - Renamed `DomainProjectionSynchronization` to `ProjectionSynchronization`
 - Renamed `DomainProjectionTypeRegistryInterface` to `ProjectionTypeRegistryInterface`
 - Added default projection messages (`Command\` and `Event\`)
+
+## UserBundle
+
+- Updated `make:user` to generate code using Symfony Messenger instead of SimpleBus
+- Disabled legacy credentials in `make:user` (`Email/NicknameSaltedPassword`)

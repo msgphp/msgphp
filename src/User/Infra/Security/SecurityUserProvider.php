@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class SecurityUserProvider implements UserProviderInterface
 {
-    public const DEFAULT_ROLE = 'ROLE_DEFAULT';
+    public const DEFAULT_ROLE = 'ROLE_USER';
 
     private $repository;
     private $factory;
