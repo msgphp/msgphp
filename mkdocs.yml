@@ -53,6 +53,7 @@ pages:
 - Cookbook:
     - Bundle Installation: cookbook/bundle-installation.md
     - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
+    - Configuring A Message Bus: cookbook/configuring-a-message-bus.md
 - Reference:
     - Identifiers: reference/identifiers.md
     - Entities: reference/entities.md

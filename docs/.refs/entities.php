@@ -14,7 +14,7 @@ Class | Abstract
 {% endfor %}
 
 {% endif %}
-### Entity Fields
+### Fields
 
 {% for field in domain.entity_fields %}
 - `{{ field }}`
@@ -22,7 +22,7 @@ Class | Abstract
 - No fields available
 {% endfor %}
 
-### Entity Features
+### Features
 
 {% for feature in domain.entity_features %}
 - `{{ feature }}`

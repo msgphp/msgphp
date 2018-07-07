@@ -10,49 +10,6 @@ They are defined in a dedicated namespace for discovery, respectively `Msgphp\Do
 !!! note
     See the [reference](../reference/entities.md) page for all available entities provided per domain
 
-## Entity Fields
-
-### `CreatedAtField`
-
-A datetime value representing an entity was initially created at. Requires `$createdAt` to be set initially.
-
-- `getCreatedAt(): \DateTimeInterface`
-
-### `EnabledField`
-
-A boolean value representing an entity its availability state. Sets `$enabled` to `false` by default.
-
-- `isEnabled(): bool`
-
-### `LastUpdatedAtField`
-
-A datetime value representing an entity was last updated at. Requires `$lastUpdatedAt` to be set initially.
-
-- `getLastUpdatedAt(): \DateTimeInterface`
-
-## Entity Features
-
-### `CanBeConfirmed`
-
-Provides ability to confirm an entity. Requires `$confirmationToken` to be set initially (usually a random token).
-
-- `getConfirmationToken(): ?string`
-- `getConfirmedAt(): ?\DateTimeInterface` 
-- `isConfirmed(): bool` 
-- `confirm(): void` 
-    - Resets `$confirmationToken`
-    - Sets `$confirmatedAt` to the current datetime
-
-### `CanBeEnabled`
-
-Provides ability to toggle an entity its availability state.
-
-- Inherits from `EnabledField`
-- `enable(): void`
-    - Sets `$enabled` to `true`
-- `disable(): void`
-    - Sets `$enabled` to `false`
-
 ## Basic Example
 
 ```php

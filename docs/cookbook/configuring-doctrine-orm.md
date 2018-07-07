@@ -7,7 +7,7 @@ After a [bundle](bundle-installation.md) is installed we can configure [Doctrine
 ```bash
 composer install doctrine/orm doctrine/doctrine-bundle
 
-# using Symfony Flex
+# with Symfony Flex
 composer install orm
 ```
 
@@ -18,7 +18,19 @@ See the Doctrine Bundle [recipe configuration] for the minimal configuration to 
 Although the examples use annotation based mappings, you are not required to do so. [Read more][doctrine-bundle-mapping-config].
 
 !!! info
-    The configuration is automatically added when using Symfony Flex
+    The configuration is automatically added with Symfony Flex
+
+By default MsgPHP uses the `doctrine.orm.entity_manager` service. You can override its alias service to use any other
+entity manager:
+
+```yaml
+# config/services.yaml
+
+services:
+    msgphp.doctrine.entity_manager: '@doctrine.orm.some_other_entity_manager'
+
+    # ...
+```
 
 ## Mapping Entities
 
@@ -57,7 +69,7 @@ msgphp_<name>:
     entity field / feature trait its default ORM mapping is configured automatically.
 
 !!! info
-    When using Symfony Flex the required entities of a MsgPHP bundle are automatically created, including ORM mapping
+    With Symfony Flex the required entities of a MsgPHP bundle are automatically created, including ORM mapping
     and configuration
 
 ## Mapping Identifiers
@@ -210,19 +222,6 @@ Create the database schema:
 ```bash
 bin/console doctrine:database:create
 bin/console doctrine:schema:update --force
-```
-
-## Changing The Entity Manager
-
-To change the default entity manager used by MsgPHP, override its alias service:
-
-```yaml
-# config/services.yaml
-
-services:
-    msgphp.doctrine.entity_manager: '@doctrine.orm.some_entity_manager'
-
-    # ...
 ```
 
 [recipe configuration]: https://github.com/symfony/recipes/blob/master/doctrine/doctrine-bundle/1.6/config/packages/doctrine.yaml
