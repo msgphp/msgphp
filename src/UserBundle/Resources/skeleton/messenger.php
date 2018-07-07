@@ -13,10 +13,10 @@ framework:
             # Route your messages to the transports
             # 'App\Message\YourMessage': amqp
 
-        default_bus: command
+        default_bus: command_bus
         buses:
-            command: ~
-            event:
-                middleware: [logging, allow_no_handler, route_messages, call_message_handler]
+            command_bus: ~
+            event_bus:
+                middleware: [allow_no_handler]
 
 YAML;

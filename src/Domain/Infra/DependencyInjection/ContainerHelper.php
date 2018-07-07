@@ -61,22 +61,23 @@ final class ContainerHelper
         }
     }
 
-    public static function registerAnonymous(ContainerBuilder $container, string $class, bool $child = false): Definition
+    public static function registerAnonymous(ContainerBuilder $container, string $class, bool $child = false, string &$id = null): Definition
     {
         $definition = $child ? new ChildDefinition($class) : new Definition($class);
         $definition->setPublic(false);
 
-        return $container->setDefinition($class.'.'.ContainerBuilder::hash(__METHOD__.++self::$counter), $definition);
+        return $container->setDefinition($id = $class.'.'.ContainerBuilder::hash(__METHOD__.++self::$counter), $definition);
     }
 
-    public static function tagMessageHandler(ContainerBuilder $container, Definition $handler, array $handles): void
+    public static function tagCommandHandler(ContainerBuilder $container, string $handlerId, array $handles, string $busId): void
     {
+        $handler = $container->getDefinition($handlerId);
         $messengerEnabled = FeatureDetection::isMessengerAvailable($container);
         $simpleBusEnabled = FeatureDetection::hasSimpleBusCommandBusBundle($container);
 
         foreach ($handles as $class) {
             if ($messengerEnabled) {
-                $handler->addTag('messenger.message_handler', ['handles' => $class]);
+                $handler->addTag('messenger.message_handler', ['handles' => $class, 'bus' => $busId]);
             }
             if ($simpleBusEnabled) {
                 $handler

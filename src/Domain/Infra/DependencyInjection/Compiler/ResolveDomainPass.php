@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +26,22 @@ final class ResolveDomainPass implements CompilerPassInterface
         }));
         $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $defaultEvents) : $defaultEvents);
 
-        if (!$container->has(DomainMessageBusInterface::class)) {
+        if ($container->has(DomainMessageBusInterface::class)) {
+            $commandBus = $container->findDefinition('msgphp.command_bus');
+            $commandBusId = null;
+            $container->removeAlias('msgphp.command_bus');
+
+            foreach ($container->getDefinitions() as $id => $definition) {
+                if ($definition === $commandBus) {
+                    $commandBusId = $id;
+                    break;
+                }
+            }
+
+            foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
+                ContainerHelper::tagCommandHandler($container, $id, explode(',', $attr[0]['handles']), $commandBusId);
+            }
+        } else {
             foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {
                 $container->removeDefinition($id);
             }

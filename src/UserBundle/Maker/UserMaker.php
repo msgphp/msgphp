@@ -419,6 +419,9 @@ PHP;
 
         if ($io->confirm('Add config/packages/messenger.yaml?')) {
             $this->writes[] = [$this->projectDir.'/config/packages/messenger.yaml', self::getSkeleton('messenger.php')];
+            $this->services[] = <<<PHP
+->alias('msgphp.messenger.event_bus', 'event_bus')
+PHP;
         }
 
         if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {

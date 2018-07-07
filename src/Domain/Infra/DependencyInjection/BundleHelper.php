@@ -114,11 +114,12 @@ final class BundleHelper
     private static function initMessageBus(ContainerBuilder $container): void
     {
         if (FeatureDetection::isMessengerAvailable($container)) {
-            $container->setAlias('msgphp.messenger.bus', new Alias('message_bus', false));
-            $container->setAlias('msgphp.messenger.event_bus', new Alias('msgphp.messenger.bus', false));
+            $type = 'messenger';
+            $container->setAlias('msgphp.messenger.command_bus', new Alias('message_bus', false));
+            $commandBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class, false, $commandBusId);
+            $commandBus->setArgument('$bus', new Reference('msgphp.messenger.command_bus'));
 
-            $defaultBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class);
-            $defaultBus->setArgument('$bus', new Reference('msgphp.messenger.bus'));
+            $container->setAlias('msgphp.messenger.event_bus', new Alias('message_bus', false));
             $eventBus = ContainerHelper::registerAnonymous($container, MessengerInfra\DomainMessageBus::class);
             $eventBus->setArgument('$bus', new Reference('msgphp.messenger.event_bus'));
 
@@ -127,27 +128,42 @@ final class BundleHelper
                     ->setPublic(false);
             }
         } elseif (FeatureDetection::hasSimpleBusCommandBusBundle($container)) {
-            $container->setAlias('msgphp.simple_bus.bus', new Alias('simple_bus.command_bus', false));
-            $container->setAlias('msgphp.simple_bus.event_bus', new Alias((FeatureDetection::hasSimpleBusEventBusBundle($container) ? 'simple_bus.event_bus' : 'msgphp.simple_bus.bus'), false));
+            $type = 'simple_bus';
+            $container->setAlias('msgphp.simple_bus.command_bus', new Alias('simple_bus.command_bus', false));
+            $commandBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class, false, $commandBusId);
+            $commandBus->setArgument('$bus', new Reference('msgphp.simple_bus.command_bus'));
 
-            $defaultBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
-            $defaultBus->setArgument('$bus', new Reference('msgphp.simple_bus.bus'));
-            $eventBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
-            $eventBus->setArgument('$bus', new Reference('msgphp.simple_bus.event_bus'));
+            if (FeatureDetection::hasSimpleBusEventBusBundle($container)) {
+                $container->setAlias('msgphp.simple_bus.event_bus', new Alias('simple_bus.event_bus', false));
+                $eventBus = ContainerHelper::registerAnonymous($container, SimpleBusInfra\DomainMessageBus::class);
+                $eventBus->setArgument('$bus', new Reference('msgphp.simple_bus.event_bus'));
+            } else {
+                $eventBus = null;
+            }
 
             if (FeatureDetection::isConsoleAvailable($container)) {
-                $container->autowire(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
+                $consoleReceiver = $container->autowire(SimpleBusInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
                     ->setPublic(false)
-                    ->addTag('command_bus_middleware')
-                    ->addTag('event_bus_middleware');
+                    ->addTag('command_bus_middleware');
+                if (null !== $eventBus) {
+                    $consoleReceiver->addTag('event_bus_middleware');
+                }
             }
         } else {
             return;
         }
 
+        $container->setAlias('msgphp.command_bus', new Alias('msgphp.'.$type.'.command_bus', false));
+
+        if (null === $eventBus) {
+            $container->setAlias(DomainMessageBusInterface::class, new Alias($commandBusId, false));
+
+            return;
+        }
+
         $container->register(DomainMessageBus::class)
             ->setPublic(false)
-            ->setArgument('$bus', $defaultBus)
+            ->setArgument('$commandBus', $commandBus)
             ->setArgument('$eventBus', $eventBus)
             ->setArgument('$eventClasses', '%msgphp.domain.events%');
         $container->setAlias(DomainMessageBusInterface::class, new Alias(DomainMessageBus::class, false));

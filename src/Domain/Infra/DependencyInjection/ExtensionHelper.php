@@ -6,7 +6,6 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra};
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use MsgPhp\Domain\Message\NoopMessageHandler;
 use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -86,7 +85,7 @@ final class ExtensionHelper
 
     public static function finalizeCommandHandlers(ContainerBuilder $container, array $classMapping, array $commands, array $events): void
     {
-        foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
+        foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
             $definition->addTag('msgphp.domain.message_aware');
 
@@ -101,7 +100,9 @@ final class ExtensionHelper
                 $handles[] = $classMapping[$command];
             }
 
-            ContainerHelper::tagMessageHandler($container, $definition, $handles);
+            $definition
+                ->clearTag($tag)
+                ->addTag($tag, $attr[0] + ['handles' => implode(',', $handles)]);
         }
 
         foreach ($events as $class) {
@@ -111,10 +112,6 @@ final class ExtensionHelper
         }
 
         $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
-
-        $definition = ContainerHelper::registerAnonymous($container, NoopMessageHandler::class);
-        $definition->addTag('msgphp.domain.message_aware');
-        ContainerHelper::tagMessageHandler($container, $definition, $events);
     }
 
     public static function finalizeDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $entityRepositoryMapping): void
