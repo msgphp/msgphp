@@ -432,6 +432,10 @@ PHP;
                 'fieldName' => $usernameField,
             ])];
         }
+        
+        if ($hasLogin && $io->confirm('Activate /logout route (Add config/routes.yaml)?')) {
+            $this->writes[] = [$this->projectDir.'/config/routes.yaml', self::getSkeleton('routes.php')];
+        }
 
         if ($hasRegistration) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
