@@ -31,6 +31,10 @@ security:
                 default_target_path: /profile
                 username_parameter: ${fieldName}
                 password_parameter: password
+            
+            logout:
+                path: /logout
+                target: /
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
