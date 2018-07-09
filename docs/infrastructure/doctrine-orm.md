@@ -166,11 +166,12 @@ $otherEntity = $factory->create(MyEntity::class, [
 ## Domain Identifier Hydration
 
 When working with [domain identifiers](../ddd/identifiers.md) and its corresponding [type](doctrine-dbal.md#domain-identifier-type)
-a problem might occur when hydrating scalar values, e.g. using [`Query::getScalarResult()`][api-query-getscalarresult];
-it would return instances of `MsgPhp\Domain\DomainIdInterface` that can only be casted to string as its (true) scalar
-value (due to `__toString()`). In case the underlying data type is e.g. `integer` we'll lose it.
+a problem might occur when hydrating scalar values, e.g. using [`Query::getScalarResult()`][api-query-getscalarresult].
 
-To overcome, two hydration modes are available in order to hydrate the primitive identifier value instead.
+It would use instances of `MsgPhp\Domain\DomainIdInterface` that can only be casted to string as its (true) scalar
+value (due to `__toString()`). In case the underlying data type is e.g. `integer` it'll be lost.
+
+To overcome, two hydration modes are available to hydrate the primitive identifier value instead.
 
 ### Basic example
 
@@ -182,7 +183,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
-use MsgPhp\Domain\Infra\Doctrine\Hydration\{ScalarHydrator, SingleScalarHydrator}
+use MsgPhp\Domain\Infra\Doctrine\Hydration\{ScalarHydrator, SingleScalarHydrator};
 
 // --- SETUP ---
 
@@ -193,6 +194,8 @@ class MyEntity
     public $id;
 }
 
+DomainIdType::setClass(DomainId::class);
+DomainIdType::setDataType(Type::INTEGER);
 Type::addType(DomainIdType::NAME, DomainIdType::class);
 
 /** @var EntityManagerInterface $em */
@@ -204,7 +207,7 @@ $config->addCustomHydrationMode(SingleScalarHydrator::NAME, SingleScalarHydrator
 
 // --- USAGE ---
 
-$query = $em->createQuery('SELECT entity.id FORM MyEntity entity');
+$query = $em->createQuery('SELECT entity.id FROM MyEntity entity');
 
 $query->getScalarResult()[0]['id']; // "1"
 $query->getResult(ScalarHydrator::NAME)[0]['id']; // int(1)
