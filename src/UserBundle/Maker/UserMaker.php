@@ -426,15 +426,18 @@ PHP;
 PHP;
         }
 
-        if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
-            $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
-                'hashAlgorithm' => $this->getPassordHashAlgorithm(),
-                'fieldName' => $usernameField,
-            ])];
+        $wantsLogout = $io->confirm('Can users logout? (adds config/routes.yaml)');
+        if ($hasLogin && $wantsLogout) {
+            $this->writes[] = [$this->projectDir.'/config/routes.yaml', self::getSkeleton('routes.php')];
+            $securityLogout = self::getSkeleton('securityLogout.php');
         }
 
-        if ($hasLogin && $io->confirm('Activate /logout route (Add config/routes.yaml)?')) {
-            $this->writes[] = [$this->projectDir.'/config/routes.yaml', self::getSkeleton('routes.php')];
+        if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
+            $this->writes[] = [$this->projectDir . '/config/packages/security.yaml', self::getSkeleton('security.php', [
+                'hashAlgorithm' => $this->getPassordHashAlgorithm(),
+                'fieldName' => $usernameField,
+                'logout' => $securityLogout,
+            ])];
         }
 
         if ($hasRegistration) {

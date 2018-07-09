@@ -9,5 +9,4 @@ return <<<YAML
 logout:
     path: /logout
 
-
 YAML;
