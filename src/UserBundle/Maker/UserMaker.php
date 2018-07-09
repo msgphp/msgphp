@@ -426,17 +426,16 @@ PHP;
 PHP;
         }
 
-        $wantsLogout = $io->confirm('Can users logout? (adds config/routes.yaml)');
-        if ($hasLogin && $wantsLogout) {
+        $hasLogout = $hasLogin && $io->confirm('Can users logout? (adds config/routes.yaml)');
+        if ($hasLogin && $hasLogout) {
             $this->writes[] = [$this->projectDir.'/config/routes.yaml', self::getSkeleton('routes.php')];
-            $securityLogout = self::getSkeleton('securityLogout.php');
         }
 
         if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
-            $this->writes[] = [$this->projectDir . '/config/packages/security.yaml', self::getSkeleton('security.php', [
+            $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
                 'hashAlgorithm' => $this->getPassordHashAlgorithm(),
                 'fieldName' => $usernameField,
-                'logout' => $securityLogout,
+                'logout' => $hasLogout,
             ])];
         }
 
@@ -486,6 +485,7 @@ PHP;
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
                 'fieldName' => $usernameField,
+                'logout' => $hasLogout,
             ])];
         }
 
