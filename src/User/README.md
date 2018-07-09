@@ -16,10 +16,11 @@ composer require msgphp/user
 
 ## Features
 
-- Doctrine persistence
 - Symfony console commands
+- Symfony messenger commands & events
 - Symfony security infrastructure
 - Symfony validators
+- Doctrine persistence
 - Credential independent (supports e-mail, nickname, etc.)
 - Multiple username / credential support
 - Primary and secondary user e-mails

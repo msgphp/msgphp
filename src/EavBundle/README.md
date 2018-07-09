@@ -17,8 +17,9 @@ composer require msgphp/eav-bundle
 ## Features
 
 - Symfony 3.4 / 4.0 ready
+- Symfony messenger commands & events
 - Doctrine persistence
-- Standard supported attribute value types: `bool`, `int`, `float`, `string`, `\DateTimeInterface` and `null`
+- Default attribute value types: `bool`, `int`, `float`, `string`, `\DateTimeInterface` and `null`
 
 ## Configuration
 
@@ -40,29 +41,6 @@ return function (ContainerConfigurator $container) {
 ```
 
 And be done.
-
-## Usage
-
-### With [`DoctrineBundle`](https://github.com/doctrine/DoctrineBundle)
-
-Repositories from `MsgPhp\Eav\Infra\Doctrine\Repository\*` are registered as a service. Corresponding domain interfaces
-from  `MsgPhp\Eav\Repository\*` are aliased.
-
-Minimal configuration:
-
-```yaml
-# config/packages/doctrine.yaml
-
-doctrine:
-    orm:
-        mappings:
-            app:
-                dir: '%kernel.project_dir%/src/Entity'
-                type: annotation
-                prefix: App\Entity
-```
-
-- Requires `doctrine/orm`
 
 ## Documentation
 
