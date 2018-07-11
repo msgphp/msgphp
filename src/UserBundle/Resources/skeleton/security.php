@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+$logoutSection = '';
+
 if ($logout) {
     $logoutSection = <<<YAML
-            
+
             logout:
                 path: /logout
                 target: /
