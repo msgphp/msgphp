@@ -22,55 +22,50 @@ if [[ ! -z $GITHUB_TOKEN ]] ; then
     URL="$URL?access_token=${GITHUB_TOKEN}"
 fi
 
-if [[ ! $(git branch --list ${BRANCH}) ]] ; then
-    BODY=$(curl -sS -w ">>>%{http_code}" "${URL}")
-
-    if [[ ! $BODY =~ \>\>\>200\s*$ ]] ; then
-        echo "Error fetching pull request #${PR}..."
-        echo "${BODY}"
-        exit 1
-    fi
-
-    BODY=$(echo "${BODY}" | sed -e "s/>>>200$//" -e "s/\\\/\\\\\\\/g")
-
-    UPSTREAM_SSH_URL=$(cat <<EOF
-(@json_decode(trim(<<<EOL
-    ${BODY}
-EOL
-), true) ?: [])['head']['repo']['ssh_url'] ?? '';
-EOF
-    )
-    UPSTREAM_SSH_URL=$(php -r "echo ${UPSTREAM_SSH_URL}")
-
-    if [[ -z $UPSTREAM_SSH_URL ]] ; then
-        echo "Upstream SSH URL not found for pull request \"${URL}\""
-        exit 1
-    fi
-
-    UPSTREAM_BRANCH=$(cat <<EOF
-(@json_decode(trim(<<<EOL
-    ${BODY}
-EOL
-), true) ?: [])['head']['ref'] ?? '';
-EOF
-    )
-    UPSTREAM_BRANCH=$(php -r "echo ${UPSTREAM_BRANCH}")
-
-    echo "Adding pull request remote \"${UPSTREAM_SSH_URL}\"..."
-    git remote remove "${BRANCH}" &> /dev/null
-    git remote add "${BRANCH}" "${UPSTREAM_SSH_URL}" --fetch --track "${UPSTREAM_BRANCH}"
-    if [[ $? -eq 1 ]] ; then
-        git remote remove "${BRANCH}"
-        echo "Pull request closed. Aborted."
-        exit 1
-    fi
-    git branch --set-upstream-to "${BRANCH}/${UPSTREAM_BRANCH}"
-fi
-
-if [[ ! -z $(git status --porcelain) ]] ; then
-    echo "Current working directory must be clean to continue..."
+if [[ $(git branch --list ${BRANCH}) ]] ; then
+    echo "Branch \"${BRANCH}\" already exists"
     exit 1
 fi
 
-git checkout "${BRANCH}"
-git pull
+BODY=$(curl -sS -w ">>>%{http_code}" "${URL}")
+
+if [[ ! $BODY =~ \>\>\>200\s*$ ]] ; then
+    echo "Error fetching pull request #${PR}..."
+    echo "${BODY}"
+    exit 1
+fi
+
+BODY=$(echo "${BODY}" | sed -e "s/>>>200$//" -e "s/\\\/\\\\\\\/g")
+
+UPSTREAM_SSH_URL=$(cat <<EOF
+(@json_decode(trim(<<<EOL
+${BODY}
+EOL
+), true) ?: [])['head']['repo']['ssh_url'] ?? '';
+EOF
+)
+UPSTREAM_SSH_URL=$(php -r "echo ${UPSTREAM_SSH_URL}")
+
+if [[ -z $UPSTREAM_SSH_URL ]] ; then
+    echo "Upstream SSH URL not found for pull request \"${URL}\""
+    exit 1
+fi
+
+UPSTREAM_BRANCH=$(cat <<EOF
+(@json_decode(trim(<<<EOL
+${BODY}
+EOL
+), true) ?: [])['head']['ref'] ?? '';
+EOF
+)
+UPSTREAM_BRANCH=$(php -r "echo ${UPSTREAM_BRANCH}")
+
+echo "Adding pull request remote \"${UPSTREAM_SSH_URL}\"..."
+git remote remove "${BRANCH}" &> /dev/null
+git remote add "${BRANCH}" "${UPSTREAM_SSH_URL}" --fetch --track "${UPSTREAM_BRANCH}"
+if [[ $? -eq 1 ]] ; then
+    git remote remove "${BRANCH}"
+    echo "Pull request closed. Aborted."
+    exit 1
+fi
+git checkout -b "${BRANCH}" "${BRANCH}/${UPSTREAM_BRANCH}"
