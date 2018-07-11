@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
@@ -37,6 +38,7 @@ final class UserMaker implements MakerInterface
     private $passwordReset = false;
     private $configs = [];
     private $services = [];
+    private $routes = [];
     private $writes = [];
 
     /** @var \ReflectionClass */
@@ -70,7 +72,7 @@ final class UserMaker implements MakerInterface
     {
         $this->credential = $this->user = null;
         $this->passwordReset = false;
-        $this->configs = $this->services = $this->writes = [];
+        $this->configs = $this->services = $this->routes = $this->writes = [];
 
         if (!isset($this->classMapping[Entity\User::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
@@ -92,6 +94,10 @@ final class UserMaker implements MakerInterface
             }
         }
 
+        if ($io->confirm('Write Symfony Messenger configuration? (config/packages/messenger.yaml)')) {
+            $this->writes[] = [$this->projectDir.'/config/packages/messenger.yaml', self::getSkeleton('messenger.php')];
+        }
+
         $this->user = new \ReflectionClass($this->classMapping[Entity\User::class]);
 
         $this->generateUser($io);
@@ -99,16 +105,18 @@ final class UserMaker implements MakerInterface
         $this->generateConsole($io);
 
         if ($this->configs || $this->services) {
-            $configFile = $this->projectDir.'/config/packages/msgphp_user.make.php';
-            $i = 0;
-            while (file_exists($configFile)) {
-                $configFile = $this->projectDir.'/config/packages/msgphp_user.make_'.++$i.'.php';
-            }
-            array_unshift($this->writes, [$configFile, self::getSkeleton('config.php', [
+            array_unshift($this->writes, [$this->projectDir.'/config/packages/msgphp_user.make.php', self::getSkeleton('config.php', [
                 'config' => $this->configs ? var_export(array_merge_recursive(...$this->configs), true) : null,
                 'services' => $this->services,
             ])]);
             $this->configs = $this->services = [];
+        }
+
+        if ($this->routes) {
+            array_unshift($this->writes, [$this->projectDir.'/config/routes/user.php', self::getSkeleton('routes.php', [
+                'routes' => $this->routes,
+            ])]);
+            $this->routes = [];
         }
 
         $io->success('All questions answered! We\'re almost done.');
@@ -412,13 +420,13 @@ PHP;
 
         if (
             !class_exists(AnnotatedRouteControllerLoader::class) ||
+            !class_exists(Route::class) ||
             !interface_exists(FormInterface::class) ||
             !interface_exists(ValidatorInterface::class) ||
             !class_exists(Environment::class) ||
-            !interface_exists(MessageBusInterface::class) ||
-            !class_exists(Security::class)
+            !interface_exists(MessageBusInterface::class)
         ) {
-            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig messenger security`');
+            $io->warning(['Not all controller dependencies are met, run:', 'composer require annotations router form validator twig messenger']);
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
@@ -432,18 +440,21 @@ PHP;
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
         $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
         $hasRegistration = $this->hasCredential() && $io->confirm('Add a registration controller?');
-        $hasLogin = $this->hasPassword() && $io->confirm('Add a login and profile controller?');
         $hasForgotPassword = $this->passwordReset && $io->confirm('Add a forgot and reset password controller?');
+        $hasLogin = $this->hasPassword() && $io->confirm('Add a login and profile controller?'); // keep last
 
-        if ($io->confirm('Add config/packages/messenger.yaml?')) {
-            $this->writes[] = [$this->projectDir.'/config/packages/messenger.yaml', self::getSkeleton('messenger.php')];
-            $this->services[] = <<<PHP
-->alias('msgphp.messenger.event_bus', 'event_bus')
+        if ($hasLogin) {
+            if (!class_exists(Security::class)) {
+                $io->warning(['Not all controller dependencies are met, run:', 'composer require security']);
+
+                if (!$io->confirm('Continue anyway?')) {
+                    return;
+                }
+            }
+
+            $this->routes[] = <<<PHP
+->add('logout', '/logout')
 PHP;
-        }
-
-        if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
-            $this->writes[] = [$this->projectDir.'/config/routes.yaml', self::getSkeleton('routes.php')];
             $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
                 'hashAlgorithm' => $this->getPassordHashAlgorithm(),
                 'fieldName' => $usernameField,
