@@ -9,6 +9,7 @@ use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
 use MsgPhp\User\{CredentialInterface, Entity};
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\UserBundle\DependencyInjection\Configuration;
+use SebastianBergmann\Diff\Diff;
 use Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -58,6 +59,7 @@ final class UserMaker implements MakerInterface
 
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
+        $dependencies->addClassDependency(Diff::class, 'sebastian/diff', true, true);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -72,6 +74,22 @@ final class UserMaker implements MakerInterface
 
         if (!isset($this->classMapping[Entity\User::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
+        }
+
+        if (!interface_exists(EntityManagerInterface::class)) {
+            $io->note(['It\'s recommended to enable Doctrine ORM, run:', 'composer require orm']);
+
+            if (!$io->confirm('Continue anyway?')) {
+                return;
+            }
+        }
+
+        if (!interface_exists(MessageBusInterface::class)) {
+            $io->note(['It\'s recommended to enable Symfony Messenger, run:', 'composer require messenger']);
+
+            if (!$io->confirm('Continue anyway?')) {
+                return;
+            }
         }
 
         $this->user = new \ReflectionClass($this->classMapping[Entity\User::class]);
@@ -227,7 +245,7 @@ final class UserMaker implements MakerInterface
 
         $this->credential = $this->classMapping[CredentialInterface::class] ?? null;
 
-        if (!$this->hasUsername() && $io->confirm('Generate a user credential?')) {
+        if (!$this->hasCredential() && $io->confirm('Generate a user credential?')) {
             $credentials = [];
             foreach (glob(Configuration::getPackageDir().'/Entity/Credential/*.php') as $file) {
                 if ('Anonymous' === ($credential = basename($file, '.php')) || false !== strpos($credential, 'SaltedPassword')) {
@@ -398,25 +416,23 @@ PHP;
             !interface_exists(ValidatorInterface::class) ||
             !class_exists(Environment::class) ||
             !interface_exists(MessageBusInterface::class) ||
-            !interface_exists(EntityManagerInterface::class) ||
             !class_exists(Security::class)
         ) {
-            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig messenger orm security`');
+            $io->note('Not all controller dependencies are met. Run `composer require annotations form validator twig messenger security`');
 
             if (!$io->confirm('Continue anyway?')) {
                 return;
             }
         }
 
-        $usernameField = ($hasUsername = $this->hasUsername()) ? $this->credential::getUsernameField() : null;
-        $hasPassword = $this->hasPassword();
+        $usernameField = $this->hasCredential() ? $this->credential::getUsernameField() : null;
         $nsForm = trim($io->ask('Provide the form namespace', 'App\\Form\\User\\'), '\\');
         $nsController = trim($io->ask('Provide the controller namespace', 'App\\Controller\\User\\'), '\\');
         $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
         $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
-        $hasRegistration = $hasUsername && $io->confirm('Add a registration controller?');
-        $hasLogin = $hasPassword && $io->confirm('Add a login and profile controller?');
+        $hasRegistration = $this->hasCredential() && $io->confirm('Add a registration controller?');
+        $hasLogin = $this->hasPassword() && $io->confirm('Add a login and profile controller?');
         $hasForgotPassword = $this->passwordReset && $io->confirm('Add a forgot and reset password controller?');
 
         if ($io->confirm('Add config/packages/messenger.yaml?')) {
@@ -433,16 +449,16 @@ PHP;
 
         if ($hasLogin && $io->confirm('Add config/packages/security.yaml?')) {
             $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
+                'hasLogout' => $hasLogout,
                 'hashAlgorithm' => $this->getPassordHashAlgorithm(),
                 'fieldName' => $usernameField,
-                'logout' => $hasLogout,
             ])];
         }
 
         if ($hasRegistration) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
+                'hasPassword' => $this->hasPassword(),
                 'ns' => $nsForm,
-                'hasPassword' => $hasPassword,
                 'fieldName' => $usernameField,
             ])];
             $this->writes[] = [$this->getClassFileName($nsController.'\\RegisterController'), self::getSkeleton('controller/RegisterController.php', [
@@ -453,10 +469,10 @@ PHP;
                 'redirect' => $hasLogin ? '/login' : '/',
             ])];
             $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/register.html.php', [
+                'hasPassword' => $this->hasPassword(),
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
                 'fieldName' => $usernameField,
-                'hasPassword' => $hasPassword,
             ])];
         }
 
@@ -476,16 +492,16 @@ PHP;
                 'template' => $templateProfile = $templateDir.'/profile.html.twig',
             ])];
             $this->writes[] = [$this->getTemplateFileName($templateLogin), self::getSkeleton('template/login.html.php', [
+                'hasForgotPassword' => $hasForgotPassword,
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
                 'fieldName' => $usernameField,
-                'hasForgotPassword' => $hasForgotPassword,
             ])];
             $this->writes[] = [$this->getTemplateFileName($templateProfile), self::getSkeleton('template/profile.html.php', [
+                'hasLogout' => $hasLogout,
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
                 'fieldName' => $usernameField,
-                'logout' => $hasLogout,
             ])];
         }
 
@@ -602,19 +618,19 @@ PHP;
         return $this->projectDir.'/src/'.str_replace('\\', '/', $class).'.php';
     }
 
-    private function hasUsername(): bool
+    private function hasCredential(): bool
     {
         return $this->credential && Entity\Credential\Anonymous::class !== $this->credential;
     }
 
     private function hasPassword(): bool
     {
-        return $this->credential && false !== strpos($this->credential, 'Password');
+        return $this->hasCredential() && false !== strpos($this->credential, 'Password');
     }
 
     private function getPassordHashAlgorithm(): string
     {
-        if ($this->credential && false !== strpos($this->credential, 'SaltedPassword')) {
+        if ($this->hasCredential() && false !== strpos($this->credential, 'SaltedPassword')) {
             return PasswordAlgorithm::DEFAULT_LEGACY;
         }
 
