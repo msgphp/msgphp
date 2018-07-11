@@ -9,7 +9,7 @@ use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
 use MsgPhp\User\{CredentialInterface, Entity};
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\UserBundle\DependencyInjection\Configuration;
-use SebastianBergmann\Diff\Diff;
+use SebastianBergmann\Diff\Differ;
 use Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -61,7 +61,7 @@ final class UserMaker implements MakerInterface
 
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
-        $dependencies->addClassDependency(Diff::class, 'sebastian/diff', true, true);
+        $dependencies->addClassDependency(Differ::class, 'sebastian/diff', true, true);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -94,7 +94,7 @@ final class UserMaker implements MakerInterface
             }
         }
 
-        if ($io->confirm('Write Symfony Messenger configuration? (config/packages/messenger.yaml)')) {
+        if ($io->confirm('Enable Symfony Messenger configuration? (config/packages/messenger.yaml)')) {
             $this->writes[] = [$this->projectDir.'/config/packages/messenger.yaml', self::getSkeleton('messenger.php')];
         }
 
@@ -119,31 +119,56 @@ final class UserMaker implements MakerInterface
             $this->routes = [];
         }
 
-        $io->success('All questions answered! We\'re almost done.');
+        if (!$this->writes) {
+            return;
+        }
 
-        $writeAll = count($this->writes) > 1 && $io->confirm('Write all changes at once?');
+        $io->success('All questions have been answered!');
+        $io->note(count($this->writes).' file(s) are about to be written');
+
+        $review = $io->confirm('Review changes? All changes will be written otherwise!');
+        $written = [];
+        $writer = function (string $file, string $contents) use ($io, &$written): void {
+            if (!file_put_contents($file, $contents)) {
+                $io->error(sprintf('Cannot write changes to "%s"', $file));
+
+                return;
+            }
+
+            $written[] = $file;
+        };
+        $differ = new Differ();
+        $choices = ['y' => 'Yes', 'r' => 'No, show this review once more', 'n' => 'No, skip this file and continue'];
 
         while ($write = array_shift($this->writes)) {
-            [$fileName, $contents] = $write;
+            [$file, $contents] = $write;
 
-            switch ($writeAll ? 'y' : $io->choice(sprintf('Write changes to %s?', preg_replace('~^'.preg_quote($this->projectDir.'/', '~').'~', './', $fileName)), ['n' => 'No', 's' => 'No, show new code', 'y' => 'Yes'], 'Yes')) {
-                case 'n':
-                    continue 2;
-                case 's':
-                    $io->writeln($contents);
-                    break;
-                case 'y':
-                default:
-                    if (!is_dir($parent = dirname($fileName))) {
-                        mkdir($parent, 0777, true);
-                    }
-                    file_put_contents($fileName, $contents);
-                    break;
+            if (!is_dir($parent = dirname($file))) {
+                mkdir($parent, 0777, true);
+            }
+
+            if (!$review) {
+                $writer($file, $contents);
+                continue;
+            }
+
+            do {
+                $io->text('<info>'.(($exist = file_exists($file)) ? '[changed file]' : '[new file]').'</> '.$file);
+                $io->writeln($differ->diff($exist ? file_get_contents($file) : '', $contents));
+            } while ('r' === $choice = $io->choice('Write changes and continue reviewing?', $choices, $choices['r']));
+
+            if ('y' === $choice) {
+                $writer($file, $contents);
             }
         }
 
         $io->success('Done!');
         $io->note('Don\'t forget to update your database schema, if needed');
+
+        if ($io->confirm('Show written file names?')) {
+            sort($written);
+            $io->listing($written);
+        }
     }
 
     private function generateUser(ConsoleStyle $io): void
