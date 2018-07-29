@@ -50,7 +50,7 @@ final class CreateRoleCommand extends Command implements MessageReceivingInterfa
 
     protected function configure(): void
     {
-        $this->setDescription('Create a user');
+        $this->setDescription('Create a role');
         $this->contextFactory->configure($this->getDefinition());
     }
 

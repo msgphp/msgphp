@@ -9,7 +9,7 @@ use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\CreateRoleCommand;
 use MsgPhp\User\Entity\Role;
 use MsgPhp\User\Event\RoleCreatedEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Repository\RoleRepositoryInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -20,7 +20,7 @@ final class CreateRoleHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, RoleRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
