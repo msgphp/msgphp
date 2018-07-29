@@ -38,7 +38,9 @@ Reference of available messages per domain that can be dispatched using a [messa
 - `MsgPhp\User\Command\ChangeUserCredentialCommand`
 - `MsgPhp\User\Command\ConfirmUserCommand`
 - `MsgPhp\User\Command\ConfirmUserEmailCommand`
+- `MsgPhp\User\Command\CreateRoleCommand`
 - `MsgPhp\User\Command\CreateUserCommand`
+- `MsgPhp\User\Command\DeleteRoleCommand`
 - `MsgPhp\User\Command\DeleteUserAttributeValueCommand`
 - `MsgPhp\User\Command\DeleteUserCommand`
 - `MsgPhp\User\Command\DeleteUserEmailCommand`
@@ -49,6 +51,8 @@ Reference of available messages per domain that can be dispatched using a [messa
 
 ### Events
 
+- `MsgPhp\User\Event\RoleCreatedEvent`
+- `MsgPhp\User\Event\RoleDeletedEvent`
 - `MsgPhp\User\Event\UserAttributeValueAddedEvent`
 - `MsgPhp\User\Event\UserAttributeValueChangedEvent`
 - `MsgPhp\User\Event\UserAttributeValueDeletedEvent`
