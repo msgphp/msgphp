@@ -7,8 +7,8 @@ namespace MsgPhp\User\Infra\Console\Command;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait, MessageReceivingInterface};
-use MsgPhp\User\Command\CreateUserCommand as CreateUserDomainCommand;
-use MsgPhp\User\Event\UserCreatedEvent;
+use MsgPhp\User\Command\CreateRoleCommand as CreateRoleDomainCommand;
+use MsgPhp\User\Event\RoleCreatedEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +22,7 @@ final class CreateRoleCommand extends Command implements MessageReceivingInterfa
 {
     use MessageDispatchingTrait;
 
-    protected static $defaultName = 'user:role:create';
+    protected static $defaultName = 'role:create';
 
     private $contextFactory;
 
@@ -43,8 +43,8 @@ final class CreateRoleCommand extends Command implements MessageReceivingInterfa
      */
     public function onMessageReceived($message): void
     {
-        if ($message instanceof UserCreatedEvent) {
-            $this->io->success('Created user '.$message->user->getCredential()->getUsername());
+        if ($message instanceof RoleCreatedEvent) {
+            $this->io->success('Created role '.$message->role->getName());
         }
     }
 
@@ -59,7 +59,7 @@ final class CreateRoleCommand extends Command implements MessageReceivingInterfa
         $this->io = new SymfonyStyle($input, $output);
         $context = $this->contextFactory->getContext($input, $this->io);
 
-        $this->dispatch(CreateUserDomainCommand::class, [$context]);
+        $this->dispatch(CreateRoleDomainCommand::class, [$context]);
 
         return 0;
     }

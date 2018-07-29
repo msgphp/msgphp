@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 abstract class UserRoleCommand extends UserCommand
 {
-    private $repository;
+    use RoleAwareTrait;
 
     public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository)
     {
@@ -31,20 +31,5 @@ abstract class UserRoleCommand extends UserCommand
         parent::configure();
 
         $this->addArgument('role', InputArgument::OPTIONAL, 'The role name');
-    }
-
-    protected function getRole(InputInterface $input, StyleInterface $io): Role
-    {
-        if (null === $value = $input->getArgument('role')) {
-            if (!$input->isInteractive()) {
-                throw new \LogicException('No value provided for "role".');
-            }
-
-            do {
-                $value = $io->ask('Role name');
-            } while (null === $value);
-        }
-
-        return $this->repository->find($value);
     }
 }
