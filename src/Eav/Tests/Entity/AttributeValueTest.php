@@ -21,7 +21,6 @@ final class AttributeValueTest extends TestCase
         $this->assertSame($attribute, $attributeValue->getAttribute());
         $this->assertSame($attribute->getId(), $attributeValue->getAttributeId());
         $this->assertSame('value', $attributeValue->getValue());
-        $this->assertSame(md5(serialize('value')), $attributeValue->getChecksum());
     }
 
     /**
@@ -30,13 +29,11 @@ final class AttributeValueTest extends TestCase
     public function testChangeValue($initialValue, $newValue): void
     {
         $attributeValue = $this->createEntity($this->createMock(AttributeValueIdInterface::class), $this->createMock(Attribute::class), $initialValue);
-        $checksum = $attributeValue->getChecksum();
 
         $this->assertSame($initialValue, $attributeValue->getValue());
 
         $attributeValue->changeValue($newValue);
 
-        $this->assertNotSame($checksum, $attributeValue->getChecksum());
         $this->assertSame($newValue, $attributeValue->getValue());
     }
 

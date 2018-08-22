@@ -53,11 +53,6 @@ abstract class AttributeValue
         return $this->value = $value;
     }
 
-    public function getChecksum(): string
-    {
-        return $this->checksum;
-    }
-
     public function changeValue($value): void
     {
         $this->isNull = true;
@@ -69,7 +64,12 @@ abstract class AttributeValue
             $this->value = $value;
         }
 
-        $this->checksum = md5(serialize($value));
+        $this->checksum = static::createChecksumForValue($value);
+    }
+
+    protected static function createChecksumForValue($value): string
+    {
+        return md5(serialize($value));
     }
 
     protected function doSetValue($value): void
