@@ -2,4 +2,5 @@
 
 ## Eav
 
-- Removed `AttributeValue::getChecksum()`
+- Marked `AttributeValue::getChecksum()` static, requiring `$value` as 1st argument
+- Finalized `AttributeValue::get/changeValue()`
