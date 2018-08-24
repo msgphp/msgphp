@@ -21,9 +21,9 @@ abstract class AttributeValue
     private $value;
     private $isNull;
 
-    public static function getChecksum($value, string $type = null): string
+    public static function getChecksum($value): string
     {
-        return md5(serialize([$type ?? gettype($value), $value]));
+        return md5(serialize([\gettype($value), static::prepareChecksumValue($value)]));
     }
 
     public function __construct(Attribute $attribute, $value)
@@ -73,6 +73,11 @@ abstract class AttributeValue
 
         $this->value = $value;
         $this->checksum = static::getChecksum($value);
+    }
+
+    protected static function prepareChecksumValue($value)
+    {
+        return $value;
     }
 
     protected function doClearValue(): void

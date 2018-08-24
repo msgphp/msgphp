@@ -37,6 +37,14 @@ final class AttributeValueTest extends TestCase
         $this->assertSame($newValue, $attributeValue->getValue());
     }
 
+    public function testGetChecksum(): void
+    {
+        $this->assertSame(AttributeValue::getChecksum('foo'), AttributeValue::getChecksum('foo'));
+        $this->assertSame(AttributeValue::getChecksum(1), AttributeValue::getChecksum(1));
+        $this->assertNotSame(AttributeValue::getChecksum('foo'), AttributeValue::getChecksum('bar'));
+        $this->assertNotSame(AttributeValue::getChecksum(1), AttributeValue::getChecksum('1'));
+    }
+
     public function provideAttributeValues(): iterable
     {
         yield [null, true];
