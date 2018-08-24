@@ -21,9 +21,9 @@ abstract class AttributeValue
     private $value;
     private $isNull;
 
-    public static function getChecksum($value): string
+    public static function getChecksum($value, string $type = null): string
     {
-        return md5(serialize($value));
+        return md5(serialize([$type ?? gettype($value), $value]));
     }
 
     public function __construct(Attribute $attribute, $value)
