@@ -84,7 +84,7 @@ final class ProjectionTypeRegistry implements ProjectionTypeRegistryInterface
 
         foreach ($this->provideMappings() as $type => $mapping) {
             foreach ($mapping as $property => $propertyMapping) {
-                if (!is_array($propertyMapping)) {
+                if (!\is_array($propertyMapping)) {
                     $propertyMapping = ['type' => $propertyMapping];
                 } elseif (!isset($propertyMapping['type'])) {
                     $propertyMapping['type'] = self::DEFAULT_PROPERTY_TYPE;
@@ -100,7 +100,7 @@ final class ProjectionTypeRegistry implements ProjectionTypeRegistryInterface
     private function provideMappings(): iterable
     {
         foreach ($this->mappings as $type => $mapping) {
-            if (is_string($mapping)) {
+            if (\is_string($mapping)) {
                 if (!class_exists($mapping) || !is_subclass_of($mapping, DocumentMappingProviderInterface::class)) {
                     throw new \LogicException(sprintf('The class "%s" does not exists or is not a sub class of "%s".', $mapping, DocumentMappingProviderInterface::class));
                 }

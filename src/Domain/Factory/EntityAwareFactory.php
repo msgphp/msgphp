@@ -32,7 +32,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
     {
         $idFields = $this->identityMapping->getIdentifierFieldNames($class);
 
-        if (!is_array($id)) {
+        if (!\is_array($id)) {
             $id = [array_shift($idFields) => $id];
         }
 

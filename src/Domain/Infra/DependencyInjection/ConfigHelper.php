@@ -21,7 +21,7 @@ final class ConfigHelper
     public static function defaultBundleConfig(array $defaultIdClassMapping, array $idClassMappingPerType): \Closure
     {
         return function (array $value) use ($defaultIdClassMapping, $idClassMappingPerType): array {
-            $defaultType = $value['default_id_type'] ?? ConfigHelper::DEFAULT_ID_TYPE;
+            $defaultType = $value['default_id_type'] ?? self::DEFAULT_ID_TYPE;
             unset($value['default_id_type']);
 
             if (isset($value['id_type_mapping'])) {
@@ -31,7 +31,7 @@ final class ConfigHelper
                     }
 
                     if (null === $mappedClass = $idClassMapping[$type][$class] ?? $defaultIdClassMapping[$class] ?? null) {
-                        $mappedClass = in_array($type, self::UUID_TYPES, true) ? UuidInfra\DomainId::class : DomainId::class;
+                        $mappedClass = \in_array($type, self::UUID_TYPES, true) ? UuidInfra\DomainId::class : DomainId::class;
                     }
 
                     $value['class_mapping'][$class] = $mappedClass;
@@ -57,7 +57,7 @@ final class ConfigHelper
             $handlerAvailable = $available && is_subclass_of($classMapping[$class], DomainEventHandlerInterface::class);
 
             foreach ($features as $feature => $info) {
-                if (!is_array($info)) {
+                if (!\is_array($info)) {
                     $config += [$info => $available];
                 } else {
                     $config += array_fill_keys($info, $available && self::uses($classMapping[$class], $feature) ? $handlerAvailable : false);

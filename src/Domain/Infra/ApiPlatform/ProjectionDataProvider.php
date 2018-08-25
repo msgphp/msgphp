@@ -25,7 +25,7 @@ final class ProjectionDataProvider implements CollectionDataProviderInterface, I
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return in_array($resourceClass, $this->typeRegistry->all(), true);
+        return \in_array($resourceClass, $this->typeRegistry->all(), true);
     }
 
     /**

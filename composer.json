@@ -2,12 +2,12 @@
     "description": "Composer configuration for bulk CI testing of packages",
     "require-dev": {
         "wikimedia/composer-merge-plugin": "^1.4",
-        "friendsofphp/php-cs-fixer": "^2.12",
+        "friendsofphp/php-cs-fixer": "^2.13",
         "phpstan/phpstan": "^0.10",
         "phpstan/phpstan-phpunit": "^0.10",
-        "phpunit/phpunit": "^7.0",
+        "phpunit/phpunit": "^7.3",
         "ro0nl/link": "^1.0",
-        "twig/twig": "^2.4"
+        "twig/twig": "^2.5"
     },
     "autoload-dev": {
         "psr-4": {

@@ -77,7 +77,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
 
         $result = [];
         foreach ($results ? array_merge(...$results) : [] as $target) {
-            $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(get_class($target)));
+            $metadata = $this->em->getClassMetadata($class = ClassUtils::getRealClass(\get_class($target)));
 
             foreach ($targets[$class] as $field => $mappedBy) {
                 $user = null === $mappedBy ? $target : $metadata->getFieldValue($target, $mappedBy);
@@ -87,7 +87,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
                 }
 
                 if (!$user instanceof User) {
-                    throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $field, get_class($target), is_object($user) ? get_class($user) : gettype($user)));
+                    throw new \LogicException(sprintf('Field "%s.%s" must return an instance of "%s" or null, got "%s".', $class, $field, \get_class($target), \is_object($user) ? \get_class($user) : \gettype($user)));
                 }
 
                 if (null !== $username = $metadata->getFieldValue($target, $field)) {

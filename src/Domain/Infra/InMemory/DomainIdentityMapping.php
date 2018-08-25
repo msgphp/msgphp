@@ -38,7 +38,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
     {
         $ids = [];
 
-        foreach ($this->getIdentifierFieldNames(get_class($object)) as $field) {
+        foreach ($this->getIdentifierFieldNames(\get_class($object)) as $field) {
             if (null === ($value = $this->accessor->getValue($object, $field))) {
                 continue;
             }
@@ -47,7 +47,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
                 if ($value->isEmpty()) {
                     continue;
                 }
-            } elseif (is_object($value) && !$this->getIdentity($value)) {
+            } elseif (\is_object($value) && !$this->getIdentity($value)) {
                 continue;
             }
 

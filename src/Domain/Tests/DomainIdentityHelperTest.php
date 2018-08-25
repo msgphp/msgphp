@@ -32,7 +32,7 @@ final class DomainIdentityHelperTest extends TestCase
                     return Entities\BaseTestEntity::getPrimaryIds($object);
                 }
 
-                throw InvalidClassException::create(get_class($object));
+                throw InvalidClassException::create(\get_class($object));
             });
     }
 

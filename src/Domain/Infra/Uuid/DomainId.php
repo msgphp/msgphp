@@ -39,7 +39,7 @@ class DomainId implements DomainIdInterface
 
     final public function equals(DomainIdInterface $id): bool
     {
-        return $id === $this ? true : ($id instanceof self && static::class === get_class($id) ? $this->uuid->equals($id->uuid) : false);
+        return $id === $this ? true : ($id instanceof self && static::class === \get_class($id) ? $this->uuid->equals($id->uuid) : false);
     }
 
     final public function toString(): string

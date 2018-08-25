@@ -151,7 +151,7 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
         $this->assertClosedGenerator();
 
-        count($collection);
+        \count($collection);
     }
 
     protected static function createCollection(array $elements): DomainCollectionInterface

@@ -23,7 +23,7 @@ final class GlobalObjectMemoryTest extends TestCase
 
         foreach ([$std1 = new \stdClass(), $std2 = new \stdClass(), $anonymous] as $object) {
             $memory->persist($object);
-            $objects[get_class($object)] = [];
+            $objects[\get_class($object)] = [];
         }
         $memory->persist($std1);
 
@@ -34,11 +34,11 @@ final class GlobalObjectMemoryTest extends TestCase
         }
 
         $this->assertSame([$std1, $std2], $objects[\stdClass::class]);
-        $this->assertSame([$anonymous], $objects[get_class($anonymous)]);
+        $this->assertSame([$anonymous], $objects[\get_class($anonymous)]);
 
         $memory->remove($anonymous);
 
-        $class = get_class($anonymous);
+        $class = \get_class($anonymous);
         $objects[$class] = [];
 
         foreach ($memory->all($class) as $i => $object) {

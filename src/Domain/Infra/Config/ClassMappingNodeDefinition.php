@@ -81,8 +81,8 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     {
         $this->validate()->always(function (array $value): array {
             foreach ($value as $class => $mappedClass) {
-                if (!is_string($mappedClass)) {
-                    throw new \LogicException(sprintf('Class "%s" must be configured to a mapped sub class value, got type "%s".', $class, gettype($mappedClass)));
+                if (!\is_string($mappedClass)) {
+                    throw new \LogicException(sprintf('Class "%s" must be configured to a mapped sub class value, got type "%s".', $class, \gettype($mappedClass)));
                 }
                 if (!is_subclass_of($mappedClass, $class)) {
                     throw new \LogicException(sprintf('Class "%s" must be configured to a mapped sub class value, got "%s".', $class, $mappedClass));
@@ -166,7 +166,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         $prototypedNode = $prototype->getNode();
 
         if (!$prototypedNode instanceof PrototypeNodeInterface) {
-            throw new \LogicException(sprintf('Prototyped node must be an instance of "%s", got "%s".', PrototypeNodeInterface::class, get_class($prototypedNode)));
+            throw new \LogicException(sprintf('Prototyped node must be an instance of "%s", got "%s".', PrototypeNodeInterface::class, \get_class($prototypedNode)));
         }
 
         $node->setPrototype($prototypedNode);

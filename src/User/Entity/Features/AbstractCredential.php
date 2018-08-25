@@ -30,11 +30,11 @@ trait AbstractCredential
             $readIsProp = $writeIsProp = false;
 
             if (!method_exists($this, $writeMethod = 'change'.($ucField = ucfirst($field))) && !method_exists($this, $writeMethod = 'set'.$ucField) && !($writeIsProp = property_exists($this, $field))) {
-                throw new \LogicException(sprintf('Unable to handle event "%s", method "%s::change/set%s()" nor property "$%s" does not exists.', get_class($event), get_class($this), $ucField, $field));
+                throw new \LogicException(sprintf('Unable to handle event "%s", method "%s::change/set%s()" nor property "$%s" does not exists.', \get_class($event), \get_class($this), $ucField, $field));
             }
 
             if (!method_exists($this, $readMethod = 'get'.$ucField) && !method_exists($this, $readMethod = 'is'.$ucField) && !method_exists($this, $readMethod = 'has'.$ucField) && !($readIsProp = property_exists($this, $field))) {
-                throw new \LogicException(sprintf('Unable to handle event "%s", method "%s::get/is/has%s()" nor property "$%s" does not exists.', get_class($event), get_class($this), $ucField, $field));
+                throw new \LogicException(sprintf('Unable to handle event "%s", method "%s::get/is/has%s()" nor property "$%s" does not exists.', \get_class($event), \get_class($this), $ucField, $field));
             }
 
             if ($value !== ($readIsProp ? $this->$field : $this->$readMethod())) {

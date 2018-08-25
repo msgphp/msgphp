@@ -21,7 +21,7 @@ final class ResolveDomainPass implements CompilerPassInterface
     {
         $defaultEvents = array_values(array_filter(array_map(function (string $file): string {
             return 'MsgPhp\\Domain\\Event\\'.basename($file, '.php');
-        }, glob(dirname(dirname(dirname(__DIR__))).'/Event/*Event.php')), function (string $class): bool {
+        }, glob(\dirname(__DIR__, 3).'/Event/*Event.php')), function (string $class): bool {
             return !is_subclass_of($class, DomainEventInterface::class);
         }));
         $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $defaultEvents) : $defaultEvents);
@@ -66,11 +66,11 @@ final class ResolveDomainPass implements CompilerPassInterface
 
     private static function processClassMapping($value, array $classMapping, bool $arrayKeys = false)
     {
-        if (is_string($value) && isset($classMapping[$value])) {
+        if (\is_string($value) && isset($classMapping[$value])) {
             return $classMapping[$value];
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $value;
         }
 

@@ -41,7 +41,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
             $expectedValue = $property->getValue($expected);
             $actualValue = $property->getValue($actual);
 
-            if (is_object($expectedValue) && is_object($actualValue)) {
+            if (\is_object($expectedValue) && \is_object($actualValue)) {
                 if (!$this->equalsEntity($expectedValue, $actualValue)) {
                     $equals = false;
                     break;

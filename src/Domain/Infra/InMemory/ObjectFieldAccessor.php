@@ -38,6 +38,6 @@ final class ObjectFieldAccessor
             return $object->$field;
         }
 
-        throw new \RuntimeException(sprintf('Unknown field name "%s" for object "%s".', $field, get_class($object)));
+        throw new \RuntimeException(sprintf('Unknown field name "%s" for object "%s".', $field, \get_class($object)));
     }
 }

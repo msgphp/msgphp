@@ -18,7 +18,7 @@ final class EnabledFieldTest extends TestCase
 
     private function getObject($value = null)
     {
-        if (func_num_args()) {
+        if (\func_num_args()) {
             return new class($value) {
                 use EnabledField;
 

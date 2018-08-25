@@ -109,7 +109,7 @@ trait DomainEntityRepositoryTrait
     private function doSave($entity): void
     {
         if (!$entity instanceof $this->class) {
-            throw InvalidClassException::create(get_class($entity));
+            throw InvalidClassException::create(\get_class($entity));
         }
 
         $this->em->persist($entity);
@@ -117,7 +117,7 @@ trait DomainEntityRepositoryTrait
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(get_class($entity), $this->identityHelper->getIdentity($entity));
+            throw DuplicateEntityException::createForId(\get_class($entity), $this->identityHelper->getIdentity($entity));
         }
     }
 
@@ -127,7 +127,7 @@ trait DomainEntityRepositoryTrait
     private function doDelete($entity): void
     {
         if (!$entity instanceof $this->class) {
-            throw InvalidClassException::create(get_class($entity));
+            throw InvalidClassException::create(\get_class($entity));
         }
 
         $this->em->remove($entity);
@@ -192,7 +192,7 @@ trait DomainEntityRepositoryTrait
 
             $param = $this->addFieldParameter($qb, $field, $value);
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $where->add($expr->in($fieldAlias, $param));
             } elseif (isset($associations[$field])) {
                 $where->add($expr->eq('IDENTITY('.$fieldAlias.')', $param));

@@ -41,7 +41,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         if (!$this->isManaged($class = $this->classMapping[$class] ?? $class)) {
             throw InvalidClassException::create($class);
         }
-        if (is_array($id)) {
+        if (\is_array($id)) {
             $class = $this->getDiscriminatorClass($class, $id, true);
         }
         if (null === $ref = $this->em->getReference($class, $id)) {

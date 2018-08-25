@@ -21,7 +21,7 @@ final class ScalarHydratorTest extends TestCase
         self::$em->persist($entity = Entities\TestPrimitiveEntity::create(['id' => new DomainId('1')]));
         self::$em->flush();
 
-        $query = self::$em->createQuery('SELECT root.id FROM '.get_class($entity).' root');
+        $query = self::$em->createQuery('SELECT root.id FROM '.\get_class($entity).' root');
 
         $this->assertSame('1', $query->getScalarResult()[0]['id']);
 

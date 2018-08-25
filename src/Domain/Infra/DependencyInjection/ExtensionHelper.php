@@ -61,7 +61,7 @@ final class ExtensionHelper
                 }
             }
 
-            if (!defined($typeClass.'::NAME')) {
+            if (!\defined($typeClass.'::NAME')) {
                 throw new \LogicException(sprintf('Type class "%s" for identifier "%s" requires a "NAME" constant.', $typeClass, $idClass));
             }
 

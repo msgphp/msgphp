@@ -21,7 +21,7 @@ final class ContainerHelper
 
     public static function hasBundle(ContainerInterface $container, string $class): bool
     {
-        return in_array($class, $container->getParameter('kernel.bundles'), true);
+        return \in_array($class, $container->getParameter('kernel.bundles'), true);
     }
 
     public static function getBundles(ContainerInterface $container): array

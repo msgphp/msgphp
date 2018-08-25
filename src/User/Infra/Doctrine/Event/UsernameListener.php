@@ -70,7 +70,7 @@ final class UsernameListener
             if (null !== $username = $event->getOldValue($field)) {
                 $this->updateUsernames[$username] = $event->getNewValue($field);
             } elseif (null !== $username = $event->getNewValue($field)) {
-                $user = null === $mappedBy ? $entity : $em->getClassMetadata(get_class($entity))->getFieldValue($entity, $mappedBy);
+                $user = null === $mappedBy ? $entity : $em->getClassMetadata(\get_class($entity))->getFieldValue($entity, $mappedBy);
 
                 if (null === $user) {
                     continue;
@@ -87,7 +87,7 @@ final class UsernameListener
     public function remove($entity, LifecycleEventArgs $event): void
     {
         $em = $event->getEntityManager();
-        $metadata = $em->getClassMetadata(get_class($entity));
+        $metadata = $em->getClassMetadata(\get_class($entity));
 
         foreach (array_keys($this->getTargetMapping($entity, $em)) as $field) {
             if (null === $username = $metadata->getFieldValue($entity, $field)) {
@@ -133,7 +133,7 @@ final class UsernameListener
      */
     private function getUsernames($entity, EntityManagerInterface $em): iterable
     {
-        $metadata = $em->getClassMetadata(get_class($entity));
+        $metadata = $em->getClassMetadata(\get_class($entity));
 
         foreach ($this->getTargetMapping($entity, $em) as $field => $mappedBy) {
             $user = null === $mappedBy ? $entity : $metadata->getFieldValue($entity, $mappedBy);

@@ -42,7 +42,7 @@ final class GlobalObjectMemory
      */
     public function persist($object): void
     {
-        $this->storage->attach($object, get_class($object));
+        $this->storage->attach($object, \get_class($object));
     }
 
     /**

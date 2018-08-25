@@ -30,12 +30,12 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
 
     public function getIdentity($object): array
     {
-        return array_filter($this->getMetadata(get_class($object))->getIdentifierValues($object), function ($value) {
+        return array_filter($this->getMetadata(\get_class($object))->getIdentifierValues($object), function ($value) {
             if ($value instanceof DomainIdInterface) {
                 return !$value->isEmpty();
             }
 
-            if (is_object($value)) {
+            if (\is_object($value)) {
                 return (bool) $this->getIdentity($value);
             }
 

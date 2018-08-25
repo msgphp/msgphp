@@ -21,8 +21,8 @@ final class ClassMappingNode extends PrototypedArrayNode
     {
         parent::validateType($value);
 
-        if (!is_array($value)) {
-            throw new \UnexpectedValueException(sprintf('Expected configuration value to be type array, got "%s".', gettype($value)));
+        if (!\is_array($value)) {
+            throw new \UnexpectedValueException(sprintf('Expected configuration value to be type array, got "%s".', \gettype($value)));
         }
 
         foreach ($value as $k => $v) {

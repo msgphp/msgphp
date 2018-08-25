@@ -24,9 +24,9 @@ final class DomainIdentityHelper
             return true;
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             try {
-                $this->mapping->getIdentifierFieldNames(get_class($value));
+                $this->mapping->getIdentifierFieldNames(\get_class($value));
 
                 return true;
             } catch (InvalidClassException $e) {
@@ -46,14 +46,14 @@ final class DomainIdentityHelper
             return $value->isEmpty();
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             try {
                 $identity = $this->mapping->getIdentity($value);
             } catch (InvalidClassException $e) {
                 return false;
             }
 
-            return !$this->isIdentity(get_class($value), $identity);
+            return !$this->isIdentity(\get_class($value), $identity);
         }
 
         return false;
@@ -65,7 +65,7 @@ final class DomainIdentityHelper
             return $value->isEmpty() ? null : $value->toString();
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             try {
                 $identity = $this->mapping->getIdentity($value);
             } catch (InvalidClassException $e) {
@@ -76,7 +76,7 @@ final class DomainIdentityHelper
                 return $this->normalizeIdentifier($id);
             }, $identity);
 
-            return 1 === count($this->mapping->getIdentifierFieldNames(get_class($value))) ? reset($identity) : $identity;
+            return 1 === \count($this->mapping->getIdentifierFieldNames(\get_class($value))) ? reset($identity) : $identity;
         }
 
         return $value;
@@ -105,10 +105,10 @@ final class DomainIdentityHelper
         }
 
         $fields = $this->mapping->getIdentifierFieldNames($class);
-        $count = count($fields);
+        $count = \count($fields);
 
-        if (is_array($value)) {
-            if (count($value) !== $count) {
+        if (\is_array($value)) {
+            if (\count($value) !== $count) {
                 return false;
             }
 
@@ -126,7 +126,7 @@ final class DomainIdentityHelper
 
     public function toIdentity(string $class, $value): array
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $value;
         }
 

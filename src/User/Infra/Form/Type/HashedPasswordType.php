@@ -60,7 +60,7 @@ final class HashedPasswordType extends AbstractType
                 } else {
                     $algorithm = null === $algorithm && null !== ($salt = $user->getSalt())
                         ? PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt))
-                        : (is_callable($algorithm) ? $algorithm() : $algorithm);
+                        : (\is_callable($algorithm) ? $algorithm() : $algorithm);
 
                     $valid = $this->passwordHashing->isValid($user->getPassword(), $plainPassword, $algorithm);
                 }
@@ -77,7 +77,7 @@ final class HashedPasswordType extends AbstractType
         $builder->get('password')->addModelTransformer(new CallbackTransformer(function (?string $value): ?string {
             return null;
         }, function (?string $value) use ($algorithm, &$plainPassword): ?string {
-            return null === $value ? null : $this->passwordHashing->hash($plainPassword = $value, is_callable($algorithm) ? $algorithm() : $algorithm);
+            return null === $value ? null : $this->passwordHashing->hash($plainPassword = $value, \is_callable($algorithm) ? $algorithm() : $algorithm);
         }));
 
         if ($options['password_confirm']) {
@@ -100,7 +100,7 @@ final class HashedPasswordType extends AbstractType
                     return;
                 }
 
-                if (!$this->passwordHashing->isValid($password, $value, is_callable($algorithm) ? $algorithm() : $algorithm)) {
+                if (!$this->passwordHashing->isValid($password, $value, \is_callable($algorithm) ? $algorithm() : $algorithm)) {
                     /** @var FormInterface $form */
                     $form = $context->getObject();
                     $form->addError(new FormError($passwordConfirmOptions['invalid_message'], $passwordConfirmOptions['invalid_message'], $passwordConfirmOptions['invalid_message_parameters'], null, $this));
@@ -135,7 +135,7 @@ final class HashedPasswordType extends AbstractType
     {
         if (!isset($options['constraints'])) {
             $options['constraints'] = [];
-        } elseif (!is_array($options['constraints'])) {
+        } elseif (!\is_array($options['constraints'])) {
             $options['constraints'] = [$options['constraints']];
         }
 

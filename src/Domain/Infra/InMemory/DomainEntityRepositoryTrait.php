@@ -108,7 +108,7 @@ trait DomainEntityRepositoryTrait
     private function doSave($entity): void
     {
         if (!$entity instanceof $this->class) {
-            throw InvalidClassException::create(get_class($entity));
+            throw InvalidClassException::create(\get_class($entity));
         }
 
         if ($this->memory->contains($entity)) {
@@ -116,7 +116,7 @@ trait DomainEntityRepositoryTrait
         }
 
         if (null !== ($id = $this->identityHelper->getIdentity($entity)) && $this->doExists($id)) {
-            throw DuplicateEntityException::createForId(get_class($entity), $id);
+            throw DuplicateEntityException::createForId(\get_class($entity), $id);
         }
 
         $this->memory->persist($entity);
@@ -128,7 +128,7 @@ trait DomainEntityRepositoryTrait
     private function doDelete($entity): void
     {
         if (!$entity instanceof $this->class) {
-            throw InvalidClassException::create(get_class($entity));
+            throw InvalidClassException::create(\get_class($entity));
         }
 
         $this->memory->remove($entity);
@@ -137,7 +137,7 @@ trait DomainEntityRepositoryTrait
     private function createResultSet(array $entities, int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         if ($offset || $limit) {
-            $entities = array_slice($entities, $offset, $limit ?: null);
+            $entities = \array_slice($entities, $offset, $limit ?: null);
         }
 
         return DomainCollectionFactory::create($entities);
@@ -148,7 +148,7 @@ trait DomainEntityRepositoryTrait
      */
     private function matchesFields($entity, array $fields): bool
     {
-        $idFields = array_flip($this->identityHelper->getIdentifierFieldNames(get_class($entity)));
+        $idFields = array_flip($this->identityHelper->getIdentifierFieldNames(\get_class($entity)));
         foreach ($fields as $field => $value) {
             if (isset($idFields[$field]) && $this->identityHelper->isEmptyIdentifier($value)) {
                 return false;
@@ -156,12 +156,12 @@ trait DomainEntityRepositoryTrait
 
             $knownValue = $this->identityHelper->normalizeIdentifier($this->accessor->getValue($entity, $field));
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = array_map(function ($v) {
                     return $this->identityHelper->normalizeIdentifier($v);
                 }, $value);
 
-                if (null === $knownValue || !in_array($knownValue, $value)) {
+                if (null === $knownValue || !\in_array($knownValue, $value)) {
                     return false;
                 }
 

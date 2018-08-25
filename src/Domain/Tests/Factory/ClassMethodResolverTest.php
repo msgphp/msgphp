@@ -29,7 +29,7 @@ final class ClassMethodResolverTest extends TestCase
     {
         $object = new class() {
         };
-        $arguments = ClassMethodResolver::resolve(get_class($object), '__construct');
+        $arguments = ClassMethodResolver::resolve(\get_class($object), '__construct');
 
         $this->assertSame([], $arguments);
     }
@@ -48,7 +48,7 @@ final class ClassMethodResolverTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        ClassMethodResolver::resolve(get_class($object), 'bar');
+        ClassMethodResolver::resolve(\get_class($object), 'bar');
     }
 }
 

@@ -62,7 +62,7 @@ final class DomainCollection implements DomainCollectionInterface
             return false;
         }
 
-        return in_array($element, $this->elements, true);
+        return \in_array($element, $this->elements, true);
     }
 
     public function containsKey($key): bool
@@ -157,7 +157,7 @@ final class DomainCollection implements DomainCollectionInterface
             return new self($elements);
         }
 
-        return new self(array_slice($this->elements, $offset, $limit ?: null, true));
+        return new self(\array_slice($this->elements, $offset, $limit ?: null, true));
     }
 
     public function map(callable $mapper): array
@@ -176,6 +176,6 @@ final class DomainCollection implements DomainCollectionInterface
 
     public function count(): int
     {
-        return $this->elements instanceof \Traversable ? iterator_count($this->elements) : count($this->elements);
+        return $this->elements instanceof \Traversable ? iterator_count($this->elements) : \count($this->elements);
     }
 }

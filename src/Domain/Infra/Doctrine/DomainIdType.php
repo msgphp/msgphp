@@ -56,7 +56,7 @@ class DomainIdType extends Type
     final public static function resolveName($value): ?string
     {
         if ($value instanceof DomainIdInterface) {
-            $class = get_class($value);
+            $class = \get_class($value);
 
             foreach (self::$mapping as $type => $mapping) {
                 if ($class === $mapping['class']) {
@@ -76,7 +76,7 @@ class DomainIdType extends Type
     final public static function resolveValue($value, AbstractPlatform $platform)
     {
         if ($value instanceof DomainIdInterface) {
-            $class = get_class($value);
+            $class = \get_class($value);
             $type = Type::INTEGER;
 
             foreach (self::$mapping as $type => $mapping) {

@@ -379,7 +379,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
     final protected function assertEntityCollectionEquals(array $expected, $actual): void
     {
         $this->assertInstanceOf(DomainCollectionInterface::class, $actual);
-        $this->assertCount(count($expected), $actual);
+        $this->assertCount(\count($expected), $actual);
 
         $equals = true;
         foreach ($actual as $i => $entity) {
@@ -394,7 +394,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
     final protected function assertEntityEquals($expected, $actual): void
     {
-        $this->assertSame(get_class($expected), get_class($actual));
+        $this->assertSame(\get_class($expected), \get_class($actual));
 
         if (!$this->equalsEntity($expected, $actual)) {
             $this->fail();
@@ -411,7 +411,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
     private function loadEntities(Entities\BaseTestEntity ...$context): void
     {
         $entities = [];
-        foreach (func_get_args() as $entity) {
+        foreach (\func_get_args() as $entity) {
             Entities\BaseTestEntity::getPrimaryIds($entity, $primitiveIds);
             $entities[serialize($primitiveIds)] = $entity;
         }

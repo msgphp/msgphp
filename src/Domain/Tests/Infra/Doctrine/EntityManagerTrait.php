@@ -26,7 +26,7 @@ trait EntityManagerTrait
         }
 
         $config = new Configuration();
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), dirname(dirname(__DIR__)).'/Fixtures/Entities'));
+        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), \dirname(__DIR__, 2).'/Fixtures/Entities'));
         $config->setProxyDir(\sys_get_temp_dir().'/msgphp_'.md5(microtime()));
         $config->setProxyNamespace(__NAMESPACE__);
 

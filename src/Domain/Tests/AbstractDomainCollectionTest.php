@@ -11,7 +11,7 @@ abstract class AbstractDomainCollectionTest extends TestCase
 {
     public function testFromValue(): void
     {
-        $class = get_class(static::createCollection([]));
+        $class = \get_class(static::createCollection([]));
 
         $this->assertSame([], iterator_to_array($class::fromValue(null)));
         $this->assertSame([1], iterator_to_array($class::fromValue([1])));

@@ -13,6 +13,6 @@ final class UnknownDomainEventException extends \RuntimeException implements Dom
 {
     public static function createForHandler(DomainEventHandlerInterface $handler, DomainEventInterface $event): self
     {
-        return new self(sprintf('Domain event "%s" cannot be handled by "%s".', get_class($event), get_class($handler)));
+        return new self(sprintf('Domain event "%s" cannot be handled by "%s".', \get_class($event), \get_class($handler)));
     }
 }

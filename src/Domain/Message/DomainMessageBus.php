@@ -22,7 +22,7 @@ final class DomainMessageBus implements DomainMessageBusInterface
 
     public function dispatch($message)
     {
-        if (isset($this->eventClasses[get_class($message)])) {
+        if (isset($this->eventClasses[\get_class($message)])) {
             return $this->eventBus->dispatch($message);
         }
 

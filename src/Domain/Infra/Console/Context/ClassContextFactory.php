@@ -119,7 +119,7 @@ final class ClassContextFactory implements ContextFactoryInterface
             $element = $argument['element'];
             $required = $argument['required'] && !($this->flags & self::ALWAYS_OPTIONAL);
 
-            if (is_array($value) && self::isObject($type = $argument['type']) && ($required || $given)) {
+            if (\is_array($value) && self::isObject($type = $argument['type']) && ($required || $given)) {
                 $method = is_subclass_of($type, DomainCollectionInterface::class) || is_subclass_of($type, DomainIdInterface::class) ? 'fromValue' : '__construct';
                 $context[$key] = $this->getContext($input, $io, [], array_map(function (array $argument, int $i) use ($type, $method, $value, $element): array {
                     if (array_key_exists($argument['name'], $value)) {
