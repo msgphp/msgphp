@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ *
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 final class ExistingUsername extends Constraint
