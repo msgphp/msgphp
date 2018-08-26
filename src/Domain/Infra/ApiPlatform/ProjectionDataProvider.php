@@ -7,7 +7,8 @@ namespace MsgPhp\Domain\Infra\ApiPlatform;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use MsgPhp\Domain\Projection\{ProjectionInterface, ProjectionRepositoryInterface, ProjectionTypeRegistryInterface};
+use MsgPhp\Domain\PaginatedDomainCollection;
+use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionInterface, ProjectionRepositoryInterface, ProjectionTypeRegistryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -33,9 +34,13 @@ final class ProjectionDataProvider implements CollectionDataProviderInterface, I
      */
     public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
-        foreach ($this->repository->findAll($resourceClass) as $document) {
-            yield $document->toProjection();
-        }
+        $collection = $this->repository->findAll($resourceClass);
+
+        return new Paginator(new PaginatedDomainCollection((function () use ($collection): iterable {
+            foreach ($collection as $document) {
+                yield $document->toProjection();
+            }
+        })(), $collection->getOffset(), $collection->getLimit(), (float) \count($collection), $collection->getTotalCount()));
     }
 
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?ProjectionInterface

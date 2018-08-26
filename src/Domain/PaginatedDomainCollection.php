@@ -23,13 +23,17 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
         return new self($value ?? []);
     }
 
-    public function __construct(iterable $elements, float $offset = .0, float $limit = .0, int $count = null, float $totalCount = null)
+    public function __construct(iterable $elements, float $offset = .0, float $limit = .0, float $count = null, float $totalCount = null)
     {
-        $this->collection = DomainCollection::fromValue($elements);
+        if (null !== $count) {
+            $count = (int) $count;
+        }
+
+        $this->collection = $elements instanceof DomainCollectionInterface ? $elements : DomainCollection::fromValue($elements);
         $this->offset = $offset;
         $this->limit = $limit;
         $this->count = $count;
-        $this->totalCount = $totalCount ?? $count;
+        $this->totalCount = $totalCount;
     }
 
     public function getIterator(): \Traversable
@@ -84,7 +88,7 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
 
     public function count(): int
     {
-        return (int) ($this->count ?? ($this->count = count($this->collection)));
+        return $this->count ?? $this->count = \count($this->collection);
     }
 
     public function getOffset(): float
@@ -112,11 +116,11 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
             return 1.;
         }
 
-        return ceil($this->getTotalItems() / $this->limit) ?: 1.;
+        return ceil($this->getTotalCount() / $this->limit) ?: 1.;
     }
 
     public function getTotalCount(): float
     {
-        return $this->totalCount ?? $this->totalCount = (float) count($this);
+        return $this->totalCount ?? $this->totalCount = (float) \count($this);
     }
 }

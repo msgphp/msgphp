@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use MsgPhp\Domain\{PaginatedDomainCollection, PaginatedDomainCollectionInterface};
 use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionRepositoryInterface};
 
 /**
@@ -23,9 +24,9 @@ final class ProjectionRepository implements ProjectionRepositoryInterface
     }
 
     /**
-     * @return ProjectionDocument[]
+     * @return PaginatedDomainCollectionInterface|ProjectionDocument[]
      */
-    public function findAll(string $type, int $offset = 0, int $limit = 0): iterable
+    public function findAll(string $type, int $offset = 0, int $limit = 0): PaginatedDomainCollectionInterface
     {
         $params = [
             'index' => $this->index,
@@ -40,11 +41,16 @@ final class ProjectionRepository implements ProjectionRepositoryInterface
             $params['body']['size'] = $limit;
         }
 
-        $documents = $this->client->search($params);
+        $result = $this->client->search($params);
+        $documents = $result['hits']['hits'] ?? [];
+        $count = \count($documents);
+        $totalCount = $result['hits']['total'] ?? $count;
 
-        foreach ($documents['hits']['hits'] ?? [] as $document) {
-            yield $this->createDocument($document);
-        }
+        return new PaginatedDomainCollection((function () use ($documents) {
+            foreach ($documents as $document) {
+                yield $this->createDocument($document);
+            }
+        })(), (float) $offset, (float) $limit, (float) $count, (float) $totalCount);
     }
 
     public function find(string $type, string $id): ?ProjectionDocument

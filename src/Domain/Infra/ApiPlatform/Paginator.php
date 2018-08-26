@@ -26,7 +26,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
 
     public function count(): int
     {
-        return count($this->collection);
+        return \count($this->collection);
     }
 
     public function getLastPage(): float
