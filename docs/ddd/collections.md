@@ -71,6 +71,48 @@ Keys are preserved.
 
 Returns a map with each collection element as returned by `$mapper`.
 
+## Pagination API
+
+A collection that is part of a paginated result set is bound to `MsgPhp\Domain\PaginatedDomainCollectionInterface`. Its
+purpose is to expose the current pagination.
+
+### Extends
+
+- [`DomainCollectionInterface`](#collections)
+
+---
+
+### `getOffset(): float`
+
+Get the current page offset.
+
+---
+
+### `getLimit(): float`
+
+Get the current page limit (e.g. items per page).
+
+---
+
+### `getCurrentPage(): float`
+
+Get the current page number.
+
+---
+
+### `getLastPage(): float`
+
+Get the last page number.
+
+---
+
+### `getTotalCount(): float`
+
+Get the total no. of items in the full result set.
+
+!!! note
+    `count()` should return the no. of items on the current page
+
 ## Implementations
 
 ### `MsgPhp\Domain\DomainCollection`
@@ -121,6 +163,13 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
     return ++$value;
 }); // [2, 4]
 ```
+
+### `MsgPhp\Domain\PaginatedDomainCollection`
+
+A first class citizen paginated domain collection to transform any collection into a paginated collection.
+
+- `__construct(iterable $elements, float $offset = .0, float $limit = .0, float $count = null, float $totalCount = null)`
+    - `$elements`: The elements this collection contains
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainCollection`
 
