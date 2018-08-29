@@ -47,7 +47,7 @@ A first class citizen domain identifier. It leverages `string|null` as underlyin
 - `__construct(string $id = null)`
     - `$id`: The primitive identifier value. In case of `null` an empty identifier is implied.
 
-#### Basic example
+#### Basic Example
 
 ```php
 <?php

@@ -26,6 +26,27 @@ final class DomainCollectionFactory
         return DomainCollection::fromValue($value);
     }
 
+    public static function createFromCallable(callable $value): DomainCollectionInterface
+    {
+        $iterator = new class($value) implements \IteratorAggregate {
+            private $callback;
+
+            public function __construct(callable $value)
+            {
+                $this->callback = $value;
+            }
+
+            public function getIterator(): \Traversable
+            {
+                $iterable = ($this->callback)();
+
+                return \is_array($iterable) ? new \ArrayIterator($iterable) : $iterable;
+            }
+        };
+
+        return self::create($iterator);
+    }
+
     private function __construct()
     {
     }

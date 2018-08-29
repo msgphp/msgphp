@@ -4,6 +4,7 @@
 
 - Updated `ProjectionRepositoryInterface::findAll(): iterable` to `findAll(): PaginatedDomainCollectionInterface`
 - Added `PaginatedDomainCollection`
+- Added `DomainCollectionFactory::createFromCallable()`
 
 ## Eav
 

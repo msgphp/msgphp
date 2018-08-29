@@ -69,7 +69,7 @@ Repository trait based on in-memory persistence.
     - `$memory`: Custom memory layer. By default the same global pool is used. See also [`GlobalObjectMemory`][api-globalobjectmemory].
     - `$accessor`: Custom object field accessor. See also [`ObjectFieldAccessor`][api-objectfieldaccessor].
 
-#### Basic example
+#### Basic Example
 
 ```php
 <?php

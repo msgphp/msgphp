@@ -124,7 +124,7 @@ type `\Traversable`. Meaning the minimal no. of elements are traversed, i.e. unt
 - `__construct(iterable $elements)`
     - `$elements`: The elements this collection contains
 
-#### Basic example
+#### Basic Example
 
 ```php
 <?php

@@ -26,7 +26,7 @@ Identity mapping based on a known in-memory mapping.
     - `$mapping`: The identity mapping to use
     - `$accessor`: Custom object field accessor. See also [`ObjectFieldAccessor`][api-objectfieldaccessor].
 
-#### Basic example
+#### Basic Example
 
 ```php
 <?php
