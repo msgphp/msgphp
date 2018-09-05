@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
+use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\User\{CredentialInterface, UserIdInterface};
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\SecurityUser;
@@ -15,13 +17,13 @@ final class SecurityUserTest extends TestCase
 {
     public function testCreate(): void
     {
-        $user = new SecurityUser($this->createUser('id'), ['ROLE_FOO']);
+        $user = new SecurityUser($entity = $this->createUser('id'), ['ROLE_FOO']);
 
+        $this->assertSame($entity->getId(), $user->getUserId());
         $this->assertSame('id', $user->getUsername());
         $this->assertSame(['ROLE_FOO'], $user->getRoles());
         $this->assertSame('', $user->getPassword());
         $this->assertNull($user->getSalt());
-        $this->assertEquals($user, unserialize(serialize($user)));
     }
 
     public function testCreateWithPassword(): void
@@ -30,7 +32,6 @@ final class SecurityUserTest extends TestCase
 
         $this->assertSame('password', $user->getPassword());
         $this->assertNull($user->getSalt());
-        $this->assertEquals($user, unserialize(serialize($user)));
     }
 
     public function testCreateWithSaltedPassword(): void
@@ -39,7 +40,15 @@ final class SecurityUserTest extends TestCase
 
         $this->assertSame('password', $user->getPassword());
         $this->assertSame('salt', $user->getSalt());
-        $this->assertEquals($user, unserialize(serialize($user)));
+    }
+
+    public function testCreateWithEmptyId(): void
+    {
+        $user = $this->createUser();
+
+        $this->expectException(\LogicException::class);
+
+        new SecurityUser($user);
     }
 
     public function testEraseCredentials(): void
@@ -68,12 +77,32 @@ final class SecurityUserTest extends TestCase
         $this->assertFalse($user->isEqualTo($other));
     }
 
-    private function createUser(string $id, string $password = null, string $salt = null): User
+    public function testSerialize(): void
     {
-        $userId = $this->createMock(UserIdInterface::class);
-        $userId->expects($this->any())
-            ->method('toString')
-            ->willReturn($id);
+        $user = new SecurityUser($entity = $this->createUser(new TestUserId('id'), 'password', 'salt'), ['ROLE_FOO']);
+
+        $this->assertEquals($user, unserialize(serialize($user)));
+    }
+
+    private function createUser($id = null, string $password = null, string $salt = null): User
+    {
+        if ($id instanceof UserIdInterface) {
+            $userId = $id;
+        } else {
+            $userId = $this->createMock(UserIdInterface::class);
+            $userId->expects($this->any())
+                ->method('toString')
+                ->willReturn($id);
+            $userId->expects($this->any())
+                ->method('equals')
+                ->willReturnCallback(function (DomainIdInterface $other) use ($id) {
+                    return $id === $other->toString();
+                });
+            $userId->expects($this->any())
+                ->method('isEmpty')
+                ->willReturn(null === $id);
+        }
+
         $user = $this->createMock(User::class);
         $user->expects($this->any())
             ->method('getId')
@@ -97,4 +126,8 @@ final class SecurityUserTest extends TestCase
 
         return $user;
     }
+}
+
+class TestUserId extends DomainId implements UserIdInterface
+{
 }

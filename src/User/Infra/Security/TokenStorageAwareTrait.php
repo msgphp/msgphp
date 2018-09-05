@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -18,13 +17,11 @@ trait TokenStorageAwareTrait
 {
     private $tokenStorage;
     private $repository;
-    private $factory;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory)
+    public function __construct(TokenStorageInterface $tokenStorage, UserRepositoryInterface $repository)
     {
         $this->tokenStorage = $tokenStorage;
         $this->repository = $repository;
-        $this->factory = $factory;
     }
 
     private function isUser(): bool
@@ -44,6 +41,6 @@ trait TokenStorageAwareTrait
             return null;
         }
 
-        return $this->repository->find($this->factory->identify(User::class, $user->getUsername()));
+        return $this->repository->find($user->getUserId());
     }
 }

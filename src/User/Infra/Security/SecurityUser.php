@@ -6,6 +6,7 @@ namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Password\PasswordProtectedInterface;
+use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -21,7 +22,12 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function __construct(User $user, array $roles = [])
     {
-        $this->id = $user->getId()->toString();
+        $this->id = $user->getId();
+
+        if ($this->id->isEmpty()) {
+            throw new \LogicException('The user ID cannot be empty.');
+        }
+
         $this->roles = $roles;
 
         $credential = $user->getCredential();
@@ -35,9 +41,14 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
         }
     }
 
-    public function getUsername(): string
+    public function getUserId(): UserIdInterface
     {
         return $this->id;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->id->toString();
     }
 
     public function getRoles(): array
@@ -57,13 +68,12 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function eraseCredentials(): void
     {
-        $this->password = '';
-        $this->passwordSalt = null;
+        $this->password = $this->passwordSalt = null;
     }
 
     public function isEqualTo(UserInterface $user)
     {
-        return $user instanceof self && $this->id === $user->getUsername();
+        return $user instanceof self && $user->getUserId()->equals($this->id);
     }
 
     public function serialize(): string
