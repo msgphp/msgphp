@@ -19,5 +19,16 @@
 
 - Renamed default Twig variable
 
-    Before: `{{ msgphp_user.id }}`
-    After: `{{ msgphp_user.currentId }}` or `{{ app.user.userId }}`
+    Before:
+
+    ```
+    {{ msgphp_user.id }}
+    ```
+
+    After:
+
+    ```
+    {{ msgphp_user.currentId }}
+    ```
+
+- Changed default value for `msgphp_user.username_lookup.N.mapped_by` to `null`
