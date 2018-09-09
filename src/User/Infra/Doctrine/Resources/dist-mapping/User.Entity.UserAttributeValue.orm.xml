@@ -6,7 +6,7 @@
     <mapped-superclass name="MsgPhp\User\Entity\UserAttributeValue">
         <id name="attributeValue" association-key="true" />
 
-        <one-to-one field="attributeValue" target-entity="MsgPhp\Eav\Entity\AttributeValue">
+        <one-to-one field="attributeValue" target-entity="MsgPhp\Eav\Entity\AttributeValue" fetch="EAGER">
             <cascade><cascade-all /></cascade>
             <join-column on-delete="CASCADE" />
         </one-to-one>
