@@ -13,11 +13,11 @@ final class DomainMessageBusTest extends TestCase
     public function testDispatch(): void
     {
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
+        $bus->expects(self::once())
             ->method('dispatch')
             ->with($message = new \stdClass())
             ->willReturn('foo');
 
-        $this->assertSame('foo', (new DomainMessageBus($bus))->dispatch($message));
+        self::assertSame('foo', (new DomainMessageBus($bus))->dispatch($message));
     }
 }

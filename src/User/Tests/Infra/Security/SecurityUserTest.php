@@ -19,27 +19,27 @@ final class SecurityUserTest extends TestCase
     {
         $user = new SecurityUser($entity = $this->createUser('id'), ['ROLE_FOO']);
 
-        $this->assertSame($entity->getId(), $user->getUserId());
-        $this->assertSame('id', $user->getUsername());
-        $this->assertSame(['ROLE_FOO'], $user->getRoles());
-        $this->assertSame('', $user->getPassword());
-        $this->assertNull($user->getSalt());
+        self::assertSame($entity->getId(), $user->getUserId());
+        self::assertSame('id', $user->getUsername());
+        self::assertSame(['ROLE_FOO'], $user->getRoles());
+        self::assertSame('', $user->getPassword());
+        self::assertNull($user->getSalt());
     }
 
     public function testCreateWithPassword(): void
     {
         $user = new SecurityUser($this->createUser('id', 'password'));
 
-        $this->assertSame('password', $user->getPassword());
-        $this->assertNull($user->getSalt());
+        self::assertSame('password', $user->getPassword());
+        self::assertNull($user->getSalt());
     }
 
     public function testCreateWithSaltedPassword(): void
     {
         $user = new SecurityUser($this->createUser('id', 'password', 'salt'));
 
-        $this->assertSame('password', $user->getPassword());
-        $this->assertSame('salt', $user->getSalt());
+        self::assertSame('password', $user->getPassword());
+        self::assertSame('salt', $user->getSalt());
     }
 
     public function testCreateWithEmptyId(): void
@@ -56,32 +56,32 @@ final class SecurityUserTest extends TestCase
         $user = new SecurityUser($this->createUser('id', 'password', 'salt'));
         $user->eraseCredentials();
 
-        $this->assertSame('', $user->getPassword());
-        $this->assertNull($user->getSalt());
+        self::assertSame('', $user->getPassword());
+        self::assertNull($user->getSalt());
     }
 
     public function testIsEqualTo(): void
     {
         $user = new SecurityUser($this->createUser('id'));
 
-        $this->assertTrue($user->isEqualTo($user));
-        $this->assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id'))));
-        $this->assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id', 'password', 'salt'))));
-        $this->assertFalse($user->isEqualTo(new SecurityUser($this->createUser('other'))));
+        self::assertTrue($user->isEqualTo($user));
+        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id'))));
+        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id', 'password', 'salt'))));
+        self::assertFalse($user->isEqualTo(new SecurityUser($this->createUser('other'))));
 
         $other = $this->createMock(UserInterface::class);
-        $other->expects($this->any())
+        $other->expects(self::any())
             ->method('getUsername')
             ->willReturn('id');
 
-        $this->assertFalse($user->isEqualTo($other));
+        self::assertFalse($user->isEqualTo($other));
     }
 
     public function testSerialize(): void
     {
         $user = new SecurityUser($entity = $this->createUser(new TestUserId('id'), 'password', 'salt'), ['ROLE_FOO']);
 
-        $this->assertEquals($user, unserialize(serialize($user)));
+        self::assertEquals($user, unserialize(serialize($user)));
     }
 
     private function createUser($id = null, string $password = null, string $salt = null): User
@@ -90,21 +90,21 @@ final class SecurityUserTest extends TestCase
             $userId = $id;
         } else {
             $userId = $this->createMock(UserIdInterface::class);
-            $userId->expects($this->any())
+            $userId->expects(self::any())
                 ->method('toString')
                 ->willReturn($id);
-            $userId->expects($this->any())
+            $userId->expects(self::any())
                 ->method('equals')
                 ->willReturnCallback(function (DomainIdInterface $other) use ($id) {
                     return $id === $other->toString();
                 });
-            $userId->expects($this->any())
+            $userId->expects(self::any())
                 ->method('isEmpty')
                 ->willReturn(null === $id);
         }
 
         $user = $this->createMock(User::class);
-        $user->expects($this->any())
+        $user->expects(self::any())
             ->method('getId')
             ->willReturn($userId);
 
@@ -112,15 +112,15 @@ final class SecurityUserTest extends TestCase
             $credential = $this->createMock(CredentialInterface::class);
         } else {
             $credential = $this->createMock([CredentialInterface::class, PasswordProtectedInterface::class]);
-            $credential->expects($this->any())
+            $credential->expects(self::any())
                 ->method('getPassword')
                 ->willReturn($password);
-            $credential->expects($this->any())
+            $credential->expects(self::any())
                 ->method('getPasswordAlgorithm')
                 ->willReturn(null === $salt ? PasswordAlgorithm::create() : PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt)));
         }
 
-        $user->expects($this->any())
+        $user->expects(self::any())
             ->method('getCredential')
             ->willReturn($credential);
 

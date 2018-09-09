@@ -14,42 +14,42 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(false);
 
-        $this->assertFalse($object->isEnabled());
+        self::assertFalse($object->isEnabled());
 
         $object->enable();
 
-        $this->assertTrue($object->isEnabled());
+        self::assertTrue($object->isEnabled());
     }
 
     public function testDisable(): void
     {
         $object = $this->getObject(true);
 
-        $this->assertTrue($object->isEnabled());
+        self::assertTrue($object->isEnabled());
 
         $object->disable();
 
-        $this->assertFalse($object->isEnabled());
+        self::assertFalse($object->isEnabled());
     }
 
     public function testHandleEnableEvent(): void
     {
         $object = $this->getObject(false);
 
-        $this->assertTrue($object->handleEnableEvent($this->createMock(EnableEvent::class)));
-        $this->assertTrue($object->isEnabled());
-        $this->assertFalse($object->handleEnableEvent($this->createMock(EnableEvent::class)));
-        $this->assertTrue($object->isEnabled());
+        self::assertTrue($object->handleEnableEvent($this->createMock(EnableEvent::class)));
+        self::assertTrue($object->isEnabled());
+        self::assertFalse($object->handleEnableEvent($this->createMock(EnableEvent::class)));
+        self::assertTrue($object->isEnabled());
     }
 
     public function testHandleDisableEvent(): void
     {
         $object = $this->getObject(true);
 
-        $this->assertTrue($object->handleDisableEvent($this->createMock(DisableEvent::class)));
-        $this->assertFalse($object->isEnabled());
-        $this->assertFalse($object->handleDisableEvent($this->createMock(DisableEvent::class)));
-        $this->assertFalse($object->isEnabled());
+        self::assertTrue($object->handleDisableEvent($this->createMock(DisableEvent::class)));
+        self::assertFalse($object->isEnabled());
+        self::assertFalse($object->handleDisableEvent($this->createMock(DisableEvent::class)));
+        self::assertFalse($object->isEnabled());
     }
 
     private function getObject($value)

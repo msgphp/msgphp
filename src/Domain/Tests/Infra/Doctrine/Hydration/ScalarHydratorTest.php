@@ -23,10 +23,10 @@ final class ScalarHydratorTest extends TestCase
 
         $query = self::$em->createQuery('SELECT root.id FROM '.\get_class($entity).' root');
 
-        $this->assertSame('1', $query->getScalarResult()[0]['id']);
+        self::assertSame('1', $query->getScalarResult()[0]['id']);
 
         self::$em->getConfiguration()->addCustomHydrationMode(ScalarHydrator::NAME, ScalarHydrator::class);
 
-        $this->assertSame(1, $query->getResult(ScalarHydrator::NAME)[0]['id']);
+        self::assertSame(1, $query->getResult(ScalarHydrator::NAME)[0]['id']);
     }
 }

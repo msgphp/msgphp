@@ -14,13 +14,13 @@ final class UserAttributeValueTest extends TestCase
     public function testCreate(): void
     {
         $attributeValue = $this->createMock(AttributeValue::class);
-        $attributeValue->expects($this->once())
+        $attributeValue->expects(self::once())
             ->method('getId')
             ->willReturn($id = $this->createMock(AttributeValueIdInterface::class));
         $userAttributeValue = $this->createEntity($user = $this->createMock(User::class), $attributeValue);
 
-        $this->assertSame($user, $userAttributeValue->getUser());
-        $this->assertSame($id, $userAttributeValue->getId());
+        self::assertSame($user, $userAttributeValue->getUser());
+        self::assertSame($id, $userAttributeValue->getId());
     }
 
     private function createEntity($user, $attributeValue): UserAttributeValue

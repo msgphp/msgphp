@@ -15,8 +15,8 @@ final class DomainIdentityMappingTest extends AbstractDomainIdentityMappingTest
     {
         $mapping = new DomainIdentityMapping(['foo' => 'a', 'bar' => ['b']]);
 
-        $this->assertSame(['a'], $mapping->getIdentifierFieldNames('foo'));
-        $this->assertSame(['b'], $mapping->getIdentifierFieldNames('bar'));
+        self::assertSame(['a'], $mapping->getIdentifierFieldNames('foo'));
+        self::assertSame(['b'], $mapping->getIdentifierFieldNames('bar'));
     }
 
     public function testGetIdentifierFieldNamesWithEmptyMapping(): void

@@ -14,7 +14,7 @@ final class ClassMethodResolverTest extends TestCase
     {
         $arguments = ClassMethodResolver::resolve(TestClass::class, '__construct');
 
-        $this->assertSame([
+        self::assertSame([
             ['name' => 'fooBar', 'key' => 'foo_bar', 'required' => true, 'default' => null, 'type' => 'string'],
             ['name' => 'foo_bar', 'key' => 'foo_bar', 'required' => false, 'default' => null, 'type' => WrongCase::class],
             ['name' => 'fooBar_Baz', 'key' => 'foo_bar_baz', 'required' => false, 'default' => null, 'type' => null],
@@ -31,7 +31,7 @@ final class ClassMethodResolverTest extends TestCase
         };
         $arguments = ClassMethodResolver::resolve(\get_class($object), '__construct');
 
-        $this->assertSame([], $arguments);
+        self::assertSame([], $arguments);
     }
 
     public function testResolveWithUnknownClass(): void

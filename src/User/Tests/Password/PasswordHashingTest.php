@@ -16,17 +16,17 @@ final class PasswordHashingTest extends TestCase
     {
         $hashing = new PasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
 
-        $this->assertNotSame($hashing->hash('password'), $hashing->hash('password'));
-        $this->assertNotSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
-        $this->assertNotSame($hashing->hash('password', $algorithm), $hashing->hash('password', $algorithm));
-        $this->assertNotSame($hashing->hash('password', $algorithm), $hashing->hash('password'));
+        self::assertNotSame($hashing->hash('password'), $hashing->hash('password'));
+        self::assertNotSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
+        self::assertNotSame($hashing->hash('password', $algorithm), $hashing->hash('password', $algorithm));
+        self::assertNotSame($hashing->hash('password', $algorithm), $hashing->hash('password'));
 
         if (!$deprecateLegacyApi) {
-            $this->assertNotSame($hashing->hash('password'), $hashing->hash('password', self::createAlgorithm(true)));
+            self::assertNotSame($hashing->hash('password'), $hashing->hash('password', self::createAlgorithm(true)));
         }
 
-        $this->assertNotSame($hashing->hash('password'), $hashing->hash('other-password'));
-        $this->assertNotSame($hashing->hash('password'), 'password');
+        self::assertNotSame($hashing->hash('password'), $hashing->hash('other-password'));
+        self::assertNotSame($hashing->hash('password'), 'password');
     }
 
     /**
@@ -36,19 +36,19 @@ final class PasswordHashingTest extends TestCase
     {
         $hashing = new PasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
 
-        $this->assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
-        $this->assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password'));
+        self::assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
+        self::assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password'));
 
         if (!$deprecateLegacyApi) {
-            $this->assertFalse($hashing->isValid($hashing->hash('password'), 'password', self::createAlgorithm(true)));
+            self::assertFalse($hashing->isValid($hashing->hash('password'), 'password', self::createAlgorithm(true)));
         }
 
-        $this->assertFalse($hashing->isValid($hashing->hash('password'), $hashing->hash('password')));
-        $this->assertFalse($hashing->isValid('password', $hashing->hash('password')));
-        $this->assertFalse($hashing->isValid('password', 'password'));
-        $this->assertFalse($hashing->isValid($hashing->hash('other-password'), 'password'));
+        self::assertFalse($hashing->isValid($hashing->hash('password'), $hashing->hash('password')));
+        self::assertFalse($hashing->isValid('password', $hashing->hash('password')));
+        self::assertFalse($hashing->isValid('password', 'password'));
+        self::assertFalse($hashing->isValid($hashing->hash('other-password'), 'password'));
     }
 
     public function provideLegacyApiModes(): iterable
@@ -61,28 +61,28 @@ final class PasswordHashingTest extends TestCase
     {
         $hashing = new PasswordHashing($algorithm = self::createAlgorithm(true), false);
 
-        $this->assertSame($hashing->hash('password'), $hashing->hash('password'));
-        $this->assertSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
-        $this->assertSame($hashing->hash('password', $algorithm), $hashing->hash('password', $algorithm));
-        $this->assertSame($hashing->hash('password', $algorithm), $hashing->hash('password'));
-        $this->assertNotSame($hashing->hash('password'), $hashing->hash('password', self::createAlgorithm()));
-        $this->assertNotSame($hashing->hash('password'), $hashing->hash('other-password'));
-        $this->assertNotSame($hashing->hash('password'), 'password');
+        self::assertSame($hashing->hash('password'), $hashing->hash('password'));
+        self::assertSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
+        self::assertSame($hashing->hash('password', $algorithm), $hashing->hash('password', $algorithm));
+        self::assertSame($hashing->hash('password', $algorithm), $hashing->hash('password'));
+        self::assertNotSame($hashing->hash('password'), $hashing->hash('password', self::createAlgorithm()));
+        self::assertNotSame($hashing->hash('password'), $hashing->hash('other-password'));
+        self::assertNotSame($hashing->hash('password'), 'password');
     }
 
     public function testIsValidWithLegacyApi(): void
     {
         $hashing = new PasswordHashing($algorithm = self::createAlgorithm(true), false);
 
-        $this->assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
-        $this->assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password'));
-        $this->assertFalse($hashing->isValid($hashing->hash('password'), 'password', self::createAlgorithm()));
-        $this->assertFalse($hashing->isValid($hashing->hash('password'), $hashing->hash('password')));
-        $this->assertFalse($hashing->isValid('password', $hashing->hash('password')));
-        $this->assertFalse($hashing->isValid('password', 'password'));
-        $this->assertFalse($hashing->isValid($hashing->hash('other-password'), 'password'));
+        self::assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
+        self::assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password'));
+        self::assertFalse($hashing->isValid($hashing->hash('password'), 'password', self::createAlgorithm()));
+        self::assertFalse($hashing->isValid($hashing->hash('password'), $hashing->hash('password')));
+        self::assertFalse($hashing->isValid('password', $hashing->hash('password')));
+        self::assertFalse($hashing->isValid('password', 'password'));
+        self::assertFalse($hashing->isValid($hashing->hash('other-password'), 'password'));
     }
 
     public function testBase64EncodedAlgorithm(): void
@@ -91,13 +91,13 @@ final class PasswordHashingTest extends TestCase
         $algorithm = PasswordAlgorithm::createLegacyBase64Encoded('md5');
         $algorithm2 = PasswordAlgorithm::createLegacyBase64Encoded('sha1');
 
-        $this->assertNotSame($baseHash = $hashing->hash('password'), $hashing->hash('password', $algorithm));
-        $this->assertSame($hash = base64_encode((string) hex2bin($baseHash)), $hashing->hash('password', $algorithm));
-        $this->assertNotSame($hash, $hashing->hash('password', $algorithm2));
+        self::assertNotSame($baseHash = $hashing->hash('password'), $hashing->hash('password', $algorithm));
+        self::assertSame($hash = base64_encode((string) hex2bin($baseHash)), $hashing->hash('password', $algorithm));
+        self::assertNotSame($hash, $hashing->hash('password', $algorithm2));
 
-        $this->assertFalse($hashing->isValid($baseHash, 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hash, 'password', $algorithm));
-        $this->assertFalse($hashing->isValid($hash, 'password', $algorithm2));
+        self::assertFalse($hashing->isValid($baseHash, 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hash, 'password', $algorithm));
+        self::assertFalse($hashing->isValid($hash, 'password', $algorithm2));
     }
 
     /**
@@ -111,17 +111,17 @@ final class PasswordHashingTest extends TestCase
         $algorithmBase64 = PasswordAlgorithm::createLegacySalted($salt, true, 'md5');
         $algorithmOtherSalt = PasswordAlgorithm::createLegacySalted($otherSalt, false, 'md5');
 
-        $this->assertNotSame($baseHash = $hashing->hash('password'), $hashing->hash('password', $algorithm));
-        $this->assertSame($hash = $hashing->hash('password{token}'), $hashing->hash('password', $algorithm));
-        $this->assertNotSame($hash, $hashing->hash('password', $algorithm2));
-        $this->assertNotSame($hash, $hashing->hash('password', $algorithmBase64));
-        $this->assertNotSame($hash, $hashing->hash('password', $algorithmOtherSalt));
+        self::assertNotSame($baseHash = $hashing->hash('password'), $hashing->hash('password', $algorithm));
+        self::assertSame($hash = $hashing->hash('password{token}'), $hashing->hash('password', $algorithm));
+        self::assertNotSame($hash, $hashing->hash('password', $algorithm2));
+        self::assertNotSame($hash, $hashing->hash('password', $algorithmBase64));
+        self::assertNotSame($hash, $hashing->hash('password', $algorithmOtherSalt));
 
-        $this->assertFalse($hashing->isValid($baseHash, 'password', $algorithm));
-        $this->assertTrue($hashing->isValid($hash, 'password', $algorithm));
-        $this->assertFalse($hashing->isValid($hash, 'password', $algorithm2));
-        $this->assertFalse($hashing->isValid($hash, 'password', $algorithmBase64));
-        $this->assertFalse($hashing->isValid($hash, 'password', $algorithmOtherSalt));
+        self::assertFalse($hashing->isValid($baseHash, 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hash, 'password', $algorithm));
+        self::assertFalse($hashing->isValid($hash, 'password', $algorithm2));
+        self::assertFalse($hashing->isValid($hash, 'password', $algorithmBase64));
+        self::assertFalse($hashing->isValid($hash, 'password', $algorithmOtherSalt));
     }
 
     public function provideOtherPasswordSalts(): iterable
@@ -178,7 +178,7 @@ final class PasswordHashingTest extends TestCase
     {
         $hashing = new PasswordHashing();
 
-        $this->assertNotSame('password', $hashing->hash('password', self::createAlgorithm(true)));
+        self::assertNotSame('password', $hashing->hash('password', self::createAlgorithm(true)));
     }
 
     /**
@@ -192,7 +192,7 @@ final class PasswordHashingTest extends TestCase
         $hashing = new PasswordHashing();
         $algorithm = self::createAlgorithm(true);
 
-        $this->assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
+        self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));
     }
 
     private static function createAlgorithm(bool $legacy = false): PasswordAlgorithm

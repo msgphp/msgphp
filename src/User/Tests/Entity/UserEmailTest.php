@@ -13,8 +13,8 @@ final class UserEmailTest extends TestCase
     {
         $userEmail = $this->createEntity($user = $this->createMock(User::class), 'foo@bar.baz');
 
-        $this->assertSame($user, $userEmail->getUser());
-        $this->assertSame('foo@bar.baz', $userEmail->getEmail());
+        self::assertSame($user, $userEmail->getUser());
+        self::assertSame('foo@bar.baz', $userEmail->getEmail());
     }
 
     private function createEntity($user, $email): UserEmail

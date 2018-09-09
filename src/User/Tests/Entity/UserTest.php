@@ -12,7 +12,7 @@ final class UserTest extends TestCase
 {
     public function testGetCredential(): void
     {
-        $this->assertInstanceOf(Credential\Anonymous::class, $this->createEntity($this->createMock(UserIdInterface::class))->getCredential());
+        self::assertInstanceOf(Credential\Anonymous::class, $this->createEntity($this->createMock(UserIdInterface::class))->getCredential());
     }
 
     private function createEntity($id): User

@@ -13,15 +13,15 @@ final class ChainObjectFactoryTest extends TestCase
     public function testCreate(): void
     {
         $factory1 = $this->createMock(DomainObjectFactoryInterface::class);
-        $factory1->expects($this->any())
+        $factory1->expects(self::any())
             ->method('create')
             ->willThrowException(InvalidClassException::create('some'));
         $factory2 = $this->createMock(DomainObjectFactoryInterface::class);
-        $factory2->expects($this->any())
+        $factory2->expects(self::any())
             ->method('create')
             ->willReturn($object = new \stdClass());
 
-        $this->assertSame($object, (new ChainObjectFactory([$factory1, $factory2]))->create('some'));
+        self::assertSame($object, (new ChainObjectFactory([$factory1, $factory2]))->create('some'));
     }
 
     public function testCreateWithoutFactories(): void

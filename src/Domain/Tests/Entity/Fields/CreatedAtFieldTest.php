@@ -13,7 +13,7 @@ final class CreatedAtFieldTest extends TestCase
     {
         $object = $this->getObject($value = new \DateTime());
 
-        $this->assertSame($value, $object->getCreatedAt());
+        self::assertSame($value, $object->getCreatedAt());
     }
 
     private function getObject($value)

@@ -12,7 +12,7 @@ final class ClassMappingObjectFactoryTest extends TestCase
     public function testCreate(): void
     {
         $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
-        $innerFactory->expects($this->any())
+        $innerFactory->expects(self::any())
             ->method('create')
             ->willReturnCallback(function ($class, $context) {
                 $o = new \stdClass();
@@ -23,7 +23,7 @@ final class ClassMappingObjectFactoryTest extends TestCase
             });
         $factory = new ClassMappingObjectFactory($innerFactory, ['foo' => 'bar']);
 
-        $this->assertSame(['class' => 'bar', 'context' => []], (array) $factory->create('foo'));
-        $this->assertSame(['class' => 'Foo', 'context' => ['context']], (array) $factory->create('Foo', ['context']));
+        self::assertSame(['class' => 'bar', 'context' => []], (array) $factory->create('foo'));
+        self::assertSame(['class' => 'Foo', 'context' => ['context']], (array) $factory->create('Foo', ['context']));
     }
 }

@@ -14,15 +14,15 @@ final class DomainEventHandlerTraitTest extends TestCase
     {
         $object = $this->getObject();
 
-        $this->assertTrue($object->handleEvent($event = new TestEvent()));
-        $this->assertTrue($event->handled);
-        $this->assertTrue($object->handleEvent($event = new TestEventDifferentSuffix()));
-        $this->assertTrue($event->handled);
+        self::assertTrue($object->handleEvent($event = new TestEvent()));
+        self::assertTrue($event->handled);
+        self::assertTrue($object->handleEvent($event = new TestEventDifferentSuffix()));
+        self::assertTrue($event->handled);
 
         $event = $this->getMockBuilder(DomainEventInterface::class)
             ->setMockClassName('MsgPhp_Test_Root_Event')
             ->getMock();
-        $this->assertFalse($object->handleEvent($event));
+        self::assertFalse($object->handleEvent($event));
     }
 
     public function testHandleEventWithUnknownEvent(): void

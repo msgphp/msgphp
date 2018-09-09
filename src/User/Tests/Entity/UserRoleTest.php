@@ -13,8 +13,8 @@ final class UserRoleTest extends TestCase
     {
         $userRole = $this->createEntity($user = $this->createMock(User::class), $role = $this->createMock(Role::class));
 
-        $this->assertSame($user, $userRole->getUser());
-        $this->assertSame($role, $userRole->getRole());
+        self::assertSame($user, $userRole->getUser());
+        self::assertSame($role, $userRole->getRole());
     }
 
     private function createEntity($user, $role): UserRole

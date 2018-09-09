@@ -11,7 +11,7 @@ final class GlobalObjectMemoryTest extends TestCase
 {
     public function testCreateDefault(): void
     {
-        $this->assertSame(GlobalObjectMemory::createDefault(), GlobalObjectMemory::createDefault());
+        self::assertSame(GlobalObjectMemory::createDefault(), GlobalObjectMemory::createDefault());
     }
 
     public function testAll(): void
@@ -33,8 +33,8 @@ final class GlobalObjectMemoryTest extends TestCase
             }
         }
 
-        $this->assertSame([$std1, $std2], $objects[\stdClass::class]);
-        $this->assertSame([$anonymous], $objects[\get_class($anonymous)]);
+        self::assertSame([$std1, $std2], $objects[\stdClass::class]);
+        self::assertSame([$anonymous], $objects[\get_class($anonymous)]);
 
         $memory->remove($anonymous);
 
@@ -45,21 +45,21 @@ final class GlobalObjectMemoryTest extends TestCase
             $objects[$class][$i] = $object;
         }
 
-        $this->assertSame([], $objects[$class]);
+        self::assertSame([], $objects[$class]);
     }
 
     public function testContains(): void
     {
         $memory = new GlobalObjectMemory();
 
-        $this->assertFalse($memory->contains($object = new \stdClass()));
+        self::assertFalse($memory->contains($object = new \stdClass()));
 
         $memory->persist($object);
 
-        $this->assertTrue($memory->contains($object));
+        self::assertTrue($memory->contains($object));
 
         $memory->remove($object);
 
-        $this->assertFalse($memory->contains($object));
+        self::assertFalse($memory->contains($object));
     }
 }

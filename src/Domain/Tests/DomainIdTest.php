@@ -11,22 +11,22 @@ final class DomainIdTest extends TestCase
 {
     public function testFromValue(): void
     {
-        $this->assertSame((array) new DomainId(), (array) DomainId::fromValue(null));
-        $this->assertSame((array) new DomainId(null), (array) DomainId::fromValue(null));
-        $this->assertNotSame((array) new DomainId(''), (array) DomainId::fromValue(null));
-        $this->assertSame((array) new DomainId(''), (array) DomainId::fromValue(''));
-        $this->assertSame((array) new DomainId(''), (array) DomainId::fromValue(false));
-        $this->assertSame((array) new DomainId('1'), (array) DomainId::fromValue(1));
-        $this->assertInstanceOf(OtherTestDomainId::class, OtherTestDomainId::fromValue(null));
+        self::assertSame((array) new DomainId(), (array) DomainId::fromValue(null));
+        self::assertSame((array) new DomainId(null), (array) DomainId::fromValue(null));
+        self::assertNotSame((array) new DomainId(''), (array) DomainId::fromValue(null));
+        self::assertSame((array) new DomainId(''), (array) DomainId::fromValue(''));
+        self::assertSame((array) new DomainId(''), (array) DomainId::fromValue(false));
+        self::assertSame((array) new DomainId('1'), (array) DomainId::fromValue(1));
+        self::assertInstanceOf(OtherTestDomainId::class, OtherTestDomainId::fromValue(null));
     }
 
     public function testIsEmpty(): void
     {
-        $this->assertTrue((new DomainId())->isEmpty());
-        $this->assertTrue((new DomainId(null))->isEmpty());
-        $this->assertFalse((new DomainId(''))->isEmpty());
-        $this->assertFalse((new DomainId(' '))->isEmpty());
-        $this->assertFalse((new DomainId('foo'))->isEmpty());
+        self::assertTrue((new DomainId())->isEmpty());
+        self::assertTrue((new DomainId(null))->isEmpty());
+        self::assertFalse((new DomainId(''))->isEmpty());
+        self::assertFalse((new DomainId(' '))->isEmpty());
+        self::assertFalse((new DomainId('foo'))->isEmpty());
     }
 
     public function testEquals(): void
@@ -34,13 +34,13 @@ final class DomainIdTest extends TestCase
         $id = new DomainId('foo');
         $emptyId = new DomainId();
 
-        $this->assertTrue($id->equals($id));
-        $this->assertTrue($id->equals(new DomainId('foo')));
-        $this->assertFalse($id->equals($emptyId));
-        $this->assertFalse($id->equals(new OtherTestDomainId('foo')));
-        $this->assertTrue($emptyId->equals($emptyId));
-        $this->assertFalse($emptyId->equals(new DomainId()));
-        $this->assertFalse($emptyId->equals(new OtherTestDomainId()));
+        self::assertTrue($id->equals($id));
+        self::assertTrue($id->equals(new DomainId('foo')));
+        self::assertFalse($id->equals($emptyId));
+        self::assertFalse($id->equals(new OtherTestDomainId('foo')));
+        self::assertTrue($emptyId->equals($emptyId));
+        self::assertFalse($emptyId->equals(new DomainId()));
+        self::assertFalse($emptyId->equals(new OtherTestDomainId()));
     }
 
     /**
@@ -48,8 +48,8 @@ final class DomainIdTest extends TestCase
      */
     public function testToString(DomainId $id, string $value): void
     {
-        $this->assertSame($value, $id->toString());
-        $this->assertSame($value, (string) $id);
+        self::assertSame($value, $id->toString());
+        self::assertSame($value, (string) $id);
     }
 
     /**
@@ -57,7 +57,7 @@ final class DomainIdTest extends TestCase
      */
     public function testSerialize(DomainId $id): void
     {
-        $this->assertSame((array) $id, (array) unserialize(serialize($id)));
+        self::assertSame((array) $id, (array) unserialize(serialize($id)));
     }
 
     /**
@@ -65,7 +65,7 @@ final class DomainIdTest extends TestCase
      */
     public function testJsonSerialize(DomainId $id): void
     {
-        $this->assertSame($id->isEmpty() ? null : $id->toString(), json_decode((string) json_encode($id)));
+        self::assertSame($id->isEmpty() ? null : $id->toString(), json_decode((string) json_encode($id)));
     }
 
     public function provideIds(): iterable

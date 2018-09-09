@@ -13,7 +13,7 @@ final class LastUpdatedAtFieldTest extends TestCase
     {
         $object = $this->getObject($value = new \DateTime());
 
-        $this->assertSame($value, $object->getLastUpdatedAt());
+        self::assertSame($value, $object->getLastUpdatedAt());
     }
 
     private function getObject($value)

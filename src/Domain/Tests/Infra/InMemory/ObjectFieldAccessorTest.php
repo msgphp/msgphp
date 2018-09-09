@@ -40,13 +40,13 @@ final class ObjectFieldAccessorTest extends TestCase
             }
         };
 
-        $this->assertNull($accessor->getValue($object, 'field'));
-        $this->assertSame('foo', $accessor->getValue($object, 'field2'));
-        $this->assertSame(1, $accessor->getValue($object2, 'fieldA'));
-        $this->assertTrue($accessor->getValue($object2, 'fieldB'));
-        $this->assertFalse($accessor->getValue($object2, 'fieldC'));
-        $this->assertSame('bar', $accessor->getValue($object2, 'otherField'));
-        $this->assertSame(1, $accessor->getValue($object2, 'getFieldA'));
+        self::assertNull($accessor->getValue($object, 'field'));
+        self::assertSame('foo', $accessor->getValue($object, 'field2'));
+        self::assertSame(1, $accessor->getValue($object2, 'fieldA'));
+        self::assertTrue($accessor->getValue($object2, 'fieldB'));
+        self::assertFalse($accessor->getValue($object2, 'fieldC'));
+        self::assertSame('bar', $accessor->getValue($object2, 'otherField'));
+        self::assertSame(1, $accessor->getValue($object2, 'getFieldA'));
     }
 
     /**

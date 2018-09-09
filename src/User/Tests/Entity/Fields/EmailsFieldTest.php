@@ -15,9 +15,9 @@ final class EmailsFieldTest extends TestCase
     {
         $object = $this->getObject($emails = [$this->createMock(UserEmail::class)]);
 
-        $this->assertInstanceOf(DomainCollectionInterface::class, $collection = $object->getEmails());
-        $this->assertSame($emails, iterator_to_array($collection));
-        $this->assertSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getEmails());
+        self::assertInstanceOf(DomainCollectionInterface::class, $collection = $object->getEmails());
+        self::assertSame($emails, iterator_to_array($collection));
+        self::assertSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getEmails());
     }
 
     private function getObject($value)

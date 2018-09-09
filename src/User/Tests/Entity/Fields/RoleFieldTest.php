@@ -13,14 +13,14 @@ final class RoleFieldTest extends TestCase
     public function testField(): void
     {
         $value = $this->createMock(Role::class);
-        $value->expects($this->any())
+        $value->expects(self::any())
             ->method('getName')
             ->willReturn('ROLE_FOO');
 
         $object = $this->getObject($value);
 
-        $this->assertSame($value, $object->getRole());
-        $this->assertSame('ROLE_FOO', $object->getRoleName());
+        self::assertSame($value, $object->getRole());
+        self::assertSame('ROLE_FOO', $object->getRoleName());
     }
 
     private function getObject($value)

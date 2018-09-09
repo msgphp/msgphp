@@ -17,7 +17,7 @@ final class DomainIdentityMappingTest extends AbstractDomainIdentityMappingTest
 
     public function testClassMapping(): void
     {
-        $this->assertSame(['id'], (new DomainIdentityMapping(self::$em, ['foo' => Entities\TestEntity::class]))->getIdentifierFieldNames('foo'));
+        self::assertSame(['id'], (new DomainIdentityMapping(self::$em, ['foo' => Entities\TestEntity::class]))->getIdentifierFieldNames('foo'));
     }
 
     protected static function createMapping(): DomainIdentityMappingInterface

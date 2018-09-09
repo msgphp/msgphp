@@ -11,9 +11,9 @@ final class EnabledFieldTest extends TestCase
 {
     public function testField(): void
     {
-        $this->assertFalse($this->getObject()->isEnabled());
-        $this->assertTrue($this->getObject(true)->isEnabled());
-        $this->assertFalse($this->getObject(false)->isEnabled());
+        self::assertFalse($this->getObject()->isEnabled());
+        self::assertTrue($this->getObject(true)->isEnabled());
+        self::assertFalse($this->getObject(false)->isEnabled());
     }
 
     private function getObject($value = null)

@@ -16,11 +16,11 @@ abstract class AbstractDomainIdentityMappingTest extends TestCase
     {
         $mapping = static::createMapping();
 
-        $this->assertSame(['idA', 'idB'], $mapping->getIdentifierFieldNames(Entities\TestCompositeEntity::class));
-        $this->assertSame(['entity', 'id'], $mapping->getIdentifierFieldNames(Entities\TestDerivedCompositeEntity::class));
-        $this->assertSame(['entity'], $mapping->getIdentifierFieldNames(Entities\TestDerivedEntity::class));
-        $this->assertSame(['id'], $mapping->getIdentifierFieldNames(Entities\TestEntity::class));
-        $this->assertSame(['id'], $mapping->getIdentifierFieldNames(Entities\TestPrimitiveEntity::class));
+        self::assertSame(['idA', 'idB'], $mapping->getIdentifierFieldNames(Entities\TestCompositeEntity::class));
+        self::assertSame(['entity', 'id'], $mapping->getIdentifierFieldNames(Entities\TestDerivedCompositeEntity::class));
+        self::assertSame(['entity'], $mapping->getIdentifierFieldNames(Entities\TestDerivedEntity::class));
+        self::assertSame(['id'], $mapping->getIdentifierFieldNames(Entities\TestEntity::class));
+        self::assertSame(['id'], $mapping->getIdentifierFieldNames(Entities\TestPrimitiveEntity::class));
     }
 
     public function testGetIdentifierFieldNamesWithInvalidClass(): void
@@ -36,40 +36,40 @@ abstract class AbstractDomainIdentityMappingTest extends TestCase
     {
         $mapping = static::createMapping();
         $id = $this->createMock(DomainIdInterface::class);
-        $id->expects($this->any())
+        $id->expects(self::any())
             ->method('isEmpty')
             ->willReturn(false);
         $entity = Entities\TestPrimitiveEntity::create(['id' => $id]);
 
-        $this->assertSame($identity = ['idA' => $id, 'idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create($identity)));
-        $this->assertSame($identity = ['entity' => $entity, 'id' => 0], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create($identity)));
-        $this->assertSame($identity = ['entity' => $entity], $mapping->getIdentity(Entities\TestDerivedEntity::create($identity)));
-        $this->assertSame($identity = ['id' => $id], $mapping->getIdentity(Entities\TestEntity::create($identity + ['strField' => 'foo'])));
-        $this->assertSame($identity = ['id' => $id], $mapping->getIdentity(Entities\TestPrimitiveEntity::create($identity)));
+        self::assertSame($identity = ['idA' => $id, 'idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create($identity)));
+        self::assertSame($identity = ['entity' => $entity, 'id' => 0], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create($identity)));
+        self::assertSame($identity = ['entity' => $entity], $mapping->getIdentity(Entities\TestDerivedEntity::create($identity)));
+        self::assertSame($identity = ['id' => $id], $mapping->getIdentity(Entities\TestEntity::create($identity + ['strField' => 'foo'])));
+        self::assertSame($identity = ['id' => $id], $mapping->getIdentity(Entities\TestPrimitiveEntity::create($identity)));
     }
 
     public function testGetIdentityWithEmptyIdentifier(): void
     {
         $mapping = static::createMapping();
         $id = $this->createMock(DomainIdInterface::class);
-        $id->expects($this->any())
+        $id->expects(self::any())
             ->method('isEmpty')
             ->willReturn(true);
         $entity = Entities\TestPrimitiveEntity::create(['id' => $id]);
 
-        $this->assertSame(['idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create(['idA' => $id, 'idB' => 'foo'])));
-        $this->assertSame(['id' => 0], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create(['entity' => $entity, 'id' => 0])));
-        $this->assertSame([], $mapping->getIdentity(Entities\TestDerivedEntity::create(['entity' => $entity])));
-        $this->assertSame([], $mapping->getIdentity(Entities\TestEntity::create(['id' => $id, 'strField' => 'foo'])));
-        $this->assertSame([], $mapping->getIdentity(Entities\TestPrimitiveEntity::create(['id' => $id])));
+        self::assertSame(['idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create(['idA' => $id, 'idB' => 'foo'])));
+        self::assertSame(['id' => 0], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create(['entity' => $entity, 'id' => 0])));
+        self::assertSame([], $mapping->getIdentity(Entities\TestDerivedEntity::create(['entity' => $entity])));
+        self::assertSame([], $mapping->getIdentity(Entities\TestEntity::create(['id' => $id, 'strField' => 'foo'])));
+        self::assertSame([], $mapping->getIdentity(Entities\TestPrimitiveEntity::create(['id' => $id])));
     }
 
     public function testGetIdentityWithIncompleteIdentifier(): void
     {
         $mapping = static::createMapping();
 
-        $this->assertSame($identity = ['idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create($identity)));
-        $this->assertSame($identity = ['id' => 1], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create($identity)));
+        self::assertSame($identity = ['idB' => 'foo'], $mapping->getIdentity(Entities\TestCompositeEntity::create($identity)));
+        self::assertSame($identity = ['id' => 1], $mapping->getIdentity(Entities\TestDerivedCompositeEntity::create($identity)));
     }
 
     public function testGetIdentityWithInvalidClass(): void

@@ -14,14 +14,14 @@ final class UserFieldTest extends TestCase
     public function testField(): void
     {
         $value = $this->createMock(User::class);
-        $value->expects($this->any())
+        $value->expects(self::any())
             ->method('getId')
             ->willReturn($this->createMock(UserIdInterface::class));
 
         $object = $this->getObject($value);
 
-        $this->assertSame($value, $object->getUser());
-        $this->assertSame($value->getId(), $object->getUserId());
+        self::assertSame($value, $object->getUser());
+        self::assertSame($value->getId(), $object->getUserId());
     }
 
     private function getObject($value)

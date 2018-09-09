@@ -14,7 +14,7 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 {
     public function testFromValueWithCollection(): void
     {
-        $this->assertEquals(new DomainCollection($collection = $this->createMock(Collection::class)), DomainCollection::fromValue($collection));
+        self::assertEquals(new DomainCollection($collection = $this->createMock(Collection::class)), DomainCollection::fromValue($collection));
     }
 
     protected static function createCollection(array $elements): DomainCollectionInterface

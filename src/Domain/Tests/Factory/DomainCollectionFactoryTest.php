@@ -14,11 +14,11 @@ final class DomainCollectionFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $this->assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create(null));
-        $this->assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create([]));
-        $this->assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create([1, 2, 3]));
-        $this->assertInstanceOf(DoctrineDomainCollection::class, DomainCollectionFactory::create($this->createMock(Collection::class)));
-        $this->assertSame($collection = $this->createMock(DomainCollectionInterface::class), DomainCollectionFactory::create($collection));
+        self::assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create(null));
+        self::assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create([]));
+        self::assertInstanceOf(DomainCollection::class, DomainCollectionFactory::create([1, 2, 3]));
+        self::assertInstanceOf(DoctrineDomainCollection::class, DomainCollectionFactory::create($this->createMock(Collection::class)));
+        self::assertSame($collection = $this->createMock(DomainCollectionInterface::class), DomainCollectionFactory::create($collection));
     }
 
     public function testCreateFromCallable(): void
@@ -31,11 +31,11 @@ final class DomainCollectionFactoryTest extends TestCase
             $visited = true;
         });
 
-        $this->assertFalse($collection->isEmpty());
-        $this->assertFalse($visited);
-        $this->assertSame([1, 2], iterator_to_array($collection));
-        $this->assertTrue($visited);
-        $this->assertSame(1, $collection->first());
-        $this->assertFalse($visited);
+        self::assertFalse($collection->isEmpty());
+        self::assertFalse($visited);
+        self::assertSame([1, 2], iterator_to_array($collection));
+        self::assertTrue($visited);
+        self::assertSame(1, $collection->first());
+        self::assertFalse($visited);
     }
 }

@@ -14,27 +14,27 @@ final class CanBeConfirmedTest extends TestCase
     {
         $object = $this->getObject('foo', null);
 
-        $this->assertSame('foo', $object->getConfirmationToken());
-        $this->assertNull($object->getConfirmedAt());
-        $this->assertFalse($object->isConfirmed());
+        self::assertSame('foo', $object->getConfirmationToken());
+        self::assertNull($object->getConfirmedAt());
+        self::assertFalse($object->isConfirmed());
 
         $object->confirm();
 
-        $this->assertNull($object->getConfirmationToken());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
-        $this->assertTrue($object->isConfirmed());
+        self::assertNull($object->getConfirmationToken());
+        self::assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
+        self::assertTrue($object->isConfirmed());
     }
 
     public function testHandleConfirmEvent(): void
     {
         $object = $this->getObject('foo', null);
 
-        $this->assertTrue($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
-        $this->assertNull($prevToken = $object->getConfirmationToken());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
-        $this->assertTrue($object->isConfirmed());
-        $this->assertFalse($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
-        $this->assertTrue($object->isConfirmed());
+        self::assertTrue($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
+        self::assertNull($prevToken = $object->getConfirmationToken());
+        self::assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
+        self::assertTrue($object->isConfirmed());
+        self::assertFalse($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
+        self::assertTrue($object->isConfirmed());
     }
 
     private function getObject($confirmationToken, $confirmedAt)

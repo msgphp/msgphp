@@ -11,14 +11,14 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 {
     public function testLazyFromValue(): void
     {
-        $this->assertEquals(new DomainCollection($generator = self::getGenerator([])), DomainCollection::fromValue($generator));
+        self::assertEquals(new DomainCollection($generator = self::getGenerator([])), DomainCollection::fromValue($generator));
     }
 
     public function testLazyGetIterator(): void
     {
-        $this->assertSame([], iterator_to_array(self::createLazyCollection([])));
-        $this->assertSame($elements = [2, 'key' => 'val'], iterator_to_array($collection = self::createLazyCollection($elements, $visited)));
-        $this->assertSame($elements, $visited);
+        self::assertSame([], iterator_to_array(self::createLazyCollection([])));
+        self::assertSame($elements = [2, 'key' => 'val'], iterator_to_array($collection = self::createLazyCollection($elements, $visited)));
+        self::assertSame($elements, $visited);
 
         $this->assertClosedGenerator();
 
@@ -27,11 +27,11 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyIsEmpty(): void
     {
-        $this->assertTrue(self::createLazyCollection([])->isEmpty());
-        $this->assertFalse(($collection = self::createLazyCollection([1, 2], $visited))->isEmpty());
-        $this->assertSame([1], $visited);
-        $this->assertFalse($collection->isEmpty());
-        $this->assertSame([1, 2], iterator_to_array($collection));
+        self::assertTrue(self::createLazyCollection([])->isEmpty());
+        self::assertFalse(($collection = self::createLazyCollection([1, 2], $visited))->isEmpty());
+        self::assertSame([1], $visited);
+        self::assertFalse($collection->isEmpty());
+        self::assertSame([1, 2], iterator_to_array($collection));
 
         $this->assertClosedGenerator();
 
@@ -40,13 +40,13 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyContains(): void
     {
-        $this->assertFalse(static::createLazyCollection([])->contains(1));
-        $this->assertTrue(static::createLazyCollection([null], $visited)->contains(null));
-        $this->assertSame([null], $visited);
-        $this->assertTrue(($collection = static::createLazyCollection([1, '2'], $visited))->contains(1));
-        $this->assertSame([1], $visited);
-        $this->assertFalse($collection->contains(2));
-        $this->assertSame([1, '2'], $visited);
+        self::assertFalse(static::createLazyCollection([])->contains(1));
+        self::assertTrue(static::createLazyCollection([null], $visited)->contains(null));
+        self::assertSame([null], $visited);
+        self::assertTrue(($collection = static::createLazyCollection([1, '2'], $visited))->contains(1));
+        self::assertSame([1], $visited);
+        self::assertFalse($collection->contains(2));
+        self::assertSame([1, '2'], $visited);
 
         $this->assertClosedGenerator();
 
@@ -55,9 +55,9 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyContainsKey(): void
     {
-        $this->assertFalse(static::createLazyCollection([])->containsKey(1));
-        $this->assertTrue(($collection = static::createLazyCollection([1, 'k' => 'v', '2' => null], $visited))->containsKey(2));
-        $this->assertSame([1, 'k' => 'v', '2' => null], $visited);
+        self::assertFalse(static::createLazyCollection([])->containsKey(1));
+        self::assertTrue(($collection = static::createLazyCollection([1, 'k' => 'v', '2' => null], $visited))->containsKey(2));
+        self::assertSame([1, 'k' => 'v', '2' => null], $visited);
 
         $this->assertUnrewindableGenerator();
 
@@ -66,11 +66,11 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyFirst(): void
     {
-        $this->assertFalse(self::createLazyCollection([])->first());
-        $this->assertSame(1, ($collection = static::createLazyCollection([1, 2], $visited))->first());
-        $this->assertSame([1], $visited);
-        $this->assertSame(1, $collection->first());
-        $this->assertSame([1, 2], iterator_to_array($collection));
+        self::assertFalse(self::createLazyCollection([])->first());
+        self::assertSame(1, ($collection = static::createLazyCollection([1, 2], $visited))->first());
+        self::assertSame([1], $visited);
+        self::assertSame(1, $collection->first());
+        self::assertSame([1, 2], iterator_to_array($collection));
 
         $this->assertClosedGenerator();
 
@@ -79,9 +79,9 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyLast(): void
     {
-        $this->assertFalse(self::createLazyCollection([])->last());
-        $this->assertSame(2, ($collection = static::createLazyCollection([1, 2], $visited))->last());
-        $this->assertSame([1, 2], $visited);
+        self::assertFalse(self::createLazyCollection([])->last());
+        self::assertSame(2, ($collection = static::createLazyCollection([1, 2], $visited))->last());
+        self::assertSame([1, 2], $visited);
 
         $this->assertClosedGenerator();
 
@@ -90,11 +90,11 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyGet(): void
     {
-        $this->assertNull(self::createLazyCollection([])->get('key'));
-        $this->assertSame(1, ($collection = static::createLazyCollection([1], $visited))->get(0));
-        $this->assertSame([1], $visited);
-        $this->assertSame(1, $collection->get('0'));
-        $this->assertNull($collection->get('foo'));
+        self::assertNull(self::createLazyCollection([])->get('key'));
+        self::assertSame(1, ($collection = static::createLazyCollection([1], $visited))->get(0));
+        self::assertSame([1], $visited);
+        self::assertSame(1, $collection->get('0'));
+        self::assertNull($collection->get('foo'));
 
         $this->assertClosedGenerator();
 
@@ -103,14 +103,14 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyFilter(): void
     {
-        $this->assertNotSame($collection = self::createLazyCollection([]), $filtered = $collection->filter(function (): bool {
+        self::assertNotSame($collection = self::createLazyCollection([]), $filtered = $collection->filter(function (): bool {
             return true;
         }));
-        $this->assertSame([], iterator_to_array($filtered));
-        $this->assertSame([1, 2 => 3], iterator_to_array(($collection = static::createLazyCollection([1, null, 3], $visited))->filter($filter = function ($v): bool {
+        self::assertSame([], iterator_to_array($filtered));
+        self::assertSame([1, 2 => 3], iterator_to_array(($collection = static::createLazyCollection([1, null, 3], $visited))->filter($filter = function ($v): bool {
             return null !== $v;
         })));
-        $this->assertSame([1, null, 3], $visited);
+        self::assertSame([1, null, 3], $visited);
 
         $this->assertClosedGenerator();
 
@@ -119,10 +119,10 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazySlice(): void
     {
-        $this->assertNotSame($collection = self::createLazyCollection([]), $slice = $collection->slice(0));
-        $this->assertSame([], iterator_to_array($slice));
-        $this->assertSame([1 => 2], iterator_to_array(($collection = static::createLazyCollection([1, 2, 3, null, 5], $visited))->slice(1, 1)));
-        $this->assertSame([1, 2, 3], $visited);
+        self::assertNotSame($collection = self::createLazyCollection([]), $slice = $collection->slice(0));
+        self::assertSame([], iterator_to_array($slice));
+        self::assertSame([1 => 2], iterator_to_array(($collection = static::createLazyCollection([1, 2, 3, null, 5], $visited))->slice(1, 1)));
+        self::assertSame([1, 2, 3], $visited);
 
         $this->assertUnrewindableGenerator();
 
@@ -131,10 +131,10 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyMap(): void
     {
-        $this->assertSame([], self::createLazyCollection([])->map(function ($v) {
+        self::assertSame([], self::createLazyCollection([])->map(function ($v) {
             return $v;
         }));
-        $this->assertSame([2], ($collection = self::createLazyCollection([1]))->map($mapper = function (int $v): int {
+        self::assertSame([2], ($collection = self::createLazyCollection([1]))->map($mapper = function (int $v): int {
             return $v * 2;
         }));
 
@@ -145,9 +145,9 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyCount(): void
     {
-        $this->assertCount(0, self::createLazyCollection([]));
-        $this->assertCount(2, $collection = self::createLazyCollection([1, 2], $visited));
-        $this->assertSame([1, 2], $visited);
+        self::assertCount(0, self::createLazyCollection([]));
+        self::assertCount(2, $collection = self::createLazyCollection([1, 2], $visited));
+        self::assertSame([1, 2], $visited);
 
         $this->assertClosedGenerator();
 

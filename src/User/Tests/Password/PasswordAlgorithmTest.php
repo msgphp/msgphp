@@ -40,19 +40,19 @@ final class PasswordAlgorithmTest extends TestCase
 
     private function assertNonLegacyAlgorithm(int $type, array $options, PasswordAlgorithm $algorithm): void
     {
-        $this->assertSame($type, $algorithm->type);
-        $this->assertSame($options, $algorithm->options);
-        $this->assertFalse($algorithm->legacy);
-        $this->assertNull($algorithm->salt);
-        $this->assertNull($algorithm->encodeBase64);
+        self::assertSame($type, $algorithm->type);
+        self::assertSame($options, $algorithm->options);
+        self::assertFalse($algorithm->legacy);
+        self::assertNull($algorithm->salt);
+        self::assertNull($algorithm->encodeBase64);
     }
 
     private function assertLegacyAlgorithm(string $type, ?PasswordSalt $salt, bool $encodeBase64, PasswordAlgorithm $algorithm): void
     {
-        $this->assertSame($type, $algorithm->type);
-        $this->assertNull($algorithm->options);
-        $this->assertTrue($algorithm->legacy);
-        $this->assertSame($salt, $algorithm->salt);
-        $this->assertSame($encodeBase64, $algorithm->encodeBase64);
+        self::assertSame($type, $algorithm->type);
+        self::assertNull($algorithm->options);
+        self::assertTrue($algorithm->legacy);
+        self::assertSame($salt, $algorithm->salt);
+        self::assertSame($encodeBase64, $algorithm->encodeBase64);
     }
 }

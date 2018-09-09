@@ -30,7 +30,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         $repository->addFieldCriteria($qb, ['foo.bar' => 'bar2']);
         $repository->addFieldCriteria($qb, ['foo.bar' => 'bar3']);
 
-        $this->assertCount(3, $qb->getParameters());
+        self::assertCount(3, $qb->getParameters());
     }
 
     protected function equalsEntity($expected, $actual)

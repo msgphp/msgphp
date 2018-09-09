@@ -41,10 +41,10 @@ final class DomainIdTypeTest extends TestCase
         $this->type = Type::getType('domain_id');
         $this->otherType = Type::getType('other_domain_id');
         $this->platform = $this->createMock(AbstractPlatform::class);
-        $this->platform->expects($this->any())
+        $this->platform->expects(self::any())
             ->method('getIntegerTypeDeclarationSQL')
             ->willReturn('native_integer_type');
-        $this->platform->expects($this->any())
+        $this->platform->expects(self::any())
             ->method('getVarcharTypeDeclarationSQL')
             ->willReturn('native_string_type');
 
@@ -62,25 +62,25 @@ final class DomainIdTypeTest extends TestCase
 
     public function testGetName(): void
     {
-        $this->assertSame(DomainIdType::NAME, $this->type->getName());
-        $this->assertSame(OtherTestDomainIdType::NAME, $this->otherType->getName());
+        self::assertSame(DomainIdType::NAME, $this->type->getName());
+        self::assertSame(OtherTestDomainIdType::NAME, $this->otherType->getName());
     }
 
     public function testGetSQLDeclaration(): void
     {
         OtherTestDomainIdType::setDataType(Type::STRING);
 
-        $this->assertSame('native_integer_type', $this->type->getSQLDeclaration([], $this->platform));
-        $this->assertSame(Type::INTEGER, DomainIdType::getDataType());
-        $this->assertSame('native_string_type', $this->otherType->getSQLDeclaration([], $this->platform));
-        $this->assertSame(Type::STRING, OtherTestDomainIdType::getDataType());
+        self::assertSame('native_integer_type', $this->type->getSQLDeclaration([], $this->platform));
+        self::assertSame(Type::INTEGER, DomainIdType::getDataType());
+        self::assertSame('native_string_type', $this->otherType->getSQLDeclaration([], $this->platform));
+        self::assertSame(Type::STRING, OtherTestDomainIdType::getDataType());
     }
 
     public function testConvertToDatabaseValue(): void
     {
-        $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
-        $this->assertSame('1', $this->type->convertToDatabaseValue(new DomainId('1'), $this->platform));
-        $this->assertSame('1', $this->type->convertToDatabaseValue('1', $this->platform));
+        self::assertNull($this->type->convertToDatabaseValue(null, $this->platform));
+        self::assertSame('1', $this->type->convertToDatabaseValue(new DomainId('1'), $this->platform));
+        self::assertSame('1', $this->type->convertToDatabaseValue('1', $this->platform));
     }
 
     public function testConvertToPHPValue(): void
@@ -88,11 +88,11 @@ final class DomainIdTypeTest extends TestCase
         OtherTestDomainIdType::setDataType('string');
         OtherTestDomainIdType::setClass(OtherTestDomainId::class);
 
-        $this->assertNull($this->type->convertToPHPValue(null, $this->platform));
-        $this->assertEquals(new DomainId('0'), $this->type->convertToPHPValue('foo', $this->platform));
-        $this->assertEquals(new DomainId('1'), $this->type->convertToPHPValue('1', $this->platform));
-        $this->assertEquals(new OtherTestDomainId('foo'), $this->otherType->convertToPHPValue('foo', $this->platform));
-        $this->assertEquals(new OtherTestDomainId('1'), $this->otherType->convertToPHPValue('1', $this->platform));
+        self::assertNull($this->type->convertToPHPValue(null, $this->platform));
+        self::assertEquals(new DomainId('0'), $this->type->convertToPHPValue('foo', $this->platform));
+        self::assertEquals(new DomainId('1'), $this->type->convertToPHPValue('1', $this->platform));
+        self::assertEquals(new OtherTestDomainId('foo'), $this->otherType->convertToPHPValue('foo', $this->platform));
+        self::assertEquals(new OtherTestDomainId('1'), $this->otherType->convertToPHPValue('1', $this->platform));
     }
 }
 
