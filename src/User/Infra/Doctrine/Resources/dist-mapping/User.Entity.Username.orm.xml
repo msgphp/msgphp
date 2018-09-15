@@ -3,12 +3,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="MsgPhp\User\Entity\Username">
+    <mapped-superclass name="MsgPhp\User\Entity\Username">
         <id name="username" />
 
         <many-to-one field="user" target-entity="MsgPhp\User\Entity\User" fetch="EAGER">
             <join-column on-delete="CASCADE" nullable="false" />
         </many-to-one>
-    </entity>
+    </mapped-superclass>
 
 </doctrine-mapping>

@@ -11,18 +11,21 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\MappingException;
-use MsgPhp\User\Entity\Username;
+use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\User\Entity\{User, Username};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 final class UsernameListener
 {
+    private $factory;
     private $targetMappings;
     private $updateUsernames = [];
 
-    public function __construct(array $targetMappings)
+    public function __construct(EntityAwareFactoryInterface $factory, array $targetMappings)
     {
+        $this->factory = $factory;
         $this->targetMappings = $targetMappings;
     }
 
@@ -76,7 +79,7 @@ final class UsernameListener
                     continue;
                 }
 
-                $em->persist(new Username($user, $username));
+                $em->persist($this->createUsername($user, $username));
             }
         }
     }
@@ -117,7 +120,7 @@ final class UsernameListener
             $em->remove($username);
 
             if (isset($this->updateUsernames[$usernameValue = (string) $username])) {
-                $em->persist(new Username($username->getUser(), $this->updateUsernames[$usernameValue]));
+                $em->persist($this->createUsername($username->getUser(), $this->updateUsernames[$usernameValue]));
             }
         }
 
@@ -142,8 +145,13 @@ final class UsernameListener
                 continue;
             }
 
-            yield new Username($user, $username);
+            yield $this->createUsername($user, $username);
         }
+    }
+
+    private function createUsername(User $user, string $username): Username
+    {
+        return $this->factory->create(Username::class, [$user, $username]);
     }
 
     private function getTargetMapping($entity, EntityManagerInterface $em): array

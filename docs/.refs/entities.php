@@ -7,10 +7,8 @@ $template = <<<'MD'
 {% if domain.entities %}
 ### Entities
 
-Class | Abstract
---- | ---
 {% for entity in domain.entities %}
-`{{ entity.class }}` | {{ entity.abstract ? '✔' : '✗' }}
+- `{{ entity }}`
 {% endfor %}
 
 {% endif %}

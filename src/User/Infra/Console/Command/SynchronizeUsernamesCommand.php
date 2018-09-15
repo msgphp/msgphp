@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class SynchronizeUsernamesCommand extends Command
 {
-    protected static $defaultName = 'user:synchronize:usernames';
+    protected static $defaultName = 'user:synchronize-usernames';
 
     private $repository;
 

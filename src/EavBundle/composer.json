@@ -18,7 +18,7 @@
         "exclude-from-classmap": ["/Tests/"]
     },
     "require": {
-        "msgphp/eav": "^0.6",
+        "msgphp/eav": "^0.7",
         "symfony/config": "^3.4|^4.0",
         "symfony/dependency-injection": "^3.4|^4.0",
         "symfony/http-kernel": "^3.4|^4.0"

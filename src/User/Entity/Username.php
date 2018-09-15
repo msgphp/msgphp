@@ -8,10 +8,8 @@ use MsgPhp\User\Entity\Fields\UserField;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @final
  */
-class Username
+abstract class Username
 {
     use UserField;
 

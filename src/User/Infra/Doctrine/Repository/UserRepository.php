@@ -11,7 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\{User, Username};
+use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
 
@@ -26,12 +26,14 @@ final class UserRepository implements UserRepositoryInterface
 
     private $alias = 'user';
     private $usernameField;
+    private $usernameClass;
 
-    public function __construct(string $class, ?string $usernameField, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, ?string $usernameField, ?string $usernameClass, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
     {
         $this->__parent_construct($class, $em, $identityHelper);
 
         $this->usernameField = $usernameField;
+        $this->usernameClass = $usernameClass;
     }
 
     /**
@@ -49,7 +51,7 @@ final class UserRepository implements UserRepositoryInterface
 
     public function findByUsername(string $username): User
     {
-        $qb = $this->createUsernameQueryBuilder($username);
+        $qb = $this->createQueryBuilderForUsername($username);
 
         if (null !== $qb) {
             try {
@@ -69,7 +71,7 @@ final class UserRepository implements UserRepositoryInterface
 
     public function usernameExists(string $username): bool
     {
-        $qb = $this->createUsernameQueryBuilder($username);
+        $qb = $this->createQueryBuilderForUsername($username);
 
         if (null !== $qb) {
             $qb->select('1');
@@ -99,16 +101,14 @@ final class UserRepository implements UserRepositoryInterface
         return [$this->usernameField => $username];
     }
 
-    private function createUsernameQueryBuilder(string $username): ?QueryBuilder
+    private function createQueryBuilderForUsername(string $username): ?QueryBuilder
     {
-        if ($this->em->getMetadataFactory()->isTransient(Username::class)) {
+        if (null === $this->usernameClass) {
             return null;
         }
 
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('user');
-        $qb->from($this->class, 'user');
-        $qb->join(Username::class, 'username', Join::WITH, 'username.user = user');
+        $qb = $this->createQueryBuilder();
+        $qb->join($this->usernameClass, 'username', Join::WITH, 'username.user = '.$this->alias);
         $qb->where($qb->expr()->eq('username.username', ':username'));
         $qb->setMaxResults(1);
         $qb->setParameter('username', $username);
