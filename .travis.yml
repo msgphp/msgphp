@@ -3,10 +3,6 @@ notifications:
 
 language: php
 
-php:
-  - 7.1
-  - 7.2
-
 env:
   global:
     - COMPOSER_ARGS="--no-progress --prefer-dist --no-interaction --no-suggest"
@@ -14,6 +10,7 @@ env:
 
 matrix:
   include:
+    - php: 7.1
     - php: 7.1
       env:
         - DEPS=high
