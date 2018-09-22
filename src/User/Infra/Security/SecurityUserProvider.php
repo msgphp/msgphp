@@ -36,7 +36,7 @@ final class SecurityUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException($e->getMessage());
         }
 
-        return $this->fromUser($user);
+        return $this->fromUser($user, $username);
     }
 
     public function refreshUser(UserInterface $user): UserInterface
@@ -45,13 +45,15 @@ final class SecurityUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Unsupported user "%s".', \get_class($user)));
         }
 
+        $securityUser = $user;
+
         try {
-            $user = $this->repository->find($user->getUserId());
+            $user = $this->repository->find($securityUser->getUserId());
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
 
-        return $this->fromUser($user);
+        return $this->fromUser($user, $securityUser->getOriginUsername());
     }
 
     public function supportsClass($class): bool
@@ -59,8 +61,8 @@ final class SecurityUserProvider implements UserProviderInterface
         return SecurityUser::class === $class;
     }
 
-    public function fromUser(User $user): SecurityUser
+    public function fromUser(User $user, string $originUsername = null): SecurityUser
     {
-        return new SecurityUser($user, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : [self::DEFAULT_ROLE]);
+        return new SecurityUser($user, $originUsername, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : [self::DEFAULT_ROLE]);
     }
 }

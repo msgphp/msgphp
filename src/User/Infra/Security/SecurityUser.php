@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
+use MsgPhp\User\Entity\Credential\Anonymous;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Password\PasswordProtectedInterface;
 use MsgPhp\User\UserIdInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class SecurityUser implements UserInterface, EquatableInterface, \Serializable
 {
     private $id;
+    private $originUsername;
     private $roles;
     private $password;
     private $passwordSalt;
 
-    public function __construct(User $user, array $roles = [])
+    public function __construct(User $user, string $originUsername = null, array $roles = [])
     {
         $this->id = $user->getId();
 
@@ -28,9 +30,15 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
             throw new \LogicException('The user ID cannot be empty.');
         }
 
+        $credential = $user->getCredential();
+
+        if (null === $originUsername && !$credential instanceof Anonymous) {
+            $originUsername = $credential->getUsername();
+        }
+
+        $this->originUsername = $originUsername;
         $this->roles = $roles;
 
-        $credential = $user->getCredential();
         if ($credential instanceof PasswordProtectedInterface) {
             $this->password = $credential->getPassword();
 
@@ -44,6 +52,11 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
     public function getUserId(): UserIdInterface
     {
         return $this->id;
+    }
+
+    public function getOriginUsername(): ?string
+    {
+        return $this->originUsername;
     }
 
     public function getUsername(): string
@@ -78,11 +91,11 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
     public function serialize(): string
     {
-        return serialize([$this->id, $this->roles, $this->password, $this->passwordSalt]);
+        return serialize([$this->id, $this->originUsername, $this->roles, $this->password, $this->passwordSalt]);
     }
 
     public function unserialize($serialized): void
     {
-        list($this->id, $this->roles, $this->password, $this->passwordSalt) = unserialize($serialized);
+        list($this->id, $this->originUsername, $this->roles, $this->password, $this->passwordSalt) = unserialize($serialized);
     }
 }
