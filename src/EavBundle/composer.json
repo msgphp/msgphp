@@ -26,7 +26,7 @@
     "require-dev": {
         "doctrine/doctrine-bundle": "^1.8",
         "doctrine/orm": "^2.6",
-        "symfony/phpunit-bridge": "^3.4|^4.0",
+        "symfony/phpunit-bridge": "^3.4.9|^4.0.9",
         "symfony/var-dumper": "^3.4|^4.0"
     },
     "config": {

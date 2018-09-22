@@ -1,62 +1,51 @@
+dist: trusty
+sudo: false
+language: php
+
 notifications:
   email: false
 
-language: php
+branches:
+  only:
+    - master
+    - /^\d\.\d$/
 
-env:
-  global:
-    - COMPOSER_ARGS="--no-progress --prefer-dist --no-interaction --no-suggest"
-    - PHPUNIT_ARGS=""
+php: 7.2
 
-matrix:
+jobs:
   include:
+    - stage: Code-quality
+      install: true
+      script:
+        - bin/cs
+        - bin/sa
+    - stage: Unit-tests
+      env: CC=true
+    - env: DEPS=low
     - php: 7.1
-    - php: 7.1
-      env:
-        - DEPS=high
-        - CC=true
-        - CS=true
-        - SA=true
-        - SMOKE_TEST=true
-    - php: 7.2
-      env:
-        - DEPS=low
-  fast_finish: true
-
-before_script:
-  - if [[ $CC != true ]] ; then phpenv config-rm xdebug.ini || true ; fi
-  - if [[ $CS = true ]] ; then mkdir -p var/cache ; fi
 
 before_install:
+  - if [[ $CC = true && $TRAVIS_PULL_REQUEST != false ]] ; then unset CC ; fi
+  - if [[ $CC != true ]] ; then phpenv config-rm xdebug.ini || true ; fi
   - source .travis/tfold
 
 install:
-  - travis_retry php .travis/packager.php HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
-  - if [[ ! $DEPS || $DEPS = high ]] ; then travis_retry bin/composer update $COMPOSER_ARGS ; fi
-  - if [[ $DEPS = low ]] ; then travis_retry bin/composer update $COMPOSER_ARGS --prefer-stable --prefer-lowest ; fi
-  - bin/phpunit install
-  - if [[ $CS = true || $SA = true ]] ; then composer install $COMPOSER_ARGS ; fi
+  - |
+    COMPOSER_ARGS="--no-progress --prefer-dist --no-interaction --no-suggest"
+    PHPUNIT_ARGS=""
+    if [[ $DEPS = low ]] ; then COMPOSER_ARGS="${COMPOSER_ARGS} --prefer-stable --prefer-lowest" ; fi
+    if [[ $CC = true ]] ; then PHPUNIT_ARGS="${PHPUNIT_ASRGS} --coverage-clover=coverage.xml" ; fi
+  - travis_retry .travis/packager HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
+  - travis_retry bin/composer update $COMPOSER_ARGS
+  - travis_retry bin/phpunit install
 
 script:
-  - if [[ ! $CC  ]] ; then bin/phpunit $PHPUNIT_ARGS ; fi
-  - if [[ $CC = true ]] ; then bin/phpunit --coverage-clover=coverage.xml $PHPUNIT_ARGS ; fi
-  - if [[ $CS = true ]] ; then bin/cs ; fi
-  - if [[ $SA = true ]] ; then bin/sa ; fi
-  - if [[ $SMOKE_TEST = true ]] ; then bin/smoke-test-bundles ; fi
+  - bin/phpunit $PHPUNIT_ARGS
 
 after_success:
   - if [[ $CC = true ]] ; then .travis/codecov ; fi
 
 cache:
   directories:
-    - $HOME/.composer/cache/files/
+    - $HOME/.composer/cache
     - var/cache/
-    - var/smoke-test/bundles/base/
-
-before_cache:
-  - rm -rf $HOME/.composer/cache/files/msgphp
-
-branches:
-  only:
-    - master
-    - /^\d\.\d$/

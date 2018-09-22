@@ -40,7 +40,7 @@ fi
 
 pushd "${PACKAGE_DIR}" &> /dev/null
 
-echo -e "\e[34mTesting package\e[0m"
 bash -xc "${CMD}" 2>&1
+[[ $? -ne 0 ]] && exit 1
 
 popd &> /dev/null
