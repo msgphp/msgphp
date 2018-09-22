@@ -14,15 +14,15 @@ php: 7.2
 
 jobs:
   include:
+    - stage: Unit-tests
+      env: CC=true
+    - env: DEPS=low
+    - php: 7.1
     - stage: Code-quality
       install: true
       script:
         - bin/cs
         - bin/sa
-    - stage: Unit-tests
-      env: CC=true
-    - env: DEPS=low
-    - php: 7.1
 
 before_install:
   - if [[ $CC = true && $TRAVIS_PULL_REQUEST != false ]] ; then unset CC ; fi
