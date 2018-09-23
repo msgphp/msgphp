@@ -4,6 +4,7 @@
 
 - Marked `Username` abstract
 - Renamed CLI command `user:synchronize:usernames` to `user:synchronize-usernames`
+- Replaced `MsgPhp\User\Infra\Security\UserRolesProviderInterface` by `MsgPhp\User\Role\RoleProviderInterface`
 
 ## UserBundle
 
