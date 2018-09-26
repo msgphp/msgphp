@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\DependencyInjection\Compiler;
 
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
-use MsgPhp\User\{Command, Repository};
+use MsgPhp\User\{Command, Repository, Role};
 use MsgPhp\User\Infra\{Console as ConsoleInfra, Security as SecurityInfra, Validator as ValidatorInfra};
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -63,6 +63,7 @@ final class CleanupPass implements CompilerPassInterface
             Command\Handler\DeleteUserEmailHandler::class,
         ]);
         ContainerHelper::removeIf($container, !$container->has(Repository\UserRoleRepositoryInterface::class), [
+            Role\UserRoleProvider::class,
             Command\Handler\AddUserRoleHandler::class,
             Command\Handler\DeleteUserRoleHandler::class,
             ConsoleInfra\Command\AddUserRoleCommand::class,

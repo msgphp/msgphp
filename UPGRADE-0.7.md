@@ -8,6 +8,16 @@
 
 ## UserBundle
 
+- Replaced generated `App\Security\UserRolesProvider` with config:
+
+    ```yaml
+    msgphp_user:
+        # ...
+        role_providers:
+            #- default: [ROLE_USER]
+            - MsgPhp\User\Role\UserRoleProvider
+    ```
+
 - Create and configure the `Username` entity in case `msgphp_php.username_lookup` is configured
 
     ```yaml

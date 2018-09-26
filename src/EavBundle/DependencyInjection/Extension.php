@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use MsgPhp\Domain\Infra\DependencyInjection\ExtensionHelper;
-use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
+use MsgPhp\Domain\Infra\DependencyInjection\{ExtensionHelper, FeatureDetection};
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
