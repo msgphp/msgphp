@@ -12,7 +12,7 @@ class DomainId implements DomainIdInterface
     private $id;
 
     /**
-     * @return $this|self
+     * @return static
      */
     final public static function fromValue($value): DomainIdInterface
     {

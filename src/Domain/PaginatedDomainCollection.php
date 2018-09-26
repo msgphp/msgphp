@@ -15,9 +15,6 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
     private $count;
     private $totalCount;
 
-    /**
-     * @return $this|self
-     */
     public static function fromValue(?iterable $value): DomainCollectionInterface
     {
         return new self($value ?? []);

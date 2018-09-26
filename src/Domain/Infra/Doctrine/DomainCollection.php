@@ -15,9 +15,6 @@ final class DomainCollection implements DomainCollectionInterface
 {
     private $collection;
 
-    /**
-     * @return $this|self
-     */
     public static function fromValue(?iterable $value): DomainCollectionInterface
     {
         if ($value instanceof Collection) {

@@ -5,6 +5,9 @@ includes:
 parameters:
     level: max
 
+    autoload_directories:
+        - tests/fixtures/sa
+
     ignoreErrors:
         - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'
         - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject\.#'

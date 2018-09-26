@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ $# -eq 0 ]] ; then
-    DIR="src/"
+    DIR="src/ tests/fixtures/sa"
 elif [[ -d $1 ]] ; then
     DIR="$1"
     shift;
