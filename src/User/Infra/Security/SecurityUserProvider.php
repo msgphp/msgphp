@@ -7,6 +7,7 @@ namespace MsgPhp\User\Infra\Security;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Role\RoleProviderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,15 +18,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class SecurityUserProvider implements UserProviderInterface
 {
-    public const DEFAULT_ROLE = 'ROLE_USER';
-
     private $repository;
-    private $rolesProvider;
+    private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, UserRolesProviderInterface $rolesProvider = null)
+    public function __construct(UserRepositoryInterface $repository, RoleProviderInterface $roleProvider = null)
     {
         $this->repository = $repository;
-        $this->rolesProvider = $rolesProvider;
+        $this->roleProvider = $roleProvider;
     }
 
     public function loadUserByUsername($username): UserInterface
@@ -63,6 +62,6 @@ final class SecurityUserProvider implements UserProviderInterface
 
     public function fromUser(User $user, string $originUsername = null): SecurityUser
     {
-        return new SecurityUser($user, $originUsername, $this->rolesProvider ? $this->rolesProvider->getRoles($user) : [self::DEFAULT_ROLE]);
+        return new SecurityUser($user, $originUsername, $this->roleProvider ? $this->roleProvider->getRoles($user) : []);
     }
 }

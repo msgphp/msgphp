@@ -6,9 +6,10 @@ namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\User\Entity\User;
-use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider, UserRolesProviderInterface};
+use MsgPhp\User\Infra\Security\{SecurityUser, SecurityUserProvider};
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\{CredentialInterface, UserIdInterface};
+use MsgPhp\User\Role\RoleProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -25,7 +26,7 @@ final class SecurityUserProviderTest extends TestCase
         self::assertSame($entity->getId(), $user->getUserId());
         self::assertSame('id', $user->getUsername());
         self::assertSame('username', $user->getOriginUsername());
-        self::assertSame(['ROLE_USER'], $user->getRoles());
+        self::assertSame([], $user->getRoles());
         self::assertSame('', $user->getPassword());
         self::assertNull($user->getSalt());
     }
@@ -39,26 +40,26 @@ final class SecurityUserProviderTest extends TestCase
         self::assertSame($entity->getId(), $user->getUserId());
         self::assertSame('id', $user->getUsername());
         self::assertSame('origin-username', $user->getOriginUsername());
-        self::assertSame(['ROLE_USER'], $user->getRoles());
+        self::assertSame([], $user->getRoles());
         self::assertSame('', $user->getPassword());
         self::assertNull($user->getSalt());
     }
 
     public function testLoadUserByUsernameWithRoles(): void
     {
-        $rolesProvider = $this->createMock(UserRolesProviderInterface::class);
-        $rolesProvider->expects(self::any())
+        $roleProvider = $this->createMock(RoleProviderInterface::class);
+        $roleProvider->expects(self::any())
             ->method('getRoles')
-            ->willReturn($roles = ['ROLE_FOO']);
+            ->willReturn(['ROLE_FOO']);
 
         /** @var SecurityUser $user */
-        $user = (new SecurityUserProvider($this->createRepository($entity = $this->createUser()), $rolesProvider))->loadUserByUsername('username');
+        $user = (new SecurityUserProvider($this->createRepository($entity = $this->createUser()), $roleProvider))->loadUserByUsername('username');
 
         self::assertInstanceOf(SecurityUser::class, $user);
         self::assertSame($entity->getId(), $user->getUserId());
         self::assertSame('id', $user->getUsername());
         self::assertSame('username', $user->getOriginUsername());
-        self::assertSame($roles, $user->getRoles());
+        self::assertSame(['ROLE_FOO'], $user->getRoles());
         self::assertSame('', $user->getPassword());
         self::assertNull($user->getSalt());
     }
@@ -126,12 +127,12 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testFromUser(): void
     {
-        $rolesProvider = $this->createMock(UserRolesProviderInterface::class);
-        $rolesProvider->expects(self::once())
+        $roleProvider = $this->createMock(RoleProviderInterface::class);
+        $roleProvider->expects(self::once())
             ->method('getRoles')
-            ->willReturn($roles = ['ROLE_FOO']);
+            ->willReturn(['ROLE_FOO']);
 
-        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $rolesProvider);
+        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $roleProvider);
         $securityUser = $provider->fromUser($user = $this->createUser());
 
         self::assertSame($user->getId(), $securityUser->getUserId());
@@ -139,7 +140,7 @@ final class SecurityUserProviderTest extends TestCase
         self::assertSame('username', $securityUser->getOriginUsername());
         self::assertSame('', $securityUser->getPassword());
         self::assertNull($securityUser->getSalt());
-        self::assertSame($roles, $securityUser->getRoles());
+        self::assertSame(['ROLE_FOO'], $securityUser->getRoles());
     }
 
     public function testFromUserWithOriginUsername(): void
