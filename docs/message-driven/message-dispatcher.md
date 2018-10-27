@@ -5,10 +5,9 @@ The domain message dispatcher is a utility trait. Its purpose is to dispatch a f
 
 ## API
 
-### `dispatch(string $class, array $context = []): mixed`
+### `dispatch(string $class, array $context = []): void`
 
-Dispatches a message object factorized from `$class` and `$context`. The dispatcher can return a value coming from
-handlers, but is not required to do so.
+Dispatches a message object factorized from `$class` and `$context`.
 
 ## Basic example
 

@@ -8,9 +8,9 @@ of message object and helps you to use [CQRS](cqrs.md) and [event sourcing](../e
 
 ## API
 
-### `dispatch(object $message): mixed`
+### `dispatch(object $message): void`
 
-Dispatches the given message object. The bus can return a value coming from handlers, but is not required to do so.
+Dispatches the given message object.
 
 ## Implementations
 

@@ -19,8 +19,8 @@ final class DomainMessageBus implements DomainMessageBusInterface
         $this->bus = $bus;
     }
 
-    public function dispatch($message)
+    public function dispatch($message): void
     {
-        return $this->bus->dispatch($message);
+        $this->bus->dispatch($message);
     }
 }

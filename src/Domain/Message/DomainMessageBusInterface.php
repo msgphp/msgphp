@@ -12,5 +12,5 @@ interface DomainMessageBusInterface
     /**
      * @param object $message
      */
-    public function dispatch($message);
+    public function dispatch($message): void;
 }

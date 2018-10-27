@@ -20,8 +20,8 @@ trait MessageDispatchingTrait
         $this->bus = $bus;
     }
 
-    private function dispatch(string $class, array $context = [])
+    private function dispatch(string $class, array $context = []): void
     {
-        return $this->bus->dispatch($this->factory->create($class, $context));
+        $this->bus->dispatch($this->factory->create($class, $context));
     }
 }
