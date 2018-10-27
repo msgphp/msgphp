@@ -41,11 +41,7 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
 
         if ($credential instanceof PasswordProtectedInterface) {
             $this->password = $credential->getPassword();
-
-            $algorithm = $credential->getPasswordAlgorithm();
-            if (null !== $algorithm->salt) {
-                $this->passwordSalt = $algorithm->salt->token;
-            }
+            $this->passwordSalt = $credential->getPasswordAlgorithm()->salt->token ?? null;
         }
     }
 
