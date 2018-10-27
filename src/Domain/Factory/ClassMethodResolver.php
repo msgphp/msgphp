@@ -62,7 +62,7 @@ final class ClassMethodResolver
 
             return [
                 'name' => $name = $param->getName(),
-                'key' => strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $name)),
+                'key' => strtolower((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $name)),
                 'required' => $required,
                 'default' => $default,
                 'type' => $type,

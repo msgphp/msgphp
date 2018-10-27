@@ -15,19 +15,14 @@ final class MessageDispatchingTraitTest extends TestCase
         $factory = $this->createMock(DomainObjectFactoryInterface::class);
         $factory->expects(self::once())
             ->method('create')
-            ->willReturnCallback(function ($class, $context) {
-                $o = new \stdClass();
-                $o->class = $class;
-                $o->context = $context;
-
-                return $o;
-            });
+            ->with('class', ['context'])
+            ->willReturn($message = new \stdClass());
         $bus = $this->createMock(DomainMessageBusInterface::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->willReturnArgument(0);
+            ->with($message);
 
-        self::assertSame(['class' => 'class', 'context' => ['argument' => 'value', 1]], (array) $this->getObject($factory, $bus)->dispatch('class', ['argument' => 'value', 1]));
+        self::assertNull($this->getObject($factory, $bus)->dispatch('class', ['context']));
     }
 
     private function getObject(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus)

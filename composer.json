@@ -7,6 +7,7 @@
         "phpstan/phpstan-phpunit": "^0.10",
         "phpunit/phpunit": "^7.3",
         "ro0nl/link": "^1.0",
+        "symfony/messenger": "@dev",
         "twig/twig": "^2.5"
     },
     "autoload-dev": {

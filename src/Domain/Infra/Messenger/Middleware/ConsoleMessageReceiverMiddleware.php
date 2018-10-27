@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Messenger\Middleware;
 
 use MsgPhp\Domain\Infra\Console\MessageReceiver;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -19,10 +21,10 @@ final class ConsoleMessageReceiverMiddleware implements MiddlewareInterface
         $this->receiver = $receiver;
     }
 
-    public function handle($message, callable $next)
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $this->receiver->receive($message);
+        $this->receiver->receive($envelope->getMessage());
 
-        return $next($message);
+        return $stack->next()->handle($envelope, $stack);
     }
 }
