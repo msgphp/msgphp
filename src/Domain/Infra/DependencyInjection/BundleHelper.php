@@ -11,6 +11,7 @@ use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InM
 use MsgPhp\Domain\Message\{DomainMessageBus, DomainMessageBusInterface};
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -180,8 +181,6 @@ final class BundleHelper
     {
         @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/msgphp/doctrine-mapping'), 0777, true);
 
-        $container->addCompilerPass(new Compiler\DoctrineObjectFieldMappingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
-
         $container->prependExtensionConfig('doctrine', ['orm' => [
             'hydrators' => [
                 DoctrineInfra\Hydration\ScalarHydrator::NAME => DoctrineInfra\Hydration\ScalarHydrator::class,
@@ -199,19 +198,22 @@ final class BundleHelper
 
         $container->setAlias('msgphp.doctrine.entity_manager', new Alias('doctrine.orm.entity_manager', false));
 
-        $container->register(DoctrineInfra\ObjectFieldMappings::class)
-            ->setPublic(false)
-            ->addTag('msgphp.doctrine.object_field_mappings', ['priority' => -100]);
-
-        $container->register(DoctrineInfra\Event\ObjectFieldMappingListener::class)
-            ->setPublic(false)
-            ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])
-            ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$mappings']);
-
         $container->register(DoctrineInfra\MappingConfig::class)
             ->setPublic(false)
             ->setArgument('$mappingFiles', '%msgphp.doctrine.mapping_files%')
             ->setArgument('$mappingConfig', '%msgphp.doctrine.mapping_config%');
+
+        $container->register(DoctrineInfra\ObjectMappings::class)
+            ->setPublic(false)
+            ->addTag('msgphp.doctrine.object_mapping_provider');
+
+        $container->autowire(DoctrineInfra\Event\ObjectMappingListener::class)
+            ->setPublic(false)
+            ->setArgument('$providers', new TaggedIteratorArgument('msgphp.doctrine.object_mapping_provider'))
+            ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata]);
+
+        $container->registerForAutoconfiguration(DoctrineInfra\ObjectMappingProviderInterface::class)
+            ->addTag('msgphp.doctrine.object_mapping_provider');
 
         if (FeatureDetection::hasFrameworkBundle($container)) {
             $container->autowire(DoctrineInfra\MappingCacheWarmer::class)

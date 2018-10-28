@@ -7,24 +7,44 @@ namespace MsgPhp\Domain\Infra\Doctrine\Event;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
+use MsgPhp\Domain\Infra\Doctrine\ObjectMappingProviderInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ObjectFieldMappingListener
+final class ObjectMappingListener
 {
-    private $mappings;
+    private $providers;
+    private $mappingConfig;
 
     /** @var ClassMetadataFactory|null */
     private $metadataFactory;
 
-    public function __construct(array $mappings)
+    /** @var array|null */
+    private $mappings;
+
+    /**
+     * @param ObjectMappingProviderInterface[] $providers
+     */
+    public function __construct(iterable $providers, MappingConfig $mappingConfig)
     {
-        $this->mappings = $mappings;
+        $this->providers = $providers;
+        $this->mappingConfig = $mappingConfig;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
+        if (null === $this->mappings) {
+            $this->mappings = [];
+
+            foreach ($this->providers as $provider) {
+                foreach ($provider::provideObjectMappings($this->mappingConfig) as $object => $mapping) {
+                    $this->mappings[$object] = $mapping;
+                }
+            }
+        }
+
         if (!$this->mappings) {
             return;
         }

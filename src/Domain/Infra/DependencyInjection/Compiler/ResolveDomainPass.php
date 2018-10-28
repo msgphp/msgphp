@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection\Compiler;
 
 use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\FeatureDetection;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -62,9 +63,11 @@ final class ResolveDomainPass implements CompilerPassInterface
             $definition->clearTag($tag);
         }
 
-        $container->setParameter($param = 'msgphp.doctrine.mapping_config', ($container->hasParameter($param) ? $container->getParameter($param) : []) + [
-            'mapping_dir' => '%kernel.project_dir%/config/packages/msgphp/doctrine',
-        ]);
+        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
+            $container->setParameter($param = 'msgphp.doctrine.mapping_config', ($container->hasParameter($param) ? $container->getParameter($param) : []) + [
+                'mapping_dir' => '%kernel.project_dir%/config/packages/msgphp/doctrine',
+            ]);
+        }
     }
 
     private static function processClassMapping($value, array $classMapping, bool $arrayKeys = false)

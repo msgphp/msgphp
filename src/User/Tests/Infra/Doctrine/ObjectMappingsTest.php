@@ -6,10 +6,10 @@ namespace MsgPhp\User\Tests\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
 use MsgPhp\User\Entity\Features;
-use MsgPhp\User\Infra\Doctrine\ObjectFieldMappings;
+use MsgPhp\User\Infra\Doctrine\ObjectMappings;
 use PHPUnit\Framework\TestCase;
 
-final class ObjectFieldMappingsTest extends TestCase
+final class ObjectMappingsTest extends TestCase
 {
     public function testMapping(): void
     {
@@ -22,7 +22,7 @@ final class ObjectFieldMappingsTest extends TestCase
             $available[Features\AbstractSaltedPasswordCredential::class]
         );
 
-        $mappings = ObjectFieldMappings::provideObjectFieldMappings(new MappingConfig([]));
+        $mappings = ObjectMappings::provideObjectMappings(new MappingConfig([]));
         $mappings = array_keys($mappings instanceof \Traversable ? iterator_to_array($mappings) : $mappings);
         sort($mappings);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Doctrine;
 
-use MsgPhp\Domain\Infra\Doctrine\{MappingConfig, ObjectFieldMappingsProviderInterface};
+use MsgPhp\Domain\Infra\Doctrine\{MappingConfig, ObjectMappingProviderInterface};
 use MsgPhp\User\Entity\{Credential, Features, Fields, Role, User, UserAttributeValue, UserEmail, UserRole};
 
 /**
@@ -12,7 +12,7 @@ use MsgPhp\User\Entity\{Credential, Features, Fields, Role, User, UserAttributeV
  *
  * @internal
  */
-final class ObjectFieldMappings implements ObjectFieldMappingsProviderInterface
+final class ObjectMappings implements ObjectMappingProviderInterface
 {
     private const CREDENTIALS = [
         Features\EmailCredential::class => Credential\Email::class,
@@ -24,7 +24,7 @@ final class ObjectFieldMappings implements ObjectFieldMappingsProviderInterface
         Features\TokenCredential::class => Credential\Token::class,
     ];
 
-    public static function provideObjectFieldMappings(MappingConfig $config): iterable
+    public static function provideObjectMappings(MappingConfig $config): iterable
     {
         foreach (self::CREDENTIALS as $object => $credential) {
             yield $object => [

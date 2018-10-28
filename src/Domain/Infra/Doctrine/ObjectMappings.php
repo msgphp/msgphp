@@ -11,9 +11,9 @@ use MsgPhp\Domain\Entity\{Features, Fields};
  *
  * @internal
  */
-final class ObjectFieldMappings implements ObjectFieldMappingsProviderInterface
+final class ObjectMappings implements ObjectMappingProviderInterface
 {
-    public static function provideObjectFieldMappings(MappingConfig $config): iterable
+    public static function provideObjectMappings(MappingConfig $config): iterable
     {
         yield Features\CanBeConfirmed::class => [
             'confirmationToken' => [
