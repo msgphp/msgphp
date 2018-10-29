@@ -121,14 +121,14 @@ final class DomainCollection implements DomainCollectionInterface
     public function filter(callable $filter): DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
-            $elements = [];
-            foreach ($this->elements as $key => $element) {
-                if ($filter($element)) {
-                    $elements[$key] = $element;
+            return new self((function() use ($filter): iterable
+            {
+                foreach ($this->elements as $key => $element) {
+                    if ($filter($element)) {
+                        yield $key => $element;
+                    }
                 }
-            }
-
-            return new self($elements);
+            })());
         }
 
         return new self(array_filter($this->elements, $filter));
@@ -137,21 +137,21 @@ final class DomainCollection implements DomainCollectionInterface
     public function slice(int $offset, int $limit = 0): DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
-            $elements = [];
-            $i = -1;
-            foreach ($this->elements as $key => $element) {
-                if (++$i < $offset) {
-                    continue;
+            return new self((function() use ($offset, $limit): iterable
+            {
+                $i = -1;
+                foreach ($this->elements as $key => $element) {
+                    if (++$i < $offset) {
+                        continue;
+                    }
+
+                    if ($limit && $i >= ($offset + $limit)) {
+                        break;
+                    }
+
+                    yield $key => $element;
                 }
-
-                if ($limit && $i >= ($offset + $limit)) {
-                    break;
-                }
-
-                $elements[$key] = $element;
-            }
-
-            return new self($elements);
+            })());
         }
 
         return new self(\array_slice($this->elements, $offset, $limit ?: null, true));
