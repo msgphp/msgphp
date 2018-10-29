@@ -121,8 +121,7 @@ final class DomainCollection implements DomainCollectionInterface
     public function filter(callable $filter): DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
-            return new self((function() use ($filter): iterable
-            {
+            return new self((function () use ($filter): iterable {
                 foreach ($this->elements as $key => $element) {
                     if ($filter($element)) {
                         yield $key => $element;
@@ -137,8 +136,7 @@ final class DomainCollection implements DomainCollectionInterface
     public function slice(int $offset, int $limit = 0): DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
-            return new self((function() use ($offset, $limit): iterable
-            {
+            return new self((function () use ($offset, $limit): iterable {
                 $i = -1;
                 foreach ($this->elements as $key => $element) {
                     if (++$i < $offset) {
