@@ -4,3 +4,4 @@
 
 - Updated to `symfony/messenger@^4.2`
 - Updated `DomainMessageBusInterface::dispatch()` to return `void`
+- Updated `DomainCollectionInterface::map()` to return `DomainCollectionInterface`
