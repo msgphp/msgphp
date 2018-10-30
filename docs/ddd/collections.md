@@ -67,9 +67,10 @@ Keys are preserved.
 
 ---
 
-### `map(callable $mapper): array`
+### `map(callable $mapper): DomainCollectionInterface`
 
-Returns a map with each collection element as returned by `$mapper`.
+Returns a **new** collection containing each collection element as returned by `$mapper`.
+Keys are preserved.
 
 ## Pagination API
 
