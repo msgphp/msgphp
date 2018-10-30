@@ -44,7 +44,7 @@ final class DomainCollection implements DomainCollectionInterface
             return true;
         }
 
-        return !$this->elements;
+        return $this->elements === [];
     }
 
     public function contains($element): bool
