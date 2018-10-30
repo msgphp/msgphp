@@ -78,7 +78,7 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
         return $this->collection->slice($offset, $limit);
     }
 
-    public function map(callable $mapper): array
+    public function map(callable $mapper): DomainCollectionInterface
     {
         return $this->collection->map($mapper);
     }

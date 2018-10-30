@@ -25,6 +25,6 @@ final class UserRoleProvider implements RoleProviderInterface
             return $userRole->getRoleName();
         });
 
-        return array_values($roles);
+        return array_values(iterator_to_array($roles));
     }
 }

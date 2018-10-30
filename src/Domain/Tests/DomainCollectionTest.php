@@ -133,16 +133,17 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyMap(): void
     {
-        self::assertSame([], self::createLazyCollection([])->map(function ($v) {
+        self::assertSame([], iterator_to_array(self::createLazyCollection([])->map(function ($v) {
             return $v;
-        }));
-        self::assertSame([2], ($collection = self::createLazyCollection([1]))->map($mapper = function (int $v): int {
+        })));
+        self::assertSame([2], iterator_to_array($collection = self::createLazyCollection([1])->map($mapper = function (int $v): int {
             return $v * 2;
-        }));
+        })));
+
+        $result = $collection->map($mapper);
 
         $this->assertClosedGenerator();
-
-        $collection->map($mapper);
+        iterator_to_array($result);
     }
 
     public function testLazyCount(): void

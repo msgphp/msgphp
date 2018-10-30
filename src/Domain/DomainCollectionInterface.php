@@ -33,5 +33,5 @@ interface DomainCollectionInterface extends \Countable, \IteratorAggregate
 
     public function slice(int $offset, int $limit = 0): self;
 
-    public function map(callable $mapper): array;
+    public function map(callable $mapper): self;
 }

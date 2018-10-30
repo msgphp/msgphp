@@ -107,12 +107,12 @@ abstract class AbstractDomainCollectionTest extends TestCase
 
     public function testMap(): void
     {
-        self::assertSame([], static::createCollection([])->map(function ($v) {
+        self::assertSame([], iterator_to_array(static::createCollection([])->map(function ($v) {
             return $v;
-        }));
-        self::assertSame(['k' => 2, 4, 6], static::createCollection(['k' => 1, 2, 3])->map(function (int $v): int {
+        })));
+        self::assertSame(['k' => 2, 4, 6], iterator_to_array(static::createCollection(['k' => 1, 2, 3])->map(function (int $v): int {
             return $v * 2;
-        }));
+        })));
     }
 
     public function testCount(): void

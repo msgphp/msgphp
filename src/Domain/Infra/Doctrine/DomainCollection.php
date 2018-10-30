@@ -78,9 +78,9 @@ final class DomainCollection implements DomainCollectionInterface
         return new self(new ArrayCollection($this->collection->slice($offset, $limit ?: null)));
     }
 
-    public function map(callable $mapper): array
+    public function map(callable $mapper): DomainCollectionInterface
     {
-        return $this->collection->map($mapper)->toArray();
+        return new self($this->collection->map($mapper));
     }
 
     public function count(): int

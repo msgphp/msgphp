@@ -155,18 +155,17 @@ final class DomainCollection implements DomainCollectionInterface
         return new self(\array_slice($this->elements, $offset, $limit ?: null, true));
     }
 
-    public function map(callable $mapper): array
+    public function map(callable $mapper): DomainCollectionInterface
     {
         if ($this->elements instanceof \Traversable) {
-            $elements = [];
-            foreach ($this->elements as $key => $element) {
-                $elements[$key] = $mapper($element);
-            }
-
-            return $elements;
+            return new self((function () use ($mapper): iterable {
+                foreach ($this->elements as $key => $element) {
+                    yield $key => $mapper($element);
+                }
+            })());
         }
 
-        return array_map($mapper, $this->elements);
+        return new self(array_map($mapper, $this->elements));
     }
 
     public function count(): int
