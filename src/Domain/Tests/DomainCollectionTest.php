@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use function iterator_to_array;
 use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainCollectionInterface;
 
@@ -113,9 +112,8 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
         })));
         self::assertSame([1, null, 3], $visited);
 
-        $result = static::createLazyCollection([1, 2, 3])->filter($filter);
+        $result = $collection->filter($filter);
 
-        iterator_to_array($result);
         $this->assertClosedGenerator();
         iterator_to_array($result);
     }
@@ -127,10 +125,9 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
         self::assertSame([1 => 2], iterator_to_array(($collection = static::createLazyCollection([1, 2, 3, null, 5], $visited))->slice(1, 1)));
         self::assertSame([1, 2, 3], $visited);
 
-        $result = static::createLazyCollection([1, 2, 3])->slice(0);
+        $result = $collection->slice(0);
 
-        iterator_to_array($result);
-        $this->assertClosedGenerator();
+        $this->assertUnrewindableGenerator();
         iterator_to_array($result);
     }
 
