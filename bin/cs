@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+VERSION="v2.13.1"
+PHAR="var/cache/php-cs-fixer-${VERSION}.phar"
+
+if [[ ! -f ${PHAR} ]] ; then
+    mkdir -p $(dirname ${PHAR})
+    curl -Lso ${PHAR} https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/${VERSION}/php-cs-fixer.phar
+    chmod +x ${PHAR}
+fi
+
 if [[ $# -eq 0 ]] ; then
     DIR="src/"
 elif [[ -d $1 ]] ; then
@@ -10,12 +19,6 @@ else
     shift;
 fi
 
-BIN="vendor/bin/php-cs-fixer"
-CMD="${BIN} fix --dry-run --verbose --diff ${@} ${DIR}"
-
-if [[ ! -f "${BIN}" ]] ; then
-    composer update --prefer-dist --quiet
-    [[ $? -ne 0 ]] && exit 1
-fi
+CMD="${PHAR} fix --dry-run --verbose --diff ${@} ${DIR}"
 
 bash -xc "${CMD}" 2>&1
