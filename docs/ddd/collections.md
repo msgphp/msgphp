@@ -32,25 +32,25 @@ Tells if a collection contains the given element. Comparison is done strictly.
 
 ### `containsKey($key): bool`
 
-Tells if a collection contains an element at the given key/index.
+Tells if a collection contains an element at the given key.
 
 ---
 
-### `first()`
+### `first(): mixed`
 
-Returns the first element or `false` if the collection is empty.
-
----
-
-### `last()`
-
-Returns the last element or `false` if the collection is empty.
+Returns the first element from a collection.
 
 ---
 
-### `get($key)`
+### `last(): mixed`
 
-Returns the element at the given key/index or `null` if the collection is empty.
+Returns the last element from a collection.
+
+---
+
+### `get($key): mixed`
+
+Returns the element at the given key from a collection.
 
 ---
 
@@ -69,8 +69,7 @@ Keys are preserved.
 
 ### `map(callable $mapper): DomainCollectionInterface`
 
-Returns a **new** collection containing each collection element as returned by `$mapper`.
-Keys are preserved.
+Returns a **new** collection containing each collection element as returned by `$mapper`. Keys are preserved.
 
 ## Pagination API
 
@@ -162,7 +161,7 @@ $firstTwoInts = $onlyInts->slice(0, 2);
 
 $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
     return ++$value;
-}); // [2, 4]
+});
 ```
 
 ### `MsgPhp\Domain\PaginatedDomainCollection`

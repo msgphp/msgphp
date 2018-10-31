@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\Exception\{EmptyCollectionException, UnknownCollectionElementException};
 
 final class DomainCollectionTest extends AbstractDomainCollectionTest
 {
@@ -66,7 +67,6 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
 
     public function testLazyFirst(): void
     {
-        self::assertFalse(self::createLazyCollection([])->first());
         self::assertSame(1, ($collection = static::createLazyCollection([1, 2], $visited))->first());
         self::assertSame([1], $visited);
         self::assertSame(1, $collection->first());
@@ -77,9 +77,17 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
         $collection->first();
     }
 
+    public function testLazyFirstWithEmptyCollection(): void
+    {
+        $collection = self::createLazyCollection([]);
+
+        $this->expectException(EmptyCollectionException::class);
+
+        $collection->first();
+    }
+
     public function testLazyLast(): void
     {
-        self::assertFalse(self::createLazyCollection([])->last());
         self::assertSame(2, ($collection = static::createLazyCollection([1, 2], $visited))->last());
         self::assertSame([1, 2], $visited);
 
@@ -88,17 +96,43 @@ final class DomainCollectionTest extends AbstractDomainCollectionTest
         $collection->last();
     }
 
+    public function testLazyLastWithEmptyCollection(): void
+    {
+        $collection = self::createLazyCollection([]);
+
+        $this->expectException(EmptyCollectionException::class);
+
+        $collection->last();
+    }
+
     public function testLazyGet(): void
     {
-        self::assertNull(self::createLazyCollection([])->get('key'));
-        self::assertSame(1, ($collection = static::createLazyCollection([1], $visited))->get(0));
+        self::assertSame(1, ($collection = static::createLazyCollection([1, 2], $visited))->get(0));
         self::assertSame([1], $visited);
         self::assertSame(1, $collection->get('0'));
-        self::assertNull($collection->get('foo'));
+        self::assertSame(2, $collection->get(1));
 
-        $this->assertClosedGenerator();
+        $this->assertUnrewindableGenerator();
 
-        $collection->get('k');
+        $collection->get(1);
+    }
+
+    public function testLazyGetWithEmptyCollection(): void
+    {
+        $collection = self::createLazyCollection([]);
+
+        $this->expectException(UnknownCollectionElementException::class);
+
+        $collection->get('foo');
+    }
+
+    public function testLazyGetWithUnknownKey(): void
+    {
+        $collection = self::createLazyCollection(['bar' => 'foo', 1]);
+
+        $this->expectException(UnknownCollectionElementException::class);
+
+        $collection->get('foo');
     }
 
     public function testLazyFilter(): void

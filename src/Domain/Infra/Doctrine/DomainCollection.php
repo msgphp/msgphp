@@ -7,6 +7,7 @@ namespace MsgPhp\Domain\Infra\Doctrine;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\Exception\{EmptyCollectionException, UnknownCollectionElementException};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -55,16 +56,28 @@ final class DomainCollection implements DomainCollectionInterface
 
     public function first()
     {
+        if ($this->collection->isEmpty()) {
+            throw EmptyCollectionException::create();
+        }
+
         return $this->collection->first();
     }
 
     public function last()
     {
+        if ($this->collection->isEmpty()) {
+            throw EmptyCollectionException::create();
+        }
+
         return $this->collection->last();
     }
 
     public function get($key)
     {
+        if (!$this->collection->containsKey($key)) {
+            throw UnknownCollectionElementException::createForKey($key);
+        }
+
         return $this->collection->get($key);
     }
 

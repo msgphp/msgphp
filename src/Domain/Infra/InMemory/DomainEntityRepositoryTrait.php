@@ -71,8 +71,8 @@ trait DomainEntityRepositoryTrait
      */
     private function doFindByFields(array $fields)
     {
-        if ($entity = $this->doFindAllByFields($fields)->first()) {
-            return $entity;
+        if (!($result = $this->doFindAllByFields($fields))->isEmpty()) {
+            return $result->first();
         }
 
         if ($this->identityHelper->isIdentity($this->class, $fields)) {

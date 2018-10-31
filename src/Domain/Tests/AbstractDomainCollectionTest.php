@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\Exception\{EmptyCollectionException, UnknownCollectionElementException};
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractDomainCollectionTest extends TestCase
@@ -59,28 +60,60 @@ abstract class AbstractDomainCollectionTest extends TestCase
 
     public function testFirst(): void
     {
-        self::assertFalse(static::createCollection([])->first());
         self::assertSame(1, static::createCollection([1])->first());
         self::assertSame(1, static::createCollection([1, 2])->first());
         self::assertNull(static::createCollection([null, 2])->first());
     }
 
+    public function testFirstWithEmptyCollection(): void
+    {
+        $collection = static::createCollection([]);
+
+        $this->expectException(EmptyCollectionException::class);
+
+        $collection->first();
+    }
+
     public function testLast(): void
     {
-        self::assertFalse(static::createCollection([])->last());
         self::assertSame(1, static::createCollection([1])->last());
         self::assertSame(2, static::createCollection([1, 2])->last());
         self::assertNull(static::createCollection([1, null])->last());
     }
 
+    public function testLastWithEmptyCollection(): void
+    {
+        $collection = static::createCollection([]);
+
+        $this->expectException(EmptyCollectionException::class);
+
+        $collection->last();
+    }
+
     public function testGet(): void
     {
-        self::assertNull(static::createCollection([])->get(0));
-        self::assertNull(static::createCollection([])->get('k'));
         self::assertSame(1, ($collection = static::createCollection([1, 'k' => 'v', 2 => null]))->get(0));
         self::assertSame(1, $collection->get('0'));
         self::assertNull($collection->get(2));
         self::assertNull($collection->get('2'));
+    }
+
+    public function testGetWithEmptyCollection(): void
+    {
+        $collection = static::createCollection([]);
+
+        $this->expectException(UnknownCollectionElementException::class);
+
+        $collection->get(0);
+    }
+
+    public function testGetWithUnknownKey(): void
+    {
+        $collection = static::createCollection(['bar' => 'foo', 1]);
+
+        $this->expectException(UnknownCollectionElementException::class);
+
+        $collection->get('foo');
     }
 
     public function testFilter(): void

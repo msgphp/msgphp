@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain;
 
+use MsgPhp\Domain\Exception\{EmptyCollectionException, UnknownCollectionElementException};
+
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
@@ -84,7 +86,11 @@ final class DomainCollection implements DomainCollectionInterface
                 return $element;
             }
 
-            return false;
+            throw EmptyCollectionException::create();
+        }
+
+        if ([] === $this->elements) {
+            throw EmptyCollectionException::create();
         }
 
         return reset($this->elements);
@@ -93,11 +99,21 @@ final class DomainCollection implements DomainCollectionInterface
     public function last()
     {
         if ($this->elements instanceof \Traversable) {
-            $element = false;
+            $empty = true;
+            $element = null;
             foreach ($this->elements as $key => $element) {
+                $empty = false;
+            }
+
+            if ($empty) {
+                throw EmptyCollectionException::create();
             }
 
             return $element;
+        }
+
+        if ([] === $this->elements) {
+            throw EmptyCollectionException::create();
         }
 
         return end($this->elements);
@@ -112,10 +128,14 @@ final class DomainCollection implements DomainCollectionInterface
                 }
             }
 
-            return null;
+            throw UnknownCollectionElementException::createForKey($key);
         }
 
-        return $this->elements[$key] ?? null;
+        if (isset($this->elements[$key]) || array_key_exists($key, $this->elements)) {
+            return $this->elements[$key];
+        }
+
+        throw UnknownCollectionElementException::createForKey($key);
     }
 
     public function filter(callable $filter): DomainCollectionInterface
