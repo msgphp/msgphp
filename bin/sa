@@ -10,7 +10,7 @@ else
     shift;
 fi
 
-BIN="vendor/bin/phpstan"
+BIN="vendor/bin/phpstan.phar"
 CMD="${BIN} analyse ${@} ${DIR}"
 
 if [[ ! -f $BIN ]] ; then

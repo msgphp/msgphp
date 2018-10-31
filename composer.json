@@ -3,7 +3,7 @@
     "require-dev": {
         "wikimedia/composer-merge-plugin": "^1.4",
         "friendsofphp/php-cs-fixer": "^2.13",
-        "phpstan/phpstan": "^0.10",
+        "phpstan/phpstan-shim": "^0.10",
         "phpstan/phpstan-phpunit": "^0.10",
         "phpunit/phpunit": "^7.3",
         "ro0nl/link": "^1.0",

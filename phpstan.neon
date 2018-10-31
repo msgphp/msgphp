@@ -4,6 +4,7 @@ includes:
 
 parameters:
     level: max
+    tmpDir: var/cache/phpstan
 
     autoload_directories:
         - tests/fixtures/sa
