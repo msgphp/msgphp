@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Exception;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UnknownCollectionElementException extends \RuntimeException implements DomainExceptionInterface
+final class UnknownCollectionElementException extends \OutOfBoundsException implements DomainExceptionInterface
 {
     /**
      * @param string|int $key
