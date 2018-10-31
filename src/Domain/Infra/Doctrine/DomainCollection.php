@@ -36,7 +36,7 @@ final class DomainCollection implements DomainCollectionInterface
 
     public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this->collection->toArray());
+        return $this->collection->getIterator();
     }
 
     public function isEmpty(): bool
