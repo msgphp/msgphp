@@ -118,6 +118,7 @@ final class Configuration implements ConfigurationInterface
                 ->disallowClasses([CredentialInterface::class])
                 ->groupClasses([Entity\Role::class, Entity\UserRole::class])
                 ->subClassValues()
+                ->hint(Entity\UserAttributeValue::class, 'Try running "composer require msgphp/user-eav".')
             ->end()
             ->classMappingNode('id_type_mapping')
                 ->subClassKeys([DomainIdInterface::class])

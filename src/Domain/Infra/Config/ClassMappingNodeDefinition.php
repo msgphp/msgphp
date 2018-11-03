@@ -24,6 +24,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     private $builder;
     private $prototype;
     private $type = 'scalar';
+    private $hints = [];
 
     public function requireClasses(array $classes): self
     {
@@ -122,6 +123,18 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         return $this;
     }
 
+    /**
+     * @param string|string[] $class
+     */
+    public function hint($class, string $hint): self
+    {
+        foreach ((array) $class as $class) {
+            $this->hints[$class] = $hint;
+        }
+
+        return $this;
+    }
+
     public function children(): BaseNodeBuilder
     {
         throw new \BadMethodCallException(sprintf('Method "%s" is not applicable.', __METHOD__));
@@ -160,6 +173,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         /** @var ClassMappingNode $node */
         $node = parent::createNode();
         $node->setKeyAttribute('class');
+        $node->setHints($this->hints);
 
         $prototype = $this->getPrototype();
         $prototype->parent = $node;
