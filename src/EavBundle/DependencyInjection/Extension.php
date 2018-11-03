@@ -43,7 +43,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         // message infra
         $loader->load('message.php');
         ExtensionHelper::finalizeCommandHandlers($container, $config['class_mapping'], $config['commands'], array_map(function (string $file): string {
-            return Configuration::getPackageNs().'Event\\'.basename($file, '.php');
+            return Configuration::PACKAGE_NS.'Event\\'.basename($file, '.php');
         }, glob(Configuration::getPackageGlob().'/Event/*Event.php', \GLOB_BRACE)));
 
         // persistence infra
@@ -62,18 +62,13 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 $config['class_mapping'],
                 $config['id_type_mapping'],
                 Configuration::DOCTRINE_TYPE_MAPPING,
-                self::getDoctrineMappingFiles($config, $container)
+                glob(Configuration::getPackageGlob().'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml', \GLOB_BRACE)
             );
         }
     }
 
     public function process(ContainerBuilder $container): void
     {
-    }
-
-    private static function getDoctrineMappingFiles(array $config, ContainerBuilder $container): array
-    {
-        return glob(Configuration::getPackageGlob().'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml', \GLOB_BRACE);
     }
 
     private function loadDoctrineOrm(array $config, LoaderInterface $loader, ContainerBuilder $container): void

@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 final class Configuration implements ConfigurationInterface
 {
+    public const PACKAGE_NS = 'MsgPhp\\Eav\\';
     public const AGGREGATE_ROOTS = [
         Entity\Attribute::class => AttributeIdInterface::class,
         Entity\AttributeValue::class => AttributeValueIdInterface::class,
@@ -49,11 +50,6 @@ final class Configuration implements ConfigurationInterface
     ];
 
     private static $packageDirs;
-
-    public static function getPackageNs(): string
-    {
-        return '\\MsgPhp\\Eav\\';
-    }
 
     /**
      * @return string[]
