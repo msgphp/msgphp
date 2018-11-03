@@ -26,7 +26,7 @@ composer require msgphp/user
 - Primary and secondary user e-mails
 - Disabled / enabled users
 - User roles
-- User attribute values
+- User attribute values (with [`msgphp/user-eav`](https://github.com/msgphp/user-eav))
 
 ## Blog posts
 

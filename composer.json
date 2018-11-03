@@ -26,6 +26,7 @@
         "msgphp/eav": "*",
         "msgphp/eav-bundle": "*",
         "msgphp/user": "*",
-        "msgphp/user-bundle": "*"
+        "msgphp/user-bundle": "*",
+        "msgphp/user-eav": "*"
     }
 }

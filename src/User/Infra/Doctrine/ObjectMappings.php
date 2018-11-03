@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\{MappingConfig, ObjectMappingProviderInterface};
-use MsgPhp\User\Entity\{Credential, Features, Fields, Role, User, UserAttributeValue, UserEmail, UserRole};
+use MsgPhp\User\Entity\{Credential, Features, Fields, Role, User, UserEmail, UserRole};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -46,13 +46,6 @@ final class ObjectMappings implements ObjectMappingProviderInterface
             'passwordRequestedAt' => [
                 'type' => 'datetime',
                 'nullable' => true,
-            ],
-        ];
-        yield Fields\AttributeValuesField::class => [
-            'attributeValues' => [
-                'type' => self::TYPE_ONE_TO_MANY,
-                'targetEntity' => UserAttributeValue::class,
-                'mappedBy' => 'user',
             ],
         ];
         yield Fields\EmailsField::class => [

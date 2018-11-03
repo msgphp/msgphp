@@ -1,9 +1,9 @@
 {
-    "name": "msgphp/user",
+    "name": "msgphp/user-eav",
     "type": "library",
     "license": "MIT",
-    "description": "A domain layer providing basic user management",
-    "keywords": ["ddd", "domain-driven-design", "rich domain model", "user", "security"],
+    "description": "A bridge between the EAV and user domain",
+    "keywords": ["ddd", "domain-driven-design", "rich domain model", "user", "entity-attribute-value", "eav"],
     "authors": [
         {
             "name": "Roland Franssen",
@@ -18,22 +18,13 @@
         "exclude-from-classmap": ["/Tests/"]
     },
     "require": {
-        "msgphp/domain": "^0.8"
+        "msgphp/eav": "^0.8",
+        "msgphp/user": "^0.8"
     },
     "require-dev": {
         "doctrine/orm": "^2.6",
-        "lexik/jwt-authentication-bundle": "^2.5",
-        "sensio/framework-extra-bundle": "^5.1",
-        "symfony/console": "^3.4|^4.0",
-        "symfony/form": "^3.4|^4.0",
-        "symfony/http-kernel": "^3.4|^4.0",
         "symfony/phpunit-bridge": "^3.4.9|^4.0.9",
-        "symfony/security-core": "^3.4|^4.0",
-        "symfony/validator": "^3.4|^4.0",
         "symfony/var-dumper": "^3.4|^4.0"
-    },
-    "suggest": {
-        "msgphp/user-eav": "To enable user attribute values"
     },
     "config": {
         "preferred-install": {

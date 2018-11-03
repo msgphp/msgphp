@@ -13,11 +13,15 @@ MsgPHP is a project that aims to provide (common) message based domain layers fo
 
 ## Packages
 
-Domain | Bundle
---- | ---
-[`msgphp/domain`](https://github.com/msgphp/domain) | n/a
-[`msgphp/eav`](https://github.com/msgphp/eav) | [`msgphp/eav-bundle`](https://github.com/msgphp/eav-bundle)
-[`msgphp/user`](https://github.com/msgphp/user) | [`msgphp/user-bundle`](https://github.com/msgphp/user-bundle)
+- [`msgphp/domain`](https://github.com/msgphp/domain)
+- [`msgphp/eav`](https://github.com/msgphp/eav)
+- [`msgphp/user`](https://github.com/msgphp/user)
+  - [`msgphp/user-eav`](https://github.com/msgphp/user-eav)
+
+### Symfony Bundles
+
+- [`msgphp/eav-bundle`](https://github.com/msgphp/eav-bundle)
+- [`msgphp/user-bundle`](https://github.com/msgphp/user-bundle)
 
 ## Contributing
 
