@@ -32,6 +32,7 @@
         "symfony/validator": "^3.4|^4.0"
     },
     "suggest": {
+        "ext-sodium": "To clear plain passwords from memory if applicable",
         "msgphp/user-eav": "To enable user attribute values"
     },
     "config": {

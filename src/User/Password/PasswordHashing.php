@@ -25,6 +25,10 @@ final class PasswordHashing implements PasswordHashingInterface
         if (!$algorithm->legacy) {
             $hash = password_hash($plainPassword, $algorithm->type, $algorithm->options);
 
+            if (\function_exists('sodium_memzero')) {
+                sodium_memzero($plainPassword);
+            }
+
             if (false === $hash) {
                 throw new \RuntimeException(sprintf('Unable to hash password with algorithm "%s".', $algorithm->type));
             }
@@ -46,6 +50,11 @@ final class PasswordHashing implements PasswordHashingInterface
             }
 
             $salted = sprintf($algorithm->salt->format, $plainPassword, $algorithm->salt->token);
+
+            if (\function_exists('sodium_memzero')) {
+                sodium_memzero($plainPassword);
+            }
+
             $hash = hash($algorithm->type, $salted, true);
 
             for ($i = 1; $i < $algorithm->salt->iterations; ++$i) {
@@ -53,6 +62,10 @@ final class PasswordHashing implements PasswordHashingInterface
             }
         } else {
             $hash = hash($algorithm->type, $plainPassword, true);
+
+            if (\function_exists('sodium_memzero')) {
+                sodium_memzero($plainPassword);
+            }
         }
 
         return $algorithm->encodeBase64 ? base64_encode($hash) : bin2hex($hash);
@@ -61,9 +74,14 @@ final class PasswordHashing implements PasswordHashingInterface
     public function isValid(string $hashedPassword, string $plainPassword, PasswordAlgorithm $algorithm = null): bool
     {
         $algorithm = $algorithm ?? $this->defaultAlgorithm;
-
-        return $algorithm->legacy
+        $valid = $algorithm->legacy
             ? hash_equals($hashedPassword, $this->hash($plainPassword, $algorithm))
             : password_verify($plainPassword, $hashedPassword);
+
+        if (\function_exists('sodium_memzero')) {
+            sodium_memzero($plainPassword);
+        }
+
+        return $valid;
     }
 }

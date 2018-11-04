@@ -21,16 +21,32 @@ final class PasswordHashing implements PasswordHashingInterface
 
     public function hash(string $plainPassword, PasswordAlgorithm $algorithm = null): string
     {
-        return $this->hashing->encodePassword($plainPassword, self::getSalt($algorithm));
+        $hash = $this->hashing->encodePassword($plainPassword, self::getSalt($algorithm));
+
+        if (\function_exists('sodium_memzero')) {
+            sodium_memzero($plainPassword);
+        }
+
+        return $hash;
     }
 
     public function isValid(string $hashedPassword, string $plainPassword, PasswordAlgorithm $algorithm = null): bool
     {
-        return $this->hashing->isPasswordValid($hashedPassword, $plainPassword, self::getSalt($algorithm));
+        $valid = $this->hashing->isPasswordValid($hashedPassword, $plainPassword, self::getSalt($algorithm));
+
+        if (\function_exists('sodium_memzero')) {
+            sodium_memzero($plainPassword);
+        }
+
+        return $valid;
     }
 
-    private static function getSalt(PasswordAlgorithm $algorithm = null): string
+    private static function getSalt(?PasswordAlgorithm $algorithm): string
     {
-        return null === $algorithm || null === $algorithm->salt || empty($algorithm->salt->token) ? '' : $algorithm->salt->token;
+        if (null === $algorithm) {
+            return '';
+        }
+
+        return $algorithm->salt->token ?? '';
     }
 }
