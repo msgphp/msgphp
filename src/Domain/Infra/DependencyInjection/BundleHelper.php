@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface};
-use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, DomainObjectFactory, DomainObjectFactoryInterface, EntityAwareFactory, EntityAwareFactoryInterface};
+use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface, EntityAwareFactory, EntityAwareFactoryInterface};
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra, SimpleBus as SimpleBusInfra};
 use MsgPhp\Domain\Message\{DomainMessageBus, DomainMessageBusInterface};
 use Symfony\Component\Console\ConsoleEvents;
@@ -90,15 +90,10 @@ final class BundleHelper
     {
         $container->register(DomainObjectFactory::class)
             ->setPublic(false)
+            ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
             ->addMethodCall('setNestedFactory', [new Reference(DomainObjectFactoryInterface::class)]);
 
         $container->setAlias(DomainObjectFactoryInterface::class, new Alias(DomainObjectFactory::class, false));
-
-        $container->register(ClassMappingObjectFactory::class)
-            ->setPublic(false)
-            ->setDecoratedService(DomainObjectFactory::class)
-            ->setArgument('$factory', new Reference(ClassMappingObjectFactory::class.'.inner'))
-            ->setArgument('$mapping', '%msgphp.domain.class_mapping%');
 
         $container->autowire(EntityAwareFactory::class)
             ->setPublic(false)
@@ -113,8 +108,7 @@ final class BundleHelper
                 ->setPublic(false)
                 ->setDecoratedService(EntityAwareFactory::class)
                 ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
-                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
-                ->setArgument('$classMapping', '%msgphp.domain.class_mapping%');
+                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'));
         }
     }
 

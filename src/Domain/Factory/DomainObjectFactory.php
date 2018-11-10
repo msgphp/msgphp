@@ -12,7 +12,13 @@ use MsgPhp\Domain\Exception\InvalidClassException;
  */
 final class DomainObjectFactory implements DomainObjectFactoryInterface
 {
+    private $classMapping;
     private $factory;
+
+    public function __construct(array $classMapping = [])
+    {
+        $this->classMapping = $classMapping;
+    }
 
     public function setNestedFactory(?DomainObjectFactoryInterface $factory): void
     {
@@ -21,6 +27,8 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
 
     public function create(string $class, array $context = [])
     {
+        $class = $this->getClass($class, $context);
+
         if (is_subclass_of($class, DomainIdInterface::class) || is_subclass_of($class, DomainCollectionInterface::class)) {
             return $class::fromValue(...$this->resolveArguments($class, 'fromValue', $context));
         }
@@ -30,6 +38,11 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
         }
 
         return new $class(...$this->resolveArguments($class, '__construct', $context));
+    }
+
+    public function getClass(string $class, array $context = []): string
+    {
+        return $this->classMapping[$class] ?? $class;
     }
 
     private function resolveArguments(string $class, string $method, array $context): array

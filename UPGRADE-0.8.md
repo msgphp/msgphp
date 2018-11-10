@@ -6,6 +6,8 @@
 - Updated `DomainMessageBusInterface::dispatch()` to return `void`
 - Updated `DomainCollectionInterface::map()` to return `DomainCollectionInterface`
 - Renamed `TreeBuilder` to `TreeBuilderHelper`
+- Removed `ChainObjectFactory` and `ClassMappingObjectFactory`
+- Added `DomainObjectFactoryInterface::getClass()`
 
 ## UserEav
 

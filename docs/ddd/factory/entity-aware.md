@@ -33,12 +33,11 @@ value might be considered empty if it's not capable to calculate one upfront.
 
 ### `MsgPhp\Domain\Factory\EntityAwareFactory`
 
-A generic entity factory. It decorates any object factory and uses the [domain identity mapping](../identity-mapping.md)
-as well as a known entity to identifier class mapping.
+A generic entity factory.
 
-- `__construct(DomainObjectFactoryInterface $factory, DomainIdentityMappingInterface $identityMapping, array $identifierMapping = [])`
-    - `$factory`: The decorated object factory
-    - `$identityMapping`: The identity mapping
+- `__construct(DomainObjectFactoryInterface $factory, DomainIdentityHelper $identityHelper, array $identifierMapping = [])`
+    - `$factory`: The decorated [object factory](object.md)
+    - `$identityHelper`: The [identity helper](../identities.md)
     - `$identifierMapping`: The identifier class mapping (`['EntityType' => 'IdType']`)
 
 #### Basic example
@@ -46,7 +45,7 @@ as well as a known entity to identifier class mapping.
 ```php
 <?php
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\{DomainId, DomainIdentityHelper};
 use MsgPhp\Domain\Factory\{DomainObjectFactory, EntityAwareFactory};
 use MsgPhp\Domain\Infra\InMemory\DomainIdentityMapping;
 
@@ -64,9 +63,9 @@ class MyEntity
 
 $factory = new EntityAwareFactory(
     new DomainObjectFactory(),
-    new DomainIdentityMapping([
+    new DomainIdentityHelper(new DomainIdentityMapping([
         MyEntity::class => 'id',
-    ]),
+    ])),
     [
         MyEntity::class => DomainId::class,
     ]
@@ -83,8 +82,14 @@ $id = $factory->identify(MyEntity::class, 1);
 /** @var DomainId $id */
 $id = $factory->nextIdentifier(MyEntity::class);
 ```
+
+!!! note
+    `EntityAwareFactory::reference()` requires [symfony/var-exporter]
+
 ### `MsgPhp\Domain\Infra\Doctrine\EntityAwareFactory`
 
 A Doctrine tailored entity aware factory.
 
 - [Read more](../../infrastructure/doctrine-orm.md#entity-aware-factory)
+
+[symfony/var-exporter]: https://packagist.org/packages/symfony/var-exporter

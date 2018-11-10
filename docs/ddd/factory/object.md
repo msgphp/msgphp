@@ -9,6 +9,10 @@ any domain object based on a given class name and context.
 
 Returns a factorized domain object by class name. Optionally a context can be provided for the factory to act upon.
 
+### `getClass(string $class, array $context = []): string`
+
+Returns the actual class name the factory will create and equalizes `get_class($factory->create($class, $context))`.
+
 ## Implementations
 
 ### `MsgPhp\Domain\Factory\DomainObjectFactory`
@@ -21,9 +25,12 @@ higher precedence. In case the context key is numeric its value will be provided
 Any sub class of `MsgPhp\Domain\DomainIdInterface` or `MsgPhp\Domain\DomainCollectionInterface` will be initialized
 using `$class::fromValue()` by default, otherwise initialization happens regularly (i.e. `new $class(...$arguments)`).
 
+A class mapping can be provided and is usually used to map abstracts to concretes.
+
 Nested objects (e.g. `MyObject $myArgument`) can be provided as nested context (thus nested array).
 
 - `setNestedFactory(?DomainObjectFactoryInterface $factory): void`
+    - `$classMapping`: The class mapping (`['SourceType' => 'TargetType']`)`
     - `$factory`: The optional factory to use for nested objects. If not set the current factory will be used instead.
 
 #### Basic example
@@ -35,7 +42,11 @@ use MsgPhp\Domain\Factory\DomainObjectFactory;
 
 // --- SETUP ---
 
-class Some
+interface KnownInterface
+{
+}
+
+class Some implements KnownInterface
 {
     public function __construct(int $a, ?int $b, ?int $c)
     {
@@ -44,14 +55,20 @@ class Some
 
 class Subject
 {
-    public function __construct(string $argument, Some $some, Subject $otherSubject = null)
+    public function __construct(string $argument, KnownInterface $some, Subject $otherSubject = null)
     {
     }
 }
 
-$factory = new DomainObjectFactory();
+$factory = new DomainObjectFactory([
+    KnownInterface::class => Some::class,
+]);
 
 // --- USAGE ---
+
+/** @var Some $object */
+$object = $factory->create(KnownInterface::class, ['a' => 1]);
+$factory->getClass(KnownInterface::class); // "Some"
 
 /** @var Subject $object */
 $object = $factory->create(Subject::class, [
@@ -62,68 +79,4 @@ $object = $factory->create(Subject::class, [
         'some' => ['a' => 1],
     ],
 ]);
-```
-
-### `MsgPhp\Domain\Factory\ChainObjectFactory`
-
-A chain object factory. It holds many object factories and returns a domain object from the first supporting factory.
-
-- `__construct(iterable $factories)`
-    - `$factories`: Available object factories
-
-#### Basic example
-
-```php
-<?php
-
-use MsgPhp\Domain\Factory\{ChainObjectFactory, DomainObjectFactory, DomainObjectFactoryInterface};
-
-// --- SETUP ---
-
-class MyFactory implements DomainObjectFactoryInterface
-{
-    public function create(string $class, array $context = [])
-    {
-        // ...
-    }
-}
-
-$factory = new ChainObjectFactory([new MyFactory(), new DomainObjectFactory()]);
-```
-
-### `MsgPhp\Domain\Factory\ClassMappingObjectFactory`
-
-A class mapping object factory. It decorates any object factory and resolves the actual class name from a provided
-mapping. It's usually used to map abstracts to concretes. In case the class is not mapped it will be used as is.
-
-- `__construct(DomainObjectFactoryInterface $factory, array $mapping)`
-    - `$factory`: The decorated object factory
-    - `$mapping`: The class mapping (`['SourceType' => 'TargetType']`)
-
-#### Basic example
-
-```php
-<?php
-
-use MsgPhp\Domain\Factory\{ClassMappingObjectFactory, DomainObjectFactory};
-
-// --- SETUP ---
-
-interface KnownInterface
-{
-}
-
-class Subject implements KnownInterface
-{
-}
-
-$factory = new ClassMappingObjectFactory(
-    new DomainObjectFactory(),
-    [KnownInterface::class => Subject::class]
-);
-
-// --- USAGE ---
-
-/** @var Subject $object */
-$object = $factory->create(KnownInterface::class);
 ```

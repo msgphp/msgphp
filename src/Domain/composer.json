@@ -34,7 +34,8 @@
         "symfony/http-kernel": "^3.4|^4.0",
         "symfony/messenger": "^4.2",
         "symfony/phpunit-bridge": "^3.4.9|^4.0.9",
-        "symfony/property-access": "^3.4|^4.0"
+        "symfony/property-access": "^3.4|^4.0",
+        "symfony/var-exporter": "^4.2"
     },
     "conflict": {
         "symfony/messenger": "<4.2"

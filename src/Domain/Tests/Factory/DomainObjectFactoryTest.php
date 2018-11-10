@@ -20,6 +20,13 @@ final class DomainObjectFactoryTest extends TestCase
         self::assertSame('foo', $object->b);
     }
 
+    public function testCreateWithAlias(): void
+    {
+        $object = (new DomainObjectFactory(['alias' => \stdClass::class]))->create('alias');
+
+        self::assertInstanceOf(\stdClass::class, $object);
+    }
+
     public function testCreateWithDomainId(): void
     {
         self::assertInstanceOf(DomainId::class, (new DomainObjectFactory())->create(DomainId::class, [1]));
@@ -136,6 +143,15 @@ final class DomainObjectFactoryTest extends TestCase
         $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\TestObject, array given\b/', preg_quote(NestedTestObject::class)));
 
         $factory->create(NestedTestObject::class, [['a', 'b']]);
+    }
+
+    public function testGetClass(): void
+    {
+        $factory = new DomainObjectFactory(['alias' => \stdClass::class]);
+
+        self::assertSame('foo', $factory->getClass('foo'));
+        self::assertSame(\stdClass::class, $factory->getClass('alias'));
+        self::assertSame(\stdClass::class, $factory->getClass(\stdClass::class));
     }
 }
 

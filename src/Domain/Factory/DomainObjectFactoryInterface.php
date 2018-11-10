@@ -13,4 +13,6 @@ interface DomainObjectFactoryInterface
      * @return object
      */
     public function create(string $class, array $context = []);
+
+    public function getClass(string $class, array $context = []): string;
 }
