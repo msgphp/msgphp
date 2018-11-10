@@ -13,7 +13,7 @@ $uses = [
 ];
 
 $validators = ['new NotBlank()'];
-if ('EmailType' === $fieldType) {
+if ('email' === $fieldName) {
     $validators[] = 'new Email()';
     $uses[] = 'use Symfony\\Component\\Validator\\Constraints\\Email;';
 }

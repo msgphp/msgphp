@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\UserBundle\Maker;
 
 use Doctrine\ORM\EntityManagerInterface;
+use MsgPhp\Domain\Entity\Features;
 use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait};
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
 use MsgPhp\User\{CredentialInterface, Entity, Role};
@@ -37,7 +38,8 @@ final class UserMaker implements MakerInterface
     private $projectDir;
     private $mappingConfig;
     private $credential;
-    private $passwordReset = false;
+    private $passwordReset;
+    private $defaultRoles;
     private $configs = [];
     private $services = [];
     private $routes = [];
@@ -74,10 +76,11 @@ final class UserMaker implements MakerInterface
     {
         $this->credential = $this->user = null;
         $this->passwordReset = false;
+        $this->defaultRoles = [];
         $this->configs = $this->services = $this->routes = $this->writes = [];
 
         if (!isset($this->classMapping[Entity\User::class])) {
-            throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
+            throw new \LogicException(sprintf('The "%s" class is not configured. Did you install the bundle using Symfony Recipes?', Entity\User::class));
         }
 
         $continue = true;
@@ -89,12 +92,10 @@ final class UserMaker implements MakerInterface
             $io->note(['It\'s recommended to enable Doctrine ORM, run:', 'composer require orm']);
             $continue = false;
         }
-
         if (!interface_exists(MessageBusInterface::class)) {
             $io->note(['It\'s recommended to enable Symfony Messenger, run:', 'composer require messenger']);
             $continue = false;
         }
-
         if (!$continue && !$io->confirm('Continue anyway?', false)) {
             return;
         }
@@ -281,12 +282,14 @@ final class UserMaker implements MakerInterface
         $addUses = $addTraitUses = $addImplementors = [];
         $write = false;
         $enableEventHandler = function () use ($implementors, &$addUses, &$addImplementors, &$addTraitUses): void {
-            if (!isset($implementors[DomainEventHandlerInterface::class])) {
-                $addUses[DomainEventHandlerInterface::class] = true;
-                $addUses[DomainEventHandlerTrait::class] = true;
-                $addImplementors['DomainEventHandlerInterface'] = true;
-                $addTraitUses['DomainEventHandlerTrait'] = true;
+            if (isset($implementors[DomainEventHandlerInterface::class]) || isset($addImplementors['DomainEventHandlerInterface'])) {
+                return;
             }
+
+            $addUses[DomainEventHandlerInterface::class] = true;
+            $addUses[DomainEventHandlerTrait::class] = true;
+            $addImplementors['DomainEventHandlerInterface'] = true;
+            $addTraitUses['DomainEventHandlerTrait'] = true;
         };
 
         $this->credential = $this->classMapping[CredentialInterface::class] ?? null;
@@ -383,22 +386,22 @@ PHP
             $roleProviders[] = Role\UserRoleProvider::class;
         }
 
-        $defaultRoles = [];
+        $this->defaultRoles = [];
         do {
             do {
                 $defaultRole = $io->ask('Provide a default user role (e.g. <comment>ROLE_USER</>)');
             } while (null === $defaultRole);
-            $defaultRoles[] = $defaultRole;
+            $this->defaultRoles[] = $defaultRole;
         } while ($io->confirm('Add another default user role?', false));
 
-        $this->configs[] = ['role_providers' => ['default' => $defaultRoles] + $roleProviders];
+        $this->configs[] = ['role_providers' => ['default' => $this->defaultRoles] + $roleProviders];
 
-//        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
-//            $implementors[] = DomainEventHandlerInterface::class;
-//            $addUses[Features\CanBeEnabled::class] = true;
-//            $addTraitUses['CanBeEnabled'] = true;
-//            $enableEventHandler();
-//        }
+        if (!isset($traits[Features\CanBeEnabled::class]) && $io->confirm('Can users be enabled / disabled?')) {
+            $implementors[] = DomainEventHandlerInterface::class;
+            $addUses[Features\CanBeEnabled::class] = true;
+            $addTraitUses['CanBeEnabled'] = true;
+            $enableEventHandler();
+        }
 //
 //        if (!isset($traits[Features\CanBeConfirmed::class]) && $io->confirm('Can users be confirmed?')) {
 //            $implementors[] = DomainEventHandlerInterface::class;
@@ -468,15 +471,14 @@ PHP
             }
         }
 
-        $usernameField = $this->hasCredential() ? $this->credential::getUsernameField() : null;
         $nsForm = trim($io->ask('Provide the form namespace', 'App\\Form\\User\\'), '\\');
         $nsController = trim($io->ask('Provide the controller namespace', 'App\\Controller\\User\\'), '\\');
         $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
         $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
+        $hasLogin = $this->hasPassword() && $io->confirm('Add a login / profile controller?');
         $hasRegistration = $this->hasCredential() && $io->confirm('Add a registration controller?');
-        $hasForgotPassword = $this->passwordReset && $io->confirm('Add a forgot and reset password controller?');
-        $hasLogin = $this->hasPassword() && $io->confirm('Add a login and profile controller?'); // keep last
+        $hasForgotPassword = $this->passwordReset && $io->confirm('Add a forgot / reset password controller?');
 
         if ($hasLogin) {
             if (!class_exists(Security::class)) {
@@ -491,41 +493,19 @@ PHP
 ->add('logout', '/logout')
 PHP;
             $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
+                'hasLogin' => $hasLogin,
+                'userRole' => $this->defaultRoles ? reset($this->defaultRoles) : 'IS_AUTHENTICATED_FULLY',
                 'hashAlgorithm' => $this->getPassordHashAlgorithm(),
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
-        }
-
-        if ($hasRegistration) {
-            $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
-                'hasPassword' => $this->hasPassword(),
-                'ns' => $nsForm,
-                'fieldName' => $usernameField,
-            ])];
-            $this->writes[] = [$this->getClassFileName($nsController.'\\RegisterController'), self::getSkeleton('controller/RegisterController.php', [
-                'ns' => $nsController,
-                'formNs' => $nsForm,
-                'fieldName' => $usernameField,
-                'template' => $template = $templateDir.'/register.html.twig',
-                'redirect' => $hasLogin ? '/login' : '/',
-            ])];
-            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/register.html.php', [
-                'hasPassword' => $this->hasPassword(),
-                'base' => $baseTemplate,
-                'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
-            ])];
-        }
-
-        if ($hasLogin) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\LoginType'), self::getSkeleton('form/LoginType.php', [
                 'ns' => $nsForm,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
             $this->writes[] = [$this->getClassFileName($nsController.'\\LoginController'), self::getSkeleton('controller/LoginController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
                 'template' => $templateLogin = $templateDir.'/login.html.twig',
             ])];
             $this->writes[] = [$this->getClassFileName($nsController.'\\ProfileController'), self::getSkeleton('controller/ProfileController.php', [
@@ -536,19 +516,40 @@ PHP;
                 'hasForgotPassword' => $hasForgotPassword,
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
             $this->writes[] = [$this->getTemplateFileName($templateProfile), self::getSkeleton('template/profile.html.php', [
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
+            ])];
+        }
+
+        if ($hasRegistration) {
+            $this->writes[] = [$this->getClassFileName($nsForm.'\\RegisterType'), self::getSkeleton('form/RegisterType.php', [
+                'hasPassword' => $this->hasPassword(),
+                'ns' => $nsForm,
+                'fieldName' => $this->getUsernameField(),
+            ])];
+            $this->writes[] = [$this->getClassFileName($nsController.'\\RegisterController'), self::getSkeleton('controller/RegisterController.php', [
+                'ns' => $nsController,
+                'formNs' => $nsForm,
+                'fieldName' => $this->getUsernameField(),
+                'template' => $template = $templateDir.'/register.html.twig',
+                'redirect' => $hasLogin ? '/login' : '/',
+            ])];
+            $this->writes[] = [$this->getTemplateFileName($template), self::getSkeleton('template/register.html.php', [
+                'hasPassword' => $this->hasPassword(),
+                'base' => $baseTemplate,
+                'block' => $baseTemplateBlock,
+                'fieldName' => $this->getUsernameField(),
             ])];
         }
 
         if ($hasForgotPassword) {
             $this->writes[] = [$this->getClassFileName($nsForm.'\\ForgotPasswordType'), self::getSkeleton('form/ForgotPasswordType.php', [
                 'ns' => $nsForm,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
             $this->writes[] = [$this->getClassFileName($nsForm.'\\ResetPasswordType'), self::getSkeleton('form/ResetPasswordType.php', [
                 'ns' => $nsForm,
@@ -556,7 +557,7 @@ PHP;
             $this->writes[] = [$this->getClassFileName($nsController.'\\ForgotPasswordController'), self::getSkeleton('controller/ForgotPasswordController.php', [
                 'ns' => $nsController,
                 'formNs' => $nsForm,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
                 'userClass' => $this->user->getName(),
                 'userShortClass' => $this->user->getShortName(),
                 'template' => $templateForgot = $templateDir.'/forgot_password.html.twig',
@@ -571,12 +572,12 @@ PHP;
             $this->writes[] = [$this->getTemplateFileName($templateForgot), self::getSkeleton('template/forgot_password.html.php', [
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
             $this->writes[] = [$this->getTemplateFileName($templateReset), self::getSkeleton('template/reset_password.html.php', [
                 'base' => $baseTemplate,
                 'block' => $baseTemplateBlock,
-                'fieldName' => $usernameField,
+                'fieldName' => $this->getUsernameField(),
             ])];
         }
     }
@@ -666,6 +667,11 @@ PHP;
     private function hasPassword(): bool
     {
         return $this->hasCredential() && false !== strpos($this->credential, 'Password');
+    }
+
+    private function getUsernameField(): ?string
+    {
+        return $this->hasCredential() ? $this->credential::getUsernameField(): null;
     }
 
     private function getPassordHashAlgorithm(): string

@@ -2,6 +2,32 @@
 
 declare(strict_types=1);
 
+if ($hasLogin) {
+    $formLogin = <<<YAML
+            form_login:
+                login_path: /login
+                check_path: /login
+                default_target_path: /profile
+                username_parameter: ${fieldName}
+                password_parameter: password
+
+            logout:
+                path: logout
+YAML;
+    $accessControl = <<<YAML
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ${userRole} }
+YAML;
+} else {
+    $formLogin = <<<YAML
+            # form_login: true
+YAML;
+    $accessControl = <<<YAML
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+YAML;
+}
+
 return <<<YAML
 # see https://github.com/symfony/recipes/blob/master/symfony/security-bundle/3.3/config/packages/security.yaml
 security:
@@ -25,20 +51,11 @@ security:
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
 
             # https://symfony.com/doc/current/security/form_login_setup.html
-            form_login:
-                login_path: /login
-                check_path: /login
-                default_target_path: /profile
-                username_parameter: ${fieldName}
-                password_parameter: password
-
-            logout:
-                path: logout
+${formLogin}
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: IS_AUTHENTICATED_FULLY }
+${accessControl}
 
 YAML;
