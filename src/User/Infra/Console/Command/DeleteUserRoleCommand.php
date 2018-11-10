@@ -24,7 +24,7 @@ final class DeleteUserRoleCommand extends UserRoleCommand
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserRoleDeletedEvent) {
-            $this->io->success(sprintf('Deleted role "%s" from user %s', $message->userRole->getRoleName(), $message->userRole->getUser()->getCredential()->getUsername()));
+            $this->io->success(sprintf('Deleted role %s from user %s', $message->userRole->getRoleName(), $message->userRole->getUser()->getCredential()->getUsername()));
         }
     }
 

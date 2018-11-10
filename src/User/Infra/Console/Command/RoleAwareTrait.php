@@ -17,18 +17,18 @@ trait RoleAwareTrait
     /** @var RoleRepositoryInterface */
     private $repository;
 
-    protected function getRole(InputInterface $input, StyleInterface $io): Role
+    protected function getRole(InputInterface $input, StyleInterface $io, &$name = null): Role
     {
-        if (null === $value = $input->getArgument('role')) {
+        if (null === $name = $input->getArgument('role')) {
             if (!$input->isInteractive()) {
                 throw new \LogicException('No value provided for "role".');
             }
 
             do {
-                $value = $io->ask('Role name');
-            } while (null === $value);
+                $name = $io->ask('Role name');
+            } while (null === $name);
         }
 
-        return $this->repository->find($value);
+        return $this->repository->find($name);
     }
 }
