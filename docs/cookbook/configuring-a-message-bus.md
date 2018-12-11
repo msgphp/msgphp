@@ -40,10 +40,6 @@ framework:
                 middleware:
                     - msgphp.messenger.console_message_receiver
 
-services:
-    msgphp.messenger.command_bus: '@command_bus'
-    msgphp.messenger.event_bus: '@event_bus'
-
 ```
 
 By default MsgPHP uses the bus configured under `framework.messenger.default_bus`. You can override its alias services
