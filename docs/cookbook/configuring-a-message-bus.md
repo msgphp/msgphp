@@ -41,6 +41,29 @@ framework:
                     - allow_no_handler
 ```
 
+For Symfony 4.2+:
+
+```
+framework:
+    messenger:
+        # ...
+
+        default_bus: command_bus
+        buses:
+            command_bus:
+                middleware:
+                    - msgphp.messenger.console_message_receiver
+            event_bus:
+                default_middleware: allow_no_handlers
+                middleware:
+                    - msgphp.messenger.console_message_receiver
+
+services:
+    msgphp.messenger.command_bus: '@command_bus'
+    msgphp.messenger.event_bus: '@event_bus'
+
+```
+
 By default MsgPHP uses the bus configured under `framework.messenger.default_bus`. You can override its alias services
 to use any other bus:
 
