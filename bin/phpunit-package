@@ -15,7 +15,7 @@ fi
 shift;
 
 BIN="vendor/bin/simple-phpunit"
-CMD="SYMFONY_PHPUNIT_VERSION=7.4 ${BIN} ${@}"
+CMD="SYMFONY_PHPUNIT_VERSION=7.5 ${BIN} ${@}"
 
 if [[ ! -f "${PACKAGE_DIR}/phpunit.xml.dist" ]] ; then
     echo "No valid package found in \"${PACKAGE_DIR}\""

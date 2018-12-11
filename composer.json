@@ -6,7 +6,7 @@
         "wikimedia/composer-merge-plugin": "^1.4",
         "phpstan/phpstan-shim": "^0.10",
         "phpstan/phpstan-phpunit": "^0.10",
-        "phpunit/phpunit": "^7.4",
+        "phpunit/phpunit": "^7.5",
         "ro0nl/link": "^1.0",
         "twig/twig": "^2.5"
     },
