@@ -24,28 +24,25 @@ jobs:
         - bin/sa
 
 before_install:
-  - if [[ $CC = true && $TRAVIS_PULL_REQUEST != false ]]; then unset CC; fi
+  - if [[ $CC == true && $TRAVIS_PULL_REQUEST != false ]]; then unset CC; fi
   - if [[ $CC != true ]]; then phpenv config-rm xdebug.ini || true; fi
-  - source .travis/tfold
-
-install:
   - |
     COMPOSER_ARGS="--no-progress --prefer-dist --no-interaction --no-suggest"
     PHPUNIT_ARGS=""
-    if [[ $DEPS = low ]]; then COMPOSER_ARGS="${COMPOSER_ARGS} --prefer-stable --prefer-lowest"; fi
-    if [[ $CC = true ]]; then PHPUNIT_ARGS="${PHPUNIT_ASRGS} --coverage-clover=coverage.xml"; fi
+    if [[ $DEPS == low ]]; then COMPOSER_ARGS="${COMPOSER_ARGS} --prefer-stable --prefer-lowest"; fi
+    if [[ $CC == true ]]; then PHPUNIT_ARGS="${PHPUNIT_ARGS} --coverage-clover=coverage.xml"; fi
+  - source .travis/tfold
+
+install:
   - travis_retry .travis/packager HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
-  - travis_retry bin/composer update $COMPOSER_ARGS
+  - travis_retry bin/composer update ${COMPOSER_ARGS}
   - travis_retry bin/phpunit install
 
 script:
-  - bin/phpunit $PHPUNIT_ARGS
+  - bin/phpunit ${PHPUNIT_ARGS}
 
 after_success:
-  - if [[ $CC = true ]]; then bash <(curl -s https://codecov.io/bash); fi
-
-before_cache:
-  - rm -rf $HOME/.composer/cache/files/msgphp
+  - if [[ $CC == true ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 cache:
   directories:

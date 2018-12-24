@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+source bin/.bashrc
+
 if [[ ! -f var/cache/sami.phar ]]; then
-    mkdir -p var/cache
-    curl -Lso var/cache/sami.phar http://get.sensiolabs.org/sami.phar
+    label "Installing Sami"
+    download_bin var/cache/sami.phar https://get.sensiolabs.org/sami.phar
+    [[ $? -ne 0 ]] && label "Installing Sami failed" ko && exit 1
 fi
 
-php var/cache/sami.phar "${@}"
+run var/cache/sami.phar ${@}

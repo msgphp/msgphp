@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-[[ $# -ne 0 ]] && echo "Usage: $0" && exit 1
+source bin/.bashrc
+[[ $# -ne 0 ]] && label "Usage: $0" ko && exit 1
 
-VERSION="v2.13.1"
-PHAR="var/cache/php-cs-fixer-${VERSION}.phar"
+load_env
 
-if [[ ! -f ${PHAR} ]]; then
-    mkdir -p $(dirname ${PHAR})
-    curl -Lso ${PHAR} https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/${VERSION}/php-cs-fixer.phar
-    chmod +x ${PHAR}
+if [[ ! -f var/cache/php-cs-fixer.phar ]]; then
+    label "Installing PHP-CS-Fixer"
+    download_bin var/cache/php-cs-fixer.phar https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER}/php-cs-fixer.phar
+    [[ $? -ne 0 ]] && label "Installing PHP-CS-Fixer failed" ko && exit 1
 fi
 
-bash -xc "${PHAR} fix --dry-run --verbose --diff src/" 2>&1
+run var/cache/php-cs-fixer.phar fix --dry-run --verbose --diff src/

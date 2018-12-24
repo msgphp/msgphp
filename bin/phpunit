@@ -1,3 +1,18 @@
 #!/usr/bin/env bash
 
-bin/each ../../bin/phpunit-package . "${@}"
+source bin/.bashrc
+
+load_env
+export SYMFONY_PHPUNIT_VERSION
+
+test_package() {
+    if [[ ! -f vendor/bin/simple-phpunit ]]; then
+        run composer install --prefer-dist --quiet
+        [[ $? -ne 0 ]] && return 1
+    fi
+    run SYMFONY_PHPUNIT_VERSION=${SYMFONY_PHPUNIT_VERSION} vendor/bin/simple-phpunit ${@}
+}
+export -f test_package
+
+[[ ${CI} != true ]] && bin/link
+run_in_package --local test_package ${@}

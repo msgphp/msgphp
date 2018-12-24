@@ -3,14 +3,6 @@
 
 namespace MsgPhp;
 
-function file_to_class(string $file): string
-{
-    $dir = dirname($file, substr_count($file, \DIRECTORY_SEPARATOR) - 1);
-    $ns = key(json_decode(file_get_contents($dir.'/composer.json'), true)['autoload']['psr-4']);
-
-    return str_replace('/', '\\', str_replace($dir.\DIRECTORY_SEPARATOR, $ns, substr($file, 0, -4)));
-}
-
 use MsgPhp\Domain\Event\DomainEventInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -24,18 +16,43 @@ if (!is_file('vendor/autoload.php')) {
 
 require 'vendor/autoload.php';
 
-$msgphpGlobal = function(): array {
-    $result = ['domains' => [], 'bundles' => []];
+function file_to_class(string $file): string
+{
+    $dir = dirname($file, substr_count($file, \DIRECTORY_SEPARATOR) - 1);
+    $ns = key(json_decode(file_get_contents($dir.'/composer.json'), true)['autoload']['psr-4']);
+
+    return str_replace('/', '\\', str_replace($dir.\DIRECTORY_SEPARATOR, $ns, substr($file, 0, -4)));
+}
+
+function load_template(string $file): array
+{
+    $oldBaseDir = getcwd();
+    chdir(dirname(__DIR__));
+    extract(['msgphp' => global_vars()]);
+    $template = include $file;
+    chdir($oldBaseDir);
+
+    return $template;
+}
+
+function global_vars(): array
+{
+    static $vars;
+    if (null !== $vars) {
+        return $vars;
+    }
+
+    $vars = ['domains' => [], 'bundles' => []];
     foreach (glob('src/*/composer.json') as $file) {
         $package = json_decode(file_get_contents($file));
         $entry = ['path' => dirname($file), 'package' => $package];
 
         if ('-bundle' === substr($package->name, -7)) {
-            $result['bundles'][$package->name] = $entry;
+            $vars['bundles'][$package->name] = $entry;
             continue;
         }
 
-        $result['domains'][$package->name] = $entry + [
+        $vars['domains'][$package->name] = $entry + [
             'entities' => array_map(function (string $file): string {
                 return file_to_class($file);
             }, glob(dirname($file).'/Entity/*.php')),
@@ -73,33 +90,23 @@ $msgphpGlobal = function(): array {
         ];
     }
 
-    ksort($result['domains']);
-    ksort($result['bundles']);
+    ksort($vars['domains']);
+    ksort($vars['bundles']);
 
-    $result['domains'] = [$k = 'msgphp/domain' => $result['domains'][$k]] + $result['domains'];
+    $vars['domains'] = [$k = 'msgphp/domain' => $vars['domains'][$k]] + $vars['domains'];
 
-    return $result;
-};
-
-$getTemplate = function (string $file) use ($msgphpGlobal): array {
-    $oldBaseDir = getcwd();
-    chdir(dirname(__DIR__));
-    extract(['msgphp' => $msgphpGlobal()]);
-    $template = include $file;
-    chdir($oldBaseDir);
-
-    return $template;
-};
+    return $vars;
+}
 
 $templates = $templateVars = [];
 foreach (glob('docs/.refs/*.php') as $reference) {
-    $vars = $getTemplate($reference);
-    $templates[$name = basename($reference, '.php')] = array_shift($vars);
-    $templateVars[$name] = $vars;
+    $template = load_template($reference);
+    $templates[$name = basename($reference, '.php')] = array_shift($template);
+    $templateVars[$name] = $template;
 }
 
 $twig = new Environment(new ArrayLoader($templates));
-$twig->addGlobal('msgphp', $msgphpGlobal());
+$twig->addGlobal('msgphp', global_vars());
 $replacements = [];
 
 foreach (array_keys($templates) as $template) {
@@ -113,4 +120,4 @@ foreach (glob('docs/{*,**/*}.md', \GLOB_BRACE) as $file) {
 }
 
 echo "\e[34mCompiled templates\e[0m\n";
-echo ' > '.implode("\n > ", array_keys($templates))."\n";
+echo ' * '.implode("\n * ", array_keys($templates))."\n";

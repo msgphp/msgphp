@@ -1,22 +1,13 @@
 #!/usr/bin/env bash
 
-if [[ $# -ne 0 ]]; then
-    echo "Usage: $0"
-    exit 1
-fi
+source bin/.bashrc
+[[ $# -gt 1 ]] && label "Usage: $0 [<dir>]" ko && exit 1
 
-RETURN=0
-
-for FILE in $(find . -type f -name "*.php" -not -path "*/vendor/*" -not -path "./var/*"); do
-    echo -en "\e[0K\r${FILE}"
-    RESULT=$(php -l "${FILE}")
-    [[ $? -ne 0 ]] && RETURN=$?
-
-    if [[ ${RESULT} != "No syntax errors detected in "* ]]; then
-        echo ""
-        echo "${RESULT}"
-    fi
+ret=0
+for file in $(find ${1:-.} -type f -name "*.php" -not -path "*/vendor/*" -not -path "./var/*"); do
+    result=$(run php -l "${file}")
+    last=$?
+    [[ ${last} -ne 0 ]] && ret=${last} && echo ${result}
 done
 
-echo ""
-exit ${RETURN}
+exit ${ret}

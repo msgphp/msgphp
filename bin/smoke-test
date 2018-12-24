@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 
-[[ $# -ne 0 ]] && echo "Usage: $0" && exit 1
+source bin/.bashrc
+[[ $# -ne 0 ]] && label "Usage: $0" ko && exit 1
 
-echo -e "\e[34mUpdating dependencies...\e[0m"
-bin/composer update --prefer-dist --quiet && composer update --prefer-dist --quiet
-[[ $? -ne 0 ]] && exit 1
+label "Updating dependencies"
+run composer update --prefer-dist --quiet && \
+run_in_package composer update --prefer-dist --quiet
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
-echo -e "\e[34mCode Style / Static Analysis\e[0m"
-bin/cs && bin/sa
-[[ $? -ne 0 ]] && exit 1
+label "Code Style"
+bin/cs
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
-echo -e "\e[34mUnit Tests\e[0m"
+label "Static Analysis"
+bin/sa
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
+
+label "Unit Tests"
 bin/phpunit
-[[ $? -ne 0 ]] && exit 1
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
 exit 0
