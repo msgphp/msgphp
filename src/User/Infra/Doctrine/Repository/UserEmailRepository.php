@@ -17,8 +17,6 @@ final class UserEmailRepository implements UserEmailRepositoryInterface
 {
     use DomainEntityRepositoryTrait;
 
-    private $alias = 'user_email';
-
     /**
      * @return DomainCollectionInterface|UserEmail[]
      */

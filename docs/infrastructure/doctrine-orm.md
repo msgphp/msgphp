@@ -70,8 +70,6 @@ class MyEntityRepository
         doExists as public exists;
         doSave as public save;
     }
-
-    private $alias = 'my_entity';
 }
 
 /** @var EntityManagerInterface $em */

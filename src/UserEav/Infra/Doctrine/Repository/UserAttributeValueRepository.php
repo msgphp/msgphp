@@ -18,9 +18,6 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
 {
     use EntityAttributeValueRepositoryTrait;
 
-    private $alias = 'user_attribute_value';
-    private $attributeValueField = 'attributeValue';
-
     /**
      * @return DomainCollectionInterface|UserAttributeValue[]
      */

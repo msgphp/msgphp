@@ -22,8 +22,6 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
                 createQueryBuilder as public;
                 addFieldCriteria as public;
             }
-
-            private $alias = 'root';
         };
         $qb = $repository->createQueryBuilder();
         $repository->addFieldCriteria($qb, ['foo.bar' => 'bar1']);
@@ -72,8 +70,6 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
                 doSave as public;
                 doDelete as public;
             }
-
-            private $alias = 'root';
         };
     }
 

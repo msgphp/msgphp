@@ -20,12 +20,18 @@ trait DomainEntityRepositoryTrait
     private $class;
     private $em;
     private $identityHelper;
+    private $alias;
 
     public function __construct(string $class, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
     {
         $this->class = $class;
         $this->em = $em;
         $this->identityHelper = $identityHelper ?? new DomainIdentityHelper(new DomainIdentityMapping($em));
+    }
+
+    private function getAlias()
+    {
+        return $this->alias ?? ($this->alias = strtolower((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], (string) (false === ($i = strrpos($this->class, '\\')) ? $this->class : substr($this->class, $i + 1)))));
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -147,20 +153,16 @@ trait DomainEntityRepositoryTrait
         return DomainCollectionFactory::create($query->getResult($hydrate));
     }
 
-    private function createQueryBuilder(string $alias = null): QueryBuilder
+    private function createQueryBuilder(): QueryBuilder
     {
-        if (null === $alias) {
-            $alias = $this->alias;
-        }
-
         $qb = $this->em->createQueryBuilder();
-        $qb->select($alias);
+        $qb->select($alias = $this->getAlias());
         $qb->from($this->class, $alias);
 
         return $qb;
     }
 
-    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false, string $alias = null): void
+    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false): void
     {
         if (!$fields) {
             return;
@@ -168,7 +170,7 @@ trait DomainEntityRepositoryTrait
 
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
-        $alias = $alias ?? $this->alias;
+        $alias = $this->getAlias();
         $idFields = array_flip($this->identityHelper->getIdentifierFieldNames($this->class));
         $associations = $this->em->getClassMetadata($this->class)->getAssociationMappings();
 

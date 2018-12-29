@@ -21,16 +21,15 @@ use MsgPhp\User\UserIdInterface;
 final class UserRepository implements UserRepositoryInterface
 {
     use DomainEntityRepositoryTrait {
-        __construct as private __parent_construct;
+        __construct as private init;
     }
 
-    private $alias = 'user';
     private $usernameField;
     private $usernameClass;
 
     public function __construct(string $class, ?string $usernameField, ?string $usernameClass, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
     {
-        $this->__parent_construct($class, $em, $identityHelper);
+        $this->init($class, $em, $identityHelper);
 
         $this->usernameField = $usernameField;
         $this->usernameClass = $usernameClass;

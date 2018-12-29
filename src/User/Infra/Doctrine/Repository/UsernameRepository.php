@@ -18,15 +18,14 @@ use MsgPhp\User\Repository\UsernameRepositoryInterface;
 final class UsernameRepository implements UsernameRepositoryInterface
 {
     use DomainEntityRepositoryTrait {
-        __construct as private __parent_construct;
+        __construct as private init;
     }
 
-    private $alias = 'username';
     private $targetMappings;
 
     public function __construct(string $class, EntityManagerInterface $em, array $targetMappings = [], DomainIdentityHelper $identityHelper = null)
     {
-        $this->__parent_construct($class, $em, $identityHelper);
+        $this->init($class, $em, $identityHelper);
 
         $this->targetMappings = $targetMappings;
     }
