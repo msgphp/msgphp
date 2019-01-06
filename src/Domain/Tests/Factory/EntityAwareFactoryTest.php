@@ -19,12 +19,25 @@ final class EntityAwareFactoryTest extends TestCase
         $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
         $innerFactory->expects(self::any())
             ->method('create')
-            ->willReturnCallback(function ($class, $context) {
+            ->willReturnCallback(function ($class, array $context) {
                 if ('id' === $class) {
+                    if ([] === $context || [null] === $context) {
+                        $id = $this->createMock(DomainIdInterface::class);
+                        $id->expects(self::any())
+                            ->method('toString')
+                            ->willReturn('new')
+                        ;
+
+                        return $id;
+                    }
+
+                    if (1 !== \count($context)) {
+                        self::fail();
+                    }
                     $id = $this->createMock(DomainIdInterface::class);
                     $id->expects(self::any())
                         ->method('toString')
-                        ->willReturn($context ? reset($context) : 'new')
+                        ->willReturn(reset($context))
                     ;
 
                     return $id;
@@ -92,8 +105,38 @@ final class EntityAwareFactoryTest extends TestCase
     {
         self::assertSame('1', $this->factory->identify('id', '1')->toString());
         self::assertSame('1', $this->factory->identify('alias_id', '1')->toString());
-        self::assertSame($id = $this->createMock(DomainIdInterface::class), $this->factory->identify('id', $id));
-        self::assertSame($id = $this->createMock(DomainIdInterface::class), $this->factory->identify('alias_id', $id));
+
+        $id = $this->createMock(DomainIdInterface::class);
+        $id->expects(self::exactly(4))
+            ->method('isEmpty')
+            ->willReturn(false)
+        ;
+        $id->expects(self::exactly(4))
+            ->method('toString')
+            ->willReturn('2')
+        ;
+
+        self::assertNotSame($id, $this->factory->identify('id', $id));
+        self::assertNotSame($id, $this->factory->identify('alias_id', $id));
+        self::assertSame('2', $this->factory->identify('id', $id)->toString());
+        self::assertSame('2', $this->factory->identify('alias_id', $id)->toString());
+    }
+
+    public function testIdentifyEmpty(): void
+    {
+        self::assertSame('new', $this->factory->identify('id', null)->toString());
+        self::assertSame('new', $this->factory->identify('alias_id', null)->toString());
+
+        $id = $this->createMock(DomainIdInterface::class);
+        $id->expects(self::exactly(4))
+            ->method('isEmpty')
+            ->willReturn(true)
+        ;
+
+        self::assertNotSame($id, $this->factory->identify('id', $id));
+        self::assertNotSame($id, $this->factory->identify('alias_id', $id));
+        self::assertSame('new', $this->factory->identify('id', $id)->toString());
+        self::assertSame('new', $this->factory->identify('alias_id', $id)->toString());
     }
 
     public function testIdentifyWithUnknownClass(): void
