@@ -22,8 +22,6 @@ nav:
           - Entities: ddd/entities.md
           - Repositories: ddd/repositories.md
           - Object Factory: ddd/object-factory.md
-          - Identity Mapping: ddd/identity-mapping.md
-          - Identity Helper: ddd/identity-helper.md
     - Event-Sourcing:
           - Event Handlers: event-sourcing/event-handlers.md
           - Events: event-sourcing/events.md

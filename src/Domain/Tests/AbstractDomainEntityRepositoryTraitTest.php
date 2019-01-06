@@ -243,7 +243,9 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         $this->loadEntities();
 
-        self::assertFalse($repository->doExistsByFields(['entity' => $entity]));
+        $this->expectException(\LogicException::class);
+
+        $repository->doExistsByFields(['entity' => $entity]);
     }
 
     /**

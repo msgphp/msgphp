@@ -58,50 +58,6 @@ Removes an entity from the identity map. The entity will be unavailable on any s
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\InMemory\DomainEntityRepositoryTrait`
-
-Repository trait based on in-memory persistence.
-
-#### Basic Example
-
-```php
-<?php
-
-use MsgPhp\Domain\DomainIdentityHelper;
-use MsgPhp\Domain\Infra\InMemory\{DomainIdentityMapping, DomainEntityRepositoryTrait};
-
-// --- SETUP ---
-
-class MyEntity
-{
-    public $id;
-}
-
-class MyEntityRepository
-{
-    use DomainEntityRepositoryTrait {
-        doFind as public find;
-        doExists as public exists;
-        doSave as public save;
-    }
-}
-
-$repository = new MyEntityRepository(MyEntity::class, new DomainIdentityHelper(new DomainIdentityMapping([
-    MyEntity::class => 'id',
-])));
-
-// --- USAGE ---
-
-if ($repository->exists(1)) {
-    $entity = $repository->find(1);
-} else {
-    $entity = new MyEntity();
-    $entity->id = 1;
-
-    $repository->save($entity);
-}
-```
-
 ### `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`
 
 A Doctrine tailored repository trait.

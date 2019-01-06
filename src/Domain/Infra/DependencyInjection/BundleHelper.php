@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
-use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface};
 use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface};
-use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra};
+use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, Messenger as MessengerInfra};
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
@@ -32,7 +31,6 @@ final class BundleHelper
             return;
         }
 
-        self::initIdentityMapping($container);
         self::initObjectFactory($container);
         self::initMessageBus($container);
 
@@ -62,31 +60,6 @@ final class BundleHelper
         }
 
         $initialized = true;
-    }
-
-    private static function initIdentityMapping(ContainerBuilder $container): void
-    {
-        if (FeatureDetection::isDoctrineOrmAvailable($container)) {
-            $container->register(DoctrineInfra\DomainIdentityMapping::class)
-                ->setPublic(false)
-                ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
-                ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
-            ;
-
-            $container->setAlias(DomainIdentityMappingInterface::class, new Alias(DoctrineInfra\DomainIdentityMapping::class, false));
-        } else {
-            $container->register(InMemoryInfra\DomainIdentityMapping::class)
-                ->setPublic(false)
-                ->setArgument('$mapping', '%msgphp.domain.identity_mapping%')
-                ->setArgument('$accessor', $container->autowire(InMemoryInfra\ObjectFieldAccessor::class))
-            ;
-
-            $container->setAlias(DomainIdentityMappingInterface::class, new Alias(InMemoryInfra\DomainIdentityMapping::class, false));
-        }
-
-        $container->autowire(DomainIdentityHelper::class)
-            ->setPublic(false)
-        ;
     }
 
     private static function initObjectFactory(ContainerBuilder $container): void

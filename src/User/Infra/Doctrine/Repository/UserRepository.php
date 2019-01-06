@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
+use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\User;
@@ -20,17 +20,15 @@ use MsgPhp\User\UserIdInterface;
  */
 final class UserRepository implements UserRepositoryInterface
 {
-    use DomainEntityRepositoryTrait {
-        __construct as private init;
-    }
+    use DomainEntityRepositoryTrait;
 
     private $usernameField;
     private $usernameClass;
 
-    public function __construct(string $class, ?string $usernameField, ?string $usernameClass, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, EntityManagerInterface $em, ?string $usernameField, ?string $usernameClass)
     {
-        $this->init($class, $em, $identityHelper);
-
+        $this->class = $class;
+        $this->em = $em;
         $this->usernameField = $usernameField;
         $this->usernameClass = $usernameClass;
     }

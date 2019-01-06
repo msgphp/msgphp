@@ -4,25 +4,6 @@ An overview of available infrastructural code when using Doctrine's [Object Rela
 
 - Requires [doctrine/orm]
 
-## Domain Identity Mapping
-
-A Doctrine tailored [identity mapping](../ddd/identity-mapping.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`.
-
-### Basic Example
-
-```php
-<?php
-
-use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping;
-
-// --- SETUP ---
-
-/** @var EntityManagerInterface $em */
-$em = ...;
-$mapping = new DomainIdentityMapping($em);
-```
-
 ## Domain Repository
 
 A Doctrine tailored [repository trait](../ddd/repositories.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`.

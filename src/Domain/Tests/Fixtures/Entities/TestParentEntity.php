@@ -20,7 +20,7 @@ class TestParentEntity extends BaseTestEntity
 
     /**
      * @var string|null
-     * @Doctrine\ORM\Mapping\Column(type="string", nullable=true)
+     * @Doctrine\ORM\Mapping\Column(nullable=true)
      */
     public $parentField;
 
