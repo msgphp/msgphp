@@ -123,7 +123,7 @@ trait DomainEntityRepositoryTrait
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(\get_class($entity), $this->identityHelper->getIdentity($entity));
+            throw DuplicateEntityException::createForId(\get_class($entity), $this->identityHelper->getIdentifiers($entity));
         }
     }
 

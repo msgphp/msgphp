@@ -48,12 +48,12 @@ final class DomainIdentityHelper
 
         if (\is_object($value)) {
             try {
-                $identity = $this->mapping->getIdentity($value);
+                $identifiers = $this->mapping->getIdentifiers($value);
             } catch (InvalidClassException $e) {
                 return false;
             }
 
-            return !$this->isIdentity(\get_class($value), $identity);
+            return !$this->isIdentity(\get_class($value), $identifiers);
         }
 
         return false;
@@ -67,27 +67,23 @@ final class DomainIdentityHelper
 
         if (\is_object($value)) {
             try {
-                $identity = $this->mapping->getIdentity($value);
+                $identifiers = $this->mapping->getIdentifiers($value);
             } catch (InvalidClassException $e) {
                 return $value;
             }
 
-            $identity = array_map(function ($id) {
-                return $this->normalizeIdentifier($id);
-            }, $identity);
+            if (!$identifiers) {
+                return null;
+            }
 
-            return 1 === \count($this->mapping->getIdentifierFieldNames(\get_class($value))) ? reset($identity) : $identity;
+            $identifiers = array_map(function ($id) {
+                return $this->normalizeIdentifier($id);
+            }, $identifiers);
+
+            return 1 === \count($this->mapping->getIdentifierFieldNames(\get_class($value))) ? reset($identifiers) : $identifiers;
         }
 
         return $value;
-    }
-
-    /**
-     * @param object $object
-     */
-    public function getIdentifiers($object): array
-    {
-        return null === ($identity = $this->mapping->getIdentity($object)) ? [] : array_values($identity);
     }
 
     /**
@@ -96,6 +92,14 @@ final class DomainIdentityHelper
     public function getIdentifierFieldNames(string $class): array
     {
         return $this->mapping->getIdentifierFieldNames($class);
+    }
+
+    /**
+     * @param object $object
+     */
+    public function getIdentifiers($object): array
+    {
+        return $this->mapping->getIdentifiers($object);
     }
 
     public function isIdentity(string $class, $value): bool
@@ -133,13 +137,5 @@ final class DomainIdentityHelper
         $fields = $this->mapping->getIdentifierFieldNames($class);
 
         return [reset($fields) => $value];
-    }
-
-    /**
-     * @param object $object
-     */
-    public function getIdentity($object): array
-    {
-        return $this->mapping->getIdentity($object);
     }
 }

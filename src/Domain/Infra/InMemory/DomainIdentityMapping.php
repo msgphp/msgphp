@@ -34,7 +34,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
         return $fields;
     }
 
-    public function getIdentity($object): array
+    public function getIdentifiers($object): array
     {
         $ids = [];
 
@@ -47,7 +47,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
                 if ($value->isEmpty()) {
                     continue;
                 }
-            } elseif (\is_object($value) && !$this->getIdentity($value)) {
+            } elseif (\is_object($value) && !$this->getIdentifiers($value)) {
                 continue;
             }
 

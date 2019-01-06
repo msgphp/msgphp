@@ -11,7 +11,7 @@ Returns the identifier field names for `$class`. Any instance should have an ide
 
 ---
 
-### `getIdentity(object $object): array`
+### `getIdentifiers(object $object): array`
 
 Returns the actual, non empty, identifier values of `$object`. Each identifier value is keyed by its corresponding
 identifier field name.
@@ -63,8 +63,8 @@ $compositeEntity->year = ...;
 $mapping->getIdentifierFieldNames(MyEntity::class); // ['id']
 $mapping->getIdentifierFieldNames(MyCompositeEntity::class); // ['name', 'year']
 
-$mapping->getIdentity($entity); // ['id' => ...]
-$mapping->getIdentity($compositeEntity); // ['name' => ..., 'year' => ...]
+$mapping->getIdentifiers($entity); // ['id' => ...]
+$mapping->getIdentifiers($compositeEntity); // ['name' => ..., 'year' => ...]
 ```
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`

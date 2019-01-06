@@ -28,7 +28,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
         return $this->getMetadata($class)->getIdentifierFieldNames();
     }
 
-    public function getIdentity($object): array
+    public function getIdentifiers($object): array
     {
         return array_filter($this->getMetadata(\get_class($object))->getIdentifierValues($object), function ($value) {
             if ($value instanceof DomainIdInterface) {
@@ -36,7 +36,7 @@ final class DomainIdentityMapping implements DomainIdentityMappingInterface
             }
 
             if (\is_object($value)) {
-                return (bool) $this->getIdentity($value);
+                return (bool) $this->getIdentifiers($value);
             }
 
             return null !== $value;

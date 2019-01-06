@@ -35,15 +35,15 @@ Any other type of value is preserved.
 
 ---
 
-### `getIdentifiers(object $object): array`
-
-Returns the actual identifier values of `$object`.
-
----
-
 ### `getIdentifierFieldNames(string $class): array`
 
 See `DomainIdentityMappingInterface::getIdentifierFieldNames()`.
+
+---
+
+### `getIdentifiers(object $object): array`
+
+See `DomainIdentityMappingInterface::getIdentifiers()`.
 
 ---
 
@@ -60,12 +60,6 @@ identifier field names and its values must contain no empty identifiers.
 ### `toIdentity(string $class, $value): array`
 
 Returns a composite identity value for `$class` from `$value`.
-
----
-
-### `getIdentity(object $object): array`
-
-See `DomainIdentityMappingInterface::getIdentity()`.
 
 ## Basic Example
 
@@ -111,9 +105,6 @@ $helper->normalizeIdentifier(new DomainId('1')); // "1"
 $helper->normalizeIdentifier('1'); // "1"
 $helper->normalizeIdentifier($entity); // "1"
 $helper->normalizeIdentifier($compositeEntity); // ['name' => ..., 'year' => ....]
-
-$helper->getIdentifiers($entity); // [<id>]
-$helper->getIdentifiers($compositeEntity); // [<name>, <year>]
 
 $helper->isIdentity(MyEntity::class, 1); // true
 $helper->isIdentity(MyCompositeEntity::class, 1); // false
