@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
+use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventInterface};
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\RequestUserPasswordCommand;
@@ -38,12 +39,12 @@ final class RequestUserPasswordHandler
         });
     }
 
-    protected function getDomainEvent(RequestUserPasswordCommand $command): RequestPasswordEvent
+    protected function getDomainEvent(RequestUserPasswordCommand $command): DomainEventInterface
     {
         return $this->factory->create(RequestPasswordEvent::class, [$command->token]);
     }
 
-    protected function getDomainEventHandler(RequestUserPasswordCommand $command): User
+    protected function getDomainEventHandler(RequestUserPasswordCommand $command): DomainEventHandlerInterface
     {
         return $this->repository->find($this->factory->identify(User::class, $command->userId));
     }

@@ -19,10 +19,6 @@ trait EventSourcingCommandHandlerTrait
         $event = $this->getDomainEvent($command);
         $handler = $this->getDomainEventHandler($command);
 
-        if (!$handler instanceof DomainEventHandlerInterface) {
-            throw new \LogicException(sprintf('Object "%s" is unable to handle domain event "%s". Did you forgot to implement DomainEventHandlerInterface?', \get_class($handler), \get_class($event)));
-        }
-
         if ($handler->handleEvent($event) && null !== $onHandled) {
             $onHandled($handler);
         }

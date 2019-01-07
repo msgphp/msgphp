@@ -115,8 +115,8 @@ final class UsernameListener
         $qb->where($qb->expr()->in('u.username', ':usernames'));
         $qb->setParameter('usernames', array_keys($this->updateUsernames));
 
+        /** @var Username $username */
         foreach ($qb->getQuery()->getResult() as $username) {
-            /* @var Username $username */
             $em->remove($username);
 
             if (isset($this->updateUsernames[$usernameValue = (string) $username])) {
