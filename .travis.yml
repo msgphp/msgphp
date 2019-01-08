@@ -1,50 +1,37 @@
-dist: trusty
-language: php
-
 notifications:
   email: false
+
+language: generic
+services:
+  - docker
 
 branches:
   only:
     - master
     - /^\d\.\d$/
 
-php: 7.2
-
 jobs:
   include:
-    - stage: Unit-tests
+    - stage: Unit tests
       env: CC=true
     - env: DEPS=low
-    - php: 7.1
-    - stage: Code-quality
-      install: true
+    - env: PHP=7.1
+    - stage: Code quality
       script:
-        - bin/cs
-        - bin/sa
+        - make cs
+        - make sa
 
-before_install:
-  - if [[ $CC == true && $TRAVIS_PULL_REQUEST != false ]]; then unset CC; fi
-  - if [[ $CC != true ]]; then phpenv config-rm xdebug.ini || true; fi
-  - |
-    COMPOSER_ARGS="--no-progress --prefer-dist --no-interaction --no-suggest"
-    PHPUNIT_ARGS=""
-    if [[ $DEPS == low ]]; then COMPOSER_ARGS="${COMPOSER_ARGS} --prefer-stable --prefer-lowest"; fi
-    if [[ $CC == true ]]; then PHPUNIT_ARGS="${PHPUNIT_ARGS} --coverage-clover=coverage.xml"; fi
-  - source .travis/tfold
-
-install:
-  - travis_retry .travis/packager HEAD^ $(find src/*/composer.json -type f -printf '%h\n')
-  - travis_retry bin/composer update ${COMPOSER_ARGS}
-  - travis_retry bin/phpunit install
+before_script:
+  - if [[ ${CC} == true && ${TRAVIS_PULL_REQUEST} != false ]]; then unset CC; fi
 
 script:
-  - bin/phpunit ${PHPUNIT_ARGS}
+  - make ci-install
+  - if [[ ${DEPS} == low ]]; then make update-lowest-standalone; else make update-standalone; fi
+  - if [[ ${CC} == true ]]; then make phpunit-coverage; else make phpunit; fi
 
 after_success:
-  - if [[ $CC == true ]]; then bash <(curl -s https://codecov.io/bash); fi
+  - if [[ ${CC} == true ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 cache:
   directories:
-    - $HOME/.composer/cache
-    - var/cache
+    - var/

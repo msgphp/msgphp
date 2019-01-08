@@ -3,6 +3,12 @@
 source bin/.bashrc
 [[ $# -ne 1 ]] && label "Usage: $0 <type>" ko && exit 1
 
+git_clean
+
+[[ -f var/.env ]] && source var/.env
+base_uri="https://github.com/msgphp"
+repo="git@github.com:msgphp/msgphp.git"
+
 curr_version() {
     local version="$(git describe --abbrev=0 --tags)" && [[ ${version} == v* ]] && version=${version:1}
     echo "${version}"
@@ -51,21 +57,27 @@ changelog() {
     local next_version=${3:?missing next version} && [[ ${next_version} == v* ]] && next_version=${next_version:1}
     local filename="CHANGELOG-"$(branch_alias "${next_version}")".md"
 
-    [[ ! -d "var/cache/changelog/${branch}" ]] && mkdir -p "var/cache/changelog/${branch}"
-    [[ -d ../../var/cache/changelog ]] && cp -R ../../var/cache/changelog var/cache/
+    [[ ! -d "var/changelog/${branch}" ]] && mkdir -p "var/changelog/${branch}"
+    [[ -d ../../var/changelog ]] && cp -R ../../var/changelog var/
 
-    for package in $(packages); do
+    [[ -z ${GITHUB_TOKEN} ]] && echo "(!) Generating changelog without GitHub token"
+    for package in $(find src/*/composer.json -type f); do
         name="$(package_name "${package}")"
         file="$(dirname "${package}")/${filename}"
         [[ ! -f "${file}" ]] && echo "# Changelog" >> "${file}"
         rm -f "${file}.tmp" && \
-        ../../bin/github-changelog-generator -u msgphp -p msgphp -t "${GITHUB_TOKEN}" \
-            --cache-file "var/cache/changelog/${branch}" \
+        docker run --init -it --rm \
+            -u $(id -u):$(id -g) \
+            -v $(pwd):/app \
+            -w /app \
+            ferrarimarco/github-changelog-generator \
+            -u msgphp -p msgphp -t "${GITHUB_TOKEN}" \
+            --cache-file "var/changelog/${branch}" \
             --output "${file}.tmp" \
             --since-tag "v${since_version}" \
             --future-release "v${next_version}" \
             --release-branch "${branch}" \
-            --release-url "https://github.com/msgphp/${name}/tree/%s" \
+            --release-url "${base_uri}/${name}/tree/%s" \
             --include-labels "${name/-/,}" \
             --simple-list \
             --header-label "" \
@@ -84,44 +96,42 @@ changelog() {
         [[ $? -ne 0 ]] && return 1
     done
 
-    cp -R var/cache/changelog ../../var/cache/
+    cp -R var/changelog ../../var/
     git commit --quiet -m "update changelog to ${next_version}"
 }
 
 bump() {
     local branch=${1:?missing branch}
-    mv .lando.yml .lando.yml.tmp && \
-    run_in_package composer config "extra.branch-alias.dev-master" "${branch}-dev" && \
-    mv .lando.yml.tmp .lando.yml && \
+    for package in $(find src/*/composer.json -type f); do
+        run_composer config --working-dir="$(dirname "${package}")" extra.branch-alias.dev-master "${branch}-dev"
+        [[ $? -ne 0 ]] && return 1
+    done
     git add src/*/composer.json && \
     git commit --quiet -m "bumped branch alias to ${branch}"
 }
 
-assert_clean
-load_env
-
-confirm "Run smoke test first?" yes
+confirm "Run smoke test?" yes
 if [[ $? -eq 1 ]]; then
-    bin/smoke-test
+    make smoke-test
     [[ $? -ne 0 ]] && label "Failed" ko && exit 1
 fi
 
 confirm "Build docs?" yes
 if [[ $? -eq 1 ]]; then
-    bin/build-docs && assert_clean
+    bin/build-docs
     [[ $? -ne 0 ]] && label "Failed" ko && exit 1
 fi
 
 label "Synchronizing source"
-git_sync var/release "${SRC_REPO}"
+git_sync var/release "${repo}"
 [[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
-confirm "Release?"
+confirm "Continue release?"
 [[ $? -ne 1 ]] && label "Aborted" ok && exit 0
 
 pushd var/release &> /dev/null
 restore() {
-    popd &> /dev/null
+    git reset HEAD . && git checkout -- . && git clean -df && popd &> /dev/null
 }
 
 case $1 in
@@ -133,7 +143,7 @@ major|minor)
     changelog "$(git rev-parse --abbrev-ref HEAD)" "${curr_version}" "${next_version}" && \
     bump "${branch}"
     [[ $? -ne 0 ]] && label "Failed" ko && restore && exit 1
-    confirm "Create release branch ${branch}?" yes
+    confirm "Create release branch ${branch}?"
     if [[ $? -eq 1 ]]; then
         git checkout --quiet -b "${branch}" && \
         tag "${next_version}" && \

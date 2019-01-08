@@ -1,13 +1,13 @@
 includes:
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - /tools/.composer/vendor-bin/phpstan/vendor/phpstan/phpstan-phpunit/extension.neon
+    - /tools/.composer/vendor-bin/phpstan/vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
     level: max
-    tmpDir: var/cache/phpstan
-
+    tmpDir: var/phpstan
     autoload_directories:
         - tests/fixtures/sa
+        - var/composer/vendor/bin/.phpunit/phpunit-7.5/src
 
     ignoreErrors:
         - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'

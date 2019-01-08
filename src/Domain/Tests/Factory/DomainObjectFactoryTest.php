@@ -54,7 +54,7 @@ final class DomainObjectFactoryTest extends TestCase
         self::assertInstanceOf(KnownTestObject::class, $factory->create(KnownTestObject::class, ['unknown' => 'foo']));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\UnknownTestObject or null, integer given\b/', preg_quote(KnownTestObject::class)));
+        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\UnknownTestObject or null, int(?:eger)? given\b/', preg_quote(KnownTestObject::class, '/')));
 
         $factory->create(KnownTestObject::class, [123]);
     }

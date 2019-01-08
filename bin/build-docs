@@ -3,35 +3,26 @@
 source bin/.bashrc
 [[ $# -ne 0 ]] && label "Usage: $0" ko && exit 1
 
-assert_clean
-load_env
+git_clean
 
-rev=$(git rev-parse --abbrev-ref --short --verify HEAD)
+uri="https://github.com/msgphp/msgphp"
+repo="git@github.com:msgphp/msgphp.github.io.git"
+rev="$(git rev-parse --abbrev-ref --short --verify HEAD)"
 docs_dir="docs" && [[ ${rev} != master ]] && docs_dir="${docs_dir}-${rev}"
 
-label "Compiling"
-run docs/.refs/compile
+label "Building"
+make docs-build
 [[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
-assert_clean
-
-label "Building"
-mkdir -p var/build
-bin/sami update --force .sami.dist
-bin/mkdocs build --site-dir "var/build/${docs_dir}"
-
 label "Synchronizing"
-git_sync var/www "${WWW_REPO}" && \
-rm -rf var/www/api && mv var/build/api var/www/api && \
-rm -rf "var/www/${docs_dir}" && mv "var/build/${docs_dir}" "var/www/${docs_dir}"
+git_sync var/www "${repo}" && \
+rm -rf "var/www/${docs_dir}" && \
+mv "var/build/docs" "var/www/${docs_dir}"
 [[ $? -ne 0 ]] && label "Failed" ko && exit 1
 
 if [[ $(git -C var/www status --porcelain) ]]; then
     git -C var/www add --all && \
-    git -C var/www commit --quiet -m "https://github.com/msgphp/msgphp/commit/$(git rev-parse --short --verify HEAD)" && \
+    git -C var/www commit --quiet -m "[${rev}] updated to ${uri}/commit/$(git rev-parse --short --verify HEAD)" && \
     confirm "Push docs?"
-    if [[ $? -eq 1 ]]; then
-        git -C var/www push origin master
-        [[ $? -ne 0 ]] && label "Failed" ko && exit 1
-    fi
+    [[ $? -eq 1 ]] && git -C var/www push origin master
 fi

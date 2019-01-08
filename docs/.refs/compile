@@ -11,6 +11,7 @@ if (!is_file('vendor/autoload.php')) {
     echo "\e[34mInstalling dependencies\e[0m\n";
     passthru('composer install --prefer-dist --quiet', $return);
     if (0 !== $return) {
+        echo "\e[41mFailed\e[0m\n";
         exit($return);
     }
 }

@@ -1,28 +1,20 @@
 # Contributing
 
-## Testing
-
 ```bash
-bin/phpunit
+# run unit tests
+make phpunit
+
+# run code style checks
+make cs
+
+# run static analysis checks
+make sa
+
+# run all tests/checks on latest deps
+make smoke-test
 ```
 
-## Code Style
-
-```bash
-bin/cs
-```
-
-## Static Analysis
-
-```bash
-bin/sa
-```
-
-## Linting
-
-```bash
-bin/lint
-```
+_([Docker] required)_
 
 ## Setup a Test Project
 
@@ -32,10 +24,4 @@ Create a new bare Symfony skeleton application with specific MsgPHP bundles pre-
 bin/create-project
 ```
 
-## Perform a Smoke Test
-
-To quickly see if CI is likely to pass, use:
-
-```bash
-bin/smoke-test
-```
+[Docker]: https://www.docker.com/

@@ -1,14 +1,8 @@
 {
-    "description": "Composer configuration for bulk CI testing of packages",
     "prefer-stable": true,
     "minimum-stability": "dev",
     "require-dev": {
-        "wikimedia/composer-merge-plugin": "^1.4",
-        "phpstan/phpstan-shim": "^0.10",
-        "phpstan/phpstan-phpunit": "^0.10",
-        "phpunit/phpunit": "^7.5",
-        "ro0nl/link": "^1.0",
-        "twig/twig": "^2.6"
+        "wikimedia/composer-merge-plugin": "^1.4"
     },
     "autoload-dev": {
         "psr-4": {

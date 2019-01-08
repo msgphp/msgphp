@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+run_composer() {
+    docker run --init -it --rm -u $(id -u):$(id -g) -v $(pwd):/app -w /app \
+        -e COMPOSER_HOME=/app/var/composer \
+	    jakzal/phpqa:php7.2-alpine composer ${@}
+}
+
 label() {
     case $2 in
     ok) echo -e "\e[42m$1\e[0m";;
@@ -7,7 +13,6 @@ label() {
     *) echo -e "\e[34m$1\e[0m";;
     esac
 }
-export -f label
 
 confirm() {
     if [[ $2 == yes ]]; then label "$1 [Yn]";
@@ -18,80 +23,10 @@ confirm() {
     [[ ${answer} =~ ^y|Y|yes|YES$ ]] && return 1;
     return 0;
 }
-export -f confirm
 
-load_env() {
-    source .env.dist
-    [[ -f .env ]] && source .env
-}
-export -f load_env
-
-run() {
-    if [[ ${CI} == true ]]; then
-        run_local ${@}
-        return $?
-    fi
-    lando version >/dev/null 2>&1
-    if [[ $? -eq 0 ]]; then
-        lando run ${@}
-        return $?
-    fi
-    run_local ${@}
-    return $?
-}
-export -f run
-
-run_local() {
-    bash -c "${*}" 2>&1
-    return $?
-}
-export -f run_local
-
-run_in_package() {
-    local ret=0
-    for package in $(packages); do
-        pushd "$(dirname "${package}")" &> /dev/null
-        if [[ ${TRAVIS} == true ]]; then
-            if [[ $1 == --local ]]; then tfold "[CWD] $(pwd)" ${@:2};
-            else tfold "[CWD] $(pwd)" ${@}; fi
-        elif [[ $1 == --local ]]; then
-            label "[CWD] $(pwd)"
-            run_local ${@:2}
-        else
-            label "[CWD] $(pwd)"
-            run ${@}
-        fi
-        local last=$?
-        [[ ${last} -ne 0 ]] && ret=${last}
-        popd &> /dev/null
-    done
-    return ${ret}
-}
-export -f run_in_package
-
-packages() {
-    find src/*/composer.json -type f
-}
-export -f packages
-
-package_name() {
-    echo "$(echo $(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${1:?missing file}") | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")"
-}
-export -f package_name
-
-download_bin() {
-    local file="${1:?missing file}"
-    local url="${2:?missing url}"
-    mkdir -p $(dirname "${file}") && \
-    curl -Lso "${file}" "${url}" && \
-    chmod +x "${file}"
-}
-export -f download_bin
-
-assert_clean() {
+git_clean() {
     [[ $(git status --porcelain) ]] && label "Working directory is not clean" ko && exit 1
 }
-export -f assert_clean
 
 git_sync() {
     local dir="${1:?missing dir}"
@@ -107,4 +42,7 @@ git_sync() {
         git -C "${dir}" pull origin "${branch}"
     fi
 }
-export -f git_sync
+
+package_name() {
+    echo "$(echo $(grep -E "^\s*\"name\"\s*:\s*\"msgphp\/([^\"]+)\"\s*,\s*$" "${1:?missing file}") | sed -e "s/^\s*\"name\":\s*\"msgphp\///" -e "s/\"\s*,\s*$//")"
+}

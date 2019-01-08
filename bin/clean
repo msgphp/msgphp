@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-source bin/.bashrc
-[[ $# -ne 0 ]] && label "Usage: $0" ko && exit 1
-
-rm -rf composer.lock vendor/ var/cache && \
-run_in_package rm -rf composer.lock vendor/

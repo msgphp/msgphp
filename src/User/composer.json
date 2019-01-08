@@ -27,7 +27,6 @@
         "symfony/console": "^3.4|^4.0",
         "symfony/form": "^3.4|^4.0",
         "symfony/http-kernel": "^3.4|^4.0",
-        "symfony/phpunit-bridge": "^3.4.9|^4.0.9",
         "symfony/security-core": "^3.4|^4.0",
         "symfony/validator": "^3.4|^4.0"
     },

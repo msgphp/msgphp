@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-docker run --rm --group-add "$(id -g)" -u "$(id -u)" -it -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator ${@}

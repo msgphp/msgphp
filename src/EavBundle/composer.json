@@ -25,8 +25,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^1.8",
-        "doctrine/orm": "^2.6",
-        "symfony/phpunit-bridge": "^3.4.9|^4.0.9"
+        "doctrine/orm": "^2.6"
     },
     "config": {
         "preferred-install": {
