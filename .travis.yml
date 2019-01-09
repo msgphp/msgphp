@@ -1,5 +1,4 @@
 dist: trusty
-language: php
 
 notifications:
   email: false
@@ -9,12 +8,13 @@ branches:
     - master
     - /^\d\.\d$/
 
-php: 7.2
-
 jobs:
   include:
     - stage: Unit tests
+      language: php
+      php: 7.2
     - stage: Code quality
+      language: generic
       services:
         - docker
       before_install:
