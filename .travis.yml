@@ -20,7 +20,7 @@ jobs:
       before_install:
         - docker pull jakzal/phpqa
       script:
-        - docker ps
+        - echo DOCKERISH
 
 script:
   - echo SCRIPTISH
