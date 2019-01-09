@@ -23,7 +23,7 @@ jobs:
         - docker ps
 
 script:
-  - echo SCRIPT
+  - echo SCRIPTISH
 
 cache:
   directories:
