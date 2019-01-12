@@ -112,7 +112,7 @@ final class ExtensionHelper
             }
         }
 
-        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
+        $container->setParameter($param = 'msgphp.domain.event_classes', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
     }
 
     public static function finalizeDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $entityRepositoryMapping): void

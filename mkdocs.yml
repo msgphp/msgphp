@@ -47,14 +47,13 @@ pages:
     - Doctrine DBAL: infrastructure/doctrine-dbal.md
     - Doctrine ORM: infrastructure/doctrine-orm.md
     - Elasticsearch: infrastructure/elasticsearch.md
-    - SimpleBus: infrastructure/simple-bus.md
     - Symfony Console: infrastructure/symfony-console.md
     - Symfony Messenger: infrastructure/symfony-messenger.md
     - UUID: infrastructure/uuid.md
 - Cookbook:
     - Bundle Installation: cookbook/bundle-installation.md
     - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
-    - Configuring A Message Bus: cookbook/configuring-a-message-bus.md
+    - Configuring Symfony Messenger: cookbook/configuring-symfony-messenger.md
 - Reference:
     - Identifiers: reference/identifiers.md
     - Entities: reference/entities.md

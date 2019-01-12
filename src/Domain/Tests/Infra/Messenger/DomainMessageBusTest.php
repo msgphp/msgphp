@@ -13,13 +13,29 @@ final class DomainMessageBusTest extends TestCase
 {
     public function testDispatch(): void
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects(self::once())
+        $commandBus = $this->createMock(MessageBusInterface::class);
+        $commandBus->expects(self::once())
             ->method('dispatch')
-            ->with($message = new \stdClass())
-            ->willReturn(new Envelope($message))
+            ->with($commandMessage = new TestCommandMessage())
+            ->willReturn(new Envelope($commandMessage))
+        ;
+        $eventBus = $this->createMock(MessageBusInterface::class);
+        $eventBus->expects(self::once())
+            ->method('dispatch')
+            ->with($eventMessage = new TestEventMessage())
+            ->willReturn(new Envelope($eventMessage))
         ;
 
-        (new DomainMessageBus($bus))->dispatch($message);
+        $bus = new DomainMessageBus($commandBus, $eventBus, [TestEventMessage::class]);
+        $bus->dispatch($commandMessage);
+        $bus->dispatch($eventMessage);
     }
+}
+
+final class TestCommandMessage
+{
+}
+
+final class TestEventMessage
+{
 }

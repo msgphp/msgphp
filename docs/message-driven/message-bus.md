@@ -16,9 +16,3 @@ Dispatches the given message object.
 A Symfony Messenger tailored domain message bus.
 
 - [Read more](../infrastructure/symfony-messenger.md#domain-message-bus)
-
-### `MsgPhp\Domain\Infra\SimpleBus\DomainMessageBus`
-
-A SimpleBus tailored domain message bus.
-
-- [Read more](../infrastructure/simple-bus.md#domain-message-bus)

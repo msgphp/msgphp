@@ -7,10 +7,6 @@ An overview of available infrastructural code when using [Symfony Messenger][mes
 ## Domain Message Bus
 
 A Symfony Messenger tailored [domain message bus](../message-driven/message-bus.md) is provided by `MsgPhp\Domain\Infra\Messenger\DomainMessageBus`.
-It decorates any `Symfony\Component\Messenger\MessageBusInterface` type.
-
-- `__construct(MessageBusInterface $bus)`
-    - `$bus`: The decorated bus
 
 ### Basic Example
 
@@ -22,13 +18,26 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 // --- SETUP ---
 
-/** @var MessageBusInterface $bus */
-$bus = ...;
-$domainBus = new DomainMessageBus($bus);
+class CommandMessage
+{
+}
+
+class EventMessage
+{
+}
+
+/** @var MessageBusInterface $commandBus */
+$commandBus = ...;
+/** @var MessageBusInterface $commandBus */
+$eventBus = ...;
+$eventClasses = [EventMessage::class];
+
+$domainBus = new DomainMessageBus($commandBus, $eventBus, $eventClasses);
 
 // --- USAGE ---
 
-$result = $domainBus->dispatch(new SomeMessage());
+$domainBus->dispatch(new CommandMessage());
+$domainBus->dispatch(new EventMessage());
 ```
 
 [messenger-project]: https://symfony.com/doc/current/components/messenger.html

@@ -11,6 +11,8 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class ConsoleMessageReceiverMiddleware implements MiddlewareInterface
 {

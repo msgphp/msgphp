@@ -73,17 +73,10 @@ final class ContainerHelper
     {
         $handler = $container->getDefinition($handlerId);
         $messengerEnabled = FeatureDetection::isMessengerAvailable($container);
-        $simpleBusEnabled = FeatureDetection::hasSimpleBusCommandBusBundle($container);
 
         foreach ($handles as $class) {
             if ($messengerEnabled) {
                 $handler->addTag('messenger.message_handler', ['handles' => $class, 'bus' => $busId]);
-            }
-            if ($simpleBusEnabled) {
-                $handler
-                    ->setPublic(true)
-                    ->addTag('command_handler', ['handles' => $class])
-                ;
             }
         }
     }
