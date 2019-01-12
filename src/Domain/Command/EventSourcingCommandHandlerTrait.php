@@ -16,7 +16,9 @@ trait EventSourcingCommandHandlerTrait
      */
     private function handle($command, callable $onHandled = null): void
     {
+        /** @psalm-suppress TypeCoercion */
         $event = $this->getDomainEvent($command);
+        /** @psalm-suppress TypeCoercion */
         $handler = $this->getDomainEventHandler($command);
 
         if ($handler->handleEvent($event) && null !== $onHandled) {

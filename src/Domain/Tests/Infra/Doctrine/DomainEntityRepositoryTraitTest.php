@@ -31,7 +31,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         self::assertCount(3, $qb->getParameters());
     }
 
-    protected function equalsEntity($expected, $actual)
+    protected function equalsEntity($expected, $actual): bool
     {
         $equals = true;
         foreach (($r = (new \ReflectionObject($expected)))->getProperties() as $property) {
@@ -59,6 +59,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
 
     protected static function createRepository(string $class): DomainEntityRepositoryTraitInterface
     {
+        /** @psalm-suppress InaccessibleMethod */
         return new class($class, self::$em) implements DomainEntityRepositoryTraitInterface {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;

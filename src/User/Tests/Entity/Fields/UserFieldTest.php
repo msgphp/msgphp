@@ -25,6 +25,9 @@ final class UserFieldTest extends TestCase
         self::assertSame($value->getId(), $object->getUserId());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

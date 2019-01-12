@@ -123,6 +123,7 @@ class DomainIdType extends Type
             throw ConversionException::conversionFailed($value, $this->getName());
         }
 
+        /** @psalm-suppress InvalidStringClass */
         return null === $value ? null : static::getClass()::fromValue($value);
     }
 

@@ -42,6 +42,8 @@ final class UsernameRepository implements UsernameRepositoryInterface
     }
 
     /**
+     * @psalm-suppress DeprecatedClass
+     *
      * @return DomainCollectionInterface|Username[]
      */
     public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface

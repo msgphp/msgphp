@@ -165,6 +165,9 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         return $this->parent;
     }
 
+    /**
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     */
     protected function instantiateNode(): ClassMappingNode
     {
         return new ClassMappingNode($this->name, $this->parent, $this->pathSeparator ?? '.');

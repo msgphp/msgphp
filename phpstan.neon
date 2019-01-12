@@ -26,8 +26,9 @@ parameters:
         - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'
         - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Handler)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
         - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
+        - '#Call to an undefined method object::.+\(\)\.#' # src/*/Tests/Entity/{Features,Fields}/*Test.php
 
     excludes_analyse:
-        - */vendor/*
+        - src/*/vendor
         - src/UserBundle/Resources/skeleton
         - src/UserBundle/Maker/UserMaker.php

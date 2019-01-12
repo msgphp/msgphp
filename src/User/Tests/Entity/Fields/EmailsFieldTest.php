@@ -20,6 +20,9 @@ final class EmailsFieldTest extends TestCase
         self::assertSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getEmails());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

@@ -18,10 +18,11 @@ final class ClassMethodResolverTest extends TestCase
             ['name' => 'fooBar', 'key' => 'foo_bar', 'required' => true, 'default' => null, 'type' => 'string'],
             ['name' => 'foo_bar', 'key' => 'foo_bar', 'required' => false, 'default' => null, 'type' => WrongCase::class],
             ['name' => 'fooBar_Baz', 'key' => 'foo_bar_baz', 'required' => false, 'default' => null, 'type' => null],
+            ['name' => 'it', 'key' => 'it', 'required' => true, 'default' => [], 'type' => 'iterable'],
+            ['name' => '_stdClass', 'key' => '_std_class', 'required' => true, 'default' => null, 'type' => \stdClass::class],
             ['name' => 'foo', 'key' => 'foo', 'required' => false, 'default' => 1, 'type' => 'int'],
             ['name' => 'bar', 'key' => 'bar', 'required' => false, 'default' => null, 'type' => TestClass::class],
             ['name' => 'baz', 'key' => 'baz', 'required' => false, 'default' => [1], 'type' => 'array'],
-            ['name' => 'qux', 'key' => 'qux', 'required' => true, 'default' => [], 'type' => 'iterable'],
         ], $arguments);
     }
 
@@ -54,15 +55,16 @@ final class ClassMethodResolverTest extends TestCase
 
 class TestClass
 {
-    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, self $bar = null, array $baz = [1], iterable $qux)
+    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, iterable $it, \stdClass $_stdClass, int $foo = 1, self $bar = null, array $baz = [1])
     {
         $fooBar;
         $foo_bar;
         $fooBar_Baz;
+        $it;
+        $_stdClass;
         $foo;
         $bar;
         $baz;
-        $qux;
     }
 }
 

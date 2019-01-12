@@ -24,6 +24,7 @@ final class DomainIdFactory
             return new UuidInfra\DomainId($value);
         }
 
+        /** @psalm-suppress RedundantCondition */
         if (class_exists(Uuid::class) && Uuid::isValid($value)) {
             return UuidInfra\DomainId::fromValue($value);
         }

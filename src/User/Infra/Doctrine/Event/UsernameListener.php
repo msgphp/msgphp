@@ -154,6 +154,9 @@ final class UsernameListener
         return $this->factory->create(Username::class, [$user, $username]);
     }
 
+    /**
+     * @psalm-suppress DeprecatedClass
+     */
     private function getTargetMapping($entity, EntityManagerInterface $em): array
     {
         if (isset($this->targetMappings[$class = ClassUtils::getClass($entity)])) {

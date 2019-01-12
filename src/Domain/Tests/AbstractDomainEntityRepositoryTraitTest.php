@@ -150,6 +150,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
             $this->addToAssertionCount(1);
         }
 
+        /** @psalm-suppress InvalidStringClass */
         $entity = $class::create($fields);
         $this->loadEntities($entity);
 
@@ -214,7 +215,9 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         self::assertFalse($repository->doExistsByFields($fields));
 
-        $this->loadEntities($entity = $class::create($fields));
+        /** @psalm-suppress InvalidStringClass */
+        $entity = $class::create($fields);
+        $this->loadEntities($entity);
 
         self::assertTrue($repository->doExistsByFields($fields));
     }
@@ -403,7 +406,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         }
     }
 
-    protected function equalsEntity($expected, $actual)
+    protected function equalsEntity($expected, $actual): bool
     {
         return $expected == $actual;
     }

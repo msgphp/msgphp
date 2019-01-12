@@ -24,6 +24,9 @@ final class RoleFieldTest extends TestCase
         self::assertSame('ROLE_FOO', $object->getRoleName());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

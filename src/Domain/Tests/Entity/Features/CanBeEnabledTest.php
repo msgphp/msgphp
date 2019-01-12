@@ -52,6 +52,9 @@ final class CanBeEnabledTest extends TestCase
         self::assertFalse($object->isEnabled());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

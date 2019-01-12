@@ -214,7 +214,7 @@ final class BundleHelper
         ;
     }
 
-    private static function &getInitialized(ContainerInterface $container, string $key)
+    private static function &getInitialized(ContainerInterface $container, string $key): bool
     {
         if (!isset(self::$initialized[$hash = spl_object_hash($container)."\0".$key])) {
             self::$initialized[$hash] = false;

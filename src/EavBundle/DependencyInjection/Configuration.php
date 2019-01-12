@@ -67,7 +67,7 @@ final class Configuration implements ConfigurationInterface
     {
         /** @var NodeBuilder $children */
         $children = TreeBuilderHelper::root(Extension::ALIAS, $treeBuilder)->children();
-
+        /** @psalm-suppress PossiblyNullReference */
         $children
             ->classMappingNode('class_mapping')
                 ->requireClasses([Entity\Attribute::class, Entity\AttributeValue::class])

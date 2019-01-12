@@ -41,7 +41,8 @@ final class ChangeUserCredentialCommand extends UserCommand
             $this->io->success('Changed user credential for '.$message->user->getCredential()->getUsername());
 
             $rows = [];
-            foreach (array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential) as $key => $value) {
+            $changes = array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential);
+            foreach ($changes as $key => $value) {
                 $field = false === ($i = strrpos($key, "\00")) ? $key : substr($key, $i + 1);
                 // @todo use VarDumper
                 $rows[] = [$field, json_encode($oldValues[$key] ?? null), json_encode($value)];

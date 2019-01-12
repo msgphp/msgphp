@@ -35,6 +35,7 @@ final class ClassMethodResolver
 
             if (null !== $type) {
                 if ('self' === strtolower($name = $type->getName())) {
+                    /** @psalm-suppress PossiblyNullReference */
                     $type = $param->getClass()->getName();
                 } elseif ($type->isBuiltin()) {
                     $type = $name;

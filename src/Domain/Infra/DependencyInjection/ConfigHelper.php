@@ -40,6 +40,7 @@ final class ConfigHelper
 
             if (isset($idClassMappingPerType[$defaultType])) {
                 $value['class_mapping'] += $idClassMappingPerType[$defaultType];
+                /** @psalm-suppress PossiblyNullOperand */
                 $value['id_type_mapping'] += array_fill_keys(array_keys($idClassMappingPerType[$defaultType]), $defaultType);
             }
 

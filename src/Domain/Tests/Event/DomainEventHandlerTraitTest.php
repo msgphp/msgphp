@@ -35,6 +35,9 @@ final class DomainEventHandlerTraitTest extends TestCase
         $object->handleEvent($this->createMock(DomainEventInterface::class));
     }
 
+    /**
+     * @return object
+     */
     private function getObject()
     {
         return new class() implements DomainEventHandlerInterface {

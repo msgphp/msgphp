@@ -34,6 +34,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         }
         $identityHelper = new DomainIdentityHelper(new DomainIdentityMapping($mapping));
 
+        /** @psalm-suppress InaccessibleMethod */
         return new class($class, $identityHelper, self::$identityMap) implements DomainEntityRepositoryTraitInterface {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;

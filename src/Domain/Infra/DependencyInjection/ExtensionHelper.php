@@ -87,29 +87,29 @@ final class ExtensionHelper
     {
         foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
-            $definition->addTag('msgphp.domain.message_aware');
+            $param = (new \ReflectionMethod($definition->getClass() ?? (string) $id, '__invoke'))->getParameters()[0] ?? null;
 
-            $command = (new \ReflectionMethod($definition->getClass() ?? (string) $id, '__invoke'))->getParameters()[0]->getClass()->getName();
-            if (empty($commands[$command])) {
+            if (null === $param || null === $command = $param->getClass()) {
+                throw new \LogicException(sprintf('Missing command class type-hint for handler service "%s".', $id));
+            }
+
+            $command = $command->getName();
+            $enabled = $commands[$command] ?? true;
+
+            if (!$enabled) {
                 $container->removeDefinition($id);
                 continue;
             }
 
-            $handles = [$command];
-            if (isset($classMapping[$command])) {
-                $handles[] = $classMapping[$command];
-            }
-
             $definition
                 ->clearTag($tag)
-                ->addTag($tag, $attr[0] + ['handles' => implode(',', $handles)])
+                ->addTag('msgphp.domain.message_aware')
+                ->addTag($tag, ['handles' => $classMapping[$command] ?? $command])
             ;
         }
 
-        foreach ($events as $class) {
-            if (isset($classMapping[$class])) {
-                $events[] = $classMapping[$class];
-            }
+        foreach ($events as $i => $class) {
+            $events[$i] = $classMapping[$class] ?? $class;
         }
 
         $container->setParameter($param = 'msgphp.domain.event_classes', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);

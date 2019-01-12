@@ -32,6 +32,7 @@ $rules = [
     'no_useless_return' => true,
     'phpdoc_order' => true,
     'phpdoc_trim_consecutive_blank_line_separation' => true,
+    'phpdoc_to_comment' => false,
     'logical_operators' => true,
     'no_unset_on_property' => true,
     'string_line_ending' => true,
