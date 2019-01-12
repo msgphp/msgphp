@@ -6,7 +6,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilderHelper};
-use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\{ConfigHelper, PackageMetadata};
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Command, Entity};
 use MsgPhp\Eav\Infra\{Doctrine as DoctrineInfra, Uuid as UuidInfra};
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -50,27 +50,17 @@ final class Configuration implements ConfigurationInterface
         ],
     ];
 
-    private static $packageDirs;
+    private static $packageMetadata;
 
-    /**
-     * @return string[]
-     */
-    public static function getPackageDirs(): array
+    public static function getPackageMetadata(): PackageMetadata
     {
-        if (null !== self::$packageDirs) {
-            return self::$packageDirs;
+        if (null !== self::$packageMetadata) {
+            return self::$packageMetadata;
         }
 
-        return self::$packageDirs = [
+        return self::$packageMetadata = new PackageMetadata(self::PACKAGE_NS, [
             \dirname((string) (new \ReflectionClass(AttributeIdInterface::class))->getFileName()),
-        ];
-    }
-
-    public static function getPackageGlob(): string
-    {
-        $dirs = self::getPackageDirs();
-
-        return isset($dirs[1]) ? '{'.implode(',', $dirs).'}' : $dirs[0];
+        ]);
     }
 
     public function getConfigTreeBuilder(): TreeBuilder

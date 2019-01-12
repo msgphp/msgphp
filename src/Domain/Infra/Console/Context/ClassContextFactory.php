@@ -182,7 +182,7 @@ final class ClassContextFactory implements ContextFactoryInterface
 
     private static function isObject(?string $type): bool
     {
-        return null !== $type && (class_exists($type) || interface_exists($type));
+        return null !== $type && (class_exists($type) || interface_exists($type, false));
     }
 
     private function resolve(): iterable

@@ -123,6 +123,7 @@ final class BundleHelper
         if (FeatureDetection::isMessengerAvailable($container)) {
             $container->setAlias('msgphp.messenger.command_bus', new Alias('message_bus', false));
             $container->setAlias('msgphp.messenger.event_bus', new Alias('message_bus', false));
+            $container->setAlias('msgphp.command_bus', new Alias('msgphp.messenger.command_bus', false));
             $container->register(MessengerInfra\DomainMessageBus::class)
                 ->setPublic(false)
                 ->setArgument('$commandBus', new Reference('msgphp.messenger.command_bus'))
@@ -130,7 +131,6 @@ final class BundleHelper
                 ->setArgument('$eventClasses', '%msgphp.domain.event_classes%')
             ;
             $container->setAlias(DomainMessageBusInterface::class, new Alias(MessengerInfra\DomainMessageBus::class, false));
-            $container->setAlias('msgphp.command_bus', new Alias('msgphp.messenger.command_bus', false));
 
             if (FeatureDetection::isConsoleAvailable($container)) {
                 $container->autowire('msgphp.messenger.console_message_receiver', MessengerInfra\Middleware\ConsoleMessageReceiverMiddleware::class)
