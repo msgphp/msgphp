@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\InMemory;
 
-final class GlobalObjectMemory
+final class ObjectIdentityMap
 {
-    private static $defaultContext;
+    private static $globalDefaultInstance;
 
     private $storage;
 
-    public static function createDefault(): self
+    public static function getGlobalDefault(): self
     {
-        return self::$defaultContext ?? (self::$defaultContext = new self());
+        return self::$globalDefaultInstance ?? (self::$globalDefaultInstance = new self());
     }
 
     public function __construct()

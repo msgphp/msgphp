@@ -15,20 +15,20 @@ trait DomainEntityRepositoryTrait
 {
     private $class;
     private $identityHelper;
-    private $memory;
+    private $identityMap;
     private $accessor;
 
-    public function __construct(string $class, DomainIdentityHelper $identityHelper, GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)
+    public function __construct(string $class, DomainIdentityHelper $identityHelper, ObjectIdentityMap $identityMap = null, ObjectFieldAccessor $accessor = null)
     {
         $this->class = $class;
         $this->identityHelper = $identityHelper;
-        $this->memory = $memory ?? GlobalObjectMemory::createDefault();
+        $this->identityMap = $identityMap ?? ObjectIdentityMap::getGlobalDefault();
         $this->accessor = $accessor ?? new ObjectFieldAccessor();
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
-        return $this->createResultSet(iterator_to_array($this->memory->all($this->class)), $offset, $limit);
+        return $this->createResultSet(iterator_to_array($this->identityMap->all($this->class)), $offset, $limit);
     }
 
     private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -39,7 +39,7 @@ trait DomainEntityRepositoryTrait
 
         $i = -1;
         $entities = [];
-        foreach ($this->memory->all($this->class) as $entity) {
+        foreach ($this->identityMap->all($this->class) as $entity) {
             if (!$this->matchesFields($entity, $fields) || ++$i < $offset) {
                 continue;
             }
@@ -111,7 +111,7 @@ trait DomainEntityRepositoryTrait
             throw InvalidClassException::create(\get_class($entity));
         }
 
-        if ($this->memory->contains($entity)) {
+        if ($this->identityMap->contains($entity)) {
             return;
         }
 
@@ -119,7 +119,7 @@ trait DomainEntityRepositoryTrait
             throw DuplicateEntityException::createForId(\get_class($entity), $id);
         }
 
-        $this->memory->persist($entity);
+        $this->identityMap->persist($entity);
     }
 
     /**
@@ -131,7 +131,7 @@ trait DomainEntityRepositoryTrait
             throw InvalidClassException::create(\get_class($entity));
         }
 
-        $this->memory->remove($entity);
+        $this->identityMap->remove($entity);
     }
 
     private function createResultSet(array $entities, int $offset = 0, int $limit = 0): DomainCollectionInterface
