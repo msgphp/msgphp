@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\InMemory;
 
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException, InvalidClassException};
 
 /**
@@ -140,7 +139,7 @@ trait DomainEntityRepositoryTrait
             $entities = \array_slice($entities, $offset, $limit ?: null);
         }
 
-        return DomainCollectionFactory::create($entities);
+        return new DomainCollection($entities);
     }
 
     /**

@@ -6,8 +6,7 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface, DomainIdentityHelper};
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\{User, Username};
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
@@ -97,7 +96,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
             }
         }
 
-        $result = DomainCollectionFactory::create($result);
+        $result = new DomainCollection($result);
 
         return $offset || $limit ? $result->slice($offset, $limit) : $result;
     }

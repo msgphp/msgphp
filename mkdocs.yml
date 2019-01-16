@@ -24,7 +24,6 @@ pages:
           - Factories:
                 - Object Factory: ddd/factory/object.md
                 - Entity Aware Factory: ddd/factory/entity-aware.md
-                - Static Factory: ddd/factory/static.md
           - Identity Mapping: ddd/identity-mapping.md
           - Identity Helper: ddd/identity-helper.md
     - Event-Sourcing:
