@@ -4,31 +4,6 @@ A static factory is a utility class. Its purpose is to ease factorizing some kno
 
 ## Implementations
 
-### `MsgPhp\Domain\Factory\DomainIdFactory`
-
-Factorizes an [domain identifier](../identifiers.md).
-
-- `static create($value): DomainIdInterface`
-    - `$value`: Any (primitive) identifier value
-
-#### Basic example
-
-```php
-<?php
-
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Factory\DomainIdFactory;
-use MsgPhp\Domain\Infra\Uuid\DomainId as DomainUuid;
-
-// --- USAGE ---
-
-/** @var DomainId $id */
-$id = DomainIdFactory::create(1);
-
-/** @var DomainUuid $id */
-$id = DomainIdFactory::create('cf3d2f85-6c86-44d1-8634-af51c91a9a74');
-```
-
 ### `MsgPhp\Domain\Factory\DomainCollectionFactory`
 
 Factorizes a [domain collection](../collections.md).

@@ -58,6 +58,7 @@ sa: install phpunit-install
 	mkdir -p $$(find src/ -mindepth 1 -maxdepth 1 -type d -print -quit)/vendor
 	${qa} phpstan analyse
 	${qa} psalm --show-info=false
+
 # docs
 docs-serve:
 	${mkdocs}
