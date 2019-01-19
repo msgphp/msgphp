@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\ChangeUserCredentialCommand as ChangeUserCredentialDomainCommand;
@@ -28,7 +28,7 @@ final class ChangeUserCredentialCommand extends UserCommand
     private $contextFactory;
     private $fields = [];
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository, ContextFactoryInterface $contextFactory)
     {
         $this->contextFactory = $contextFactory;
 

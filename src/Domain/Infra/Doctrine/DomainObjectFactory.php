@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class EntityAwareFactory implements EntityAwareFactoryInterface
+final class DomainObjectFactory implements DomainObjectFactoryInterface
 {
     private $factory;
     private $em;
 
-    public function __construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em)
+    public function __construct(DomainObjectFactoryInterface $factory, EntityManagerInterface $em)
     {
         $this->factory = $factory;
         $this->em = $em;
@@ -33,28 +32,22 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         return $this->resolveDiscriminatorClass($class, $context);
     }
 
-    public function reference(string $class, $id)
+    public function reference(string $class, array $context = [])
     {
-        if (\is_array($id)) {
-            $class = $this->resolveDiscriminatorClass($class, $id, true);
-        } else {
-            $class = $this->factory->getClass($class);
+        $class = $this->factory->getClass($class, $context);
+
+        if ($this->em->getMetadataFactory()->isTransient($class)) {
+            return $this->factory->reference($class, $context);
         }
 
-        try {
-            $ref = $this->em->getReference($class, $id);
-        } catch (MappingException $e) {
-            $ref = null;
-        }
-
-        if (null === $ref) {
+        if (null == $ref = $this->em->getReference($class, $context)) {
             throw InvalidClassException::create($class);
         }
 
         return $ref;
     }
 
-    private function resolveDiscriminatorClass(string $class, array &$context, bool $clear = false): string
+    private function resolveDiscriminatorClass(string $class, array $context): string
     {
         $class = $this->factory->getClass($class, $context);
 
@@ -66,13 +59,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
         if (isset($metadata->discriminatorColumn['fieldName'], $context[$metadata->discriminatorColumn['fieldName']])) {
             $class = $metadata->discriminatorMap[$context[$metadata->discriminatorColumn['fieldName']]] ?? $class;
-
-            if ($clear) {
-                unset($context[$metadata->discriminatorColumn['fieldName']]);
-            }
         }
-
-        unset($context);
 
         return $class;
     }

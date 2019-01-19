@@ -6,25 +6,8 @@ An overview of available infrastructural code when using Doctrine's [Database Ab
 
 ## Domain Identifier Type
 
-A translation between the database type and a [domain identifier](../ddd/identifiers.md) type in PHP is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainIdType`. Its purpose is to abstract the underlying data type of the identifier
-value.
-
-The design is based on [late static bindings], due the design of the Doctrine type system itself. It extends from the
-default [`Type`][api-type] implementation and can be used either generic or as a base class for custom identifiers
-(which in turn require custom types).
-
-- `static setClass(string $class): void`
-    - `$class`: A sub class of `DomainIdInterface` to use as PHP value. If not set the [default identifier](../ddd/identifiers.md#msgphpdomaindomainid)
-      is used.
-- `static getClass(): string`
-- `static setDataType(string $type): void`
-    - `$type`: A Doctrine type name to use as underlying data type. If not set `Type::INTEGER` is used.
-- `static getDataType(): string`
-
-!!! note
-    See the [reference](../reference/doctrine-identifier-types.md) page for all available identifier types provided per
-    domain
+A translation between the database type and an [identifier](../ddd/identifiers.md) type in PHP is provided by
+`MsgPhp\Domain\Infra\Doctrine\DomainIdType`.
 
 ### Basic Example
 
@@ -46,12 +29,13 @@ class MyDomainIdType extends DomainIdType
     public const NAME = 'my_domain_id';
 }
 
-Type::addType(MyDomainId::NAME, MyDomainId::class);
 
 // --- USAGE ---
 
 MyDomainIdType::setClass(MyDomainId::class);
 MyDomainIdType::setDataType(Type::GUID);
+
+Type::addType(MyDomainIdType::NAME, MyDomainIdType::class);
 ```
 
 To leverage the tailored [UUID identifier](../infrastructure/uuid.md#domain-identifier) use a data type from
@@ -69,6 +53,4 @@ MyDomainIdType::setDataType(UuidType::NAME);
 
 [dbal-project]: http://www.doctrine-project.org/projects/dbal.html
 [doctrine/dbal]: https://packagist.org/packages/doctrine/dbal
-[api-type]: http://www.doctrine-project.org/api/dbal/2.5/class-Doctrine.DBAL.Types.Type.html
-[late static bindings]: https://secure.php.net/manual/en/language.oop5.late-static-bindings.php
 [ramsey/uuid-doctrine]: https://packagist.org/packages/ramsey/uuid-doctrine

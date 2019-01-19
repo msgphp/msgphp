@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\DeleteUserCommand;
 use MsgPhp\User\Event\UserDeletedEvent;
@@ -20,7 +20,7 @@ final class DeleteUserHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;

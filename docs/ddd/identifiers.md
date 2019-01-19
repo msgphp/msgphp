@@ -41,9 +41,6 @@ be returned.
 
 A first class citizen domain identifier.
 
-- `__construct(string $id = null)`
-    - `$id`: The primitive identifier value. In case of `null` an empty identifier is implied.
-
 #### Basic Example
 
 ```php
@@ -53,29 +50,19 @@ use MsgPhp\Domain\DomainId;
 
 // --- SETUP ---
 
-class OtherDomainId extends DomainId
-{
-}
-
-$emptyId = new DomainId();
 $id = new DomainId('1');
+$emptyId = new DomainId();
 
 // --- USAGE ---
 
-$emptyId->isEmpty(); // true
 $id->isEmpty(); // false
+$emptyId->isEmpty(); // true
 
-$emptyId->equals($emptyId); // true
-$emptyId->equals(new DomainId()); // false
 $id->equals(new DomainId('1')); // true
-$id->equals(new OtherDomainId('1')); // false due type varying
+$emptyId->equals(new DomainId()); // false
 
+$id->toString(); // "1"
 $emptyId->toString(); // ""
-(string) $id; // "1"
-
-$emptyStringId = new DomainId('');
-$emptyStringId->isEmpty() ? null : $emptyStringId->toString(); // ""
-$emptyId->isEmpty() ? null : $emptyId->toString(); // null
 ```
 
 ### `MsgPhp\Domain\Infra\Uuid\DomainId`

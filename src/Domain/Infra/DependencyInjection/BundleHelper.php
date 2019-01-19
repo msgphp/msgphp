@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
 use MsgPhp\Domain\{DomainIdentityHelper, DomainIdentityMappingInterface};
-use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface, EntityAwareFactory, EntityAwareFactoryInterface};
+use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface};
 use MsgPhp\Domain\Infra\{Console as ConsoleInfra, Doctrine as DoctrineInfra, InMemory as InMemoryInfra, Messenger as MessengerInfra};
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use Symfony\Component\Console\ConsoleEvents;
@@ -99,19 +99,11 @@ final class BundleHelper
 
         $container->setAlias(DomainObjectFactoryInterface::class, new Alias(DomainObjectFactory::class, false));
 
-        $container->autowire(EntityAwareFactory::class)
-            ->setPublic(false)
-            ->setDecoratedService(DomainObjectFactory::class)
-            ->setArgument('$factory', new Reference(EntityAwareFactory::class.'.inner'))
-        ;
-
-        $container->setAlias(EntityAwareFactoryInterface::class, new Alias(DomainObjectFactoryInterface::class, false));
-
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
-            $container->register(DoctrineInfra\EntityAwareFactory::class)
+            $container->register(DoctrineInfra\DomainObjectFactory::class)
                 ->setPublic(false)
-                ->setDecoratedService(EntityAwareFactory::class)
-                ->setArgument('$factory', new Reference(DoctrineInfra\EntityAwareFactory::class.'.inner'))
+                ->setDecoratedService(DomainObjectFactory::class)
+                ->setArgument('$factory', new Reference(DoctrineInfra\DomainObjectFactory::class.'.inner'))
                 ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
             ;
         }

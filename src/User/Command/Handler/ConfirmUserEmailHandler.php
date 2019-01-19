@@ -6,7 +6,7 @@ namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Event\{ConfirmEvent, DomainEventHandlerInterface, DomainEventInterface};
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\ConfirmUserEmailCommand;
 use MsgPhp\User\Entity\UserEmail;
@@ -23,7 +23,7 @@ final class ConfirmUserEmailHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserEmailRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserEmailRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;

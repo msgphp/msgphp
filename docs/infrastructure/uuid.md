@@ -6,15 +6,7 @@ An overview of available infrastructural code when working with [UUIDs][uuid].
 
 ## Domain Identifier
 
-A UUID tailored [domain identifier](../ddd/identifiers.md) is provided by `MsgPhp\Domain\Infra\Uuid\DomainId`. It
-leverages type `Ramsey\Uuid\UuidInterface` as underlying data type.
-
-- `__construct(UuidInterface $uuid = null)`
-    - `$uuid`: The underlying UUID. In case of `null` a UUID version 4 value is generated upfront. Meaning the
-      identifier will never be considered empty.
-
-!!! note
-    See the [reference](../reference/identifiers.md) page for all available UUID identifiers provided per domain
+A UUID tailored [domain identifier](../ddd/identifiers.md) is provided by `MsgPhp\Domain\Infra\Uuid\DomainId`.
 
 ### Basic Example
 
@@ -27,12 +19,8 @@ use Ramsey\Uuid\Uuid;
 // --- SETUP ---
 
 $id = new DomainId(); // a new UUID version 4 value
-$id = new DomainId(Uuid::uuid1()); // UUID version 1 value
-$id = new DomainId(Uuid::fromString('00000000-0000-0000-0000-000000000000')); // Nil UUID value
-
-// static
-
-$id = DomainId::fromValue('00000000-0000-0000-0000-000000000000'); 
+$id = new DomainId(Uuid::uuid1());
+$id = new DomainId(Uuid::fromString('00000000-0000-0000-0000-000000000000')); 
 ```
 
 [uuid]: https://en.wikipedia.org/wiki/Universally_unique_identifier

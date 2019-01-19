@@ -34,7 +34,7 @@ msgphp_<name>:
         MsgPhp\SomeClass: App\SomeClass
 ```
 
-The class mapping applies when working with an [object factory](../ddd/factory/object.md).
+The class mapping applies when working with an [object factory](../ddd/object-factory.md).
 
 Depending on the bundle a specific class mapping entry might enable one of the bundle its features which is otherwise
 disabled by default.

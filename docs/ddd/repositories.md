@@ -62,12 +62,6 @@ Removes an entity from the identity map. The entity will be unavailable on any s
 
 Repository trait based on in-memory persistence.
 
-- `__construct(string $class, DomainIdentityHelper $identityHelper, GlobalObjectMemory $memory = null, ObjectFieldAccessor $accessor = null)`
-    - `$class`: The entity class this repository is tied to
-    - `$identityHelper`: The domain identity helper. [Read more](identity-helper.md).
-    - `$memory`: Custom memory layer. By default the same global pool is used. See also [`GlobalObjectMemory`][api-globalobjectmemory].
-    - `$accessor`: Custom object field accessor. See also [`ObjectFieldAccessor`][api-objectfieldaccessor].
-
 #### Basic Example
 
 ```php
@@ -92,11 +86,9 @@ class MyEntityRepository
     }
 }
 
-$helper = new DomainIdentityHelper(new DomainIdentityMapping([
-   MyEntity::class => 'id',
-]));
-
-$repository = new MyEntityRepository(MyEntity::class, $helper);
+$repository = new MyEntityRepository(MyEntity::class, new DomainIdentityHelper(new DomainIdentityMapping([
+    MyEntity::class => 'id',
+])));
 
 // --- USAGE ---
 
@@ -115,6 +107,3 @@ if ($repository->exists(1)) {
 A Doctrine tailored repository trait.
 
 - [Read more](../infrastructure/doctrine-orm.md#domain-repository)
-
-[api-globalobjectmemory]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/InMemory/GlobalObjectMemory.html
-[api-objectfieldaccessor]: https://msgphp.github.io/api/MsgPhp/Domain/Infra/InMemory/ObjectFieldAccessor.html

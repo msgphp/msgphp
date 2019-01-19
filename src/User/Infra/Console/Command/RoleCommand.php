@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait, MessageReceivingInterface};
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Repository\RoleRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,7 +20,7 @@ abstract class RoleCommand extends Command implements MessageReceivingInterface
         dispatch as protected;
     }
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, RoleRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, RoleRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;

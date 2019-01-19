@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\AddUserRoleCommand as AddUserRoleDomainCommand;
@@ -28,7 +28,7 @@ final class AddUserRoleCommand extends UserRoleCommand
     private $io;
     private $contextFactory;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
     {
         $this->contextFactory = $contextFactory;
 

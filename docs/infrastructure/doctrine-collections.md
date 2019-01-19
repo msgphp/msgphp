@@ -7,10 +7,6 @@ An overview of available infrastructural code when using Doctrine's [Collections
 ## Domain Collection
 
 A Doctrine tailored [domain collection](../ddd/collections.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainCollection`.
-It decorates any `Doctrine\Common\Collections\Collection` type.
-
-- `__construct(Collection $collection)`
-    - `$collection`: The decorated collection
 
 ### Basic Example
 
@@ -23,10 +19,6 @@ use MsgPhp\Domain\Infra\Doctrine\DomainCollection;
 // --- SETUP ---
 
 $collection = new DomainCollection(new ArrayCollection([1, 2, 3]));
-
-// static
-
-$collection = DomainCollection::fromValue([1, 2, 3]);
 ```
 
 [collections-project]: http://www.doctrine-project.org/projects/collections.html

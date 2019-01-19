@@ -145,6 +145,23 @@ final class DomainObjectFactoryTest extends TestCase
         $factory->create(NestedTestObject::class, ['test' => ['irrelevant']]);
     }
 
+    public function testReference(): void
+    {
+        $reference = (new DomainObjectFactory())->reference(ReferenceTestObject::class, ['fieldA' => 1, 'fieldB' => 2]);
+
+        self::assertInstanceOf(ReferenceTestObject::class, $reference);
+        self::assertSame([1, 2], $reference->get());
+    }
+
+    public function testReferenceWithUnknownClass(): void
+    {
+        $factory = new DomainObjectFactory();
+
+        $this->expectException(InvalidClassException::class);
+
+        $factory->reference(UnknownTestObject::class);
+    }
+
     public function testGetClass(): void
     {
         $factory = new DomainObjectFactory(['alias' => \stdClass::class]);
@@ -196,5 +213,21 @@ class KnownTestObject
 {
     public function __construct(UnknownTestObject $arg = null)
     {
+    }
+}
+
+class ReferenceTestObject
+{
+    private $fieldA;
+    private $fieldB = 'default B';
+
+    public function __construct()
+    {
+        throw new \BadMethodCallException();
+    }
+
+    public function get(): array
+    {
+        return [$this->fieldA, $this->fieldB];
     }
 }

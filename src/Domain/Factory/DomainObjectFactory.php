@@ -6,6 +6,8 @@ namespace MsgPhp\Domain\Factory;
 
 use MsgPhp\Domain\{DomainIdInterface, DomainCollectionInterface};
 use MsgPhp\Domain\Exception\InvalidClassException;
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Symfony\Component\VarExporter\Instantiator;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -38,6 +40,28 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
         }
 
         return new $class(...$this->resolveArguments($class, '__construct', $context));
+    }
+
+    public function reference(string $class, array $context = [])
+    {
+        if (!class_exists(Instantiator::class)) {
+            throw new \LogicException(sprintf('Method "%s()" requires "symfony/var-exporter".', __METHOD__));
+        }
+
+        $class = $this->getClass($class, $context);
+        $properties = [];
+        foreach ($context as $key => $value) {
+            if (property_exists($class, $key)) {
+                $properties[$key] = $value;
+                continue;
+            }
+        }
+
+        try {
+            return Instantiator::instantiate($class, $properties);
+        } catch (ClassNotFoundException $e) {
+            throw InvalidClassException::create($class);
+        }
     }
 
     public function getClass(string $class, array $context = []): string

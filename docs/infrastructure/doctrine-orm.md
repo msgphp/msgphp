@@ -6,13 +6,7 @@ An overview of available infrastructural code when using Doctrine's [Object Rela
 
 ## Domain Identity Mapping
 
-A Doctrine tailored [domain identity mapping](../ddd/identity-mapping.md) is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`. It uses Doctrine's [`EntityManagerInterface`][api-em] to provide
-the identity mapping from its class metadata.
-
-- `__construct(EntityManagerInterface $em, array $classMapping = [])`
-    - `$em`: The entity manager to use
-    - `$classMapping`: Global class mapping. Usually used to map abstracts to concretes.
+A Doctrine tailored [identity mapping](../ddd/identity-mapping.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainIdentityMapping`.
 
 ### Basic Example
 
@@ -31,15 +25,7 @@ $mapping = new DomainIdentityMapping($em);
 
 ## Domain Repository
 
-A Doctrine tailored [domain repository trait](../ddd/repositories.md) is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`. It uses Doctrine's [`EntityManagerInterface`][api-em] as
-underlying persistence layer.
-
-- `__construct(string $class, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)`
-    - `$class`: The entity class this repository is tied to
-    - `$em`: The entity manager to use
-    - `$identityHelper`: Custom domain identity helper. By default it's resolved from the given entity manager.
-      [Read more](../ddd/identity-helper.md).
+A Doctrine tailored [repository trait](../ddd/repositories.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`.
 
 ### Basic Example
 
@@ -89,18 +75,12 @@ if ($repository->exists($id = ['name' => ..., 'year' => ...])) {
 }
 ```
 
-## Entity Aware Factory
+## Domain Object Factory
 
-A Doctrine tailored [entity aware factory](../ddd/factory/entity-aware.md) is provided by
-`MsgPhp\Domain\Infra\Doctrine\EntityAwareFactory`. It decorates any entity aware factory and uses Doctrine's
-[`EntityManagerInterface`][api-em]. Its purpose is to create lazy-loading references when using `reference()` (see 
-[`EntityManagerInterface::getReference()`][api-em-getreference]) and handle an entity its discriminator map when working
-with [inheritance][orm-inheritance].
+A Doctrine tailored [object factory](../ddd/object-factory.md) is provided by
+`MsgPhp\Domain\Infra\Doctrine\DomainObjectFactory`.
 
-- `__construct(EntityAwareFactoryInterface $factory, EntityManagerInterface $em, array $classMapping = [])`
-    - `$factory`: The decorated factory
-    - `$em`: The entity manager to use
-    - `$classMapping`: Global class mapping. Usually used to map abstracts to concretes.
+When working with [ORM inheritance] the discriminator field can be provided to factorize a specific entity type.
 
 ### Basic Example
 
@@ -109,8 +89,8 @@ with [inheritance][orm-inheritance].
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\Factory\{DomainObjectFactory, EntityAwareFactory as BaseEntityAwareFactory};
-use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMapping, EntityAwareFactory};
+use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
+use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMapping, DomainObjectFactory};
 
 // --- SETUP ---
 
@@ -136,24 +116,9 @@ class MyOtherEntity extends MyEntity
 
 /** @var EntityManagerInterface $em */
 $em = ...;
-$factory = new EntityAwareFactory(
-    new BaseEntityAwareFactory(
-        new DomainObjectFactory(),
-        new DomainIdentityMapping($em)
-    ),
-    $em
-);
+$factory = new DomainObjectFactory(new BaseDomainObjectFactory(), $em);
 
 // --- USAGE ---
-
-/** @var MyEntity $ref */
-$ref = $factory->reference(MyEntity::class, 1); // no database hit
-
-/** @var MyOtherEntity $otherRef */
-$otherRef = $factory->reference(MyEntity::class, [
-    'id' => 1,
-    'discriminator' => MyEntity::TYPE_OTHER
-]);
 
 /** @var MyOtherEntity $otherEntity */
 $otherEntity = $factory->create(MyEntity::class, [
@@ -164,10 +129,10 @@ $otherEntity = $factory->create(MyEntity::class, [
 ## Domain Identifier Hydration
 
 When working with [domain identifiers](../ddd/identifiers.md) and its corresponding [type](doctrine-dbal.md#domain-identifier-type)
-a problem might occur when hydrating scalar values, e.g. using [`Query::getScalarResult()`][api-query-getscalarresult].
+a problem can occur when hydrating scalar values, e.g. with `Query::getScalarResult()`.
 
 It would use instances of `MsgPhp\Domain\DomainIdInterface` that can only be casted to string as its (true) scalar
-value (due to `__toString()`). In case the underlying data type is e.g. `integer` it'll be lost.
+value (due to `__toString()`). In case the underlying data type is e.g. `integer` it will be lost.
 
 To overcome, two hydration modes are available to hydrate the primitive identifier value instead.
 
@@ -215,8 +180,5 @@ $query->getSingleResult(SingleScalarHydrator::NAME); // int(1)
 ```
 
 [orm-project]: http://www.doctrine-project.org/projects/orm.html
-[orm-inheritance]: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html
+[ORM inheritance]: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html
 [doctrine/orm]: https://packagist.org/packages/doctrine/orm
-[api-em]: http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.EntityManagerInterface.html
-[api-em-getreference]: http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.EntityManagerInterface.html#_getReference
-[api-query-getscalarresult]: http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.AbstractQuery.html#_getScalarResult

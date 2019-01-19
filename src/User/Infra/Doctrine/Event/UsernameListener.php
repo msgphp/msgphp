@@ -11,7 +11,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\MappingException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Entity\{User, Username};
 
 /**
@@ -23,7 +23,7 @@ final class UsernameListener
     private $targetMappings;
     private $updateUsernames = [];
 
-    public function __construct(EntityAwareFactoryInterface $factory, array $targetMappings)
+    public function __construct(DomainObjectFactoryInterface $factory, array $targetMappings)
     {
         $this->factory = $factory;
         $this->targetMappings = $targetMappings;
