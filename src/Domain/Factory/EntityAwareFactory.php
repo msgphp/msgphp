@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\{DomainIdentityHelper, DomainIdInterface};
+use MsgPhp\Domain\DomainIdentityHelper;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Instantiator;
@@ -60,20 +60,5 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         } catch (ClassNotFoundException $e) {
             throw InvalidClassException::create($class);
         }
-    }
-
-    public function identify(string $class, $value): DomainIdInterface
-    {
-        if ($value instanceof DomainIdInterface) {
-            $value = $value->isEmpty() ? null : $value->toString();
-        }
-
-        $object = $this->factory->create($class, [$value]);
-
-        if (!$object instanceof DomainIdInterface) {
-            throw InvalidClassException::create($class);
-        }
-
-        return $object;
     }
 }

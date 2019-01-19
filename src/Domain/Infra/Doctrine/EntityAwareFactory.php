@@ -6,7 +6,6 @@ namespace MsgPhp\Domain\Infra\Doctrine;
 
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 
@@ -53,11 +52,6 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         }
 
         return $ref;
-    }
-
-    public function identify(string $class, $value): DomainIdInterface
-    {
-        return $this->factory->identify($class, $value);
     }
 
     private function resolveDiscriminatorClass(string $class, array &$context, bool $clear = false): string

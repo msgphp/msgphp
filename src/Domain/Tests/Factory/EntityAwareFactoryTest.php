@@ -100,45 +100,6 @@ final class EntityAwareFactoryTest extends TestCase
 
         $this->factory->reference(TestReferencedEntity::class, 1);
     }
-
-    public function testIdentify(): void
-    {
-        self::assertSame('1', $this->factory->identify('id', '1')->toString());
-
-        $id = $this->createMock(DomainIdInterface::class);
-        $id->expects(self::exactly(2))
-            ->method('isEmpty')
-            ->willReturn(false)
-        ;
-        $id->expects(self::exactly(2))
-            ->method('toString')
-            ->willReturn('2')
-        ;
-
-        self::assertNotSame($id, $this->factory->identify('id', $id));
-        self::assertSame('2', $this->factory->identify('id', $id)->toString());
-    }
-
-    public function testIdentifyEmpty(): void
-    {
-        self::assertSame('new', $this->factory->identify('id', null)->toString());
-
-        $id = $this->createMock(DomainIdInterface::class);
-        $id->expects(self::exactly(2))
-            ->method('isEmpty')
-            ->willReturn(true)
-        ;
-
-        self::assertNotSame($id, $this->factory->identify('id', $id));
-        self::assertSame('new', $this->factory->identify('id', $id)->toString());
-    }
-
-    public function testIdentifyWithUnknownClass(): void
-    {
-        $this->expectException(InvalidClassException::class);
-
-        $this->factory->identify('foo', '1');
-    }
 }
 
 class TestReferencedEntity

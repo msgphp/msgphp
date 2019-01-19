@@ -16,12 +16,6 @@ An entity aware factory is an [object factory](object.md) and additionally bound
 Returns a factorized reference object of type `$class` for an entity known to exist. Supported identity values are
 `scalar`, `array` (for composite identifiers), and `object` (i.e. another entity or its [identifier](../identifiers.md)). 
 
----
-
-### `identify(string $class, $value): DomainIdInterface`
-
-Returns a factorized [domain identifier](../identifiers.md) for the given entity class from a known primitive value.
-
 ## Implementations
 
 ### `MsgPhp\Domain\Factory\EntityAwareFactory`
@@ -64,9 +58,6 @@ $factory = new EntityAwareFactory(
 
 /** @var MyEntity $ref */
 $ref = $factory->reference(MyEntity::class, new DomainId('1'));
-
-/** @var DomainId $id */
-$id = $factory->identify(DomainId::class, 1);
 ```
 
 !!! note
