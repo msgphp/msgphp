@@ -34,7 +34,7 @@ final class ConfirmUserHandler
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserConfirmedEvent::class, [$user]);
+            $this->dispatch(UserConfirmedEvent::class, compact('user'));
         });
     }
 

@@ -31,6 +31,6 @@ final class CreateRoleHandler
     {
         $role = $this->factory->create(Role::class, $command->context);
         $this->repository->save($role);
-        $this->dispatch(RoleCreatedEvent::class, [$role]);
+        $this->dispatch(RoleCreatedEvent::class, compact('role'));
     }
 }

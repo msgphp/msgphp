@@ -29,14 +29,15 @@ final class ChangeUserAttributeValueHandler
     public function __invoke(ChangeUserAttributeValueCommand $command): void
     {
         $userAttributeValue = $this->repository->find($command->attributeValueId);
+        $oldValue = $userAttributeValue->getValue();
+        $newValue = $command->value;
 
-        if ($command->value === $oldValue = $userAttributeValue->getValue()) {
+        if ($newValue === $oldValue) {
             return;
         }
 
         $userAttributeValue->changeValue($command->value);
-
         $this->repository->save($userAttributeValue);
-        $this->dispatch(UserAttributeValueChangedEvent::class, [$userAttributeValue, $oldValue, $command->value]);
+        $this->dispatch(UserAttributeValueChangedEvent::class, compact('userAttributeValue', 'oldValue', 'newValue'));
     }
 }

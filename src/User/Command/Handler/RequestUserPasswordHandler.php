@@ -35,13 +35,15 @@ final class RequestUserPasswordHandler
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserPasswordRequestedEvent::class, [$user]);
+            $this->dispatch(UserPasswordRequestedEvent::class, compact('user'));
         });
     }
 
     protected function getDomainEvent(RequestUserPasswordCommand $command): DomainEventInterface
     {
-        return $this->factory->create(RequestPasswordEvent::class, [$command->token]);
+        $token = $command->token;
+
+        return $this->factory->create(RequestPasswordEvent::class, compact('token'));
     }
 
     protected function getDomainEventHandler(RequestUserPasswordCommand $command): DomainEventHandlerInterface

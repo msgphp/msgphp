@@ -151,7 +151,7 @@ final class UsernameListener
 
     private function createUsername(User $user, string $username): Username
     {
-        return $this->factory->create(Username::class, [$user, $username]);
+        return $this->factory->create(Username::class, compact('user', 'username'));
     }
 
     /**

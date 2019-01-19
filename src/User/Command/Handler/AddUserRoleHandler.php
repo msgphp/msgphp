@@ -35,6 +35,6 @@ final class AddUserRoleHandler
         ] + $command->context);
 
         $this->repository->save($userRole);
-        $this->dispatch(UserRoleAddedEvent::class, [$userRole]);
+        $this->dispatch(UserRoleAddedEvent::class, compact('userRole'));
     }
 }

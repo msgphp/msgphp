@@ -13,11 +13,27 @@ final class DomainObjectFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $object = (new DomainObjectFactory())->create(TestObject::class, ['arg_a' => 1, 'arg_b' => 'foo', 'bar' => 'baz']);
+        $object = (new DomainObjectFactory())->create(TestObject::class, ['argB' => 'foo', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 1]);
 
         self::assertInstanceOf(TestObject::class, $object);
         self::assertSame(1, $object->a);
         self::assertSame('foo', $object->b);
+    }
+
+    public function testCreateDefaultsConstructorArguments(): void
+    {
+        $object = (new DomainObjectFactory())->create(TestObject::class);
+
+        self::assertNull($object->a);
+        self::assertSame('default-b', $object->b);
+    }
+
+    public function testCreatePreservesContext(): void
+    {
+        $object = (new DomainObjectFactory())->create(TestObject::class, ['argB' => null]);
+
+        self::assertInstanceOf(TestObject::class, $object);
+        self::assertNull($object->b);
     }
 
     public function testCreateWithAlias(): void
@@ -43,7 +59,7 @@ final class DomainObjectFactoryTest extends TestCase
 
         $this->expectException(InvalidClassException::class);
 
-        $factory->create(__NAMESPACE__.'\\UnknownTestObject');
+        $factory->create(UnknownTestObject::class);
     }
 
     public function testCreateWithUnknownNestedObject(): void
@@ -54,25 +70,8 @@ final class DomainObjectFactoryTest extends TestCase
         self::assertInstanceOf(KnownTestObject::class, $factory->create(KnownTestObject::class, ['unknown' => 'foo']));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\UnknownTestObject or null, int(?:eger)? given\b/', preg_quote(KnownTestObject::class, '/')));
 
-        $factory->create(KnownTestObject::class, [123]);
-    }
-
-    public function testCreateWithNamedContext(): void
-    {
-        $object = (new DomainObjectFactory())->create(TestObject::class, [1 => 'b', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 'a']);
-
-        self::assertSame('a', $object->a);
-        self::assertSame('b', $object->b);
-    }
-
-    public function testCreateWithNumericContext(): void
-    {
-        $object = (new DomainObjectFactory())->create(TestObject::class, [1 => 'b', 'arg_a' => 'a', 0 => 'ignore']);
-
-        self::assertSame('a', $object->a);
-        self::assertSame('b', $object->b);
+        $factory->create(KnownTestObject::class, ['arg' => []]);
     }
 
     public function testCreateWithoutConstructor(): void
@@ -92,8 +91,8 @@ final class DomainObjectFactoryTest extends TestCase
     public function testNestedCreate(): void
     {
         $object = (new DomainObjectFactory())->create(NestedTestObject::class, [
-            'test' => ['arg_a' => 'nested_a', 'arg_b' => 'nested_b'],
-            'self' => ['test' => ['arg_a' => 'foo', 'arg_b' => 'bar'], 'other' => $other = new TestObject(1, 2)],
+            'test' => ['argA' => 'nested_a', 'argB' => 'nested_b', 'arg_b' => 'ignore'],
+            'self' => ['test' => ['argA' => 'foo', 'argB' => 'bar'], 'other' => $other = new TestObject(1, 2)],
         ]);
 
         self::assertInstanceOf(NestedTestObject::class, $object);
@@ -106,7 +105,7 @@ final class DomainObjectFactoryTest extends TestCase
         self::assertSame($other, $object->self->other);
     }
 
-    public function testNestedCreateWithoutContext(): void
+    public function testNestedCreateWithoutRequiredContext(): void
     {
         $factory = new DomainObjectFactory();
 
@@ -118,7 +117,7 @@ final class DomainObjectFactoryTest extends TestCase
     public function testNestedCreateWithNestedFactory(): void
     {
         $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
-        $nestedFactory->expects(self::any())
+        $nestedFactory->expects(self::once())
             ->method('create')
             ->willReturn($nested = new TestObject(1, 2))
         ;
@@ -126,25 +125,24 @@ final class DomainObjectFactoryTest extends TestCase
         $factory = new DomainObjectFactory();
         $factory->setNestedFactory($nestedFactory);
 
-        self::assertInstanceOf(NestedTestObject::class, $object = $factory->create(NestedTestObject::class, [['a', 'b']]));
+        self::assertInstanceOf(NestedTestObject::class, $object = $factory->create(NestedTestObject::class, ['test' => null]));
         self::assertSame($nested, $object->test);
     }
 
     public function testNestedCreateWithInvalidNestedFactory(): void
     {
         $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
-        $nestedFactory->expects(self::any())
+        $nestedFactory->expects(self::once())
             ->method('create')
-            ->willThrowException(InvalidClassException::create(TestObject::class))
+            ->willThrowException(new \RuntimeException())
         ;
 
         $factory = new DomainObjectFactory();
         $factory->setNestedFactory($nestedFactory);
 
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageRegExp(sprintf('/^Argument 1 passed to %s::__construct\(\) must be an instance of MsgPhp\\\Domain\\\Tests\\\Factory\\\TestObject, array given\b/', preg_quote(NestedTestObject::class, '/')));
+        $this->expectException(\RuntimeException::class);
 
-        $factory->create(NestedTestObject::class, [['a', 'b']]);
+        $factory->create(NestedTestObject::class, ['test' => ['irrelevant']]);
     }
 
     public function testGetClass(): void
@@ -159,10 +157,10 @@ final class DomainObjectFactoryTest extends TestCase
 
 class TestObject
 {
-    public $a;
+    public $a = 'default-a';
     public $b;
 
-    public function __construct($argA, $argB)
+    public function __construct($argA, $argB = 'default-b')
     {
         $this->a = $argA;
         $this->b = $argB;

@@ -33,6 +33,6 @@ final class DeleteProjectionDocumentHandler
         }
 
         $this->repository->delete($document->getType(), $document->getId());
-        $this->dispatch(ProjectionDocumentDeletedEvent::class, [$document]);
+        $this->dispatch(ProjectionDocumentDeletedEvent::class, compact('document'));
     }
 }

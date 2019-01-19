@@ -17,7 +17,7 @@ trait RoleAwareTrait
     /** @var RoleRepositoryInterface */
     private $repository;
 
-    protected function getRole(InputInterface $input, StyleInterface $io, &$name = null): Role
+    protected function getRole(InputInterface $input, StyleInterface $io): Role
     {
         if (null === $name = $input->getArgument('role')) {
             if (!$input->isInteractive()) {
@@ -27,6 +27,8 @@ trait RoleAwareTrait
             do {
                 $name = $io->ask('Role name');
             } while (null === $name);
+
+            $input->setArgument('role', $name);
         }
 
         return $this->repository->find($name);

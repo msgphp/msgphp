@@ -8,6 +8,8 @@ use MsgPhp\Domain\Exception\InvalidClassException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class ClassMethodResolver
 {
@@ -26,11 +28,11 @@ final class ClassMethodResolver
             throw InvalidClassException::createForMethod($class, $method);
         }
 
-        if (null === $reflection) {
+        if (null === $reflection || !$reflection->getNumberOfParameters()) {
             return self::$cache[$key] = [];
         }
 
-        return self::$cache[$key] = array_map(function (\ReflectionParameter $param): array {
+        foreach ($reflection->getParameters() as $i => $param) {
             $type = $param->getType();
 
             if (null !== $type) {
@@ -61,13 +63,14 @@ final class ClassMethodResolver
                 $required = true;
             }
 
-            return [
-                'name' => $name = $param->getName(),
-                'key' => strtolower((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $name)),
+            self::$cache[$key][$param->getName()] = [
+                'index' => $i,
                 'required' => $required,
                 'default' => $default,
                 'type' => $type,
             ];
-        }, $reflection->getParameters());
+        }
+
+        return self::$cache[$key];
     }
 }

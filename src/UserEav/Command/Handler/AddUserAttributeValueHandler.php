@@ -41,6 +41,6 @@ final class AddUserAttributeValueHandler
         ] + $command->context);
 
         $this->repository->save($userAttributeValue);
-        $this->dispatch(UserAttributeValueAddedEvent::class, [$userAttributeValue]);
+        $this->dispatch(UserAttributeValueAddedEvent::class, compact('userAttributeValue'));
     }
 }

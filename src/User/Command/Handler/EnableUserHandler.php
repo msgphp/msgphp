@@ -34,7 +34,7 @@ final class EnableUserHandler
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserEnabledEvent::class, [$user]);
+            $this->dispatch(UserEnabledEvent::class, compact('user'));
         });
     }
 

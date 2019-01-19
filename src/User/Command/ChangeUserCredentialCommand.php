@@ -12,11 +12,11 @@ use MsgPhp\User\UserIdInterface;
 class ChangeUserCredentialCommand
 {
     public $userId;
-    public $context;
+    public $fields;
 
-    final public function __construct(UserIdInterface $userId, array $context)
+    final public function __construct(UserIdInterface $userId, array $fields)
     {
         $this->userId = $userId;
-        $this->context = $context;
+        $this->fields = $fields;
     }
 }

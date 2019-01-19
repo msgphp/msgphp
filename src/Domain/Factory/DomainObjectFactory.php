@@ -49,28 +49,21 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
     {
         $arguments = [];
 
-        foreach (ClassMethodResolver::resolve($class, $method) as $i => $argument) {
-            $given = true;
-            if (array_key_exists($name = $argument['name'], $context)) {
-                $value = $context[$name];
-            } elseif (array_key_exists($key = $argument['key'], $context)) {
-                $value = $context[$key];
-            } elseif (array_key_exists($i, $context)) {
-                $value = $context[$i];
-            } elseif (!$argument['required']) {
-                $value = $argument['default'];
+        foreach (ClassMethodResolver::resolve($class, $method) as $argument => $metadata) {
+            if (array_key_exists($argument, $context)) {
+                $given = true;
+                $value = $context[$argument];
+            } elseif (!$metadata['required']) {
                 $given = false;
+                $value = $metadata['default'];
             } else {
-                throw new \LogicException(sprintf('No value available for argument $%s in class method "%s::%s()".', $name, $class, $method));
+                throw new \LogicException(sprintf('No value available for argument $%s in class method "%s::%s()".', $argument, $class, $method));
             }
 
-            if ($given && isset($argument['type']) && (class_exists($argument['type']) || interface_exists($argument['type'], false)) && !\is_object($value)) {
-                try {
-                    $arguments[] = ($this->factory ?? $this)->create($argument['type'], (array) $value);
-
-                    continue;
-                } catch (InvalidClassException $e) {
-                }
+            $type = $metadata['type'];
+            if ($given && null !== $type && !\is_object($value) && (class_exists($type) || interface_exists($type, false))) {
+                $arguments[] = ($this->factory ?? $this)->create($metadata['type'], (array) $value);
+                continue;
             }
 
             $arguments[] = $value;

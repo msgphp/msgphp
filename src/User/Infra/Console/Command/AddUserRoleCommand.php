@@ -59,8 +59,10 @@ final class AddUserRoleCommand extends UserRoleCommand
         $user = $this->getUser($input, $this->io);
 
         try {
-            $role = $this->getRole($input, $this->io, $roleName);
+            $role = $this->getRole($input, $this->io);
         } catch (EntityNotFoundException $e) {
+            $roleName = $input->getArgument('role');
+
             if (!$input->isInteractive() || !$this->io->confirm(sprintf('Role "%s" does not exists. Create it now?', $roleName))) {
                 throw $e;
             }
@@ -75,14 +77,14 @@ final class AddUserRoleCommand extends UserRoleCommand
                 throw new \RuntimeException(sprintf('Cannot create role "%s". Something went wrong.', $roleName));
             }
 
-            $input->setArgument('role', $roleName);
-
             $role = $this->getRole($input, $this->io);
         }
 
-        $context = $this->contextFactory->getContext($input, $this->io, ['user' => $user, 'role' => $role]);
+        $userId = $user->getId();
+        $roleName = $role->getName();
+        $context = $this->contextFactory->getContext($input, $this->io, compact('user', 'role'));
 
-        $this->dispatch(AddUserRoleDomainCommand::class, [$user->getId(), $role->getName(), $context]);
+        $this->dispatch(AddUserRoleDomainCommand::class, compact('userId', 'roleName', 'context'));
 
         return 0;
     }

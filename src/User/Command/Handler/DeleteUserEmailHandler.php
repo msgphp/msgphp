@@ -36,6 +36,6 @@ final class DeleteUserEmailHandler
         }
 
         $this->repository->delete($userEmail);
-        $this->dispatch(UserEmailDeletedEvent::class, [$userEmail]);
+        $this->dispatch(UserEmailDeletedEvent::class, compact('userEmail'));
     }
 }

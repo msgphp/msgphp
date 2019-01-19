@@ -34,7 +34,7 @@ final class DisableUserHandler
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserDisabledEvent::class, [$user]);
+            $this->dispatch(UserDisabledEvent::class, compact('user'));
         });
     }
 

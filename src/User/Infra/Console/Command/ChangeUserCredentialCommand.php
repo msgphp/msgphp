@@ -70,20 +70,20 @@ final class ChangeUserCredentialCommand extends UserCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $user = $this->getUser($input, $this->io);
-        $context = $this->contextFactory->getContext($input, $this->io);
+        $userId = $this->getUser($input, $this->io)->getId();
+        $fields = $this->contextFactory->getContext($input, $this->io);
 
-        if (!$context) {
+        if (!$fields) {
             $field = $this->io->choice('Select a field to change', $this->fields);
 
             return $this->run(new ArrayInput([
                 '--'.$field => null,
                 '--by-id' => true,
-                'user' => $user->getId()->toString(),
+                'user' => $userId->toString(),
             ]), $output);
         }
 
-        $this->dispatch(ChangeUserCredentialDomainCommand::class, [$user->getId(), $context]);
+        $this->dispatch(ChangeUserCredentialDomainCommand::class, compact('userId', 'fields'));
 
         return 0;
     }

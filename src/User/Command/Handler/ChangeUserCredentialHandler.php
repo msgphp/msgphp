@@ -38,14 +38,18 @@ final class ChangeUserCredentialHandler
         $oldCredential = $handler->getCredential();
 
         $this->handle($command, function (User $user) use ($oldCredential): void {
+            $newCredential = $user->getCredential();
+
             $this->repository->save($user);
-            $this->dispatch(UserCredentialChangedEvent::class, [$user, $oldCredential, $user->getCredential()]);
+            $this->dispatch(UserCredentialChangedEvent::class, compact('user', 'oldCredential', 'newCredential'));
         });
     }
 
     protected function getDomainEvent(ChangeUserCredentialCommand $command): DomainEventInterface
     {
-        return $this->factory->create(ChangeCredentialEvent::class, [$command->context]);
+        $fields = $command->fields;
+
+        return $this->factory->create(ChangeCredentialEvent::class, compact('fields'));
     }
 
     protected function getDomainEventHandler(ChangeUserCredentialCommand $command): DomainEventHandlerInterface

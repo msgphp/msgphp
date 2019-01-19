@@ -32,6 +32,6 @@ final class CreateUserHandler
         $user = $this->factory->create(User::class, $command->context + ['id' => $this->factory->nextIdentifier(User::class)]);
 
         $this->repository->save($user);
-        $this->dispatch(UserCreatedEvent::class, [$user]);
+        $this->dispatch(UserCreatedEvent::class, compact('user'));
     }
 }

@@ -35,6 +35,6 @@ final class AddUserEmailHandler
         ] + $command->context);
 
         $this->repository->save($userEmail);
-        $this->dispatch(UserEmailAddedEvent::class, [$userEmail]);
+        $this->dispatch(UserEmailAddedEvent::class, compact('userEmail'));
     }
 }

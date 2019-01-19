@@ -36,6 +36,6 @@ final class DeleteRoleHandler
         }
 
         $this->repository->delete($role);
-        $this->dispatch(RoleDeletedEvent::class, [$role]);
+        $this->dispatch(RoleDeletedEvent::class, compact('role'));
     }
 }

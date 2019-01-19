@@ -36,6 +36,6 @@ final class DeleteUserAttributeValueHandler
         }
 
         $this->repository->delete($userAttributeValue);
-        $this->dispatch(UserAttributeValueDeletedEvent::class, [$userAttributeValue]);
+        $this->dispatch(UserAttributeValueDeletedEvent::class, compact('userAttributeValue'));
     }
 }
