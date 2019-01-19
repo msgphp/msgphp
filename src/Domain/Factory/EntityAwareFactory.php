@@ -76,15 +76,4 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
         return $object;
     }
-
-    public function nextIdentifier(string $class): DomainIdInterface
-    {
-        $object = $this->factory->create($class);
-
-        if (!$object instanceof DomainIdInterface) {
-            throw InvalidClassException::create($class);
-        }
-
-        return $object;
-    }
 }

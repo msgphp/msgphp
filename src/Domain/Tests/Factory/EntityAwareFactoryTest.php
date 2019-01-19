@@ -139,18 +139,6 @@ final class EntityAwareFactoryTest extends TestCase
 
         $this->factory->identify('foo', '1');
     }
-
-    public function testNextIdentifier(): void
-    {
-        self::assertSame('new', $this->factory->nextIdentifier('id')->toString());
-    }
-
-    public function testNextIdentifierWithUnknownClass(): void
-    {
-        $this->expectException(InvalidClassException::class);
-
-        $this->factory->nextIdentifier('foo');
-    }
 }
 
 class TestReferencedEntity

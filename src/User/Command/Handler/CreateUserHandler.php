@@ -10,6 +10,7 @@ use MsgPhp\User\Command\CreateUserCommand;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserCreatedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\UserIdInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -29,7 +30,9 @@ final class CreateUserHandler
 
     public function __invoke(CreateUserCommand $command): void
     {
-        $user = $this->factory->create(User::class, $command->context + ['id' => $this->factory->nextIdentifier(User::class)]);
+        $context = $command->context;
+        $context['id'] = $context['id'] ?? $this->factory->create(UserIdInterface::class);
+        $user = $this->factory->create(User::class, $context);
 
         $this->repository->save($user);
         $this->dispatch(UserCreatedEvent::class, compact('user'));

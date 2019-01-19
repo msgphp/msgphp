@@ -22,13 +22,6 @@ Returns a factorized reference object of type `$class` for an entity known to ex
 
 Returns a factorized [domain identifier](../identifiers.md) for the given entity class from a known primitive value.
 
----
-
-### `nextIdentifier(string $class): DomainIdInterface`
-
-Returns the next [domain identifier](../identifiers.md) for the given entity class. Depending on the implementation its
-value might be considered empty if it's not capable to calculate one upfront.
-
 ## Implementations
 
 ### `MsgPhp\Domain\Factory\EntityAwareFactory`
@@ -74,9 +67,6 @@ $ref = $factory->reference(MyEntity::class, new DomainId('1'));
 
 /** @var DomainId $id */
 $id = $factory->identify(DomainId::class, 1);
-
-/** @var DomainId $id */
-$id = $factory->nextIdentifier(DomainId::class);
 ```
 
 !!! note

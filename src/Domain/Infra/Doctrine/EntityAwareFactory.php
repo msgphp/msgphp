@@ -60,11 +60,6 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
         return $this->factory->identify($class, $value);
     }
 
-    public function nextIdentifier(string $class): DomainIdInterface
-    {
-        return $this->factory->nextIdentifier($class);
-    }
-
     private function resolveDiscriminatorClass(string $class, array &$context, bool $clear = false): string
     {
         $class = $this->factory->getClass($class, $context);

@@ -128,17 +128,4 @@ final class EntityAwareFactoryTest extends TestCase
 
         self::assertSame($obj, $factory->identify('foo', 1));
     }
-
-    public function testNextIdentifier(): void
-    {
-        $innerFactory = $this->createMock(EntityAwareFactoryInterface::class);
-        $innerFactory->expects(self::once())
-            ->method('nextIdentifier')
-            ->with('foo')
-            ->willReturn($obj = $this->createMock(DomainIdInterface::class))
-        ;
-        $factory = new EntityAwareFactory($innerFactory, self::$em);
-
-        self::assertSame($obj, $factory->nextIdentifier('foo'));
-    }
 }
