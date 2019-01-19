@@ -30,7 +30,7 @@ final class AddUserEmailHandler
     public function __invoke(AddUserEmailCommand $command): void
     {
         $userEmail = $this->factory->create(UserEmail::class, [
-            'user' => $this->factory->reference(User::class, $command->userId),
+            'user' => $this->factory->reference(User::class, ['id' => $command->userId]),
             'email' => $command->email,
         ] + $command->context);
 

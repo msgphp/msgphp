@@ -20,10 +20,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
-    public const AGGREGATE_ROOTS = [
-        Entity\Attribute::class => AttributeIdInterface::class,
-        Entity\AttributeValue::class => AttributeValueIdInterface::class,
-    ];
     public const IDENTITY_MAPPING = [
         Entity\Attribute::class => ['id'],
         Entity\AttributeValue::class => ['id'],

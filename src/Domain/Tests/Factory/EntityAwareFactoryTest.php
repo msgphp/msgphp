@@ -61,7 +61,7 @@ final class EntityAwareFactoryTest extends TestCase
             ->willReturn(['id_field', 'id_field2'])
         ;
 
-        $this->factory = new EntityAwareFactory($innerFactory, new DomainIdentityHelper($identityMapping), ['alias_id' => 'id']);
+        $this->factory = new EntityAwareFactory($innerFactory, new DomainIdentityHelper($identityMapping));
     }
 
     public function testCreate(): void
@@ -104,39 +104,33 @@ final class EntityAwareFactoryTest extends TestCase
     public function testIdentify(): void
     {
         self::assertSame('1', $this->factory->identify('id', '1')->toString());
-        self::assertSame('1', $this->factory->identify('alias_id', '1')->toString());
 
         $id = $this->createMock(DomainIdInterface::class);
-        $id->expects(self::exactly(4))
+        $id->expects(self::exactly(2))
             ->method('isEmpty')
             ->willReturn(false)
         ;
-        $id->expects(self::exactly(4))
+        $id->expects(self::exactly(2))
             ->method('toString')
             ->willReturn('2')
         ;
 
         self::assertNotSame($id, $this->factory->identify('id', $id));
-        self::assertNotSame($id, $this->factory->identify('alias_id', $id));
         self::assertSame('2', $this->factory->identify('id', $id)->toString());
-        self::assertSame('2', $this->factory->identify('alias_id', $id)->toString());
     }
 
     public function testIdentifyEmpty(): void
     {
         self::assertSame('new', $this->factory->identify('id', null)->toString());
-        self::assertSame('new', $this->factory->identify('alias_id', null)->toString());
 
         $id = $this->createMock(DomainIdInterface::class);
-        $id->expects(self::exactly(4))
+        $id->expects(self::exactly(2))
             ->method('isEmpty')
             ->willReturn(true)
         ;
 
         self::assertNotSame($id, $this->factory->identify('id', $id));
-        self::assertNotSame($id, $this->factory->identify('alias_id', $id));
         self::assertSame('new', $this->factory->identify('id', $id)->toString());
-        self::assertSame('new', $this->factory->identify('alias_id', $id)->toString());
     }
 
     public function testIdentifyWithUnknownClass(): void
@@ -149,7 +143,6 @@ final class EntityAwareFactoryTest extends TestCase
     public function testNextIdentifier(): void
     {
         self::assertSame('new', $this->factory->nextIdentifier('id')->toString());
-        self::assertSame('new', $this->factory->nextIdentifier('alias_id')->toString());
     }
 
     public function testNextIdentifierWithUnknownClass(): void

@@ -19,13 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class ExtensionHelper
 {
-    public static function configureDomain(ContainerBuilder $container, array $classMapping, array $idClassMapping, array $identityMapping): void
+    public static function configureDomain(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
-        foreach ($idClassMapping as $class => $idClass) {
-            if (isset($classMapping[$class]) && !isset($idClassMapping[$classMapping[$class]])) {
-                $idClassMapping[$classMapping[$class]] = $idClass;
-            }
-        }
         foreach ($identityMapping as $class => $mapping) {
             if (isset($classMapping[$class]) && !isset($identityMapping[$classMapping[$class]])) {
                 $identityMapping[$classMapping[$class]] = $mapping;
@@ -33,7 +28,6 @@ final class ExtensionHelper
         }
 
         $container->setParameter($param = 'msgphp.domain.class_mapping', $container->hasParameter($param) ? $classMapping + $container->getParameter($param) : $classMapping);
-        $container->setParameter($param = 'msgphp.domain.id_class_mapping', $container->hasParameter($param) ? $idClassMapping + $container->getParameter($param) : $idClassMapping);
         $container->setParameter($param = 'msgphp.domain.identity_mapping', $container->hasParameter($param) ? $identityMapping + $container->getParameter($param) : $identityMapping);
     }
 

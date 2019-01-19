@@ -16,13 +16,11 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 {
     private $factory;
     private $identityHelper;
-    private $identifierMapping;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainIdentityHelper $identityHelper, array $identifierMapping = [])
+    public function __construct(DomainObjectFactoryInterface $factory, DomainIdentityHelper $identityHelper)
     {
         $this->factory = $factory;
         $this->identityHelper = $identityHelper;
-        $this->identifierMapping = $identifierMapping;
     }
 
     public function create(string $class, array $context = [])
@@ -70,7 +68,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
             $value = $value->isEmpty() ? null : $value->toString();
         }
 
-        $object = $this->factory->create($this->identifierMapping[$class] ?? $class, [$value]);
+        $object = $this->factory->create($class, [$value]);
 
         if (!$object instanceof DomainIdInterface) {
             throw InvalidClassException::create($class);
@@ -81,7 +79,7 @@ final class EntityAwareFactory implements EntityAwareFactoryInterface
 
     public function nextIdentifier(string $class): DomainIdInterface
     {
-        $object = $this->factory->create($this->identifierMapping[$class] ?? $class);
+        $object = $this->factory->create($class);
 
         if (!$object instanceof DomainIdInterface) {
             throw InvalidClassException::create($class);

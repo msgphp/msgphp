@@ -103,7 +103,6 @@ final class BundleHelper
             ->setPublic(false)
             ->setDecoratedService(DomainObjectFactory::class)
             ->setArgument('$factory', new Reference(EntityAwareFactory::class.'.inner'))
-            ->setArgument('$identifierMapping', '%msgphp.domain.id_class_mapping%')
         ;
 
         $container->setAlias(EntityAwareFactoryInterface::class, new Alias(DomainObjectFactoryInterface::class, false));

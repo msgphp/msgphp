@@ -38,7 +38,6 @@ A generic entity factory.
 - `__construct(DomainObjectFactoryInterface $factory, DomainIdentityHelper $identityHelper, array $identifierMapping = [])`
     - `$factory`: The decorated [object factory](object.md)
     - `$identityHelper`: The [identity helper](../identity-helper.md)
-    - `$identifierMapping`: The identifier class mapping (`['EntityType' => 'IdType']`)
 
 #### Basic example
 
@@ -65,10 +64,7 @@ $factory = new EntityAwareFactory(
     new DomainObjectFactory(),
     new DomainIdentityHelper(new DomainIdentityMapping([
         MyEntity::class => 'id',
-    ])),
-    [
-        MyEntity::class => DomainId::class,
-    ]
+    ]))
 );
 
 // --- USAGE ---
@@ -77,10 +73,10 @@ $factory = new EntityAwareFactory(
 $ref = $factory->reference(MyEntity::class, new DomainId('1'));
 
 /** @var DomainId $id */
-$id = $factory->identify(MyEntity::class, 1);
+$id = $factory->identify(DomainId::class, 1);
 
 /** @var DomainId $id */
-$id = $factory->nextIdentifier(MyEntity::class);
+$id = $factory->nextIdentifier(DomainId::class);
 ```
 
 !!! note
