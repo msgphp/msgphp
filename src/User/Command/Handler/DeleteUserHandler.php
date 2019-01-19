@@ -8,7 +8,6 @@ use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\DeleteUserCommand;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserDeletedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 
@@ -31,7 +30,7 @@ final class DeleteUserHandler
     public function __invoke(DeleteUserCommand $command): void
     {
         try {
-            $user = $this->repository->find($this->factory->identify(User::class, $command->userId));
+            $user = $this->repository->find($command->userId);
         } catch (EntityNotFoundException $e) {
             return;
         }

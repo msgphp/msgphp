@@ -50,6 +50,6 @@ final class ChangeUserCredentialHandler
 
     protected function getDomainEventHandler(ChangeUserCredentialCommand $command): DomainEventHandlerInterface
     {
-        return $this->repository->find($this->factory->identify(User::class, $command->userId));
+        return $this->repository->find($command->userId);
     }
 }
