@@ -62,7 +62,7 @@ final class DomainIdTest extends TestCase
     {
         $id = new DomainId(Uuid::fromString('00000000-0000-0000-0000-000000000000'));
 
-        self::assertEquals($id->toString(), (string) unserialize(serialize($id)));
+        self::assertSame($id->toString(), (string) unserialize(serialize($id)));
     }
 
     public function testJsonSerialize(): void

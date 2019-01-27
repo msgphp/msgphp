@@ -37,11 +37,11 @@ trait AbstractCredential
                 throw new \LogicException(sprintf('Unable to handle event "%s", method "%s::get/is/has%s()" nor property "$%s" does not exists.', \get_class($event), \get_class($this), $ucField, $field));
             }
 
-            if ($value !== ($readIsProp ? $this->$field : $this->$readMethod())) {
+            if ($value !== ($readIsProp ? $this->{$field} : $this->{$readMethod}())) {
                 if ($writeIsProp) {
-                    $this->$field = $value;
+                    $this->{$field} = $value;
                 } else {
-                    $this->$writeMethod($value);
+                    $this->{$writeMethod}($value);
                 }
 
                 $handled = true;

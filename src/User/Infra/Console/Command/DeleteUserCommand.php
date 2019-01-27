@@ -39,16 +39,17 @@ final class DeleteUserCommand extends UserCommand
     {
         $this->io = new SymfonyStyle($input, $output);
         $user = $this->getUser($input, $this->io);
+        $userId = $user->getId();
 
         if ($input->isInteractive()) {
-            $this->io->note('Deleting user '.$user->getCredential()->getUsername());
+            $this->io->note('Deleting user '.$user->getCredential()->getUsername().' with ID '.$userId->toString());
 
             if (!$this->io->confirm('Are you sure?')) {
                 return 0;
             }
         }
 
-        $this->dispatch(DeleteUserDomainCommand::class, [$user->getId()]);
+        $this->dispatch(DeleteUserDomainCommand::class, compact('userId'));
 
         return 0;
     }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity\Fields;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface};
 use MsgPhp\User\Entity\UserEmail;
 
 /**
@@ -21,6 +20,6 @@ trait EmailsField
      */
     public function getEmails(): DomainCollectionInterface
     {
-        return $this->emails instanceof DomainCollectionInterface ? $this->emails : DomainCollectionFactory::create($this->emails);
+        return new DomainCollection($this->emails);
     }
 }

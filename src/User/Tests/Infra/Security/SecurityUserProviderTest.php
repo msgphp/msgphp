@@ -50,7 +50,8 @@ final class SecurityUserProviderTest extends TestCase
         $roleProvider = $this->createMock(RoleProviderInterface::class);
         $roleProvider->expects(self::any())
             ->method('getRoles')
-            ->willReturn(['ROLE_FOO']);
+            ->willReturn(['ROLE_FOO'])
+        ;
 
         /** @var SecurityUser $user */
         $user = (new SecurityUserProvider($this->createRepository($entity = $this->createUser()), $roleProvider))->loadUserByUsername('username');
@@ -130,7 +131,8 @@ final class SecurityUserProviderTest extends TestCase
         $roleProvider = $this->createMock(RoleProviderInterface::class);
         $roleProvider->expects(self::once())
             ->method('getRoles')
-            ->willReturn(['ROLE_FOO']);
+            ->willReturn(['ROLE_FOO'])
+        ;
 
         $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $roleProvider);
         $securityUser = $provider->fromUser($user = $this->createUser());
@@ -162,7 +164,8 @@ final class SecurityUserProviderTest extends TestCase
                 }
 
                 return $user;
-            });
+            })
+        ;
         $repository->expects(self::any())
             ->method('findByUsername')
             ->willReturnCallback(function (string $username) use ($user, $originUsername) {
@@ -171,7 +174,8 @@ final class SecurityUserProviderTest extends TestCase
                 }
 
                 return $user;
-            });
+            })
+        ;
 
         return $repository;
     }
@@ -182,17 +186,21 @@ final class SecurityUserProviderTest extends TestCase
 
         $user->expects(self::any())
             ->method('getId')
-            ->willReturn($userId = $this->createMock(UserIdInterface::class));
+            ->willReturn($userId = $this->createMock(UserIdInterface::class))
+        ;
         $userId->expects(self::any())
             ->method('toString')
-            ->willReturn($id);
+            ->willReturn($id)
+        ;
 
         $user->expects(self::any())
             ->method('getCredential')
-            ->willReturn($credential = $this->createMock(CredentialInterface::class));
+            ->willReturn($credential = $this->createMock(CredentialInterface::class))
+        ;
         $credential->expects(self::any())
             ->method('getUsername')
-            ->willReturn($username);
+            ->willReturn($username)
+        ;
 
         return $user;
     }

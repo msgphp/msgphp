@@ -16,7 +16,8 @@ final class UserAttributeValueTest extends TestCase
         $attributeValue = $this->createMock(AttributeValue::class);
         $attributeValue->expects(self::once())
             ->method('getId')
-            ->willReturn($id = $this->createMock(AttributeValueIdInterface::class));
+            ->willReturn($id = $this->createMock(AttributeValueIdInterface::class))
+        ;
         $userAttributeValue = $this->createEntity($user = $this->createMock(User::class), $attributeValue);
 
         self::assertSame($user, $userAttributeValue->getUser());

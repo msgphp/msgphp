@@ -19,9 +19,12 @@ final class AttributeValuesFieldTest extends TestCase
 
         $object = $this->getObject($attributeValues = $this->createMock(DomainCollectionInterface::class));
 
-        self::assertSame($attributeValues, $object->getAttributeValues());
+        self::assertNotSame($attributeValues, $object->getAttributeValues());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

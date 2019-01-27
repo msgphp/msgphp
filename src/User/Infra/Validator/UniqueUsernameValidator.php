@@ -36,7 +36,8 @@ final class UniqueUsernameValidator extends ConstraintValidator
                 ->setParameter('{{ value }}', $value)
                 ->setInvalidValue($value)
                 ->setCode(UniqueUsername::IS_NOT_UNIQUE_ERROR)
-                ->addViolation();
+                ->addViolation()
+            ;
         }
     }
 }

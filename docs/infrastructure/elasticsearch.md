@@ -15,7 +15,7 @@ It works directly with any [`Client`][api-client] and a known configuration of t
     - `$mappings` / `$settings`: Index management information. [Read more][index management].
     - `$logger`: An optional [PSR logger]
 
-### Basic example
+### Basic Example
 
 ```php
 <?php
@@ -53,7 +53,7 @@ $typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
 ]);
 ```
 
-### Advanced mapping example
+### Advanced Mapping Example
 
 ```php
 <?php
@@ -100,7 +100,7 @@ It works directly with any [`Client`][api-client].
     - `$client`: The Client to work with
     - `$index`: The index to use
 
-### Basic example
+### Basic Example
 
 ```php
 <?php

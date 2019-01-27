@@ -6,6 +6,8 @@ namespace MsgPhp\Domain\Factory;
 
 use MsgPhp\Domain\{DomainIdInterface, DomainCollectionInterface};
 use MsgPhp\Domain\Exception\InvalidClassException;
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Symfony\Component\VarExporter\Instantiator;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -40,6 +42,28 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
         return new $class(...$this->resolveArguments($class, '__construct', $context));
     }
 
+    public function reference(string $class, array $context = [])
+    {
+        if (!class_exists(Instantiator::class)) {
+            throw new \LogicException(sprintf('Method "%s()" requires "symfony/var-exporter".', __METHOD__));
+        }
+
+        $class = $this->getClass($class, $context);
+        $properties = [];
+        foreach ($context as $key => $value) {
+            if (property_exists($class, $key)) {
+                $properties[$key] = $value;
+                continue;
+            }
+        }
+
+        try {
+            return Instantiator::instantiate($class, $properties);
+        } catch (ClassNotFoundException $e) {
+            throw InvalidClassException::create($class);
+        }
+    }
+
     public function getClass(string $class, array $context = []): string
     {
         return $this->classMapping[$class] ?? $class;
@@ -49,28 +73,21 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
     {
         $arguments = [];
 
-        foreach (ClassMethodResolver::resolve($class, $method) as $i => $argument) {
-            $given = true;
-            if (array_key_exists($name = $argument['name'], $context)) {
-                $value = $context[$name];
-            } elseif (array_key_exists($key = $argument['key'], $context)) {
-                $value = $context[$key];
-            } elseif (array_key_exists($i, $context)) {
-                $value = $context[$i];
-            } elseif (!$argument['required']) {
-                $value = $argument['default'];
+        foreach (ClassMethodResolver::resolve($class, $method) as $argument => $metadata) {
+            if (array_key_exists($argument, $context)) {
+                $given = true;
+                $value = $context[$argument];
+            } elseif (!$metadata['required']) {
                 $given = false;
+                $value = $metadata['default'];
             } else {
-                throw new \LogicException(sprintf('No value available for argument $%s in class method "%s::%s()".', $name, $class, $method));
+                throw new \LogicException(sprintf('No value available for argument $%s in class method "%s::%s()".', $argument, $class, $method));
             }
 
-            if ($given && isset($argument['type']) && (interface_exists($argument['type']) || class_exists($argument['type'])) && !\is_object($value)) {
-                try {
-                    $arguments[] = ($this->factory ?? $this)->create($argument['type'], (array) $value);
-
-                    continue;
-                } catch (InvalidClassException $e) {
-                }
+            $type = $metadata['type'];
+            if ($given && null !== $type && !\is_object($value) && (class_exists($type) || interface_exists($type, false))) {
+                $arguments[] = ($this->factory ?? $this)->create($metadata['type'], (array) $value);
+                continue;
             }
 
             $arguments[] = $value;

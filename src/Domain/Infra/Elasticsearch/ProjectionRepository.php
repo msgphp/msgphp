@@ -46,7 +46,7 @@ final class ProjectionRepository implements ProjectionRepositoryInterface
         $count = \count($documents);
         $totalCount = $result['hits']['total'] ?? $count;
 
-        return new PaginatedDomainCollection((function () use ($documents) {
+        return new PaginatedDomainCollection((function () use ($documents): iterable {
             foreach ($documents as $document) {
                 yield $this->createDocument($document);
             }

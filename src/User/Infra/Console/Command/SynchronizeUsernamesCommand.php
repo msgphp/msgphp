@@ -32,7 +32,8 @@ final class SynchronizeUsernamesCommand extends Command
     {
         $this
             ->setDescription('Synchronize usernames')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Perform a dry run');
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Perform a dry run')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

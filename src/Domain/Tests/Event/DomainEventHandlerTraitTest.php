@@ -21,7 +21,8 @@ final class DomainEventHandlerTraitTest extends TestCase
 
         $event = $this->getMockBuilder(DomainEventInterface::class)
             ->setMockClassName('MsgPhp_Test_Root_Event')
-            ->getMock();
+            ->getMock()
+        ;
         self::assertFalse($object->handleEvent($event));
     }
 
@@ -34,7 +35,7 @@ final class DomainEventHandlerTraitTest extends TestCase
         $object->handleEvent($this->createMock(DomainEventInterface::class));
     }
 
-    private function getObject()
+    private function getObject(): DomainEventHandlerInterface
     {
         return new class() implements DomainEventHandlerInterface {
             use DomainEventHandlerTrait;

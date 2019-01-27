@@ -22,6 +22,6 @@ trait DomainEventHandlerTrait
             throw UnexpectedDomainEventException::createForHandler($this, $event);
         }
 
-        return $this->$method($event);
+        return $this->{$method}($event);
     }
 }

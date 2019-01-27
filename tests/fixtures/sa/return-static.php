@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use MsgPhp\Domain\{DomainId, DomainIdInterface};
 
 interface SomeIdInterface extends DomainIdInterface
@@ -8,14 +10,13 @@ interface SomeIdInterface extends DomainIdInterface
 
 class SomeId extends DomainId implements SomeIdInterface
 {
-    public function autocomplete()
+    public function autocomplete(): void
     {
     }
 }
 
-
 $test = new class() {
-    public function accept(SomeIdInterface $id)
+    public function accept(SomeIdInterface $id): void
     {
     }
 };

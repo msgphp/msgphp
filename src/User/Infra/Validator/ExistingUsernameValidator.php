@@ -36,7 +36,8 @@ final class ExistingUsernameValidator extends ConstraintValidator
                 ->setParameter('{{ value }}', $value)
                 ->setInvalidValue($value)
                 ->setCode(ExistingUsername::DOES_NOT_EXIST_ERROR)
-                ->addViolation();
+                ->addViolation()
+            ;
         }
     }
 }

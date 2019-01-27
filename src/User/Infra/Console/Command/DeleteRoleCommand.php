@@ -38,17 +38,17 @@ final class DeleteRoleCommand extends RoleCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $role = $this->getRole($input, $this->io);
+        $roleName = $this->getRole($input, $this->io)->getName();
 
         if ($input->isInteractive()) {
-            $this->io->note('Deleting role '.$role->getName());
+            $this->io->note('Deleting role '.$roleName);
 
             if (!$this->io->confirm('Are you sure?')) {
                 return 0;
             }
         }
 
-        $this->dispatch(DeleteRoleDomainCommand::class, [$role->getName()]);
+        $this->dispatch(DeleteRoleDomainCommand::class, compact('roleName'));
 
         return 0;
     }

@@ -18,9 +18,9 @@ abstract class BaseTestEntity
 
         foreach ($fields as $field => $value) {
             if (method_exists($entity, $method = 'set'.ucfirst($field))) {
-                $entity->$method($value);
+                $entity->{$method}($value);
             } else {
-                $entity->$field = $value;
+                $entity->{$field} = $value;
             }
         }
 
@@ -32,7 +32,7 @@ abstract class BaseTestEntity
         $ids = $primitives = [];
 
         foreach ($entity::getIdFields() as $field) {
-            $ids[$field] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->$method() : $entity->$field;
+            $ids[$field] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->{$method}() : $entity->{$field};
 
             if ($id instanceof DomainIdInterface) {
                 $primitives[$field] = $id->isEmpty() ? null : $id->toString();

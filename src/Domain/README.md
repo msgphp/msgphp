@@ -1,12 +1,8 @@
-# Base Domain Layer
+# Domain
 
-A base domain layer to rapidly built other domain layers.
+A dependency-free package to help building a business domain layer.
 
 [![Latest Stable Version](https://poser.pugx.org/msgphp/domain/v/stable)](https://packagist.org/packages/msgphp/domain)
-
-This package is part of the _Message driven PHP_ project.
-
-> [MsgPHP](https://msgphp.github.io/) is a project that aims to provide (common) message based domain layers for your application. It has a low development time overhead and avoids being overly opinionated.
 
 ## Installation
 
@@ -16,7 +12,9 @@ composer require msgphp/domain
 
 ## Documentation
 
-- Read the [main documentation](https://msgphp.github.io/docs/)
+- [Domain-Driven-Design](https://msgphp.github.io/docs/ddd/identifiers/)
+- [Event Sourcing](https://msgphp.github.io/docs/event-sourcing/event-handlers/)
+- [Message Driven](https://msgphp.github.io/docs/message-driven/message-bus/)
 - Browse the [API documentation](https://msgphp.github.io/api/MsgPhp/Domain.html)
 - Try the Symfony [demo application](https://github.com/msgphp/symfony-demo-app)
 - Get support on [Symfony's Slack `#msgphp` channel](https://symfony.com/slack-invite) or [raise an issue](https://github.com/msgphp/msgphp/issues/new)

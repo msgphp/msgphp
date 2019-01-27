@@ -59,7 +59,7 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
         $this->io = new SymfonyStyle($input, $output);
         $context = $this->contextFactory->getContext($input, $this->io);
 
-        $this->dispatch(CreateUserDomainCommand::class, [$context]);
+        $this->dispatch(CreateUserDomainCommand::class, compact('context'));
 
         return 0;
     }

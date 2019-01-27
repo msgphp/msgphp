@@ -17,12 +17,14 @@ final class ChainRoleProviderTest extends TestCase
         $first->expects(self::once())
             ->method('getRoles')
             ->with($user)
-            ->willReturn(['ROLE_USER', 'ROLE_ADMIN']);
+            ->willReturn(['ROLE_USER', 'ROLE_ADMIN'])
+        ;
         $second = $this->createMock(RoleProviderInterface::class);
         $second->expects(self::once())
             ->method('getRoles')
             ->with($user)
-            ->willReturn(['ROLE_ADMIN', 'foo' => 'super admin']);
+            ->willReturn(['ROLE_ADMIN', 'foo' => 'super admin'])
+        ;
 
         self::assertSame(['ROLE_USER', 'ROLE_ADMIN', 'super admin'], (new ChainRoleProvider([$first, $second]))->getRoles($user));
     }

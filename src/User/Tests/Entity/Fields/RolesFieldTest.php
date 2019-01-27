@@ -17,9 +17,12 @@ final class RolesFieldTest extends TestCase
 
         self::assertInstanceOf(DomainCollectionInterface::class, $collection = $object->getRoles());
         self::assertSame($roles, iterator_to_array($collection));
-        self::assertSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getRoles());
+        self::assertNotSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getRoles());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

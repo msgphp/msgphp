@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity\Fields;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface};
 use MsgPhp\Eav\Entity\Fields\AttributesField;
 use MsgPhp\User\Entity\UserAttributeValue;
 
@@ -24,6 +23,6 @@ trait AttributeValuesField
      */
     public function getAttributeValues(): DomainCollectionInterface
     {
-        return $this->attributeValues instanceof DomainCollectionInterface ? $this->attributeValues : DomainCollectionFactory::create($this->attributeValues);
+        return new DomainCollection($this->attributeValues);
     }
 }

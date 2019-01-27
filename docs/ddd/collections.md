@@ -117,12 +117,7 @@ Get the total no. of items in the full result set.
 
 ### `MsgPhp\Domain\DomainCollection`
 
-A first class citizen domain collection. It leverages `iterable` as underlying data type. Lazy support is built-in for
-type `\Traversable`. Meaning the minimal no. of elements are traversed, i.e. until the first element in case of
-`isEmpty()`. Note type `\Generator` can only start traversing once.
-
-- `__construct(iterable $elements)`
-    - `$elements`: The elements this collection contains
+A first class citizen domain collection.
 
 #### Basic Example
 
@@ -167,9 +162,6 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
 ### `MsgPhp\Domain\PaginatedDomainCollection`
 
 A first class citizen paginated domain collection to transform any collection into a paginated collection.
-
-- `__construct(iterable $elements, float $offset = .0, float $limit = .0, float $count = null, float $totalCount = null)`
-    - `$elements`: The elements this collection contains
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainCollection`
 

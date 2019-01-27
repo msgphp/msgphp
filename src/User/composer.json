@@ -1,22 +1,21 @@
 {
     "name": "msgphp/user",
     "type": "library",
-    "license": "MIT",
     "description": "A domain layer providing basic user management",
-    "keywords": ["ddd", "domain-driven-design", "rich domain model", "user", "security"],
+    "keywords": [
+        "ddd",
+        "domain-driven-design",
+        "rich domain model",
+        "user",
+        "security"
+    ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Roland Franssen",
             "email": "franssen.roland@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-            "MsgPhp\\User\\": ""
-        },
-        "exclude-from-classmap": ["/Tests/"]
-    },
     "require": {
         "msgphp/domain": "^0.8"
     },
@@ -24,12 +23,11 @@
         "doctrine/orm": "^2.6",
         "lexik/jwt-authentication-bundle": "^2.5",
         "sensio/framework-extra-bundle": "^5.1",
-        "symfony/console": "^3.4|^4.0",
-        "symfony/form": "^3.4|^4.0",
-        "symfony/http-kernel": "^3.4|^4.0",
-        "symfony/phpunit-bridge": "^3.4.9|^4.0.9",
-        "symfony/security-core": "^3.4|^4.0",
-        "symfony/validator": "^3.4|^4.0"
+        "symfony/console": "^3.4 || ^4.0",
+        "symfony/form": "^3.4 || ^4.0",
+        "symfony/http-kernel": "^3.4 || ^4.0",
+        "symfony/security-core": "^3.4 || ^4.0",
+        "symfony/validator": "^3.4 || ^4.0"
     },
     "suggest": {
         "ext-sodium": "To clear plain passwords from memory if applicable",
@@ -45,5 +43,14 @@
         "branch-alias": {
             "dev-master": "0.8-dev"
         }
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "MsgPhp\\User\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

@@ -11,9 +11,9 @@ $uses = [
 $cases = [];
 
 if (false !== strpos($credentialClass, 'Email')) {
-    $cases[] = <<<PHP
+    $cases[] = <<<'PHP'
             case 'email':
-                \$element->label = 'E-mail';
+                $element->label = 'E-mail';
                 break;
 PHP;
 }
@@ -21,13 +21,13 @@ PHP;
 $constructor = '{';
 if (false !== strpos($credentialClass, 'Password')) {
     $uses[] = 'use MsgPhp\User\Password\PasswordHashingInterface;';
-    $constructor = <<<PHP
+    $constructor = <<<'PHP'
 {
-    private \$passwordHashing;
+    private $passwordHashing;
 
-    public function __construct(PasswordHashingInterface \$passwordHashing)
+    public function __construct(PasswordHashingInterface $passwordHashing)
     {
-        \$this->passwordHashing = \$passwordHashing;
+        $this->passwordHashing = $passwordHashing;
     }
 
 PHP;
@@ -41,7 +41,8 @@ PHP;
                         })
                         ->normalizer(function (string \$value): string {
                             return \$this->passwordHashing->hash(\$value);
-                        });
+                        })
+                    ;
                 }
                 break;
 PHP;
@@ -68,7 +69,7 @@ final class ${class} implements ClassContextElementFactoryInterface
 ${constructor}
     public function getElement(string \$class, string \$method, string \$argument): ContextElement
     {
-        \$element = new ContextElement(ucfirst(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\\d])([A-Z])/'], ['\\\\1 \\\\2', '\\\\1 \\\\2'], \$argument)));${switch}
+        \$element = new ContextElement(ucfirst((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\\d])([A-Z])/'], ['\\\\1 \\\\2', '\\\\1 \\\\2'], \$argument)));${switch}
 
         return \$element;
     }

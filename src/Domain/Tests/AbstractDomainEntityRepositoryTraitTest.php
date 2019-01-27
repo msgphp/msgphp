@@ -137,6 +137,8 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
     /**
      * @dataProvider provideEntityFields
+     *
+     * @psalm-param class-string<Entities\BaseTestEntity> $class
      */
     public function testFindByFields(string $class, array $fields): void
     {
@@ -207,6 +209,8 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
     /**
      * @dataProvider provideEntityFields
+     *
+     * @psalm-param class-string<Entities\BaseTestEntity> $class
      */
     public function testExistsByFields(string $class, array $fields): void
     {
@@ -214,7 +218,8 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         self::assertFalse($repository->doExistsByFields($fields));
 
-        $this->loadEntities($entity = $class::create($fields));
+        $entity = $class::create($fields);
+        $this->loadEntities($entity);
 
         self::assertTrue($repository->doExistsByFields($fields));
     }
@@ -238,7 +243,9 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
 
         $this->loadEntities();
 
-        self::assertFalse($repository->doExistsByFields(['entity' => $entity]));
+        $this->expectException(\LogicException::class);
+
+        $repository->doExistsByFields(['entity' => $entity]);
     }
 
     /**
@@ -403,7 +410,7 @@ abstract class AbstractDomainEntityRepositoryTraitTest extends TestCase
         }
     }
 
-    protected function equalsEntity($expected, $actual)
+    protected function equalsEntity($expected, $actual): bool
     {
         return $expected == $actual;
     }

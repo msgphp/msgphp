@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventInterface};
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
 use MsgPhp\User\Command\RequestUserPasswordCommand;
 use MsgPhp\User\Entity\User;
@@ -23,7 +24,7 @@ final class RequestUserPasswordHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
@@ -34,17 +35,19 @@ final class RequestUserPasswordHandler
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserPasswordRequestedEvent::class, [$user]);
+            $this->dispatch(UserPasswordRequestedEvent::class, compact('user'));
         });
     }
 
-    protected function getDomainEvent(RequestUserPasswordCommand $command): RequestPasswordEvent
+    protected function getDomainEvent(RequestUserPasswordCommand $command): DomainEventInterface
     {
-        return $this->factory->create(RequestPasswordEvent::class, [$command->token]);
+        $token = $command->token;
+
+        return $this->factory->create(RequestPasswordEvent::class, compact('token'));
     }
 
-    protected function getDomainEventHandler(RequestUserPasswordCommand $command): User
+    protected function getDomainEventHandler(RequestUserPasswordCommand $command): DomainEventHandlerInterface
     {
-        return $this->repository->find($this->factory->identify(User::class, $command->userId));
+        return $this->repository->find($command->userId);
     }
 }

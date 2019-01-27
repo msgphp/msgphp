@@ -81,7 +81,8 @@ final class SecurityUserTest extends TestCase
         $other = $this->createMock(UserInterface::class);
         $other->expects(self::any())
             ->method('getUsername')
-            ->willReturn('id');
+            ->willReturn('id')
+        ;
 
         self::assertFalse((new SecurityUser($this->createUser('id')))->isEqualTo($other));
     }
@@ -106,21 +107,25 @@ final class SecurityUserTest extends TestCase
             $userId = $this->createMock(UserIdInterface::class);
             $userId->expects(self::any())
                 ->method('toString')
-                ->willReturn($id);
+                ->willReturn($id)
+            ;
             $userId->expects(self::any())
                 ->method('equals')
                 ->willReturnCallback(function (DomainIdInterface $other) use ($id) {
                     return $id === $other->toString();
-                });
+                })
+            ;
             $userId->expects(self::any())
                 ->method('isEmpty')
-                ->willReturn(null === $id);
+                ->willReturn(null === $id)
+            ;
         }
 
         $user = $this->createMock(User::class);
         $user->expects(self::any())
             ->method('getId')
-            ->willReturn($userId);
+            ->willReturn($userId)
+        ;
 
         if (null === $password) {
             $credential = $this->createMock(CredentialInterface::class);
@@ -128,19 +133,23 @@ final class SecurityUserTest extends TestCase
             $credential = $this->createMock([CredentialInterface::class, PasswordProtectedInterface::class]);
             $credential->expects(self::any())
                 ->method('getPassword')
-                ->willReturn($password);
+                ->willReturn($password)
+            ;
             $credential->expects(self::any())
                 ->method('getPasswordAlgorithm')
-                ->willReturn(null === $salt ? PasswordAlgorithm::create() : PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt)));
+                ->willReturn(null === $salt ? PasswordAlgorithm::create() : PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt)))
+            ;
         }
 
         $credential->expects(self::any())
             ->method('getUsername')
-            ->willReturn('username');
+            ->willReturn('username')
+        ;
 
         $user->expects(self::any())
             ->method('getCredential')
-            ->willReturn($credential);
+            ->willReturn($credential)
+        ;
 
         return $user;
     }

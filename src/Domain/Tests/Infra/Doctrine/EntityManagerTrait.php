@@ -27,7 +27,7 @@ trait EntityManagerTrait
 
         $config = new Configuration();
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), \dirname(__DIR__, 2).'/Fixtures/Entities'));
-        $config->setProxyDir(\sys_get_temp_dir().'/msgphp_'.md5(microtime()));
+        $config->setProxyDir(sys_get_temp_dir().'/msgphp_'.md5(microtime()));
         $config->setProxyNamespace(__NAMESPACE__);
 
         self::$em = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);

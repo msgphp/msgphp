@@ -6,7 +6,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilderHelper};
-use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
+use MsgPhp\Domain\Infra\DependencyInjection\{ConfigHelper, PackageMetadata};
 use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Command, Entity};
 use MsgPhp\Eav\Infra\{Doctrine as DoctrineInfra, Uuid as UuidInfra};
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -20,10 +20,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
-    public const AGGREGATE_ROOTS = [
-        Entity\Attribute::class => AttributeIdInterface::class,
-        Entity\AttributeValue::class => AttributeValueIdInterface::class,
-    ];
     public const IDENTITY_MAPPING = [
         Entity\Attribute::class => ['id'],
         Entity\AttributeValue::class => ['id'],
@@ -50,34 +46,24 @@ final class Configuration implements ConfigurationInterface
         ],
     ];
 
-    private static $packageDirs;
+    private static $packageMetadata;
 
-    /**
-     * @return string[]
-     */
-    public static function getPackageDirs(): array
+    public static function getPackageMetadata(): PackageMetadata
     {
-        if (null !== self::$packageDirs) {
-            return self::$packageDirs;
+        if (null !== self::$packageMetadata) {
+            return self::$packageMetadata;
         }
 
-        return self::$packageDirs = [
+        return self::$packageMetadata = new PackageMetadata(self::PACKAGE_NS, [
             \dirname((string) (new \ReflectionClass(AttributeIdInterface::class))->getFileName()),
-        ];
-    }
-
-    public static function getPackageGlob(): string
-    {
-        $dirs = self::getPackageDirs();
-
-        return isset($dirs[1]) ? '{'.implode(',', $dirs).'}' : $dirs[0];
+        ]);
     }
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
         /** @var NodeBuilder $children */
         $children = TreeBuilderHelper::root(Extension::ALIAS, $treeBuilder)->children();
-
+        /** @psalm-suppress PossiblyNullReference */
         $children
             ->classMappingNode('class_mapping')
                 ->requireClasses([Entity\Attribute::class, Entity\AttributeValue::class])
@@ -106,7 +92,8 @@ final class Configuration implements ConfigurationInterface
 
                 return $config;
             })
-        ->end();
+        ->end()
+        ;
 
         return $treeBuilder;
     }

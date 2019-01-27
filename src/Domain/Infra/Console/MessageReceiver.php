@@ -9,6 +9,8 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class MessageReceiver
 {

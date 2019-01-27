@@ -31,6 +31,6 @@ final class SaveProjectionDocumentHandler
         $document = new ProjectionDocument($command->type, $command->id, $command->body);
 
         $this->repository->save($document);
-        $this->dispatch(ProjectionDocumentSavedEvent::class, [$document]);
+        $this->dispatch(ProjectionDocumentSavedEvent::class, compact('document'));
     }
 }

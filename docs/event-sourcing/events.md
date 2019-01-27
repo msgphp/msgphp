@@ -3,19 +3,41 @@
 A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpose is to represent any action that can
  _happen_ regarding the domain. When handled it might lead to an application state change.
 
+## API
+
 !!! note
-    See the [reference](../reference/domain-events.md) page for all available events provided per domain
+    This is a marker interface and has no API
 
 ## Implementations
 
-### `MsgPhp\Domain\Event\ConfirmEvent`
+!!! note
+    See the [reference](../reference/domain-events.md#msgphpdomain) page for all available domain events
 
-Triggers a confirmation. Handled by default with `MsgPhp\Domain\Entity\Features\CanBeConfirmed::handleConfirmEvent()`.
+## Basic Example
 
-### `MsgPhp\Domain\Event\DisableEvent`
+```php
+<?php
 
-Triggers disabling availability. Handled by default with `MsgPhp\Domain\Entity\Features\CanBeEnabled::handleDisableEvent()`.
+use MsgPhp\Domain\Entity\Features\CanBeEnabled;
+use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait, EnableEvent};
 
-### `MsgPhp\Domain\Event\EnableEvent`
+// --- SETUP ---
 
-Triggers enabling availability. Handled by default with `MsgPhp\Domain\Entity\Features\CanBeEnabled::handleEnableEvent()`.
+class MyEntity implements DomainEventHandlerInterface
+{
+    use CanBeEnabled;
+    use DomainEventHandlerTrait;
+}
+
+// --- USAGE ---
+
+$entity = new MyEntity();
+$entity->isEnabled(); // false
+$entity->handleEvent(new EnableEvent()); // true
+$entity->handleEvent(new EnableEvent()); // false
+$entity->isEnabled(); // true
+```
+
+!!! note
+    Because `CanBeEnabled` defines `handleEnableEvent(EnableEvent $event)` it's detected in `DomainEventHandlerTrait::handleEvent()`
+    by convention

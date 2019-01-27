@@ -16,7 +16,8 @@ final class UserFieldTest extends TestCase
         $value = $this->createMock(User::class);
         $value->expects(self::any())
             ->method('getId')
-            ->willReturn($this->createMock(UserIdInterface::class));
+            ->willReturn($this->createMock(UserIdInterface::class))
+        ;
 
         $object = $this->getObject($value);
 
@@ -24,6 +25,9 @@ final class UserFieldTest extends TestCase
         self::assertSame($value->getId(), $object->getUserId());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value)
     {
         return new class($value) {

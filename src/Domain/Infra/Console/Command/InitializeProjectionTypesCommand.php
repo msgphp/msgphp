@@ -31,7 +31,8 @@ final class InitializeProjectionTypesCommand extends Command
     {
         $this
             ->setDescription('Initializes all projection types')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Force initialization by destroying types first');
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force initialization by destroying types first')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

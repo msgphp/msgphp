@@ -19,13 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class ExtensionHelper
 {
-    public static function configureDomain(ContainerBuilder $container, array $classMapping, array $idClassMapping, array $identityMapping): void
+    public static function configureDomain(ContainerBuilder $container, array $classMapping, array $identityMapping): void
     {
-        foreach ($idClassMapping as $class => $idClass) {
-            if (isset($classMapping[$class]) && !isset($idClassMapping[$classMapping[$class]])) {
-                $idClassMapping[$classMapping[$class]] = $idClass;
-            }
-        }
         foreach ($identityMapping as $class => $mapping) {
             if (isset($classMapping[$class]) && !isset($identityMapping[$classMapping[$class]])) {
                 $identityMapping[$classMapping[$class]] = $mapping;
@@ -33,7 +28,6 @@ final class ExtensionHelper
         }
 
         $container->setParameter($param = 'msgphp.domain.class_mapping', $container->hasParameter($param) ? $classMapping + $container->getParameter($param) : $classMapping);
-        $container->setParameter($param = 'msgphp.domain.id_class_mapping', $container->hasParameter($param) ? $idClassMapping + $container->getParameter($param) : $idClassMapping);
         $container->setParameter($param = 'msgphp.domain.identity_mapping', $container->hasParameter($param) ? $identityMapping + $container->getParameter($param) : $identityMapping);
     }
 
@@ -87,31 +81,32 @@ final class ExtensionHelper
     {
         foreach ($container->findTaggedServiceIds($tag = 'msgphp.domain.command_handler') as $id => $attr) {
             $definition = $container->getDefinition($id);
-            $definition->addTag('msgphp.domain.message_aware');
+            $param = (new \ReflectionMethod($definition->getClass() ?? (string) $id, '__invoke'))->getParameters()[0] ?? null;
 
-            $command = (new \ReflectionMethod($definition->getClass() ?? (string) $id, '__invoke'))->getParameters()[0]->getClass()->getName();
-            if (empty($commands[$command])) {
+            if (null === $param || null === $command = $param->getClass()) {
+                throw new \LogicException(sprintf('Missing command class type-hint for handler service "%s".', $id));
+            }
+
+            $command = $command->getName();
+            $enabled = $commands[$command] ?? true;
+
+            if (!$enabled) {
                 $container->removeDefinition($id);
                 continue;
             }
 
-            $handles = [$command];
-            if (isset($classMapping[$command])) {
-                $handles[] = $classMapping[$command];
-            }
-
             $definition
                 ->clearTag($tag)
-                ->addTag($tag, $attr[0] + ['handles' => implode(',', $handles)]);
+                ->addTag('msgphp.domain.message_aware')
+                ->addTag($tag, ['handles' => $classMapping[$command] ?? $command])
+            ;
         }
 
-        foreach ($events as $class) {
-            if (isset($classMapping[$class])) {
-                $events[] = $classMapping[$class];
-            }
+        foreach ($events as $i => $class) {
+            $events[$i] = $classMapping[$class] ?? $class;
         }
 
-        $container->setParameter($param = 'msgphp.domain.events', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
+        $container->setParameter($param = 'msgphp.domain.event_classes', $container->hasParameter($param) ? array_merge($container->getParameter($param), $events) : $events);
     }
 
     public static function finalizeDoctrineOrmRepositories(ContainerBuilder $container, array $classMapping, array $entityRepositoryMapping): void
@@ -127,7 +122,8 @@ final class ExtensionHelper
             }
 
             ($definition = $container->getDefinition($repository))
-                ->setArgument('$class', $classMapping[$entity]);
+                ->setArgument('$class', $classMapping[$entity])
+                ;
 
             foreach (class_implements($definition->getClass() ?? $repository) as $interface) {
                 $container->setAlias($interface, new Alias($repository, false));
@@ -149,7 +145,8 @@ final class ExtensionHelper
                 }
 
                 $container->getDefinition($consoleCommand)
-                    ->addTag('msgphp.domain.message_aware');
+                    ->addTag('msgphp.domain.message_aware')
+                ;
             }
         }
     }
@@ -158,13 +155,15 @@ final class ExtensionHelper
     {
         $definition = ContainerHelper::registerAnonymous($container, ConsoleInfra\Context\ClassContextFactory::class, true)
             ->setArgument('$class', $class)
-            ->setArgument('$flags', $flags);
+            ->setArgument('$flags', $flags)
+        ;
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $definition = ContainerHelper::registerAnonymous($container, ConsoleInfra\Context\DoctrineEntityContextFactory::class)
                 ->setArgument('$factory', $definition)
                 ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
-                ->setArgument('$class', $class);
+                ->setArgument('$class', $class)
+            ;
         }
 
         return $definition;

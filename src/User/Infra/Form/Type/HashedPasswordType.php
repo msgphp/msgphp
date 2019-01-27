@@ -81,26 +81,27 @@ final class HashedPasswordType extends AbstractType
             return null;
         }, function ($value) use ($confirmCurrent, &$algorithm, &$plainPassword): ?string {
             $algorithm = $this->createAlgorithm($algorithm, $confirmCurrent);
-            $plainPassword = $value;
+            $plainPassword = $confirmCurrent ? $value : null;
 
             if (null === $value || !\is_string($value)) {
                 unset($algorithm, $plainPassword); // reference
 
-                if (null !== $value) {
-                    throw new TransformationFailedException();
+                if (null === $value) {
+                    return null;
                 }
 
-                return null;
+                throw new TransformationFailedException();
             }
 
-            $hashed = $this->passwordHashing->hash($plainPassword, $algorithm);
-            unset($algorithm); // reference
+            $hashed = $this->passwordHashing->hash($value, $algorithm);
 
             if (\function_exists('sodium_memzero')) {
                 sodium_memzero($value);
-                sodium_memzero($plainPassword);
+                if (!$confirmCurrent && \is_string($plainPassword)) {
+                    sodium_memzero($plainPassword);
+                }
             }
-            unset($plainPassword); // reference
+            unset($algorithm, $plainPassword); // reference
 
             return $hashed;
         }));
@@ -175,7 +176,7 @@ final class HashedPasswordType extends AbstractType
     }
 
     /**
-     * @param null|callable|int|string|PasswordAlgorithm $algorithm
+     * @param callable|int|string|PasswordAlgorithm|null $algorithm
      */
     private function createAlgorithm($algorithm, bool $current = false): ?PasswordAlgorithm
     {
