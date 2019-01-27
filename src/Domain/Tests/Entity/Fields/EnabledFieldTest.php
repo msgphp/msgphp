@@ -16,6 +16,9 @@ final class EnabledFieldTest extends TestCase
         self::assertFalse($this->getObject(false)->isEnabled());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value = null)
     {
         if (\func_num_args()) {

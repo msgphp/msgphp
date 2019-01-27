@@ -11,7 +11,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\MappingException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Entity\{User, Username};
 
 /**
@@ -23,7 +23,7 @@ final class UsernameListener
     private $targetMappings;
     private $updateUsernames = [];
 
-    public function __construct(EntityAwareFactoryInterface $factory, array $targetMappings)
+    public function __construct(DomainObjectFactoryInterface $factory, array $targetMappings)
     {
         $this->factory = $factory;
         $this->targetMappings = $targetMappings;
@@ -111,12 +111,12 @@ final class UsernameListener
 
         $qb = $em->createQueryBuilder();
         $qb->select('u');
-        $qb->from(Username::class, 'u');
+        $qb->from($this->factory->getClass(Username::class), 'u');
         $qb->where($qb->expr()->in('u.username', ':usernames'));
         $qb->setParameter('usernames', array_keys($this->updateUsernames));
 
+        /** @var Username $username */
         foreach ($qb->getQuery()->getResult() as $username) {
-            /* @var Username $username */
             $em->remove($username);
 
             if (isset($this->updateUsernames[$usernameValue = (string) $username])) {
@@ -151,9 +151,12 @@ final class UsernameListener
 
     private function createUsername(User $user, string $username): Username
     {
-        return $this->factory->create(Username::class, [$user, $username]);
+        return $this->factory->create(Username::class, compact('user', 'username'));
     }
 
+    /**
+     * @psalm-suppress DeprecatedClass
+     */
     private function getTargetMapping($entity, EntityManagerInterface $em): array
     {
         if (isset($this->targetMappings[$class = ClassUtils::getClass($entity)])) {

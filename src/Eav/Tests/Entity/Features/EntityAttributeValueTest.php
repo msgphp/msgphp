@@ -16,7 +16,8 @@ final class EntityAttributeValueTest extends TestCase
         $attribute = $this->createMock(Attribute::class);
         $attribute->expects(self::once())
             ->method('getId')
-            ->willReturn($attributeId = $this->createMock(AttributeIdInterface::class));
+            ->willReturn($attributeId = $this->createMock(AttributeIdInterface::class))
+        ;
         /** @var AttributeValue $attributeValue */
         $object = $this->getObject('value', $attribute, $attributeValue);
 
@@ -29,6 +30,9 @@ final class EntityAttributeValueTest extends TestCase
         self::assertSame('other', $attributeValue->getValue());
     }
 
+    /**
+     * @return object
+     */
     private function getObject($value, $attribute, &$attributeValue = null)
     {
         $attributeValueId = $this->createMock(AttributeValueIdInterface::class);

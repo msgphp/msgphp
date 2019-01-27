@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
-use MsgPhp\Eav\Entity\AttributeValue;
 use MsgPhp\User\Command\ChangeUserAttributeValueCommand;
 use MsgPhp\User\Event\UserAttributeValueChangedEvent;
 use MsgPhp\User\Repository\UserAttributeValueRepositoryInterface;
@@ -20,7 +19,7 @@ final class ChangeUserAttributeValueHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserAttributeValueRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserAttributeValueRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
@@ -29,16 +28,16 @@ final class ChangeUserAttributeValueHandler
 
     public function __invoke(ChangeUserAttributeValueCommand $command): void
     {
-        // @fixme configure factory to handle `UserAttributeValue::class` as well
-        $userAttributeValue = $this->repository->find($this->factory->identify(AttributeValue::class, $command->id));
+        $userAttributeValue = $this->repository->find($command->attributeValueId);
+        $oldValue = $userAttributeValue->getValue();
+        $newValue = $command->value;
 
-        if ($command->value === $oldValue = $userAttributeValue->getValue()) {
+        if ($newValue === $oldValue) {
             return;
         }
 
         $userAttributeValue->changeValue($command->value);
-
         $this->repository->save($userAttributeValue);
-        $this->dispatch(UserAttributeValueChangedEvent::class, [$userAttributeValue, $oldValue, $command->value]);
+        $this->dispatch(UserAttributeValueChangedEvent::class, compact('userAttributeValue', 'oldValue', 'newValue'));
     }
 }

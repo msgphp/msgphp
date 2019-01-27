@@ -16,8 +16,6 @@ final class RoleRepository implements RoleRepositoryInterface
 {
     use DomainEntityRepositoryTrait;
 
-    private $alias = 'role';
-
     /**
      * @return DomainCollectionInterface|Role[]
      */

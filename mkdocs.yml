@@ -2,64 +2,57 @@ site_name: MsgPHP Documentation
 site_description: Message based domain layers. Shipped with industry standard infrastructure.
 repo_url: https://github.com/msgphp/msgphp
 edit_uri: blob/master/docs/
-site_dir: var/docs/build/
 
 theme:
     name: material
     custom_dir: docs/.theme
 extra_css: [style.css]
 markdown_extensions:
-  - codehilite # https://squidfunk.github.io/mkdocs-material/extensions/codehilite/
-  - admonition # https://squidfunk.github.io/mkdocs-material/extensions/admonition/
-  - toc: # https://squidfunk.github.io/mkdocs-material/extensions/permalinks/
-      permalink: true
+    - codehilite
+    - admonition
+    - toc:
+          permalink: true
 
-pages:
-- Home: index.md
-- Code Conventions: code-conventions.md
-- Domain-Driven-Design:
-    - Identifiers: ddd/identifiers.md
-    - Identities: ddd/identities.md
-    - Identity Mapping: ddd/identity-mapping.md
-    - Collections: ddd/collections.md
-    - Factories:
-        - Object Factory: ddd/factory/object.md
-        - Entity Aware Factory: ddd/factory/entity-aware.md
-        - Static Factory: ddd/factory/static.md
-    - Entities: ddd/entities.md
-    - Repositories: ddd/repositories.md
-- Event-Sourcing:
-    - Events: event-sourcing/events.md
-    - Event Handlers: event-sourcing/event-handlers.md
-- Message Driven:
-    - Message Bus: message-driven/message-bus.md
-    - Message Dispatcher: message-driven/message-dispatcher.md
-    - CQRS: message-driven/cqrs.md
-- Projection:
-    - Models: projection/models.md
-    - Documents: projection/documents.md
-    - Document Transformers: projection/document-transformers.md
-    - Type Registry: projection/type-registry.md
-    - Repositories: projection/repositories.md
-    - Synchronization: projection/synchronization.md
-- Infrastructure:
-    - API Platform: infrastructure/api-platform.md
-    - Doctrine Collections: infrastructure/doctrine-collections.md
-    - Doctrine DBAL: infrastructure/doctrine-dbal.md
-    - Doctrine ORM: infrastructure/doctrine-orm.md
-    - Elasticsearch: infrastructure/elasticsearch.md
-    - SimpleBus: infrastructure/simple-bus.md
-    - Symfony Console: infrastructure/symfony-console.md
-    - Symfony Messenger: infrastructure/symfony-messenger.md
-    - UUID: infrastructure/uuid.md
-- Cookbook:
-    - Bundle Installation: cookbook/bundle-installation.md
-    - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
-    - Configuring A Message Bus: cookbook/configuring-a-message-bus.md
-- Reference:
-    - Identifiers: reference/identifiers.md
-    - Entities: reference/entities.md
-    - Repositories: reference/repositories.md
-    - Messages: reference/messages.md
-    - Domain Events: reference/domain-events.md
-    - Doctrine Identifier Types: reference/doctrine-identifier-types.md
+nav:
+    - Home: index.md
+    - Code Conventions: code-conventions.md
+    - Domain-Driven-Design:
+          - Identifiers: ddd/identifiers.md
+          - Collections: ddd/collections.md
+          - Entities: ddd/entities.md
+          - Repositories: ddd/repositories.md
+          - Object Factory: ddd/object-factory.md
+    - Event-Sourcing:
+          - Event Handlers: event-sourcing/event-handlers.md
+          - Events: event-sourcing/events.md
+    - Message Driven:
+          - Message Bus: message-driven/message-bus.md
+          - Message Dispatcher: message-driven/message-dispatcher.md
+          - CQRS: message-driven/cqrs.md
+    - Projection:
+          - Models: projection/models.md
+          - Documents: projection/documents.md
+          - Document Transformers: projection/document-transformers.md
+          - Type Registry: projection/type-registry.md
+          - Repositories: projection/repositories.md
+          - Synchronization: projection/synchronization.md
+    - Infrastructure:
+          - API Platform: infrastructure/api-platform.md
+          - Doctrine Collections: infrastructure/doctrine-collections.md
+          - Doctrine DBAL: infrastructure/doctrine-dbal.md
+          - Doctrine ORM: infrastructure/doctrine-orm.md
+          - Elasticsearch: infrastructure/elasticsearch.md
+          - Symfony Console: infrastructure/symfony-console.md
+          - Symfony Messenger: infrastructure/symfony-messenger.md
+          - UUID: infrastructure/uuid.md
+    - Cookbook:
+          - Bundle Installation: cookbook/bundle-installation.md
+          - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
+          - Configuring Symfony Messenger: cookbook/configuring-symfony-messenger.md
+    - Reference:
+          - Identifiers: reference/identifiers.md
+          - Entities: reference/entities.md
+          - Repositories: reference/repositories.md
+          - Messages: reference/messages.md
+          - Domain Events: reference/domain-events.md
+          - Doctrine Identifier Types: reference/doctrine-identifier-types.md

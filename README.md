@@ -11,18 +11,6 @@ MsgPHP is a project that aims to provide (common) message based domain layers fo
 - Try the Symfony [demo application](https://github.com/msgphp/symfony-demo-app)
 - Get support on [Symfony's Slack `#msgphp` channel](https://symfony.com/slack-invite) or [raise an issue](https://github.com/msgphp/msgphp/issues/new)
 
-## Packages
-
-- [`msgphp/domain`](https://github.com/msgphp/domain)
-  - [`msgphp/eav`](https://github.com/msgphp/eav)
-  - [`msgphp/user`](https://github.com/msgphp/user)
-    - [`msgphp/user-eav`](https://github.com/msgphp/user-eav)
-
-### Symfony Bundles
-
-- [`msgphp/eav-bundle`](https://github.com/msgphp/eav-bundle)
-- [`msgphp/user-bundle`](https://github.com/msgphp/user-bundle)
-
 ## Contributing
 
-See the [contributing](CONTRIBUTING.md) section.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md)

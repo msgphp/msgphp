@@ -22,8 +22,6 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
                 createQueryBuilder as public;
                 addFieldCriteria as public;
             }
-
-            private $alias = 'root';
         };
         $qb = $repository->createQueryBuilder();
         $repository->addFieldCriteria($qb, ['foo.bar' => 'bar1']);
@@ -33,7 +31,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
         self::assertCount(3, $qb->getParameters());
     }
 
-    protected function equalsEntity($expected, $actual)
+    protected function equalsEntity($expected, $actual): bool
     {
         $equals = true;
         foreach (($r = (new \ReflectionObject($expected)))->getProperties() as $property) {
@@ -61,6 +59,7 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
 
     protected static function createRepository(string $class): DomainEntityRepositoryTraitInterface
     {
+        /** @psalm-suppress InaccessibleMethod */
         return new class($class, self::$em) implements DomainEntityRepositoryTraitInterface {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
@@ -72,8 +71,6 @@ final class DomainEntityRepositoryTraitTest extends AbstractDomainEntityReposito
                 doSave as public;
                 doDelete as public;
             }
-
-            private $alias = 'root';
         };
     }
 

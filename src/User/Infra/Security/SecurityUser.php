@@ -22,6 +22,9 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
     private $password;
     private $passwordSalt;
 
+    /**
+     * @param string[] $roles
+     */
     public function __construct(User $user, string $originUsername = null, array $roles = [])
     {
         $this->id = $user->getId();
@@ -60,6 +63,9 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
         return $this->id->toString();
     }
 
+    /**
+     * @return string[]
+     */
     public function getRoles(): array
     {
         return $this->roles;

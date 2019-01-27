@@ -43,10 +43,12 @@ final class DomainIdTypeTest extends TestCase
         $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform->expects(self::any())
             ->method('getIntegerTypeDeclarationSQL')
-            ->willReturn('native_integer_type');
+            ->willReturn('native_integer_type')
+        ;
         $this->platform->expects(self::any())
             ->method('getVarcharTypeDeclarationSQL')
-            ->willReturn('native_string_type');
+            ->willReturn('native_string_type')
+        ;
 
         DomainIdType::resetMapping();
     }

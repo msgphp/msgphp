@@ -1,9 +1,9 @@
-comment: off
+comment: 'off'
 ignore:
-    - "src/*/Tests/"
-    - "src/*/Command/*Command.php"
-    - "src/*/Event/*Event.php"
-    - "src/*/Event/Domain/*Event.php"
-    - "src/*/Infra/Doctrine/Type/*Type.php"
-    - "src/*Bundle/Resources/"
-    - "src/Domain/Infra/DependencyInjection/*Helper.php"
+    - src/*/Tests/
+    - src/*/Command/*Command.php
+    - src/*/Event/*Event.php
+    - src/*/Event/Domain/*Event.php
+    - src/*/Infra/Doctrine/Type/*Type.php
+    - src/*/Resources/
+    - src/Domain/Infra/DependencyInjection/*Helper.php

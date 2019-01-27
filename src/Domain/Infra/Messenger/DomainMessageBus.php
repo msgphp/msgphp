@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\Messenger;
 
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
@@ -12,15 +13,23 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 final class DomainMessageBus implements DomainMessageBusInterface
 {
-    private $bus;
+    private $commandBus;
+    private $eventBus;
+    private $eventClasses;
 
-    public function __construct(MessageBusInterface $bus)
+    public function __construct(MessageBusInterface $commandBus, MessageBusInterface $eventBus, array $eventClasses = [])
     {
-        $this->bus = $bus;
+        $this->commandBus = $commandBus;
+        $this->eventBus = $eventBus;
+        $this->eventClasses = array_flip($eventClasses);
     }
 
     public function dispatch($message): void
     {
-        $this->bus->dispatch($message);
+        if (isset($this->eventClasses[$message instanceof Envelope ? \get_class($message->getMessage()) : \get_class($message)])) {
+            $this->eventBus->dispatch($message);
+        } else {
+            $this->commandBus->dispatch($message);
+        }
     }
 }

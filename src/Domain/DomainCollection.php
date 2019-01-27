@@ -26,7 +26,7 @@ final class DomainCollection implements DomainCollectionInterface
     public function getIterator(): \Traversable
     {
         if ($this->elements instanceof \Traversable) {
-            return (function () {
+            return (function (): \Traversable {
                 foreach ($this->elements as $key => $element) {
                     yield $key => $element;
                 }

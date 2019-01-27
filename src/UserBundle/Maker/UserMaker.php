@@ -42,6 +42,7 @@ final class UserMaker implements MakerInterface
     private $services = [];
     private $routes = [];
     private $writes = [];
+    private $interactive = false;
 
     /** @var \ReflectionClass */
     private $user;
@@ -75,6 +76,7 @@ final class UserMaker implements MakerInterface
         $this->credential = $this->user = null;
         $this->passwordReset = false;
         $this->configs = $this->services = $this->routes = $this->writes = [];
+        $this->interactive = $input->isInteractive();
 
         if (!isset($this->classMapping[Entity\User::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
@@ -178,7 +180,7 @@ final class UserMaker implements MakerInterface
         $io->success('Done!');
         $io->note('Don\'t forget to update your database schema, if needed');
 
-        if ($io->confirm('Show written file names?')) {
+        if ($written && $io->confirm('Show written file names?')) {
             sort($written);
             $io->listing($written);
         }
@@ -293,12 +295,15 @@ final class UserMaker implements MakerInterface
 
         if (!$this->hasCredential() && $io->confirm('Generate a user credential?')) {
             $credentials = [];
-            foreach (glob(Configuration::getPackageGlob().'/Entity/Credential/*.php', \GLOB_BRACE) as $file) {
-                if ('Anonymous' === ($credential = basename($file, '.php')) || false !== strpos($credential, 'SaltedPassword')) {
+            foreach (Configuration::getPackageMetadata()->findPaths('Entity/Credential') as $path) {
+                if ('.php' !== substr($path, -4) || !is_file($path)) {
                     continue;
                 }
-                $credentials[] = $credential;
+                if (!\in_array($credential = basename($path, '.php'), ['Anonymous', 'EmailSaltedPassword', 'NicknameSaltedPassword'], true)) {
+                    $credentials[] = $credential;
+                }
             }
+            sort($credentials);
 
             $credential = $io->choice('Select credential type:', $credentials, 'EmailPassword');
             $credentialClass = $this->credential = Configuration::PACKAGE_NS.'Entity\\Credential\\'.$credential;
@@ -317,7 +322,7 @@ final class UserMaker implements MakerInterface
                 $offset = $constructor->getStartLine() - 1;
                 $length = $constructor->getEndLine() - $offset;
                 $contents = preg_replace_callback_array([
-                    '~^[^_]*+__construct\([^\)]*+\)~i' => function (array $match) use ($credentialSignature): string {
+                    '~^[^_]*+__construct\([^)]*+\)~i' => function (array $match) use ($credentialSignature): string {
                         $signature = substr($match[0], 0, -1);
                         if ('' !== $credentialSignature) {
                             $signature .= ('(' !== substr(rtrim($signature), -1) ? ', ' : '').$credentialSignature;
@@ -387,7 +392,7 @@ PHP
         do {
             do {
                 $defaultRole = $io->ask('Provide a default user role (e.g. <comment>ROLE_USER</>)');
-            } while (null === $defaultRole);
+            } while (null === $defaultRole && $this->interactive);
             $defaultRoles[] = $defaultRole;
         } while ($io->confirm('Add another default user role?', false));
 
@@ -487,11 +492,11 @@ PHP
                 }
             }
 
-            $this->routes[] = <<<PHP
+            $this->routes[] = <<<'PHP'
 ->add('logout', '/logout')
 PHP;
             $this->writes[] = [$this->projectDir.'/config/packages/security.yaml', self::getSkeleton('security.php', [
-                'hashAlgorithm' => $this->getPassordHashAlgorithm(),
+                'hashAlgorithm' => $this->getPasswordHashAlgorithm(),
                 'fieldName' => $usernameField,
             ])];
         }
@@ -609,7 +614,7 @@ PHP;
         $offset = $constructor->getStartLine() - 1;
         $body = implode('', \array_slice($lines, $offset, $constructor->getEndLine() - $offset));
 
-        if (preg_match('~^[^_]*+__construct\(([^\)]++)\)~i', $body, $matches)) {
+        if (preg_match('~^[^_]*+__construct\(([^)]++)\)~i', $body, $matches)) {
             return $matches[1];
         }
 
@@ -623,10 +628,10 @@ PHP;
         return isset($matches[0][0]) ? implode(', ', $matches[0]) : '';
     }
 
-    private static function getSkeleton(string $path, array $vars = [])
+    private static function getSkeleton(string $path, array $vars = []): string
     {
-        return (function () use ($path, $vars) {
-            extract($vars);
+        return (function () use ($path, $vars): string {
+            extract($vars, \EXTR_OVERWRITE);
 
             return require \dirname(__DIR__).'/Resources/skeleton/'.$path;
         })();
@@ -651,7 +656,7 @@ PHP;
 
     private function getClassFileName(string $class): string
     {
-        if ('App\\' === substr($class, 0, 4)) {
+        if (0 === strpos($class, 'App\\')) {
             $class = substr($class, 4);
         }
 
@@ -668,7 +673,7 @@ PHP;
         return $this->hasCredential() && false !== strpos($this->credential, 'Password');
     }
 
-    private function getPassordHashAlgorithm(): string
+    private function getPasswordHashAlgorithm(): string
     {
         if ($this->hasCredential() && false !== strpos($this->credential, 'SaltedPassword')) {
             return PasswordAlgorithm::DEFAULT_LEGACY;

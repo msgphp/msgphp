@@ -16,7 +16,7 @@ Its purpose is to ease the handling of command messages by sourcing a [domain ev
 - `abstract getDomainEvent(object $command): DomainEventInterface`
 - `abstract getDomainEventHandler(object $command): DomainEventHandlerInterface`
 
-### Basic example
+### Basic Example
 
 ```php
 <?php

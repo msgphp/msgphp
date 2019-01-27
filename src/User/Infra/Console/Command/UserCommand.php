@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait, MessageReceivingInterface};
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,15 +21,15 @@ use Symfony\Component\Console\Style\StyleInterface;
 abstract class UserCommand extends Command implements MessageReceivingInterface
 {
     use MessageDispatchingTrait {
+        __construct as private init;
         dispatch as protected;
     }
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
     {
-        $this->factory = $factory;
-        $this->bus = $bus;
+        $this->init($factory, $bus);
         $this->repository = $repository;
 
         parent::__construct();
@@ -45,7 +46,8 @@ abstract class UserCommand extends Command implements MessageReceivingInterface
     {
         $this
             ->addOption('by-id', null, InputOption::VALUE_NONE, 'Find user by identifier')
-            ->addArgument('user', InputArgument::OPTIONAL, 'The username or user ID');
+            ->addArgument('user', InputArgument::OPTIONAL, 'The username or user ID')
+        ;
     }
 
     protected function getUser(InputInterface $input, StyleInterface $io): User
@@ -63,7 +65,7 @@ abstract class UserCommand extends Command implements MessageReceivingInterface
         }
 
         return $byId
-            ? $this->repository->find($this->factory->identify(User::class, $value))
+            ? $this->repository->find($this->factory->create(UserIdInterface::class, ['value' => $value]))
             : $this->repository->findByUsername($value);
     }
 }

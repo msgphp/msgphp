@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\ChangeUserCredentialCommand as ChangeUserCredentialDomainCommand;
@@ -28,7 +28,7 @@ final class ChangeUserCredentialCommand extends UserCommand
     private $contextFactory;
     private $fields = [];
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository, ContextFactoryInterface $contextFactory)
     {
         $this->contextFactory = $contextFactory;
 
@@ -41,7 +41,8 @@ final class ChangeUserCredentialCommand extends UserCommand
             $this->io->success('Changed user credential for '.$message->user->getCredential()->getUsername());
 
             $rows = [];
-            foreach (array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential) as $key => $value) {
+            $changes = array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential);
+            foreach ($changes as $key => $value) {
                 $field = false === ($i = strrpos($key, "\00")) ? $key : substr($key, $i + 1);
                 // @todo use VarDumper
                 $rows[] = [$field, json_encode($oldValues[$key] ?? null), json_encode($value)];
@@ -69,20 +70,20 @@ final class ChangeUserCredentialCommand extends UserCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $user = $this->getUser($input, $this->io);
-        $context = $this->contextFactory->getContext($input, $this->io);
+        $userId = $this->getUser($input, $this->io)->getId();
+        $fields = $this->contextFactory->getContext($input, $this->io);
 
-        if (!$context) {
+        if (!$fields) {
             $field = $this->io->choice('Select a field to change', $this->fields);
 
             return $this->run(new ArrayInput([
                 '--'.$field => null,
                 '--by-id' => true,
-                'user' => $user->getId()->toString(),
+                'user' => $userId->toString(),
             ]), $output);
         }
 
-        $this->dispatch(ChangeUserCredentialDomainCommand::class, [$user->getId(), $context]);
+        $this->dispatch(ChangeUserCredentialDomainCommand::class, compact('userId', 'fields'));
 
         return 0;
     }

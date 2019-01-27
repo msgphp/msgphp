@@ -6,8 +6,6 @@ namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Version as DoctrineOrmVersion;
-use SimpleBus\SymfonyBridge\SimpleBusCommandBusBundle;
-use SimpleBus\SymfonyBridge\SimpleBusEventBusBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -49,16 +47,6 @@ final class FeatureDetection
     public static function hasDoctrineBundle(ContainerInterface $container): bool
     {
         return ContainerHelper::hasBundle($container, DoctrineBundle::class);
-    }
-
-    public static function hasSimpleBusCommandBusBundle(ContainerInterface $container): bool
-    {
-        return ContainerHelper::hasBundle($container, SimpleBusCommandBusBundle::class);
-    }
-
-    public static function hasSimpleBusEventBusBundle(ContainerInterface $container): bool
-    {
-        return ContainerHelper::hasBundle($container, SimpleBusEventBusBundle::class);
     }
 
     public static function isFormAvailable(ContainerInterface $container): bool

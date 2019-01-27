@@ -87,7 +87,7 @@ final class ObjectMappingListener
 
             if (isset($info['type']) && method_exists($metadata, $method = 'map'.ucfirst($info['type']))) {
                 unset($info['type']);
-                $metadata->$method($info);
+                $metadata->{$method}($info);
 
                 if ('mapEmbedded' === $method) {
                     $embeddableMetadata = $this->getMetadata($info['class']);

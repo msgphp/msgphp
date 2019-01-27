@@ -9,7 +9,7 @@ An overview of available infrastructural code when using [API Platform].
 When working with [projections](../projection/models.md) an [API Data Provider] is provided by `MsgPhp\Domain\Infra\ApiPlatform\ProjectionDataProvider`.
 It uses any [projection repository](../projection/repositories.md) in an effort to provide API resources. 
 
-### Minimal configuration
+### Minimal Configuration
 
 ```yaml
 api_platform:
@@ -29,7 +29,7 @@ services:
 !!! note
     See also [API Platform Configuration] documentation
 
-### Basic example
+### Basic Example
 
 ```php
 <?php

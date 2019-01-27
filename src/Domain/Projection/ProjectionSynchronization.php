@@ -33,10 +33,6 @@ final class ProjectionSynchronization
         }
 
         foreach ($this->documentProvider as $document) {
-            if (ProjectionDocument::STATUS_UNKNOWN !== $document->status) {
-                continue;
-            }
-
             try {
                 $document->status = ProjectionDocument::STATUS_SYNCHRONIZED;
 

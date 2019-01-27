@@ -6,10 +6,10 @@ namespace MsgPhp\User\Infra\Security\Jwt;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
-use MsgPhp\User\Entity\User;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\User\Infra\Security\SecurityUserProvider as BaseSecurityUserProvider;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -22,7 +22,7 @@ final class SecurityUserProvider implements PayloadAwareUserProviderInterface
     private $repository;
     private $factory;
 
-    public function __construct(BaseSecurityUserProvider $provider, UserRepositoryInterface $repository, EntityAwareFactoryInterface $factory)
+    public function __construct(BaseSecurityUserProvider $provider, UserRepositoryInterface $repository, DomainObjectFactoryInterface $factory)
     {
         $this->provider = $provider;
         $this->repository = $repository;
@@ -32,7 +32,7 @@ final class SecurityUserProvider implements PayloadAwareUserProviderInterface
     public function loadUserByUsernameAndPayload($username, array $payload): UserInterface
     {
         try {
-            $user = $this->repository->find($this->factory->identify(User::class, $username));
+            $user = $this->repository->find($this->factory->create(UserIdInterface::class, ['value' => $username]));
         } catch (EntityNotFoundException $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }

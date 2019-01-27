@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException, InvalidClassException};
 
 /**
@@ -19,13 +19,17 @@ trait DomainEntityRepositoryTrait
 {
     private $class;
     private $em;
-    private $identityHelper;
+    private $alias;
 
-    public function __construct(string $class, EntityManagerInterface $em, DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, EntityManagerInterface $em)
     {
         $this->class = $class;
         $this->em = $em;
-        $this->identityHelper = $identityHelper ?? new DomainIdentityHelper(new DomainIdentityMapping($em));
+    }
+
+    private function getAlias(): string
+    {
+        return $this->alias ?? ($this->alias = strtolower((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], (string) (false === ($i = strrpos($this->class, '\\')) ? $this->class : substr($this->class, $i + 1)))));
     }
 
     private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -49,11 +53,11 @@ trait DomainEntityRepositoryTrait
      */
     private function doFind($id)
     {
-        if (!$this->identityHelper->isIdentity($this->class, $id)) {
+        if (null === $entity = $this->em->find($this->class, $id)) {
             throw EntityNotFoundException::createForId($this->class, $id);
         }
 
-        return $this->doFindByFields($this->identityHelper->toIdentity($this->class, $id));
+        return $entity;
     }
 
     /**
@@ -70,10 +74,6 @@ trait DomainEntityRepositoryTrait
         $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
-            if ($this->identityHelper->isIdentity($this->class, $fields)) {
-                throw EntityNotFoundException::createForId($this->class, $fields);
-            }
-
             throw EntityNotFoundException::createForFields($this->class, $fields);
         }
 
@@ -82,11 +82,13 @@ trait DomainEntityRepositoryTrait
 
     private function doExists($id): bool
     {
-        if (!$this->identityHelper->isIdentity($this->class, $id)) {
+        $id = $this->toIdentity($id);
+
+        if (null === $id) {
             return false;
         }
 
-        return $this->doExistsByFields($this->identityHelper->toIdentity($this->class, $id));
+        return $this->doExistsByFields($id);
     }
 
     private function doExistsByFields(array $fields): bool
@@ -117,7 +119,7 @@ trait DomainEntityRepositoryTrait
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(\get_class($entity), $this->identityHelper->getIdentity($entity));
+            throw DuplicateEntityException::createForId(\get_class($entity), $this->em->getMetadataFactory()->getMetadataFor($this->class)->getIdentifierValues($entity));
         }
     }
 
@@ -144,23 +146,19 @@ trait DomainEntityRepositoryTrait
             $query->setMaxResults(0 === $limit ? null : $limit);
         }
 
-        return DomainCollectionFactory::create($query->getResult($hydrate));
+        return new DomainCollection($query->getResult($hydrate));
     }
 
-    private function createQueryBuilder(string $alias = null): QueryBuilder
+    private function createQueryBuilder(): QueryBuilder
     {
-        if (null === $alias) {
-            $alias = $this->alias;
-        }
-
         $qb = $this->em->createQueryBuilder();
-        $qb->select($alias);
+        $qb->select($alias = $this->getAlias());
         $qb->from($this->class, $alias);
 
         return $qb;
     }
 
-    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false, string $alias = null): void
+    private function addFieldCriteria(QueryBuilder $qb, array $fields, bool $or = false): void
     {
         if (!$fields) {
             return;
@@ -168,16 +166,10 @@ trait DomainEntityRepositoryTrait
 
         $expr = $qb->expr();
         $where = $or ? $expr->orX() : $expr->andX();
-        $alias = $alias ?? $this->alias;
-        $idFields = array_flip($this->identityHelper->getIdentifierFieldNames($this->class));
+        $alias = $this->getAlias();
         $associations = $this->em->getClassMetadata($this->class)->getAssociationMappings();
 
         foreach ($fields as $field => $value) {
-            if (isset($idFields[$field]) && $this->identityHelper->isEmptyIdentifier($value)) {
-                $where->add('TRUE = FALSE');
-                continue;
-            }
-
             $fieldAlias = $alias.'.'.$field;
 
             if (null === $value) {
@@ -190,7 +182,7 @@ trait DomainEntityRepositoryTrait
                 continue;
             }
 
-            $param = $this->addFieldParameter($qb, $field, $value);
+            $param = $this->addFieldParameter($qb, (string) $field, $value);
 
             if (\is_array($value)) {
                 $where->add($expr->in($fieldAlias, $param));
@@ -216,5 +208,42 @@ trait DomainEntityRepositoryTrait
         $qb->setParameter($name, $value, $type ?? DomainIdType::resolveName($value));
 
         return ':'.$name;
+    }
+
+    private function toIdentity($id): ?array
+    {
+        $metadataFactory = $this->em->getMetadataFactory();
+        $metadata = $metadataFactory->getMetadataFor($this->class);
+        $fields = $metadata->getIdentifierFieldNames();
+
+        if (!\is_array($id)) {
+            if (1 !== \count($fields)) {
+                return null;
+            }
+
+            $id = [reset($fields) => $id];
+        }
+
+        foreach ($id as $field => $value) {
+            if (\is_object($value) && $metadataFactory->hasMetadataFor(ClassUtils::getClass($value))) {
+                $id[$field] = $this->em->getUnitOfWork()->getSingleIdentifierValue($value);
+
+                if (null === $id[$field]) {
+                    return null;
+                }
+            }
+        }
+
+        $identity = [];
+        foreach ($fields as $field) {
+            if (!isset($id[$field])) {
+                return null;
+            }
+
+            $identity[$field] = $id[$field];
+            unset($id[$field]);
+        }
+
+        return $identity ?: null;
     }
 }

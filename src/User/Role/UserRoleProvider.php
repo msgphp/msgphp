@@ -21,7 +21,7 @@ final class UserRoleProvider implements RoleProviderInterface
 
     public function getRoles(User $user): array
     {
-        $roles = $this->repository->findAllByUserId($user->getId())->map(function (UserRole $userRole) {
+        $roles = $this->repository->findAllByUserId($user->getId())->map(function (UserRole $userRole): string {
             return $userRole->getRoleName();
         });
 

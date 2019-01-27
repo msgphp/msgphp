@@ -1,6 +1,7 @@
 # Configuring Doctrine ORM
 
-After a [bundle](bundle-installation.md) is installed we can configure [Doctrine ORM](../infrastructure/doctrine-orm.md).
+In this article is explained how to setup [Doctrine ORM infrastructure](../infrastructure/doctrine-orm.md) for any
+MsgPHP bundle within a Symfony application.
 
 ## Installation
 
@@ -13,15 +14,17 @@ composer install orm
 
 ## Configuration
 
-See the Doctrine Bundle [recipe configuration] for the minimal configuration to put in `config/packages/doctrine.yaml`.
+See the [recipe configuration] for the minimal configuration to put in `config/packages/doctrine.yaml`.
 
 Although the examples use annotation based mappings, you are not required to do so. [Read more][doctrine-bundle-mapping-config].
 
 !!! info
     The configuration is automatically added with Symfony Flex
 
-By default MsgPHP uses the `doctrine.orm.entity_manager` service. You can override its alias service to use any other
-entity manager:
+### Configure an Entity Manager
+
+MsgPHP uses the `doctrine.orm.entity_manager` entity manager service by default. To use another entity manager instead
+configure the entity manager alias service:
 
 ```yaml
 # config/services.yaml
@@ -29,12 +32,12 @@ entity manager:
 services:
     # ...
 
-    msgphp.doctrine.entity_manager: '@doctrine.orm.some_other_entity_manager'
+    msgphp.doctrine.entity_manager: '@doctrine.orm.other_entity_manager'
 ```
 
 ## Mapping Entities
 
-A MsgPHP bundle provides base entity models in the form of [mapped superclasses]. An actual entity object must be
+A MsgPHP bundle provides its base entity models in the form of [mapped superclasses]. An actual entity object must be
 defined by your application:
 
 ```php
@@ -43,12 +46,12 @@ defined by your application:
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\SomeDomain\Entity\SomeEntity as BaseSomeEntity;
+use MsgPhp\<DomainName>\Entity\<SomeEntity> as Base<SomeEntity>;
 
 /**
  * @ORM\Entity()
  */
-class SomeEntity extends BaseSomeEntity
+class <SomeEntity> extends Base<SomeEntity>
 {
     // ...
 }
@@ -57,20 +60,15 @@ class SomeEntity extends BaseSomeEntity
 Let MsgPHP know about your entity:
 
 ```yaml
-msgphp_<name>:
-    # ...
+# config/packages/msgphp_<domain-name>.yaml
 
+msgphp_<domain-name>: # e.g. msgphp_user
     class_mapping:
-        MsgPhp\SomeDomain\Entity\SomeEntity: App\Entity\SomeEntity
+        MsgPhp\<DomainName>\Entity\<SomeEntity>: App\Entity\<SomeEntity>
 ```
 
-!!! note
-    See the [reference](../reference/entities.md) page for all available entities provided per domain. When using a
-    entity field / feature trait its default ORM mapping is configured automatically.
-
 !!! info
-    With Symfony Flex the required entities of a MsgPHP bundle are automatically created, including ORM mapping
-    and configuration
+    With Symfony Flex the required entities of a MsgPHP bundle are automatically created and configured
 
 ## Mapping Identifiers
 
@@ -79,25 +77,26 @@ When an entity object is identified using a [domain identifier](../ddd/identifie
 ```php
 <?php
 
-use MsgPhp\SomeDomain\SomeIdInterface;
+namespace App\Entity;
 
-// ...
+use Doctrine\ORM\Mapping as ORM;
+use MsgPhp\<DomainName>\Entity\<SomeEntity> as Base<SomeEntity>;
+use MsgPhp\<DomainName>\<SomeEntity>IdInterface;
 
-class SomeEntity extends BaseSomeEntity
+/**
+ * @ORM\Entity()
+ */
+class <SomeEntity> extends Base<SomeEntity>
 {
     /**
-     * @var SomeIdInterface|null
+     * @var <SomeEntity>IdInterface|null
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="msghp_some_id")
+     * @ORM\Column(type="msghp_some_entity_id")
      */
-    public $id;
+    private $id;
 }
 ```
-
-!!! note
-    See the [reference](../reference/doctrine-identifier-types.md) page for all available identifier types provided per
-    domain
 
 !!! note
     When using an identifier that is able to calculate a value upfront (e.g. UUIDs) the `@ORM\GeneratedValue()` is not
@@ -111,74 +110,70 @@ class SomeEntity extends BaseSomeEntity
 In case a custom implementation is used it should be configured accordingly:
 
 ```yaml
-msgphp_<name>:
-    # ...
+# config/packages/msgphp_<domain-name>.yaml
 
+msgphp_<domain-name>: # e.g. msgphp_user
     class_mapping:
-        MsgPhp\SomeDomain\SomeIdInterface: App\SomeId
+        MsgPhp\<DomainName>\<SomeEntity>IdInterface: App\<SomeEntity>Id
     id_type_mapping:
-        MsgPhp\SomeDomain\SomeIdInterface: bigint
+        MsgPhp\<DomainName>\<SomeEntity>IdInterface: bigint
 ```
 
-### Without Nullability
+### Disable Identifier Nullability
 
 ```php
 <?php
 
-// ...
+namespace App\Entity;
 
-class SomeEntity extends BaseSomeEntity
+use Doctrine\ORM\Mapping as ORM;
+use MsgPhp\<DomainName>\Entity\<SomeEntity> as Base<SomeEntity>;
+use MsgPhp\<DomainName>\<SomeEntity>IdInterface;
+use MsgPhp\<DomainName>\<SomeEntity>Id;
+
+/**
+ * @ORM\Entity()
+ */
+class <SomeEntity> extends Base<SomeEntity>
 {
     /**
-     * @ORM\...
+     * @var <SomeEntity>IdInterface
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="msghp_some_entity_id")
      */
     private $id;
 
-    public function __construct(SomeIdInterface $id)
+    public function __construct(<SomeEntity>IdInterface $id)
     {
         $this->id = $id;
     }
-
-    public function getId(): SomeIdInterface
-    {
-        return $this->id;
-    }
-}
-```
-
-Or coupled with a known identifier class:
-
-```php
-<?php
-
-use MsgPhp\SomeDomain\SomeId;
-
-// ...
-
-class SomeEntity extends BaseSomeEntity
-{
-    // ...
+    
+    // alternatively (coupled)
 
     public function __construct()
     {
-        $this->id = new SomeId();
+        $this->id = new <SomeEntity>Id();
     }
-
-    // ...
 }
 ```
 
-### Without Automatic Hydration
-
-To hydrate the primitive identifier value instead of a value object, the type can be configured regularly. It requires
-to couple with a known identifier class.
+### Disable Automatic Identifier Hydration
 
 ```php
 <?php
 
-// ...
+namespace App\Entity;
 
-class SomeEntity extends BaseSomeEntity
+use Doctrine\ORM\Mapping as ORM;
+use MsgPhp\<DomainName>\Entity\<SomeEntity> as Base<SomeEntity>;
+use MsgPhp\<DomainName>\<SomeEntity>IdInterface;
+use MsgPhp\<DomainName>\<SomeEntity>Id;
+
+/**
+ * @ORM\Entity()
+ */
+class <SomeEntity> extends Base<SomeEntity>
 {
     /**
      * @var int|null
@@ -188,14 +183,9 @@ class SomeEntity extends BaseSomeEntity
      */
     private $id;
 
-    public function __construct(SomeIdInterface $id)
+    public function getId(): <SomeEntity>IdInterface
     {
-        $this->id = $id->isEmpty() ? null : (int) $id->toString();
-    }
-
-    public function getId(): SomeIdInterface
-    {
-        return SomeId::fromValue($this->id);
+        return <SomeEntity>Id::fromValue($this->id);
     }
 }
 ```

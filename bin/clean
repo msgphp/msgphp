@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-rm -rf composer.lock var/ vendor/
-bin/each rm -rf composer.lock vendor/

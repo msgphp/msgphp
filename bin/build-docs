@@ -1,53 +1,28 @@
 #!/usr/bin/env bash
 
-if [[ ! $# -eq 0 ]] ; then
-    echo "Usage: $0"
-    exit 1
+source bin/.bashrc
+[[ $# -ne 0 ]] && label "Usage: $0" ko && exit 1
+
+git_clean
+
+uri="https://github.com/msgphp/msgphp"
+repo="git@github.com:msgphp/msgphp.github.io.git"
+rev="$(git rev-parse --abbrev-ref --short --verify HEAD)"
+docs_dir="docs" && [[ ${rev} != master ]] && docs_dir="${docs_dir}-${rev}"
+
+label "Building"
+make docs-build
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
+
+label "Synchronizing"
+git_sync var/www "${repo}" && \
+rm -rf "var/www/${docs_dir}" && \
+mv "var/build/docs" "var/www/${docs_dir}"
+[[ $? -ne 0 ]] && label "Failed" ko && exit 1
+
+if [[ $(git -C var/www status --porcelain) ]]; then
+    git -C var/www add --all && \
+    git -C var/www commit --quiet -m "[${rev}] updated to ${uri}/commit/$(git rev-parse --short --verify HEAD)" && \
+    confirm "Push docs?"
+    [[ $? -eq 1 ]] && git -C var/www push origin master
 fi
-
-REV=$(git rev-parse --abbrev-ref --short --verify HEAD)
-DIR="var/docs"
-mkdir -p "${DIR}"
-rm -rf var/cache/api
-
-lando version >/dev/null 2>&1
-if [[ $? -eq 0 ]] ; then
-    lando bash "bin/sami update .sami.dist"
-else
-    bin/sami update .sami.dist
-fi
-
-bin/mkdocs build
-[[ $? -ne 0 ]] && exit 1
-
-pushd "${DIR}" &> /dev/null
-
-echo -e "\e[34mSynchronizing source...\e[0m"
-if [[ ! -d src/.git ]] ; then
-    echo "Cloning..."
-    git clone --quiet git@github.com:msgphp/msgphp.github.io.git src
-    [[ $? -ne 0 ]] && echo "Failed!" && exit 1
-fi
-
-git -C src fetch --tags
-git -C src pull
-
-API_DIR="src/api"
-DOCS_DIR="src/docs"
-if [[ $REV != master ]] ; then
-    DOCS_DIR="${DOCS_DIR}-${REV}"
-fi
-
-rm -rf "${DOCS_DIR}" "${API_DIR}"
-mv build "${DOCS_DIR}"
-mv build-api "${API_DIR}"
-
-echo -en "\e[34mPush docs for \"${REV}\"? [yN]\e[0m"
-read answer
-if [[ $answer =~ ^y|Y|yes|YES$ ]] ; then
-    git -C src add --all
-    git -C src commit -m "Update docs for \"${REV}\" to $(git rev-parse --short --verify HEAD)"
-    git -C src push
-fi
-
-popd &> /dev/null

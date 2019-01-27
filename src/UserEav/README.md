@@ -4,10 +4,6 @@ A bridge between the [`User`](https://github.com/msgphp/user) and [`EAV`](https:
 
 [![Latest Stable Version](https://poser.pugx.org/msgphp/user-eav/v/stable)](https://packagist.org/packages/msgphp/user-eav)
 
-This package is part of the _Message driven PHP_ project.
-
-> [MsgPHP](https://msgphp.github.io/) is a project that aims to provide (common) message based domain layers for your application. It has a low development time overhead and avoids being overly opinionated.
-
 ## Installation
 
 ```bash

@@ -1,30 +1,47 @@
 includes:
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - /tools/.composer/vendor-bin/phpstan/vendor/phpstan/phpstan-phpunit/extension.neon
+    - /tools/.composer/vendor-bin/phpstan/vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
     level: max
-    tmpDir: var/cache/phpstan
-
+    paths:
+        - src
+        - tests/fixtures/sa
     autoload_directories:
         - tests/fixtures/sa
+        - var/phpunit/phpunit-7.5/src
+    tmpDir: var/phpstan
 
     ignoreErrors:
-        - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'
-        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject\.#'
-        - '#Static property MsgPhp\\Domain\\Tests\\Infra\\InMemory\\DomainEntityRepositoryTraitTest::\$memory \(MsgPhp\\Domain\\Infra\\InMemory\\GlobalObjectMemory\) does not accept null\.#'
-        - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\.+Test::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
-        - '#Class MsgPhp\\Domain\\Tests\\Factory\\WrongCase referenced with incorrect case: MsgPhp\\Domain\\Tests\\Factory\\wrongcase\.#'
-
         # phpstan
         - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
 
         # msgphp
         - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'
         - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Handler)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
+        - '#Return type \(MsgPhp\\Domain\\Infra\\Config\\ClassMappingNode\) of method MsgPhp\\Domain\\Infra\\Config\\ClassMappingNodeDefinition::instantiateNode\(\) should be compatible with return type \(Symfony\\Component\\Config\\Definition\\VariableNode\) of method Symfony\\Component\\Config\\Definition\\Builder\\VariableNodeDefinition::instantiateNode\(\)#'
         - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
 
+        # msgphp tests
+        - '#Class MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject not found\.#'
+        - '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject has an unused parameter \$arg\.#'
+        - '#Parameter \$arg of method MsgPhp\\Domain\\Tests\\Factory\\KnownTestObject::__construct\(\) has invalid typehint type MsgPhp\\Domain\\Tests\\Factory\\UnknownTestObject\.#'
+        - '#Class MsgPhp\\Domain\\Tests\\Factory\\WrongCase referenced with incorrect case: MsgPhp\\Domain\\Tests\\Factory\\wrongcase\.#'
+        - '#Static property MsgPhp\\Domain\\Tests\\Infra\\Doctrine\\.+Test::\$em \(Doctrine\\ORM\\EntityManager\) does not accept null\.#'
+        -
+            message: '#Call to an undefined method object::.+\(\)\.#'
+            path: *src/*/Tests/Entity/Fields/*Test.php
+        -
+            message: '#Call to an undefined method object::.+\(\)\.#'
+            path: *src/*/Tests/Entity/Features/*Test.php
+        -
+            message: '#Call to an undefined method object::dispatch\(\)\.#'
+            path: src/Domain/Tests/Message/MessageDispatchingTraitTest.php
+        -
+            message: '#Access to an undefined property object::\$(a|b|test)\.#'
+            path: src/Domain/Tests/Factory/DomainObjectFactoryTest.php
+
     excludes_analyse:
-        - '*/vendor/*'
-        - src/UserBundle/Resources/skeleton/
+        - */src/*/vendor/*
+        - src/UserBundle/Resources/skeleton
         - src/UserBundle/Maker/UserMaker.php

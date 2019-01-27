@@ -18,16 +18,19 @@ final class UserRoleProviderTest extends TestCase
         $user = $this->createMock(User::class);
         $user->expects(self::once())
             ->method('getId')
-            ->willReturn($id = $this->createMock(UserIdInterface::class));
+            ->willReturn($id = $this->createMock(UserIdInterface::class))
+        ;
         $userRole = $this->createMock(UserRole::class);
         $userRole
             ->method('getRoleName')
-            ->willReturn('ROLE_USER');
+            ->willReturn('ROLE_USER')
+        ;
         $repository = $this->createMock(UserRoleRepositoryInterface::class);
         $repository->expects(self::once())
             ->method('findAllByUserId')
             ->with($id)
-            ->willReturn(new DomainCollection(['foo' => $userRole]));
+            ->willReturn(new DomainCollection(['foo' => $userRole]))
+        ;
 
         self::assertSame(['ROLE_USER'], (new UserRoleProvider($repository))->getRoles($user));
     }

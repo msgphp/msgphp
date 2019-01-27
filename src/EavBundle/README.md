@@ -4,10 +4,6 @@ A Symfony bundle for basic [EAV](https://en.wikipedia.org/wiki/Entity%E2%80%93at
 
 [![Latest Stable Version](https://poser.pugx.org/msgphp/eav-bundle/v/stable)](https://packagist.org/packages/msgphp/eav-bundle)
 
-This package is part of the _Message driven PHP_ project.
-
-> [MsgPHP](https://msgphp.github.io/) is a project that aims to provide (common) message based domain layers for your application. It has a low development time overhead and avoids being overly opinionated.
-
 ## Installation
 
 ```bash
@@ -33,12 +29,9 @@ return function (ContainerConfigurator $container) {
 };
 ```
 
-And be done.
-
 ## Documentation
 
 - Read the [main documentation](https://msgphp.github.io/docs/)
-- Browse the [API documentation](https://msgphp.github.io/api/MsgPhp/EavBundle.html)
 - Try the Symfony [demo application](https://github.com/msgphp/symfony-demo-app)
 - Get support on [Symfony's Slack `#msgphp` channel](https://symfony.com/slack-invite) or [raise an issue](https://github.com/msgphp/msgphp/issues/new)
 

@@ -20,7 +20,7 @@ final class ResolveDomainPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $container->setParameter($param = 'msgphp.domain.events', array_merge(($container->hasParameter($param) ? $container->getParameter($param) : []), array_values(array_filter(array_map(function (string $file): string {
+        $container->setParameter($param = 'msgphp.domain.event_classes', array_merge(($container->hasParameter($param) ? $container->getParameter($param) : []), array_values(array_filter(array_map(function (string $file): string {
             return 'MsgPhp\\Domain\\Event\\'.basename($file, '.php');
         }, glob(\dirname(__DIR__, 3).'/Event/*Event.php')), function (string $class): bool {
             return !is_subclass_of($class, DomainEventInterface::class);
@@ -33,13 +33,13 @@ final class ResolveDomainPass implements CompilerPassInterface
 
             foreach ($container->getDefinitions() as $id => $definition) {
                 if ($definition === $commandBus) {
-                    $commandBusId = $id;
+                    $commandBusId = (string) $id;
                     break;
                 }
             }
 
             foreach ($container->findTaggedServiceIds('msgphp.domain.command_handler') as $id => $attr) {
-                ContainerHelper::tagCommandHandler($container, $id, explode(',', $attr[0]['handles']), (string) $commandBusId);
+                ContainerHelper::tagCommandHandler($container, $id, $commandBusId, $attr[0]['handles'] ?? null);
             }
         } else {
             foreach ($container->findTaggedServiceIds('msgphp.domain.message_aware') as $id => $attr) {

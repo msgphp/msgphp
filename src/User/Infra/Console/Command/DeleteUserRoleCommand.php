@@ -38,10 +38,10 @@ final class DeleteUserRoleCommand extends UserRoleCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $user = $this->getUser($input, $this->io);
-        $role = $this->getRole($input, $this->io);
+        $userId = $this->getUser($input, $this->io)->getId();
+        $roleName = $this->getRole($input, $this->io)->getName();
 
-        $this->dispatch(DeleteUserRoleDomainCommand::class, [$user->getId(), $role->getName()]);
+        $this->dispatch(DeleteUserRoleDomainCommand::class, compact('userId', 'roleName'));
 
         return 0;
     }

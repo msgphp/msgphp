@@ -8,7 +8,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use MsgPhp\Domain\PaginatedDomainCollection;
-use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionInterface, ProjectionRepositoryInterface, ProjectionTypeRegistryInterface};
+use MsgPhp\Domain\Projection\{ProjectionInterface, ProjectionRepositoryInterface, ProjectionTypeRegistryInterface};
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

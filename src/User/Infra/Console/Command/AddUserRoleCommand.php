@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Console\Command;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\AddUserRoleCommand as AddUserRoleDomainCommand;
@@ -28,7 +28,7 @@ final class AddUserRoleCommand extends UserRoleCommand
     private $io;
     private $contextFactory;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
     {
         $this->contextFactory = $contextFactory;
 
@@ -59,8 +59,14 @@ final class AddUserRoleCommand extends UserRoleCommand
         $user = $this->getUser($input, $this->io);
 
         try {
-            $role = $this->getRole($input, $this->io, $roleName);
+            $role = $this->getRole($input, $this->io);
         } catch (EntityNotFoundException $e) {
+            $roleName = $input->getArgument('role');
+
+            if (!\is_string($roleName)) {
+                throw new \UnexpectedValueException('Role name must be a string.');
+            }
+
             if (!$input->isInteractive() || !$this->io->confirm(sprintf('Role "%s" does not exists. Create it now?', $roleName))) {
                 throw $e;
             }
@@ -75,14 +81,14 @@ final class AddUserRoleCommand extends UserRoleCommand
                 throw new \RuntimeException(sprintf('Cannot create role "%s". Something went wrong.', $roleName));
             }
 
-            $input->setArgument('role', $roleName);
-
             $role = $this->getRole($input, $this->io);
         }
 
-        $context = $this->contextFactory->getContext($input, $this->io, ['user' => $user, 'role' => $role]);
+        $userId = $user->getId();
+        $roleName = $role->getName();
+        $context = $this->contextFactory->getContext($input, $this->io, compact('user', 'role'));
 
-        $this->dispatch(AddUserRoleDomainCommand::class, [$user->getId(), $role->getName(), $context]);
+        $this->dispatch(AddUserRoleDomainCommand::class, compact('userId', 'roleName', 'context'));
 
         return 0;
     }

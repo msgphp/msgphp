@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Entity\Fields;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface};
 use MsgPhp\User\Entity\UserRole;
 
 /**
@@ -21,6 +20,6 @@ trait RolesField
      */
     public function getRoles(): DomainCollectionInterface
     {
-        return $this->roles instanceof DomainCollectionInterface ? $this->roles : DomainCollectionFactory::create($this->roles);
+        return new DomainCollection($this->roles);
     }
 }

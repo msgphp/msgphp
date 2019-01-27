@@ -44,16 +44,14 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::AGGREGATE_ROOTS, Configuration::IDENTITY_MAPPING);
+        ExtensionHelper::configureDomain($container, $config['class_mapping'], Configuration::IDENTITY_MAPPING);
 
         // default infra
         $loader->load('services.php');
 
         // message infra
         $loader->load('message.php');
-        ExtensionHelper::finalizeCommandHandlers($container, $config['class_mapping'], $config['commands'], array_map(function (string $file): string {
-            return Configuration::PACKAGE_NS.'Event\\'.basename($file, '.php');
-        }, glob(Configuration::getPackageGlob().'/Event/*Event.php', \GLOB_BRACE)));
+        ExtensionHelper::finalizeCommandHandlers($container, $config['class_mapping'], $config['commands'], Configuration::getPackageMetadata()->getEventClasses());
 
         // persistence infra
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
@@ -94,7 +92,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                 $config['class_mapping'],
                 $config['id_type_mapping'],
                 Configuration::DOCTRINE_TYPE_MAPPING,
-                glob(Configuration::getPackageGlob().'/Infra/Doctrine/Resources/dist-mapping/*.orm.xml', \GLOB_BRACE)
+                Configuration::getPackageMetadata()->getDoctrineMappingFiles()
             );
         }
 
@@ -112,7 +110,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         if (FeatureDetection::hasSecurityBundle($container) && $container->hasDefinition($id = 'data_collector.security')) {
             $container->getDefinition($id)
                 ->setClass(SecurityInfra\DataCollector::class)
-                ->setArgument('$repository', new Reference(Repository\UserRepositoryInterface::class, ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+                ->setArgument('$repository', new Reference(Repository\UserRepositoryInterface::class, ContainerBuilder::NULL_ON_INVALID_REFERENCE))
+            ;
         }
     }
 
@@ -122,16 +121,19 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
 
         $container->getDefinition(DoctrineInfra\Repository\UserRepository::class)
             ->setArgument('$usernameField', $config['username_field'])
-            ->setArgument('$usernameClass', $config['username_lookup'] ? $config['class_mapping'][Entity\Username::class] : null);
+            ->setArgument('$usernameClass', $config['username_lookup'] ? $config['class_mapping'][Entity\Username::class] : null)
+        ;
 
         $container->getDefinition(DoctrineInfra\Repository\UsernameRepository::class)
             ->setArgument('$targetMappings', $config['username_lookup'])
-            ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true]);
+            ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true])
+        ;
 
         if ($config['doctrine']['auto_sync_username']) {
             $container->getDefinition(DoctrineInfra\Event\UsernameListener::class)
                 ->setArgument('$targetMappings', $config['username_lookup'])
-                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true]);
+                ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true])
+            ;
         } else {
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
@@ -147,14 +149,16 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             ->setArgument('$contextFactory', ExtensionHelper::registerConsoleClassContextFactory(
                 $container,
                 $config['class_mapping'][Entity\User::class]
-            ));
+            ))
+        ;
 
         if (isset($config['class_mapping'][Entity\Role::class])) {
             $container->getDefinition(ConsoleInfra\Command\CreateRoleCommand::class)
                 ->setArgument('$contextFactory', ExtensionHelper::registerConsoleClassContextFactory(
                     $container,
                     $config['class_mapping'][Entity\Role::class]
-                ));
+                ))
+            ;
         }
 
         if (isset($config['class_mapping'][Entity\UserRole::class])) {
@@ -163,7 +167,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                     $container,
                     $config['class_mapping'][Entity\UserRole::class],
                     ConsoleClassContextFactory::REUSE_DEFINITION
-                ));
+                ))
+            ;
         }
 
         if (isset($config['username_field'])) {
@@ -172,7 +177,8 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
                     $container,
                     $config['class_mapping'][CredentialInterface::class],
                     ConsoleClassContextFactory::ALWAYS_OPTIONAL | ConsoleClassContextFactory::NO_DEFAULTS
-                ));
+                ))
+            ;
         }
 
         ExtensionHelper::finalizeConsoleCommands($container, $config['commands'], Configuration::CONSOLE_COMMAND_MAPPING);
@@ -201,6 +207,7 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         }
 
         $container->getDefinition(Role\ChainRoleProvider::class)
-            ->setArgument('$providers', new IteratorArgument($providers));
+            ->setArgument('$providers', new IteratorArgument($providers))
+        ;
     }
 }

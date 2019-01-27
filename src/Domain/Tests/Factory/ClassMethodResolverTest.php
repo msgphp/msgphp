@@ -15,13 +15,14 @@ final class ClassMethodResolverTest extends TestCase
         $arguments = ClassMethodResolver::resolve(TestClass::class, '__construct');
 
         self::assertSame([
-            ['name' => 'fooBar', 'key' => 'foo_bar', 'required' => true, 'default' => null, 'type' => 'string'],
-            ['name' => 'foo_bar', 'key' => 'foo_bar', 'required' => false, 'default' => null, 'type' => WrongCase::class],
-            ['name' => 'fooBar_Baz', 'key' => 'foo_bar_baz', 'required' => false, 'default' => null, 'type' => null],
-            ['name' => 'foo', 'key' => 'foo', 'required' => false, 'default' => 1, 'type' => 'int'],
-            ['name' => 'bar', 'key' => 'bar', 'required' => false, 'default' => null, 'type' => TestClass::class],
-            ['name' => 'baz', 'key' => 'baz', 'required' => false, 'default' => [1], 'type' => 'array'],
-            ['name' => 'qux', 'key' => 'qux', 'required' => true, 'default' => [], 'type' => 'iterable'],
+            'fooBar' => ['index' => 0, 'required' => true, 'default' => null, 'type' => 'string'],
+            'foo_bar' => ['index' => 1, 'required' => false, 'default' => null, 'type' => WrongCase::class],
+            'fooBar_Baz' => ['index' => 2, 'required' => false, 'default' => null, 'type' => null],
+            'it' => ['index' => 3, 'required' => true, 'default' => [], 'type' => 'iterable'],
+            '_stdClass' => ['index' => 4, 'required' => true, 'default' => null, 'type' => \stdClass::class],
+            'foo' => ['index' => 5, 'required' => false, 'default' => 1, 'type' => 'int'],
+            'bar' => ['index' => 6, 'required' => false, 'default' => null, 'type' => TestClass::class],
+            'baz' => ['index' => 7, 'required' => false, 'default' => [1], 'type' => 'array'],
         ], $arguments);
     }
 
@@ -38,31 +39,29 @@ final class ClassMethodResolverTest extends TestCase
     {
         $this->expectException(InvalidClassException::class);
 
-        ClassMethodResolver::resolve('foo', 'bar');
+        ClassMethodResolver::resolve(UnknownTestObject::class, 'bar');
     }
 
     public function testResolveWithUnknownMethod(): void
     {
-        $object = new class() {
-        };
-
         $this->expectException(InvalidClassException::class);
 
-        ClassMethodResolver::resolve(\get_class($object), 'bar');
+        ClassMethodResolver::resolve(\stdClass::class, 'bar');
     }
 }
 
 class TestClass
 {
-    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, int $foo = 1, self $bar = null, array $baz = [1], iterable $qux)
+    public function __construct(string $fooBar, ?wrongcase $foo_bar, $fooBar_Baz, iterable $it, \stdClass $_stdClass, int $foo = 1, self $bar = null, array $baz = [1])
     {
         $fooBar;
         $foo_bar;
         $fooBar_Baz;
+        $it;
+        $_stdClass;
         $foo;
         $bar;
         $baz;
-        $qux;
     }
 }
 

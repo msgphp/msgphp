@@ -24,7 +24,7 @@ yes or no.
 A utility trait implementing the event handler API. By convention it maps events to
 `handle<Event_Class_Name_Without_Event_Suffix>Event()` methods.
 
-#### Basic example
+#### Basic Example
 
 ```php
 <?php

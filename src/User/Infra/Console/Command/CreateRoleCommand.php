@@ -59,7 +59,7 @@ final class CreateRoleCommand extends Command implements MessageReceivingInterfa
         $this->io = new SymfonyStyle($input, $output);
         $context = $this->contextFactory->getContext($input, $this->io);
 
-        $this->dispatch(CreateRoleDomainCommand::class, [$context]);
+        $this->dispatch(CreateRoleDomainCommand::class, compact('context'));
 
         return 0;
     }

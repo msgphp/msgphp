@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command;
 
+use MsgPhp\Eav\AttributeValueIdInterface;
+
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
 class DeleteUserAttributeValueCommand
 {
-    public $id;
+    public $attributeValueId;
 
-    final public function __construct($id)
+    final public function __construct(AttributeValueIdInterface $attributeValueId)
     {
-        $this->id = $id;
+        $this->attributeValueId = $attributeValueId;
     }
 }

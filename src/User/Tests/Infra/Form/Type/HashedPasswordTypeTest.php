@@ -83,12 +83,14 @@ final class HashedPasswordTypeTest extends TypeTestCase
             ->method('hash')
             ->willReturnCallback($hasher = function (string $plainPassword, ?PasswordAlgorithm $algorithm): string {
                 return (string) json_encode([$plainPassword, null === $algorithm ? null : $algorithm->type]);
-            });
+            })
+        ;
         $passwordHashing->expects(self::any())
             ->method('isValid')
             ->willReturnCallback(function (string $hashedPassword, string $plainPassword, ?PasswordAlgorithm $algorithm) use ($hasher) {
                 return $hashedPassword === $hasher($plainPassword, $algorithm);
-            });
+            })
+        ;
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         return [

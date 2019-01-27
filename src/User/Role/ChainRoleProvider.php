@@ -11,6 +11,9 @@ use MsgPhp\User\Entity\User;
  */
 final class ChainRoleProvider implements RoleProviderInterface
 {
+    /**
+     * @var iterable|RoleProviderInterface[]
+     */
     private $providers;
 
     /**

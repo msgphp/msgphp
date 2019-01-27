@@ -18,7 +18,7 @@ abstract class AbstractDomainCollectionTest extends TestCase
         self::assertSame([1], iterator_to_array($class::fromValue([1])));
         self::assertSame([1, 'k' => '2'], iterator_to_array($class::fromValue([1, 'k' => '2'])));
         self::assertSame([1, 2, 3], iterator_to_array($class::fromValue(new \ArrayIterator([1, 2, 3]))));
-        self::assertEquals(['k' => 1, 2, '3' => 'v'], iterator_to_array($class::fromValue((function () {
+        self::assertSame(['k' => 1, 2, '3' => 'v'], iterator_to_array($class::fromValue((function () {
             yield from ['k' => 1, 2];
             yield '3' => 'v';
         })())));

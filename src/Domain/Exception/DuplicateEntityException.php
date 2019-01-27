@@ -11,6 +11,6 @@ final class DuplicateEntityException extends \RuntimeException implements Domain
 {
     public static function createForId(string $class, $id): self
     {
-        return new self(sprintf('Entity "%s" with identifier %s cannot be duplicated.', $class, (string) json_encode($id)));
+        return new self(sprintf('Entity "%s" with identity %s cannot be duplicated.', $class, (string) json_encode($id)));
     }
 }

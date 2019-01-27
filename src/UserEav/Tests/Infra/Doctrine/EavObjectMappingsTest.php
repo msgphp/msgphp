@@ -14,7 +14,7 @@ final class EavObjectMappingsTest extends TestCase
     {
         $available = array_flip(array_map(function (string $file): string {
             return 'MsgPhp\\User\\Entity\\'.basename(\dirname($file)).'\\'.basename($file, '.php');
-        }, glob(\dirname(__DIR__, 3).'/Entity/{Features,Fields}/*.php', \GLOB_BRACE)));
+        }, array_merge(glob(\dirname(__DIR__, 3).'/Entity/Features/*.php'), glob(\dirname(__DIR__, 3).'/Entity/Fields/*.php'))));
 
         $mappings = EavObjectMappings::provideObjectMappings(new MappingConfig([]));
         $mappings = array_keys($mappings instanceof \Traversable ? iterator_to_array($mappings) : $mappings);

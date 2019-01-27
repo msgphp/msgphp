@@ -38,9 +38,9 @@ final class ConfirmUserCommand extends UserCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $user = $this->getUser($input, $this->io);
+        $userId = $this->getUser($input, $this->io)->getId();
 
-        $this->dispatch(ConfirmUserDomainCommand::class, [$user->getId()]);
+        $this->dispatch(ConfirmUserDomainCommand::class, compact('userId'));
 
         return 0;
     }

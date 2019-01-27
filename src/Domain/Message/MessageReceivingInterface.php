@@ -6,6 +6,8 @@ namespace MsgPhp\Domain\Message;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 interface MessageReceivingInterface
 {

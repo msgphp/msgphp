@@ -69,7 +69,7 @@ asked interactively. If interaction is not possible an exception will be thrown 
            arguments
     - `$elementFactory`: A custom element factory to use. See also [Customizing context elements](#customizing-context-elements).
 
-##### Customizing context elements
+##### Customizing Context Elements
 
 Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactoryInterface`.
 
@@ -79,7 +79,7 @@ Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra
 A default implementation is provided by `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactory` which simply
 transforms argument names to human readable values so that `$argumentName` becomes `Argument Name`.
 
-##### Basic example
+##### Basic Example
 
 ```php
 <?php

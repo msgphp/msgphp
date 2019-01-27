@@ -1,14 +1,13 @@
 # Entities
 
-Entity objects are provided per domain layer and usually follow a [POPO] design. To simplify its definition common
-fields and features are provided in the form of PHP [traits]. Fields can be compared to a read-operation, whereas
-features represent a read/write-operation.
+Domain entities are "[vanilla] PHP objects" owned by the user. To simplify its definition common _fields_ and _features_
+are provided in the form of PHP [traits].
 
-They are defined in a dedicated namespace for discovery, respectively `Msgphp\Domain\Entity\Fields\` and
-`MsgPhp\Domain\Entity\Features\`. Additionally more specific fields and features can be provided per domain layer.
+Fields can be compared to a read-operation, whereas features represent a read/write-operation. They can be discovered
+in the following namespaces:
 
-!!! note
-    See the [reference](../reference/entities.md) page for all available entities provided per domain
+- `Msgphp\Domain\Entity\Fields\`
+- `MsgPhp\Domain\Entity\Features\`
 
 ## Basic Example
 
@@ -41,5 +40,8 @@ if (!$entity->isEnabled()) {
 }
 ```
 
-[POPO]: https://stackoverflow.com/questions/41188002/what-does-the-term-plain-old-php-object-popo-exactly-mean
+!!! note
+    See the [reference](../reference/entities.md#msgphpdomain) page for all available fields and features
+
+[vanilla]: https://en.wikipedia.org/wiki/Plain_vanilla
 [traits]: https://secure.php.net/traits

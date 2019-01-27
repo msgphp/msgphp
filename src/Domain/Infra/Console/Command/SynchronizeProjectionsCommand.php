@@ -32,7 +32,8 @@ final class SynchronizeProjectionsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Synchronizes all projections');
+            ->setDescription('Synchronizes all projections')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

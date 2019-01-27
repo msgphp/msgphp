@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Eav\Command\Handler;
 
-use MsgPhp\Domain\Factory\EntityAwareFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\{DomainMessageBusInterface, MessageDispatchingTrait};
+use MsgPhp\Eav\AttributeIdInterface;
 use MsgPhp\Eav\Command\CreateAttributeCommand;
 use MsgPhp\Eav\Entity\Attribute;
 use MsgPhp\Eav\Event\AttributeCreatedEvent;
@@ -20,7 +21,7 @@ final class CreateAttributeHandler
 
     private $repository;
 
-    public function __construct(EntityAwareFactoryInterface $factory, DomainMessageBusInterface $bus, AttributeRepositoryInterface $repository)
+    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, AttributeRepositoryInterface $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
@@ -29,9 +30,11 @@ final class CreateAttributeHandler
 
     public function __invoke(CreateAttributeCommand $command): void
     {
-        $attribute = $this->factory->create(Attribute::class, $command->context + ['id' => $this->factory->nextIdentifier(Attribute::class)]);
+        $context = $command->context;
+        $context['id'] = $context['id'] ?? $this->factory->create(AttributeIdInterface::class);
+        $attribute = $this->factory->create(Attribute::class, $context);
 
         $this->repository->save($attribute);
-        $this->dispatch(AttributeCreatedEvent::class, [$attribute]);
+        $this->dispatch(AttributeCreatedEvent::class, compact('attribute'));
     }
 }

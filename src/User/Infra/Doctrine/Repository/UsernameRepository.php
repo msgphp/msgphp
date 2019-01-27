@@ -6,8 +6,7 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\{DomainCollectionInterface, DomainIdentityHelper};
-use MsgPhp\Domain\Factory\DomainCollectionFactory;
+use MsgPhp\Domain\{DomainCollection, DomainCollectionInterface};
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\{User, Username};
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
@@ -17,17 +16,14 @@ use MsgPhp\User\Repository\UsernameRepositoryInterface;
  */
 final class UsernameRepository implements UsernameRepositoryInterface
 {
-    use DomainEntityRepositoryTrait {
-        __construct as private __parent_construct;
-    }
+    use DomainEntityRepositoryTrait;
 
-    private $alias = 'username';
     private $targetMappings;
 
-    public function __construct(string $class, EntityManagerInterface $em, array $targetMappings = [], DomainIdentityHelper $identityHelper = null)
+    public function __construct(string $class, EntityManagerInterface $em, array $targetMappings = [])
     {
-        $this->__parent_construct($class, $em, $identityHelper);
-
+        $this->class = $class;
+        $this->em = $em;
         $this->targetMappings = $targetMappings;
     }
 
@@ -37,12 +33,14 @@ final class UsernameRepository implements UsernameRepositoryInterface
     public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
     {
         $qb = $this->createQueryBuilder();
-        $qb->indexBy($this->alias, 'username');
+        $qb->indexBy($this->getAlias(), 'username');
 
         return $this->createResultSet($qb->getQuery(), $offset, $limit);
     }
 
     /**
+     * @psalm-suppress DeprecatedClass
+     *
      * @return DomainCollectionInterface|Username[]
      */
     public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface
@@ -96,7 +94,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
             }
         }
 
-        $result = DomainCollectionFactory::create($result);
+        $result = new DomainCollection($result);
 
         return $offset || $limit ? $result->slice($offset, $limit) : $result;
     }

@@ -1,6 +1,4 @@
-/.env
-/var
-.php_cs.cache
-composer.lock
-composer.phar
-vendor/
+/composer.lock
+/src/*/coverage.xml
+/var/
+/vendor/
