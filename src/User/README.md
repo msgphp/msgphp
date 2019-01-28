@@ -13,7 +13,7 @@ composer require msgphp/user
 ## Documentation
 
 - Read the [main documentation](https://msgphp.github.io/docs/)
-- Browse the [API documentation](https://msgphp.github.io/api/MsgPhp/User.html)
+- Checkout the [Symfony Bundle](https://github.com/msgphp/user-bundle)
 - Try the Symfony [demo application](https://github.com/msgphp/symfony-demo-app)
 - Get support on [Symfony's Slack `#msgphp` channel](https://symfony.com/slack-invite) or [raise an issue](https://github.com/msgphp/msgphp/issues/new)
 

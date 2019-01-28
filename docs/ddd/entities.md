@@ -3,11 +3,20 @@
 Domain entities are "[vanilla] PHP objects" owned by the user. To simplify its definition common _fields_ and _features_
 are provided in the form of PHP [traits].
 
-Fields can be compared to a read-operation, whereas features represent a read/write-operation. They can be discovered
-in the following namespaces:
+## Entity Fields
 
-- `Msgphp\Domain\Entity\Fields\`
-- `MsgPhp\Domain\Entity\Features\`
+Use entity fields to provide _read operations_ for common entity fields. Built-in fields are:
+
+- `Msgphp\Domain\Entity\Fields\CreatedAtField`
+- `Msgphp\Domain\Entity\Fields\EnabledField`
+- `Msgphp\Domain\Entity\Fields\LastUpdatedAtField`
+
+## Entity Features
+
+Use entity features to provide _write operations_ for common entity fields. Built-in features are:
+
+- `MsgPhp\Domain\Entity\Features\CanBeConfirmed`
+- `MsgPhp\Domain\Entity\Features\CanBeEnabled`
 
 ## Basic Example
 
@@ -39,9 +48,6 @@ if (!$entity->isEnabled()) {
     $entity->enable();
 }
 ```
-
-!!! note
-    See the [reference](../reference/entities.md#msgphpdomain) page for all available fields and features
 
 [vanilla]: https://en.wikipedia.org/wiki/Plain_vanilla
 [traits]: https://secure.php.net/traits

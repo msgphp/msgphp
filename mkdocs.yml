@@ -15,7 +15,11 @@ markdown_extensions:
 
 nav:
     - Home: index.md
-    - Code Conventions: code-conventions.md
+    - Symfony Cookbook:
+          - User Bundle:
+                - Installation: cookbook/user-bundle/installation.md
+          - Configuring Symfony Messenger: cookbook/configuring-symfony-messenger.md
+          - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
     - Domain-Driven-Design:
           - Identifiers: ddd/identifiers.md
           - Collections: ddd/collections.md
@@ -45,14 +49,3 @@ nav:
           - Symfony Console: infrastructure/symfony-console.md
           - Symfony Messenger: infrastructure/symfony-messenger.md
           - UUID: infrastructure/uuid.md
-    - Cookbook:
-          - Bundle Installation: cookbook/bundle-installation.md
-          - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
-          - Configuring Symfony Messenger: cookbook/configuring-symfony-messenger.md
-    - Reference:
-          - Identifiers: reference/identifiers.md
-          - Entities: reference/entities.md
-          - Repositories: reference/repositories.md
-          - Messages: reference/messages.md
-          - Domain Events: reference/domain-events.md
-          - Doctrine Identifier Types: reference/doctrine-identifier-types.md

@@ -6,12 +6,13 @@ A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpo
 ## API
 
 !!! note
-    This is a marker interface and has no API
+    This is a marker interface and has no default API
 
 ## Implementations
 
-!!! note
-    See the [reference](../reference/domain-events.md#msgphpdomain) page for all available domain events
+- `MsgPhp\Domain\Event\ConfirmEvent`
+- `MsgPhp\Domain\Event\DisableEvent`
+- `MsgPhp\Domain\Event\EnableEvent`
 
 ## Basic Example
 
