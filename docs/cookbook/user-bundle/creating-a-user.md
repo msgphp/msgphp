@@ -1,50 +1,97 @@
-# How to create an user?
+# Creating a User
 
-Users can be created by dispatching `CreateUserCommand` message with a data array that contains the arguments required by `User` constructor.
-
-For example, if you decided to use the `EmailPasswordCredential` trait the user email and password are the required arguments:
+Users can be created by dispatching the `CreateUserCommand` message with a data array that contains values for the `User`
+constructor arguments.
 
 ```php
-/**
- * @ORM\Entity()
- */
-class User extends BaseUser implements DomainEventHandlerInterface
+<?php
+
+use MsgPhp\User\Command\CreateUserCommand;
+use Symfony\Component\Messenger\MessageBusInterface;
+
+/** @var MessageBusInterface $bus */
+$bus->dispatch(new CreateUserCommand([]));
+```
+
+The handler will automatically add an `id` element to the data array holding an instance of `MsgPhp\User\UserIdInterface`.
+Alternatively it can be passed upfront:
+
+```php
+<?php
+
+use MsgPhp\User\UserId;
+use MsgPhp\User\Command\CreateUserCommand;
+use Symfony\Component\Messenger\MessageBusInterface;
+
+/** @var MessageBusInterface $bus */
+$bus->dispatch(new CreateUserCommand([
+    'id' => new UserId(),
+]));
+```
+
+To programmatically factorize an [identifier](../../ddd/identifiers.md), use the [object factory](../../ddd/object-factory.md):
+
+```php
+<?php
+
+use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\Command\CreateUserCommand;
+use Symfony\Component\Messenger\MessageBusInterface;
+
+/** @var DomainObjectFactoryInterface $factory */
+/** @var MessageBusInterface $bus */
+$bus->dispatch(new CreateUserCommand([
+    'id' => $factory->create(UserIdInterface::class),
+]));
+```
+
+## Adding Custom Fields
+
+Define the custom fields:
+
+```php
+<?php
+
+// src/Entity/User/User.php
+
+// ...
+
+class User extends BaseUser
 {
-    [...]
-    use EmailPasswordCredential;
+    // ...
     
-    [...]
+    private $requiredField;
+    private $optionalField;
     
-    public function __construct(UserIdInterface $id, string $email, string $password)
+    public function __construct(UserIdInterface $id, $requiredField, $optionalField = null)
     {
-        $this->id           = $id;
-        $this->credential   = new EmailPassword($email, $password);
+        $this->id = $id;
+        $this->requiredField = $requiredField;
+        $this->optionalField = $optionalField;
     }
+    
+    // ...
+}
 ```
 
-Create `User` by dispatching the message:
+Specify the fields during dispatch:
 
 ```php
+<?php
 
-    public function createUser(
-        MessageBusInterface $bus
-        [...]
-    ): Response {
-        [...]
+use MsgPhp\User\Command\CreateUserCommand;
+use Symfony\Component\Messenger\MessageBusInterface;
 
-        $bus->dispatch(new CreateUserCommand($data));
-        
-        [...]
-        return new Response('Success!');
-    }
+/** @var MessageBusInterface $bus */
+$bus->dispatch(new CreateUserCommand([
+    'requiredField' => 'value',
+]));
 
-```
+// alternatively:
 
-Where `$data' should contain:
-
-```php
-    $data = [
-        'email' => 'bar@foo.com',
-        'password' => 'supersecret'
-    ]
+$bus->dispatch(new CreateUserCommand([
+    'requiredField' => 'value',
+    'optionalField' => 'value',
+]));
 ```

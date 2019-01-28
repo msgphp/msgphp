@@ -18,6 +18,7 @@ nav:
     - Symfony Cookbook:
           - User Bundle:
                 - Installation: cookbook/user-bundle/installation.md
+                - Creating a User: cookbook/user-bundle/creating-a-user.md
           - Configuring Symfony Messenger: cookbook/configuring-symfony-messenger.md
           - Configuring Doctrine ORM: cookbook/configuring-doctrine-orm.md
     - Domain-Driven-Design:
