@@ -32,8 +32,9 @@ final class CreateRoleHandler
 
     public function __invoke(CreateRoleCommand $command): void
     {
-        $role = $this->factory->create(Role::class, $command->context);
+        $context = $command->context;
+        $role = $this->factory->create(Role::class, $context);
         $this->repository->save($role);
-        $this->dispatch(RoleCreatedEvent::class, compact('role'));
+        $this->dispatch(RoleCreatedEvent::class, compact('role', 'context'));
     }
 }

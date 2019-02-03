@@ -32,12 +32,12 @@ final class AddUserEmailHandler
 
     public function __invoke(AddUserEmailCommand $command): void
     {
-        $userEmail = $this->factory->create(UserEmail::class, [
-            'user' => $this->factory->reference(User::class, ['id' => $command->userId]),
-            'email' => $command->email,
-        ] + $command->context);
+        $context = $command->context;
+        $context['user'] = $this->factory->reference(User::class, ['id' => $command->userId]);
+        $context['email'] = $command->email;
+        $userEmail = $this->factory->create(UserEmail::class, $context);
 
         $this->repository->save($userEmail);
-        $this->dispatch(UserEmailAddedEvent::class, compact('userEmail'));
+        $this->dispatch(UserEmailAddedEvent::class, compact('userEmail', 'context'));
     }
 }

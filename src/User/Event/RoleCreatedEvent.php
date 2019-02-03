@@ -16,8 +16,14 @@ class RoleCreatedEvent
      */
     public $role;
 
-    final public function __construct(Role $role)
+    /**
+     * @var array
+     */
+    public $context;
+
+    final public function __construct(Role $role, array $context)
     {
         $this->role = $role;
+        $this->context = $context;
     }
 }

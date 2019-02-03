@@ -16,8 +16,14 @@ class UserEmailAddedEvent
      */
     public $userEmail;
 
-    final public function __construct(UserEmail $userEmail)
+    /**
+     * @var array
+     */
+    public $context;
+
+    final public function __construct(UserEmail $userEmail, array $context)
     {
         $this->userEmail = $userEmail;
+        $this->context = $context;
     }
 }

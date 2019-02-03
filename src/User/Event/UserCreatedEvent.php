@@ -16,8 +16,14 @@ class UserCreatedEvent
      */
     public $user;
 
-    final public function __construct(User $user)
+    /**
+     * @var array
+     */
+    public $context;
+
+    final public function __construct(User $user, array $context)
     {
         $this->user = $user;
+        $this->context = $context;
     }
 }

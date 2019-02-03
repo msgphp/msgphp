@@ -32,12 +32,12 @@ final class AddUserRoleHandler
 
     public function __invoke(AddUserRoleCommand $command): void
     {
-        $userRole = $this->factory->create(UserRole::class, [
-            'user' => $this->factory->reference(User::class, ['id' => $command->userId]),
-            'role' => $this->factory->reference(Role::class, ['name' => $command->roleName]),
-        ] + $command->context);
+        $context = $command->context;
+        $context['user'] = $this->factory->reference(User::class, ['id' => $command->userId]);
+        $context['role'] = $this->factory->reference(Role::class, ['name' => $command->roleName]);
+        $userRole = $this->factory->create(UserRole::class, $context);
 
         $this->repository->save($userRole);
-        $this->dispatch(UserRoleAddedEvent::class, compact('userRole'));
+        $this->dispatch(UserRoleAddedEvent::class, compact('userRole', 'context'));
     }
 }

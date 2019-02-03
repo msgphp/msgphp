@@ -16,8 +16,14 @@ class UserAttributeValueAddedEvent
      */
     public $userAttributeValue;
 
-    final public function __construct(UserAttributeValue $userAttributeValue)
+    /**
+     * @var array
+     */
+    public $context;
+
+    final public function __construct(UserAttributeValue $userAttributeValue, array $context)
     {
         $this->userAttributeValue = $userAttributeValue;
+        $this->context = $context;
     }
 }
