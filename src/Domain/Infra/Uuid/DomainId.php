@@ -20,7 +20,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DomainId implements DomainIdInterface
+class DomainId implements DomainIdInterface, \JsonSerializable
 {
     /**
      * @var UuidInterface
@@ -66,17 +66,10 @@ class DomainId implements DomainIdInterface
         return $this->uuid->toString();
     }
 
-    final public function serialize(): string
-    {
-        return serialize($this->uuid);
-    }
-
-    final public function unserialize($serialized): void
-    {
-        $this->uuid = unserialize($serialized);
-    }
-
-    final public function jsonSerialize(): string
+    /**
+     * @return mixed
+     */
+    final public function jsonSerialize()
     {
         return $this->uuid->jsonSerialize();
     }

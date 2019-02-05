@@ -16,7 +16,7 @@ namespace MsgPhp\Domain;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DomainId implements DomainIdInterface
+class DomainId implements DomainIdInterface, \JsonSerializable
 {
     /**
      * @var string|null
@@ -62,17 +62,10 @@ class DomainId implements DomainIdInterface
         return $this->id ?? '';
     }
 
-    final public function serialize(): string
-    {
-        return serialize($this->id);
-    }
-
-    final public function unserialize($serialized): void
-    {
-        $this->id = unserialize($serialized);
-    }
-
-    final public function jsonSerialize(): ?string
+    /**
+     * @return mixed
+     */
+    final public function jsonSerialize()
     {
         return $this->id;
     }

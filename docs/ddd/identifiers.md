@@ -5,13 +5,6 @@ primitive identifier value, usually used to identity an entity with.
 
 ## API
 
-### Extends
-
-- [`\Serializable`][serializable]
-- [`\JsonSerializable`][json-serializable]
-
----
-
 ### `static fromValue($value): DomainIdInterface`
 
 Returns a factorized identifier from any primitive value. Using `null` might imply an empty identifier.
@@ -70,6 +63,3 @@ $emptyId->toString(); // ""
 A UUID tailored domain identifier.
 
 - [Read more](../infrastructure/uuid.md#domain-identifier)
-
-[serializable]: https://secure.php.net/serializable
-[json-serializable]: https://secure.php.net/jsonserializable

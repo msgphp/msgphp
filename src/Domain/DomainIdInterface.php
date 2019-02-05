@@ -16,7 +16,7 @@ namespace MsgPhp\Domain;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-interface DomainIdInterface extends \Serializable, \JsonSerializable
+interface DomainIdInterface
 {
     /**
      * @param mixed $value

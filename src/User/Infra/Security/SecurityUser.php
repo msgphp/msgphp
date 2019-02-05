@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class SecurityUser implements UserInterface, EquatableInterface, \Serializable
+final class SecurityUser implements UserInterface, EquatableInterface
 {
     /**
      * @var UserIdInterface
@@ -117,15 +117,5 @@ final class SecurityUser implements UserInterface, EquatableInterface, \Serializ
     public function isEqualTo(UserInterface $user)
     {
         return $user instanceof self && $user->getUserId()->equals($this->id);
-    }
-
-    public function serialize(): string
-    {
-        return serialize([$this->id, $this->originUsername, $this->roles, $this->password, $this->passwordSalt]);
-    }
-
-    public function unserialize($serialized): void
-    {
-        [$this->id, $this->originUsername, $this->roles, $this->password, $this->passwordSalt] = unserialize($serialized);
     }
 }
