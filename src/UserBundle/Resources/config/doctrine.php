@@ -20,7 +20,6 @@ return function (ContainerConfigurator $container): void {
         ->set(Doctrine\Event\UsernameListener::class)
             ->tag('doctrine.orm.entity_listener')
             ->tag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])
-            ->tag('doctrine.event_listener', ['event' => DoctrineOrmEvents::postFlush])
     ;
 
     foreach (Configuration::getPackageMetadata()->getDoctrineServicePrototypes() as $resource => $namespace) {

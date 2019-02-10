@@ -129,7 +129,9 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
             ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true])
         ;
 
-        if ($config['doctrine']['auto_sync_username']) {
+        ExtensionHelper::finalizeDoctrineOrmRepositories($container, $config['class_mapping'], Configuration::DOCTRINE_REPOSITORY_MAPPING);
+
+        if ($config['username_lookup'] && $config['doctrine']['auto_sync_username']) {
             $container->getDefinition(DoctrineInfra\Event\UsernameListener::class)
                 ->setArgument('$targetMappings', $config['username_lookup'])
                 ->addTag('msgphp.domain.process_class_mapping', ['argument' => '$targetMappings', 'array_keys' => true])
@@ -137,8 +139,6 @@ final class Extension extends BaseExtension implements PrependExtensionInterface
         } else {
             $container->removeDefinition(DoctrineInfra\Event\UsernameListener::class);
         }
-
-        ExtensionHelper::finalizeDoctrineOrmRepositories($container, $config['class_mapping'], Configuration::DOCTRINE_REPOSITORY_MAPPING);
     }
 
     private function loadConsole(array $config, LoaderInterface $loader, ContainerBuilder $container): void
