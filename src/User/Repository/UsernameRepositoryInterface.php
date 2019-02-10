@@ -15,12 +15,12 @@ interface UsernameRepositoryInterface
     /**
      * @return DomainCollectionInterface|Username[]
      */
-    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface;
+    public function lookup(): DomainCollectionInterface;
 
     /**
      * @return DomainCollectionInterface|Username[]
      */
-    public function findAllFromTargets(int $offset = 0, int $limit = 0): DomainCollectionInterface;
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface;
 
     public function find(string $username): Username;
 

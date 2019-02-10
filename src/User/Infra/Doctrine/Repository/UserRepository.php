@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\User;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Repository\{UsernameRepositoryInterface, UserRepositoryInterface};
 use MsgPhp\User\UserIdInterface;
 
 /**
@@ -28,19 +24,19 @@ final class UserRepository implements UserRepositoryInterface
     private $usernameField;
 
     /**
-     * @var string|null
+     * @var UsernameRepositoryInterface|null
      */
-    private $usernameClass;
+    private $usernameRepository;
 
     /**
      * @psalm-param class-string $class
      */
-    public function __construct(string $class, EntityManagerInterface $em, ?string $usernameField, ?string $usernameClass)
+    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null, UsernameRepositoryInterface $usernameRepository = null)
     {
         $this->class = $class;
         $this->em = $em;
         $this->usernameField = $usernameField;
-        $this->usernameClass = $usernameClass;
+        $this->usernameRepository = $usernameRepository;
     }
 
     /**
@@ -58,17 +54,15 @@ final class UserRepository implements UserRepositoryInterface
 
     public function findByUsername(string $username): User
     {
-        $qb = $this->createQueryBuilderForUsername($username);
-
-        if (null !== $qb) {
-            try {
-                return $qb->getQuery()->getSingleResult();
-            } catch (NoResultException $e) {
-                throw EntityNotFoundException::createForFields($this->class, ['username' => $username]);
-            }
+        if (null !== $this->usernameRepository) {
+            return $this->usernameRepository->find($username)->getUser();
         }
 
-        return $this->doFindByFields($this->getUsernameCriteria($username));
+        if (null === $this->usernameField) {
+            throw new \LogicException('User has no username field.');
+        }
+
+        return $this->doFindByFields([$this->usernameField => $username]);
     }
 
     public function exists(UserIdInterface $id): bool
@@ -78,15 +72,15 @@ final class UserRepository implements UserRepositoryInterface
 
     public function usernameExists(string $username): bool
     {
-        $qb = $this->createQueryBuilderForUsername($username);
-
-        if (null !== $qb) {
-            $qb->select('1');
-
-            return (bool) $qb->getQuery()->getScalarResult();
+        if (null !== $this->usernameRepository) {
+            return $this->usernameRepository->exists($username);
         }
 
-        return $this->doExistsByFields($this->getUsernameCriteria($username));
+        if (null === $this->usernameField) {
+            throw new \LogicException('User has no username field.');
+        }
+
+        return $this->doExistsByFields([$this->usernameField => $username]);
     }
 
     public function save(User $user): void
@@ -97,29 +91,5 @@ final class UserRepository implements UserRepositoryInterface
     public function delete(User $user): void
     {
         $this->doDelete($user);
-    }
-
-    private function getUsernameCriteria(string $username): array
-    {
-        if (null === $this->usernameField) {
-            throw new \LogicException(sprintf('No username field available for entity "%s".', $this->class));
-        }
-
-        return [$this->usernameField => $username];
-    }
-
-    private function createQueryBuilderForUsername(string $username): ?QueryBuilder
-    {
-        if (null === $this->usernameClass) {
-            return null;
-        }
-
-        $qb = $this->createQueryBuilder();
-        $qb->join($this->usernameClass, 'username', Join::WITH, 'username.user = '.$this->getAlias());
-        $qb->where($qb->expr()->eq('username.username', ':username'));
-        $qb->setMaxResults(1);
-        $qb->setParameter('username', $username);
-
-        return $qb;
     }
 }

@@ -17,6 +17,8 @@ return function (ContainerConfigurator $container): void {
             ->private()
             ->bind(EntityManagerInterface::class, ref('msgphp.doctrine.entity_manager'))
 
+        ->set(Doctrine\UsernameLookup::class)
+
         ->set(Doctrine\Event\UsernameListener::class)
             ->tag('doctrine.orm.entity_listener')
             ->tag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])

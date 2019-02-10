@@ -26,22 +26,22 @@ final class UsernameListener
     /**
      * @var array[]
      */
-    private $targetMappings;
+    private $mapping;
 
     /**
-     * @param array[] $targetMappings
+     * @param array[] $mapping
      */
-    public function __construct(DomainObjectFactoryInterface $factory, array $targetMappings)
+    public function __construct(DomainObjectFactoryInterface $factory, array $mapping)
     {
         $this->factory = $factory;
-        $this->targetMappings = $targetMappings;
+        $this->mapping = $mapping;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
         $metadata = $event->getClassMetadata();
 
-        if (!isset($this->targetMappings[$metadata->getName()])) {
+        if (!isset($this->mapping[$metadata->getName()])) {
             return;
         }
 
@@ -73,7 +73,7 @@ final class UsernameListener
     {
         $em = $event->getEntityManager();
 
-        foreach ($this->getTargetMapping($entity, $em) as $field => $mappedBy) {
+        foreach ($this->getMapping($entity, $em) as $field => $mappedBy) {
             if (!$event->hasChangedField($field)) {
                 continue;
             }
@@ -103,7 +103,7 @@ final class UsernameListener
         $em = $event->getEntityManager();
         $metadata = $em->getClassMetadata(\get_class($entity));
 
-        foreach (array_keys($this->getTargetMapping($entity, $em)) as $field) {
+        foreach (array_keys($this->getMapping($entity, $em)) as $field) {
             if (null === $username = $metadata->getFieldValue($entity, $field)) {
                 continue;
             }
@@ -121,7 +121,7 @@ final class UsernameListener
     {
         $metadata = $em->getClassMetadata(\get_class($entity));
 
-        foreach ($this->getTargetMapping($entity, $em) as $field => $mappedBy) {
+        foreach ($this->getMapping($entity, $em) as $field => $mappedBy) {
             $user = null === $mappedBy ? $entity : $metadata->getFieldValue($entity, $mappedBy);
 
             if (null === $user || null === $username = $metadata->getFieldValue($entity, $field)) {
@@ -145,15 +145,15 @@ final class UsernameListener
     /**
      * @param object $entity
      */
-    private function getTargetMapping($entity, EntityManagerInterface $em): array
+    private function getMapping($entity, EntityManagerInterface $em): array
     {
-        if (isset($this->targetMappings[$class = ClassUtils::getClass($entity)])) {
-            return $this->targetMappings[$class];
+        if (isset($this->mapping[$class = ClassUtils::getClass($entity)])) {
+            return $this->mapping[$class];
         }
 
         foreach ($em->getClassMetadata($class)->parentClasses as $parent) {
-            if (isset($this->targetMappings[$parent])) {
-                return $this->targetMappings[$parent];
+            if (isset($this->mapping[$parent])) {
+                return $this->mapping[$parent];
             }
         }
 
