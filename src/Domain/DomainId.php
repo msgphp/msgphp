@@ -30,6 +30,10 @@ class DomainId implements DomainIdInterface, \JsonSerializable
 
     final public function __construct(string $id = null)
     {
+        if ('' === $id) {
+            throw new \LogicException('ID must be a non empty string.');
+        }
+
         $this->id = $id;
     }
 

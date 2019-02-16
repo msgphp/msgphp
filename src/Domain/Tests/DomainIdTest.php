@@ -13,20 +13,25 @@ final class DomainIdTest extends TestCase
     {
         self::assertSame((array) new DomainId(), (array) DomainId::fromValue(null));
         self::assertSame((array) new DomainId(null), (array) DomainId::fromValue(null));
-        self::assertNotSame((array) new DomainId(''), (array) DomainId::fromValue(null));
-        self::assertSame((array) new DomainId(''), (array) DomainId::fromValue(''));
-        self::assertSame((array) new DomainId(''), (array) DomainId::fromValue(false));
+        self::assertSame((array) new DomainId('foo'), (array) DomainId::fromValue('foo'));
+        self::assertSame((array) new DomainId(' '), (array) DomainId::fromValue(' '));
         self::assertSame((array) new DomainId('1'), (array) DomainId::fromValue(1));
         self::assertInstanceOf(OtherTestDomainId::class, OtherTestDomainId::fromValue(null));
+    }
+
+    public function testEmptyIdValue(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        new DomainId('');
     }
 
     public function testIsEmpty(): void
     {
         self::assertTrue((new DomainId())->isEmpty());
         self::assertTrue((new DomainId(null))->isEmpty());
-        self::assertFalse((new DomainId(''))->isEmpty());
-        self::assertFalse((new DomainId(' '))->isEmpty());
         self::assertFalse((new DomainId('foo'))->isEmpty());
+        self::assertFalse((new DomainId(' '))->isEmpty());
     }
 
     public function testEquals(): void
@@ -72,9 +77,8 @@ final class DomainIdTest extends TestCase
     {
         yield [new DomainId(), ''];
         yield [new DomainId(null), ''];
-        yield [new DomainId(''), ''];
-        yield [new DomainId(' '), ' '];
         yield [new DomainId('foo'), 'foo'];
+        yield [new DomainId(' '), ' '];
     }
 }
 
