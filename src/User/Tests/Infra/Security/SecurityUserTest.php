@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\User\{CredentialInterface, UserIdInterface};
+use MsgPhp\User\{CredentialInterface, UserId};
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Password\{PasswordAlgorithm, PasswordProtectedInterface, PasswordSalt};
@@ -73,7 +71,7 @@ final class SecurityUserTest extends TestCase
         self::assertTrue($user->isEqualTo($user));
         self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id'))));
         self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id', 'password', 'salt'))));
-        self::assertFalse($user->isEqualTo(new SecurityUser($this->createUser('other'))));
+        self::assertFalse($user->isEqualTo(new SecurityUser($this->createUser('other-id'))));
     }
 
     public function testIsEqualToWithOtherUserType(): void
@@ -94,37 +92,17 @@ final class SecurityUserTest extends TestCase
 
     public function testSerialize(): void
     {
-        $user = new SecurityUser($this->createUser(new TestUserId('id'), 'password', 'salt'), 'origin-username', ['ROLE_FOO']);
+        $user = new SecurityUser($this->createUser('id', 'password', 'salt'), 'origin-username', ['ROLE_FOO']);
 
         self::assertEquals($user, unserialize(serialize($user)));
     }
 
-    private function createUser($id = null, string $password = null, string $salt = null): User
+    private function createUser(string $id = null, string $password = null, string $salt = null): User
     {
-        if ($id instanceof UserIdInterface) {
-            $userId = $id;
-        } else {
-            $userId = $this->createMock(UserIdInterface::class);
-            $userId->expects(self::any())
-                ->method('toString')
-                ->willReturn($id)
-            ;
-            $userId->expects(self::any())
-                ->method('equals')
-                ->willReturnCallback(function (DomainIdInterface $other) use ($id) {
-                    return $id === $other->toString();
-                })
-            ;
-            $userId->expects(self::any())
-                ->method('isEmpty')
-                ->willReturn(null === $id)
-            ;
-        }
-
         $user = $this->createMock(User::class);
         $user->expects(self::any())
             ->method('getId')
-            ->willReturn($userId)
+            ->willReturn(new UserId($id))
         ;
 
         if (null === $password) {
@@ -148,8 +126,4 @@ final class SecurityUserTest extends TestCase
 
         return $user;
     }
-}
-
-class TestUserId extends DomainId implements UserIdInterface
-{
 }

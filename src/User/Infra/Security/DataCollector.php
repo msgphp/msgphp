@@ -12,6 +12,7 @@ use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  *
- * @todo consider decorating instead
+ * @todo decorate instead
  *
  * @internal
  */
@@ -56,17 +57,19 @@ final class DataCollector extends BaseDataCollector
             $this->data['user'] = $this->getUsername($user->getUserId());
         }
 
-        foreach ($token->getRoles() as $role) {
-            if (!$role instanceof SwitchUserRole) {
-                continue;
+        if ($token instanceof SwitchUserToken) {
+            $impersonatorUser = $token->getOriginalToken()->getUser();
+        } else {
+            // BC Symfony <4.3
+            $impersonatorUser = null;
+            foreach ($token->getRoles() as $role) {
+                if ($role instanceof SwitchUserRole) {
+                    $impersonatorUser = $role->getSource()->getUser();
+                }
             }
-
-            $impersonatorUser = $role->getSource()->getUser();
-
-            if ($impersonatorUser instanceof SecurityUser) {
-                $this->data['impersonator_user'] = $this->getUsername($impersonatorUser->getUserId());
-                break;
-            }
+        }
+        if ($impersonatorUser instanceof SecurityUser) {
+            $this->data['impersonator_user'] = $this->getUsername($impersonatorUser->getUserId());
         }
     }
 

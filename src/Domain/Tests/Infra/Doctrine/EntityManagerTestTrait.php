@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 use MsgPhp\Domain\Infra\Doctrine\Test\EntityManagerTestTrait as BaseEntityManagerTestTrait;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 trait EntityManagerTestTrait
 {
@@ -28,7 +29,7 @@ trait EntityManagerTestTrait
 
     protected static function getEntityIdTypes(): iterable
     {
-        yield DomainIdType::class;
+        yield DomainIdType::class => TestDomainId::class;
     }
 
     protected function setUp(): void

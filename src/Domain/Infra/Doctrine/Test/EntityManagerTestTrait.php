@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\ToolsException;
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
 
 /**
@@ -39,11 +40,8 @@ trait EntityManagerTestTrait
         self::cleanEmCache();
 
         foreach (self::getEntityIdTypes() as $type => $class) {
-            if (\is_int($type)) {
-                $type = $class;
-            } else {
-                $type::setClass($class);
-            }
+            $type::setClass($class);
+
             if (Type::hasType($type::NAME)) {
                 Type::overrideType($type::NAME, $type);
             } else {
@@ -77,9 +75,12 @@ trait EntityManagerTestTrait
 
     private static function destroyEm(): void
     {
-        self::cleanEmCache();
+        (new SchemaTool(self::$em))->dropDatabase();
+
         self::$em->close();
         self::$em = null;
+
+        self::cleanEmCache();
     }
 
     private static function prepareEm(): void
@@ -89,7 +90,15 @@ trait EntityManagerTestTrait
         }
 
         if (self::createSchema()) {
-            (new SchemaTool(self::$em))->createSchema(self::$em->getMetadataFactory()->getAllMetadata());
+            $schemaTool = new SchemaTool(self::$em);
+            $classes = self::$em->getMetadataFactory()->getAllMetadata();
+
+            try {
+                $schemaTool->createSchema($classes);
+            } catch (ToolsException $e) {
+                $schemaTool->dropSchema($classes);
+                $schemaTool->createSchema($classes);
+            }
         }
     }
 
@@ -98,7 +107,7 @@ trait EntityManagerTestTrait
         self::$em->clear();
 
         if (self::createSchema()) {
-            (new SchemaTool(self::$em))->dropDatabase();
+            (new SchemaTool(self::$em))->dropSchema(self::$em->getMetadataFactory()->getAllMetadata());
         }
     }
 

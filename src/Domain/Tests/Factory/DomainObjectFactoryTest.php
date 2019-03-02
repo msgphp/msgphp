@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
-use MsgPhp\Domain\{DomainCollection, DomainId};
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Factory\{DomainObjectFactory, DomainObjectFactoryInterface};
+use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use PHPUnit\Framework\TestCase;
 
 final class DomainObjectFactoryTest extends TestCase
@@ -48,9 +49,9 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDomainId(): void
     {
-        $id = (new DomainObjectFactory())->create(DomainId::class, ['value' => 123]);
+        $id = (new DomainObjectFactory())->create(TestDomainId::class, ['value' => 123]);
 
-        self::assertInstanceOf(DomainId::class, $id);
+        self::assertInstanceOf(TestDomainId::class, $id);
         self::assertSame('123', $id->toString());
     }
 

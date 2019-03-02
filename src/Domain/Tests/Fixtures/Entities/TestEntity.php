@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\{DomainId, DomainIdInterface};
+use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
  * @Doctrine\ORM\Mapping\Entity()
@@ -65,6 +66,6 @@ class TestEntity extends BaseTestEntity
 
     final public function getId(): DomainIdInterface
     {
-        return $this->id ?? ($this->id = new DomainId());
+        return $this->id ?? ($this->id = new TestDomainId());
     }
 }

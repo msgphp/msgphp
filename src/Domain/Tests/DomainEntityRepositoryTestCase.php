@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\{DomainCollectionInterface, DomainId, DomainIdInterface};
+use MsgPhp\Domain\{DomainCollectionInterface, DomainIdInterface};
 use MsgPhp\Domain\Exception\{DuplicateEntityException, EntityNotFoundException, InvalidClassException};
-use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities};
+use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities, TestDomainId};
 use PHPUnit\Framework\TestCase;
 
 abstract class DomainEntityRepositoryTestCase extends TestCase
@@ -27,9 +27,9 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
     {
         $repository = static::createRepository(Entities\TestPrimitiveEntity::class);
         $entities = [
-            $entity1 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('1')]),
-            $entity2 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('2')]),
-            $entity3 = Entities\TestPrimitiveEntity::create(['id' => new DomainId('3')]),
+            $entity1 = Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('1')]),
+            $entity2 = Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('2')]),
+            $entity3 = Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('3')]),
         ];
 
         $this->assertEntityCollectionEquals([], $repository->doFindAll());
@@ -55,18 +55,18 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
         $repository = static::createRepository(Entities\TestCompositeEntity::class);
         $repository2 = static::createRepository(Entities\TestEntity::class);
         $entities = [
-            $entity1 = Entities\TestCompositeEntity::create(['idA' => new DomainId('1'), 'idB' => 'foo']),
-            $entity2 = Entities\TestCompositeEntity::create(['idA' => new DomainId('2'), 'idB' => 'foo']),
-            $entity3 = Entities\TestCompositeEntity::create(['idA' => new DomainId('3'), 'idB' => 'bar']),
-            $entity4 = Entities\TestEntity::create(['id' => new DomainId('1'), 'intField' => 1, 'boolField' => false]),
+            $entity1 = Entities\TestCompositeEntity::create(['idA' => new TestDomainId('1'), 'idB' => 'foo']),
+            $entity2 = Entities\TestCompositeEntity::create(['idA' => new TestDomainId('2'), 'idB' => 'foo']),
+            $entity3 = Entities\TestCompositeEntity::create(['idA' => new TestDomainId('3'), 'idB' => 'bar']),
+            $entity4 = Entities\TestEntity::create(['id' => new TestDomainId('1'), 'intField' => 1, 'boolField' => false]),
         ];
 
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => 1]));
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => '2']));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new DomainId()], 1));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [null, 'foo', new DomainId('2'), new DomainId('3')]], 1, 1));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [new DomainId('1'), new DomainId('3')]], 0, 10));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new TestDomainId()], 1));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [null, 'foo', new TestDomainId('2'), new TestDomainId('3')]], 1, 1));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [new TestDomainId('2'), new TestDomainId('1'), new TestDomainId()]], 1, 0));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => [new TestDomainId('1'), new TestDomainId('3')]], 0, 10));
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idB' => 'foo'], 0, 10));
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idB' => 'bar'], 10, 10));
         $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idB' => 'foo'], 0, 2));
@@ -85,13 +85,13 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
 
         $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idA' => 1]));
         $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idA' => '2']));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new DomainId()], 1));
-        $this->assertEntityCollectionEquals([$entity3], $repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('3')]], 1, 1));
-        $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idA' => [new DomainId('2'), new DomainId('1'), new DomainId()]], 1, 0));
-        $this->assertEntityCollectionEquals([$entity1, $entity3], $repository->doFindAllByFields(['idA' => [new DomainId('1'), new DomainId('3')]], 0, 10));
-        $this->assertEntityCollectionEquals([$entity3], $repository->doFindAllByFields(['idA' => new DomainId('3')], 0, 10));
-        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new DomainId('2')], 10, 10));
-        $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idA' => new DomainId('1')], 0, 2));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new TestDomainId()], 1));
+        $this->assertEntityCollectionEquals([$entity3], $repository->doFindAllByFields(['idA' => [new TestDomainId('2'), new TestDomainId('3')]], 1, 1));
+        $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idA' => [new TestDomainId('2'), new TestDomainId('1'), new TestDomainId()]], 1, 0));
+        $this->assertEntityCollectionEquals([$entity1, $entity3], $repository->doFindAllByFields(['idA' => [new TestDomainId('1'), new TestDomainId('3')]], 0, 10));
+        $this->assertEntityCollectionEquals([$entity3], $repository->doFindAllByFields(['idA' => new TestDomainId('3')], 0, 10));
+        $this->assertEntityCollectionEquals([], $repository->doFindAllByFields(['idA' => new TestDomainId('2')], 10, 10));
+        $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idA' => new TestDomainId('1')], 0, 2));
         $this->assertEntityCollectionEquals([$entity1, $entity2], $repository->doFindAllByFields(['idB' => 'foo']));
         $this->assertEntityCollectionEquals([$entity1], $repository->doFindAllByFields(['idB' => 'foo'], 0, 1));
         $this->assertEntityCollectionEquals([$entity2], $repository->doFindAllByFields(['idB' => 'foo'], 1, 1));
@@ -182,10 +182,10 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
         ]);
 
         if (!static::$supportsAutoGeneratedIds) {
-            $entity->setId(new DomainId(bin2hex(random_bytes(32))));
+            $entity->setId(new TestDomainId(bin2hex(random_bytes(32))));
         } else {
             // https://github.com/doctrine/doctrine2/issues/4584
-            $entity->setId(new DomainId('IRRELEVANT'));
+            $entity->setId(new TestDomainId('IRRELEVANT'));
         }
 
         static::flushEntities([$derivingEntity = Entities\TestDerivedEntity::create(['entity' => $entity]), $entity2]);
@@ -267,9 +267,9 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
 
         if (!static::$supportsAutoGeneratedIds) {
             if ($entity instanceof Entities\TestEntity) {
-                $entity->setId(new DomainId(bin2hex(random_bytes(32))));
+                $entity->setId(new TestDomainId(bin2hex(random_bytes(32))));
             } elseif ($entity instanceof Entities\TestDerivedEntity) {
-                $entity->entity->setId(new DomainId(bin2hex(random_bytes(32))));
+                $entity->entity->setId(new TestDomainId(bin2hex(random_bytes(32))));
             }
         }
 
@@ -314,11 +314,11 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
     {
         $repository = static::createRepository(Entities\TestPrimitiveEntity::class);
 
-        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
+        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('999')]));
 
         $this->expectException(DuplicateEntityException::class);
 
-        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new DomainId('999')]));
+        $repository->doSave(Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('999')]));
     }
 
     public function testSaveWithInvalidClass(): void

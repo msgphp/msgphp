@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-use MsgPhp\Domain\{DomainId, DomainIdInterface};
+use MsgPhp\Domain\{DomainIdInterface, DomainIdTrait};
 
 interface SomeIdInterface extends DomainIdInterface
 {
 }
 
-class SomeId extends DomainId implements SomeIdInterface
+class SomeId implements SomeIdInterface
 {
+    use DomainIdTrait;
+
     public function autocomplete(): void
     {
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
  * @Doctrine\ORM\Mapping\Entity()
@@ -34,7 +34,7 @@ class TestDerivedCompositeEntity extends BaseTestEntity
     {
         static $entity;
         if (null === $entity) {
-            $entity = TestPrimitiveEntity::create(['id' => new DomainId('999')]);
+            $entity = TestPrimitiveEntity::create(['id' => new TestDomainId('999')]);
         }
 
         return [

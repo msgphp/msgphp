@@ -31,13 +31,9 @@ final class Configuration implements ConfigurationInterface
     public const DOCTRINE_REPOSITORY_MAPPING = [
         Entity\Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
     ];
-    private const DEFAULT_ID_MAPPING = [
-        AttributeIdInterface::class => AttributeId::class,
-        AttributeValueIdInterface::class => AttributeValueId::class,
-    ];
-    private const UUID_MAPPING = [
-        AttributeIdInterface::class => UuidInfra\AttributeId::class,
-        AttributeValueIdInterface::class => UuidInfra\AttributeValueId::class,
+    private const ID_TYPE_MAPPING = [
+        AttributeIdInterface::class => ['scalar' => AttributeId::class, 'uuid' => UuidInfra\AttributeId::class],
+        AttributeValueIdInterface::class => ['scalar' => AttributeValueId::class, 'uuid' => UuidInfra\AttributeValueId::class],
     ];
     private const COMMAND_MAPPING = [
         Entity\Attribute::class => [
@@ -84,10 +80,7 @@ final class Configuration implements ConfigurationInterface
             ->end()
         ->end()
         ->validate()
-            ->always(ConfigHelper::defaultBundleConfig(
-                self::DEFAULT_ID_MAPPING,
-                array_fill_keys(ConfigHelper::UUID_TYPES, self::UUID_MAPPING)
-            ))
+            ->always(ConfigHelper::defaultBundleConfig(self::ID_TYPE_MAPPING))
         ->end()
         ->validate()
             ->always(function (array $config): array {

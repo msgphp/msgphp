@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use Doctrine\DBAL\Types\Type;
-use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infra\Doctrine\{DomainEntityRepositoryTrait, DomainIdType};
 use MsgPhp\Domain\Tests\DomainEntityRepositoryTestCase;
-use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities};
+use MsgPhp\Domain\Tests\Fixtures\{DomainEntityRepositoryTraitInterface, Entities, TestDomainId};
 
 final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCase
 {
@@ -37,7 +36,7 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
 
         self::assertSame(':id', $repository->addFieldParameter($qb, 'id', 1));
         self::assertSame(':id1', $repository->addFieldParameter($qb, 'id', '1'));
-        self::assertSame(':id2', $repository->addFieldParameter($qb, 'id', new DomainId('1')));
+        self::assertSame(':id2', $repository->addFieldParameter($qb, 'id', new TestDomainId('1')));
 
         $parameters = $qb->getParameters();
 
@@ -56,10 +55,10 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
 
         self::assertSame(['id' => 1], $repository->toIdentity(1));
         self::assertSame(['id' => '1'], $repository->toIdentity('1'));
-        self::assertSame(['id' => 1], $repository->toIdentity(new DomainId('1')));
+        self::assertSame(['id' => 1], $repository->toIdentity(new TestDomainId('1')));
         self::assertSame(['id' => 1], $repository->toIdentity(['id' => 1]));
         self::assertSame(['id' => '1'], $repository->toIdentity(['id' => '1']));
-        self::assertSame(['id' => 1], $repository->toIdentity(['id' => new DomainId('1')]));
+        self::assertSame(['id' => 1], $repository->toIdentity(['id' => new TestDomainId('1')]));
         self::assertNull($repository->toIdentity(['id' => 1, 'foo' => 'bar']));
         self::assertNull($repository->toIdentity(null));
         self::assertNull($repository->toIdentity([]));

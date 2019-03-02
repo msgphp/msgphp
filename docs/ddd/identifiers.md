@@ -30,29 +30,35 @@ be returned.
 
 ## Implementations
 
-### `MsgPhp\Domain\DomainId`
+### `MsgPhp\Domain\DomainIdTrait`
 
-A first class citizen domain identifier.
+A first class citizen domain identifier trait.
 
 #### Basic Example
 
 ```php
 <?php
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\{DomainIdInterface, DomainIdTrait};
 
 // --- SETUP ---
 
-$id = new DomainId('1');
-$emptyId = new DomainId();
+class MyDomainId implements DomainIdInterface
+{
+    use DomainIdTrait;
+}
+
+$id = new MyDomainId('1');
+$emptyId = new MyDomainId();
 
 // --- USAGE ---
 
 $id->isEmpty(); // false
 $emptyId->isEmpty(); // true
 
-$id->equals(new DomainId('1')); // true
-$emptyId->equals(new DomainId()); // false
+$id->equals(new MyDomainId('1')); // true
+$emptyId->equals(new MyDomainId()); // false
+$emptyId->equals($emptyId); // true
 
 $id->toString(); // "1"
 $emptyId->toString(); // ""

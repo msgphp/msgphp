@@ -4,54 +4,56 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\Tests\Fixtures\{TestDomainId, TestOtherDomainId};
 use PHPUnit\Framework\TestCase;
 
 final class DomainIdTest extends TestCase
 {
     public function testFromValue(): void
     {
-        self::assertSame((array) new DomainId(), (array) DomainId::fromValue(null));
-        self::assertSame((array) new DomainId(null), (array) DomainId::fromValue(null));
-        self::assertSame((array) new DomainId('foo'), (array) DomainId::fromValue('foo'));
-        self::assertSame((array) new DomainId(' '), (array) DomainId::fromValue(' '));
-        self::assertSame((array) new DomainId('1'), (array) DomainId::fromValue(1));
-        self::assertInstanceOf(OtherTestDomainId::class, OtherTestDomainId::fromValue(null));
+        self::assertSame((array) new TestDomainId(), (array) TestDomainId::fromValue(null));
+        self::assertSame((array) new TestDomainId(null), (array) TestDomainId::fromValue(null));
+        self::assertSame((array) new TestDomainId('foo'), (array) TestDomainId::fromValue('foo'));
+        self::assertSame((array) new TestDomainId('1'), (array) TestDomainId::fromValue(1));
+        self::assertSame((array) new TestDomainId(' '), (array) TestDomainId::fromValue(' '));
+        self::assertNotSame(TestDomainId::fromValue('1'), TestDomainId::fromValue('1'));
+        self::assertInstanceOf(TestOtherDomainId::class, TestOtherDomainId::fromValue(null));
     }
 
     public function testEmptyIdValue(): void
     {
         $this->expectException(\LogicException::class);
 
-        new DomainId('');
+        new TestDomainId('');
     }
 
     public function testIsEmpty(): void
     {
-        self::assertTrue((new DomainId())->isEmpty());
-        self::assertTrue((new DomainId(null))->isEmpty());
-        self::assertFalse((new DomainId('foo'))->isEmpty());
-        self::assertFalse((new DomainId(' '))->isEmpty());
+        self::assertTrue((new TestDomainId())->isEmpty());
+        self::assertTrue((new TestDomainId(null))->isEmpty());
+        self::assertFalse((new TestDomainId('foo'))->isEmpty());
+        self::assertFalse((new TestDomainId(' '))->isEmpty());
     }
 
     public function testEquals(): void
     {
-        $id = new DomainId('foo');
-        $emptyId = new DomainId();
+        $id = new TestDomainId('foo');
+        $emptyId = new TestDomainId();
 
         self::assertTrue($id->equals($id));
-        self::assertTrue($id->equals(new DomainId('foo')));
+        self::assertTrue($id->equals(new TestDomainId('foo')));
         self::assertFalse($id->equals($emptyId));
-        self::assertFalse($id->equals(new OtherTestDomainId('foo')));
+        self::assertFalse($id->equals(new TestOtherDomainId('foo')));
         self::assertTrue($emptyId->equals($emptyId));
-        self::assertFalse($emptyId->equals(new DomainId()));
-        self::assertFalse($emptyId->equals(new OtherTestDomainId()));
+        self::assertFalse($emptyId->equals(new TestDomainId()));
+        self::assertFalse($emptyId->equals(new TestOtherDomainId()));
     }
 
     /**
      * @dataProvider provideIds
      */
-    public function testToString(DomainId $id, string $value): void
+    public function testToString(DomainIdInterface $id, string $value): void
     {
         self::assertSame($value, $id->toString());
         self::assertSame($value, (string) $id);
@@ -60,28 +62,16 @@ final class DomainIdTest extends TestCase
     /**
      * @dataProvider provideIds
      */
-    public function testSerialize(DomainId $id): void
+    public function testSerialize(DomainIdInterface $id): void
     {
         self::assertSame((array) $id, (array) unserialize(serialize($id)));
     }
 
-    /**
-     * @dataProvider provideIds
-     */
-    public function testJsonSerialize(DomainId $id): void
-    {
-        self::assertSame($id->isEmpty() ? null : $id->toString(), json_decode((string) json_encode($id)));
-    }
-
     public function provideIds(): iterable
     {
-        yield [new DomainId(), ''];
-        yield [new DomainId(null), ''];
-        yield [new DomainId('foo'), 'foo'];
-        yield [new DomainId(' '), ' '];
+        yield [new TestDomainId(), ''];
+        yield [new TestDomainId(null), ''];
+        yield [new TestDomainId('foo'), 'foo'];
+        yield [new TestDomainId(' '), ' '];
     }
-}
-
-class OtherTestDomainId extends DomainId
-{
 }

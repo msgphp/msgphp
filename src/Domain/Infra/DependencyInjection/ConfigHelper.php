@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
-use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
-use MsgPhp\Domain\Infra\Uuid as UuidInfra;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -16,36 +14,25 @@ use MsgPhp\Domain\Infra\Uuid as UuidInfra;
 final class ConfigHelper
 {
     public const DEFAULT_ID_TYPE = 'integer';
-    public const UUID_TYPES = ['uuid', 'uuid_binary', 'uuid_binary_ordered_time'];
 
-    public static function defaultBundleConfig(array $defaultIdClassMapping, array $idClassMappingPerType): \Closure
+    public static function defaultBundleConfig(array $idTypeMapping): \Closure
     {
-        return function (array $value) use ($defaultIdClassMapping, $idClassMappingPerType): array {
-            $defaultType = $value['default_id_type'] ?? self::DEFAULT_ID_TYPE;
-            unset($value['default_id_type']);
+        return function (array $value) use ($idTypeMapping): array {
+            foreach ($idTypeMapping as $id => $mapping) {
+                $types = array_keys($mapping);
+                $type = $value['id_type_mapping'][$id] ?? ($value['id_type_mapping'][$id] = $value['default_id_type'] ?? reset($types));
+                $mapping = self::resolveIdTypeMapping($mapping);
 
-            if (isset($value['id_type_mapping'])) {
-                foreach ($value['id_type_mapping'] as $class => $type) {
-                    if (isset($value['class_mapping'][$class])) {
-                        continue;
-                    }
-
-                    if (null === $mappedClass = $idClassMapping[$type][$class] ?? $defaultIdClassMapping[$class] ?? null) {
-                        $mappedClass = \in_array($type, self::UUID_TYPES, true) ? UuidInfra\DomainId::class : DomainId::class;
-                    }
-
-                    $value['class_mapping'][$class] = $mappedClass;
+                if (!isset($value['class_mapping'][$id]) && isset($mapping[$type])) {
+                    $value['class_mapping'][$id] = $mapping[$type];
                 }
             }
-
-            if (isset($idClassMappingPerType[$defaultType])) {
-                $value['class_mapping'] += $idClassMappingPerType[$defaultType];
-                /** @psalm-suppress PossiblyNullOperand */
-                $value['id_type_mapping'] += array_fill_keys(array_keys($idClassMappingPerType[$defaultType]), $defaultType);
+            foreach ($value['id_type_mapping'] as $id => $type) {
+                if (!isset($value['class_mapping'][$id])) {
+                    throw new \LogicException(sprintf('No class available for ID "%s" of data-type "%s".', $id, $type));
+                }
             }
-
-            $value['class_mapping'] += $defaultIdClassMapping;
-            $value['id_type_mapping'] += array_fill_keys(array_keys($defaultIdClassMapping), $defaultType);
+            unset($value['default_id_type']);
 
             return $value;
         };
@@ -87,6 +74,21 @@ final class ConfigHelper
         }
 
         return isset($uses[$class][$trait]);
+    }
+
+    private static function resolveIdTypeMapping(array $mapping): array
+    {
+        if (isset($mapping['scalar'])) {
+            $mapping['string'] = $mapping['string'] ?? $mapping['scalar'];
+            $mapping['integer'] = $mapping['integer'] ?? $mapping['scalar'];
+        }
+
+        if (isset($mapping['uuid'])) {
+            $mapping['uuid_binary'] = $mapping['uuid_binary'] ?? $mapping['uuid'];
+            $mapping['uuid_binary_ordered_time'] = $mapping['uuid_binary_ordered_time'] ?? $mapping['uuid_binary'];
+        }
+
+        return $mapping;
     }
 
     private function __construct()

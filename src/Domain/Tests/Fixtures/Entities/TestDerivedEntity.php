@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
  * @Doctrine\ORM\Mapping\Entity()
@@ -30,7 +30,7 @@ class TestDerivedEntity extends BaseTestEntity
             $entity = TestEntity::create(['intField' => 0, 'boolField' => true]);
 
             // https://github.com/doctrine/doctrine2/issues/4584
-            $entity->setId(new DomainId('IRRELEVANT'));
+            $entity->setId(new TestDomainId('IRRELEVANT'));
         }
 
         return [

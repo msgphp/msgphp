@@ -18,7 +18,12 @@ parameters:
         - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
 
         # deprecated
-        - '#Call to deprecated method toString\(\) of class Ramsey\\Uuid\\UuidInterface\.#'
+        -
+            message: '#Call to deprecated method toString\(\) of class Ramsey\\Uuid\\UuidInterface\.#'
+            path: src/Domain/Infra/Uuid/DomainId.php
+        -
+            message: '#Call to deprecated method getRoles\(\) of class Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface\.#'
+            path: src/User/Infra/Security/DataCollector.php
 
         # msgphp
         - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'

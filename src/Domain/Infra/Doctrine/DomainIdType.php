@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
-use MsgPhp\Domain\{DomainId, DomainIdInterface};
+use MsgPhp\Domain\DomainIdInterface;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -38,7 +38,11 @@ class DomainIdType extends Type
      */
     final public static function getClass(): string
     {
-        return self::$mapping[static::class]['class'] ?? DomainId::class;
+        if (!isset(self::$mapping[static::class]['class'])) {
+            throw new \LogicException(sprintf('No class set for type "%s".', static::class));
+        }
+
+        return self::$mapping[static::class]['class'];
     }
 
     final public static function setDataType(string $type): void
