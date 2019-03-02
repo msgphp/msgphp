@@ -6,7 +6,7 @@ namespace MsgPhp\User\Tests\Command\Handler;
 
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
-use MsgPhp\User\{UserId, UserIdInterface};
+use MsgPhp\User\{ScalarUserId, UserIdInterface};
 use MsgPhp\User\Command\CreateUserCommand;
 use MsgPhp\User\Command\Handler\CreateUserHandler;
 use MsgPhp\User\Entity\User;
@@ -69,7 +69,7 @@ final class CreateUserHandlerTest extends TestCase
     private static function createFactory(): DomainObjectFactory
     {
         return new DomainObjectFactory([
-            UserIdInterface::class => UserId::class,
+            UserIdInterface::class => ScalarUserId::class,
             User::class => TestUser::class,
         ]);
     }

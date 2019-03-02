@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Eav;
+namespace MsgPhp\User;
 
 use MsgPhp\Domain\DomainIdTrait;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class AttributeId implements AttributeIdInterface
+final class ScalarUserId implements UserIdInterface
 {
     use DomainIdTrait;
 }

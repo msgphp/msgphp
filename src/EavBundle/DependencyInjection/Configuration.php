@@ -7,7 +7,7 @@ namespace MsgPhp\EavBundle\DependencyInjection;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Infra\Config\{NodeBuilder, TreeBuilderHelper};
 use MsgPhp\Domain\Infra\DependencyInjection\{ConfigHelper, PackageMetadata};
-use MsgPhp\Eav\{AttributeId, AttributeIdInterface, AttributeValueId, AttributeValueIdInterface, Command, Entity};
+use MsgPhp\Eav\{ScalarAttributeId, AttributeIdInterface, ScalarAttributeValueId, AttributeValueIdInterface, Command, Entity};
 use MsgPhp\Eav\Infra\{Doctrine as DoctrineInfra, Uuid as UuidInfra};
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -32,8 +32,8 @@ final class Configuration implements ConfigurationInterface
         Entity\Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
     ];
     private const ID_TYPE_MAPPING = [
-        AttributeIdInterface::class => ['scalar' => AttributeId::class, 'uuid' => UuidInfra\AttributeId::class],
-        AttributeValueIdInterface::class => ['scalar' => AttributeValueId::class, 'uuid' => UuidInfra\AttributeValueId::class],
+        AttributeIdInterface::class => ['scalar' => ScalarAttributeId::class, 'uuid' => UuidInfra\AttributeId::class],
+        AttributeValueIdInterface::class => ['scalar' => ScalarAttributeValueId::class, 'uuid' => UuidInfra\AttributeValueId::class],
     ];
     private const COMMAND_MAPPING = [
         Entity\Attribute::class => [

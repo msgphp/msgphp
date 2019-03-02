@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infra\Security;
 
-use MsgPhp\User\{CredentialInterface, UserId};
+use MsgPhp\User\{CredentialInterface, ScalarUserId};
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Password\{PasswordAlgorithm, PasswordProtectedInterface, PasswordSalt};
@@ -102,7 +102,7 @@ final class SecurityUserTest extends TestCase
         $user = $this->createMock(User::class);
         $user->expects(self::any())
             ->method('getId')
-            ->willReturn(new UserId($id))
+            ->willReturn(new ScalarUserId($id))
         ;
 
         if (null === $password) {
