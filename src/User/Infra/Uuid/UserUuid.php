@@ -10,7 +10,7 @@ use MsgPhp\User\UserIdInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserId implements UserIdInterface
+final class UserUuid implements UserIdInterface
 {
     use DomainIdTrait;
 }

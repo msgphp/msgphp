@@ -32,8 +32,8 @@ final class Configuration implements ConfigurationInterface
         Entity\Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
     ];
     private const ID_TYPE_MAPPING = [
-        AttributeIdInterface::class => ['scalar' => ScalarAttributeId::class, 'uuid' => UuidInfra\AttributeId::class],
-        AttributeValueIdInterface::class => ['scalar' => ScalarAttributeValueId::class, 'uuid' => UuidInfra\AttributeValueId::class],
+        AttributeIdInterface::class => ['scalar' => ScalarAttributeId::class, 'uuid' => UuidInfra\AttributeUuid::class],
+        AttributeValueIdInterface::class => ['scalar' => ScalarAttributeValueId::class, 'uuid' => UuidInfra\AttributeValueUuid::class],
     ];
     private const COMMAND_MAPPING = [
         Entity\Attribute::class => [
