@@ -29,7 +29,9 @@ A utility trait implementing the event handler API. By convention it maps events
 ```php
 <?php
 
-use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventHandlerTrait, DomainEventInterface};
+use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEventHandlerTrait;
+use MsgPhp\Domain\Event\DomainEventInterface;
 
 // --- SETUP ---
 

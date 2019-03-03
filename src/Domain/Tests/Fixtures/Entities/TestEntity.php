@@ -40,7 +40,7 @@ class TestEntity extends BaseTestEntity
      * @var DomainIdInterface|null
      * @Doctrine\ORM\Mapping\Id()
      * @Doctrine\ORM\Mapping\GeneratedValue()
-     * @Doctrine\ORM\Mapping\Column(type="msgphp_domain_id")
+     * @Doctrine\ORM\Mapping\Column(type="domain_id")
      */
     private $id;
 

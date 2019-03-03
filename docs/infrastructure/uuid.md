@@ -19,7 +19,7 @@ use Ramsey\Uuid\Uuid;
 
 // --- SETUP ---
 
-final class MyDomainUuid implements DomainIdInterface
+class MyDomainUuid implements DomainIdInterface
 {
     use DomainIdTrait;
 }

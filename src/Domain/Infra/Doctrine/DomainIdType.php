@@ -12,7 +12,7 @@ use MsgPhp\Domain\DomainIdInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DomainIdType extends Type
+abstract class DomainIdType extends Type
 {
     public const NAME = 'msgphp_domain_id';
 
@@ -112,17 +112,17 @@ class DomainIdType extends Type
         return $value;
     }
 
-    final public function getName(): string
+    public function getName(): string
     {
         return static::NAME;
     }
 
-    final public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return static::getInnerType()->getSQLDeclaration($fieldDeclaration, $platform);
     }
 
-    final public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if ($value instanceof DomainIdInterface) {
             $value = $value->isEmpty() ? null : $value->toString();
@@ -135,7 +135,7 @@ class DomainIdType extends Type
         }
     }
 
-    final public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
     {
         try {
             $value = static::getInnerType()->convertToPHPValue($value, $platform);

@@ -59,7 +59,8 @@ $typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\{DocumentMappingProviderInterface, ProjectionTypeRegistry};
+use MsgPhp\Domain\Infra\Elasticsearch\DocumentMappingProviderInterface;
+use MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry;
 use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---

@@ -22,7 +22,8 @@ Its purpose is to ease the handling of command messages by sourcing a [domain ev
 <?php
 
 use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait; 
-use MsgPhp\Domain\Event\{DomainEventHandlerInterface, DomainEventInterface};
+use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 
 // --- SETUP ---

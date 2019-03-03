@@ -46,7 +46,9 @@ An Elasticsearch tailored projection repository.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionInterface, ProjectionRepositoryInterface};
+use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\ProjectionInterface;
+use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
 
 // --- SETUP ---
 

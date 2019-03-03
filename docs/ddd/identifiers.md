@@ -39,11 +39,12 @@ A first class citizen domain identifier trait.
 ```php
 <?php
 
-use MsgPhp\Domain\{DomainIdInterface, DomainIdTrait};
+use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainIdTrait;
 
 // --- SETUP ---
 
-final class MyDomainId implements DomainIdInterface
+class MyDomainId implements DomainIdInterface
 {
     use DomainIdTrait;
 }

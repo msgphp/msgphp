@@ -6,11 +6,11 @@ namespace MsgPhp\Domain\Tests\Infra\Doctrine;
 
 use Doctrine\DBAL\Types\Type;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 use MsgPhp\Domain\Tests\DomainEntityRepositoryTestCase;
 use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainIdType;
 
 final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCase
 {
@@ -45,7 +45,7 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
 
         self::assertSame(Type::INTEGER, $parameters->get(0)->getType());
         self::assertSame(\PDO::PARAM_STR, $parameters->get(1)->getType());
-        self::assertSame(DomainIdType::NAME, $parameters->get(2)->getType());
+        self::assertSame(TestDomainIdType::NAME, $parameters->get(2)->getType());
     }
 
     public function testToIdentity(): void

@@ -19,7 +19,9 @@ use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 
 // --- SETUP ---
 
-/** @ORM\Entity() */
+/**
+ * @ORM\Entity()
+ */
 class MyEntity
 {
     /** @ORM\Id() @ORM\Column(type="string") */
@@ -71,7 +73,7 @@ When working with [ORM inheritance] the discriminator field can be provided to f
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
-use MsgPhp\Domain\Infra\Doctrine\{DomainIdentityMapping, DomainObjectFactory};
+use MsgPhp\Domain\Infra\Doctrine\DomainObjectFactory;
 
 // --- SETUP ---
 
@@ -90,7 +92,9 @@ class MyEntity
     public $id;
 }
 
-/** @ORM\Entity */
+/**
+ * @ORM\Entity()
+ */
 class MyOtherEntity extends MyEntity
 {
 }
@@ -125,22 +129,26 @@ To overcome, two hydration modes are available to hydrate the primitive identifi
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
-use MsgPhp\Domain\Infra\Doctrine\Hydration\{ScalarHydrator, SingleScalarHydrator};
+use MsgPhp\Domain\Infra\Doctrine\Hydration\ScalarHydrator;
+use MsgPhp\Domain\Infra\Doctrine\Hydration\SingleScalarHydrator;
 
 // --- SETUP ---
 
-/** @ORM\Entity() */
+/**
+ * @ORM\Entity()
+ */
 class MyEntity
 {
-    /** @var DomainId @ORM\Id() @ORM\Column(type="msgphp_domain_id") */
+    /**
+     * @var MyDomainId|null
+     * @ORM\Id() @ORM\Column(type="my_domain_id")
+     */
     public $id;
 }
 
-DomainIdType::setClass(DomainId::class);
-DomainIdType::setDataType(Type::INTEGER);
-Type::addType(DomainIdType::NAME, DomainIdType::class);
+MyDomainIdType::setClass(MyDomainId::class);
+MyDomainIdType::setDataType(Type::INTEGER);
+Type::addType(MyDomainIdType::NAME, MyDomainIdType::class);
 
 /** @var EntityManagerInterface $em */
 $em = ...;

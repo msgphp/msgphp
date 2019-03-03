@@ -15,20 +15,14 @@ A translation between the database type and an [identifier](../ddd/identifiers.m
 <?php
 
 use Doctrine\DBAL\Types\Type;
-use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 
 // --- SETUP ---
-
-class MyDomainId extends DomainId
-{
-}
 
 class MyDomainIdType extends DomainIdType
 {
     public const NAME = 'my_domain_id';
 }
-
 
 // --- USAGE ---
 
@@ -38,16 +32,15 @@ MyDomainIdType::setDataType(Type::GUID);
 Type::addType(MyDomainIdType::NAME, MyDomainIdType::class);
 ```
 
-To leverage the tailored [UUID identifier](../infrastructure/uuid.md#domain-identifier) use a data type from
-[ramsey/uuid-doctrine] instead.
+To leverage a tailored [UUID identifier](../infrastructure/uuid.md#domain-identifier) use one of the UUID data types
+provided by [ramsey/uuid-doctrine].
 
 ```php
 <?php
 
-use MsgPhp\Domain\Infra\Uuid\DomainId as DomainUuid;
 use Ramsey\Uuid\Doctrine\UuidType;
 
-MyDomainIdType::setClass(DomainUuid::class);
+MyDomainIdType::setClass(MyDomainUuid::class);
 MyDomainIdType::setDataType(UuidType::NAME);
 ```
 

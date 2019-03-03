@@ -14,7 +14,12 @@ Yields all projection documents attempted to be synchronized. The actual documen
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionDocumentProvider, ProjectionDocumentTransformerInterface, ProjectionRepositoryInterface, ProjectionSynchronization, ProjectionTypeRegistryInterface};
+use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\ProjectionDocumentProvider;
+use MsgPhp\Domain\Projection\ProjectionDocumentTransformerInterface;
+use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
+use MsgPhp\Domain\Projection\ProjectionSynchronization;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
 
 // --- SETUP ---
 

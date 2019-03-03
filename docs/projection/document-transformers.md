@@ -14,7 +14,9 @@ Transforms the domain object into a projection document.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\{ProjectionDocument, ProjectionDocumentTransformerInterface, ProjectionInterface};
+use MsgPhp\Domain\Projection\ProjectionDocument;
+use MsgPhp\Domain\Projection\ProjectionDocumentTransformerInterface;
+use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---
 

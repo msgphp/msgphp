@@ -15,7 +15,7 @@ class TestPrimitiveEntity extends BaseTestEntity
     /**
      * @var DomainIdInterface
      * @Doctrine\ORM\Mapping\Id()
-     * @Doctrine\ORM\Mapping\Column(type="msgphp_domain_id")
+     * @Doctrine\ORM\Mapping\Column(type="domain_id")
      */
     public $id;
 

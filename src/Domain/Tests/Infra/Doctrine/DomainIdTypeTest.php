@@ -8,7 +8,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainIdType;
 use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainId;
+use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainIdType;
 use PHPUnit\Framework\TestCase;
 
 final class DomainIdTypeTest extends TestCase
@@ -30,26 +32,26 @@ final class DomainIdTypeTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (Type::hasType('domain_id')) {
-            Type::overrideType('domain_id', DomainIdType::class);
+        if (Type::hasType(TestDomainIdType::NAME)) {
+            Type::overrideType(TestDomainIdType::NAME, TestDomainIdType::class);
         } else {
-            Type::addType('domain_id', DomainIdType::class);
+            Type::addType(TestDomainIdType::NAME, TestDomainIdType::class);
         }
 
-        if (Type::hasType('other_domain_id')) {
-            Type::overrideType('other_domain_id', TestOtherDomainIdType::class);
+        if (Type::hasType(TestOtherDomainIdType::NAME)) {
+            Type::overrideType(TestOtherDomainIdType::NAME, TestOtherDomainIdType::class);
         } else {
-            Type::addType('other_domain_id', TestOtherDomainIdType::class);
+            Type::addType(TestOtherDomainIdType::NAME, TestOtherDomainIdType::class);
         }
     }
 
     protected function setUp(): void
     {
         DomainIdType::resetMapping();
-        DomainIdType::setClass(TestDomainId::class);
+        TestDomainIdType::setClass(TestDomainId::class);
 
-        $this->type = Type::getType('domain_id');
-        $this->otherType = Type::getType('other_domain_id');
+        $this->type = Type::getType(TestDomainIdType::NAME);
+        $this->otherType = Type::getType(TestOtherDomainIdType::NAME);
         $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform->expects(self::any())
             ->method('getIntegerTypeDeclarationSQL')
@@ -90,7 +92,7 @@ final class DomainIdTypeTest extends TestCase
 
     public function testGetName(): void
     {
-        self::assertSame(DomainIdType::NAME, $this->type->getName());
+        self::assertSame(TestDomainIdType::NAME, $this->type->getName());
         self::assertSame(TestOtherDomainIdType::NAME, $this->otherType->getName());
     }
 
@@ -99,7 +101,7 @@ final class DomainIdTypeTest extends TestCase
         TestOtherDomainIdType::setDataType(Type::STRING);
 
         self::assertSame('native_integer_type', $this->type->getSQLDeclaration([], $this->platform));
-        self::assertSame(Type::INTEGER, DomainIdType::getDataType());
+        self::assertSame(Type::INTEGER, TestDomainIdType::getDataType());
         self::assertSame('native_string_type', $this->otherType->getSQLDeclaration([], $this->platform));
         self::assertSame(Type::STRING, TestOtherDomainIdType::getDataType());
     }
@@ -122,9 +124,4 @@ final class DomainIdTypeTest extends TestCase
         self::assertEquals(new TestOtherDomainId('foo'), $this->otherType->convertToPHPValue('foo', $this->platform));
         self::assertEquals(new TestOtherDomainId('1'), $this->otherType->convertToPHPValue('1', $this->platform));
     }
-}
-
-class TestOtherDomainIdType extends DomainIdType
-{
-    public const NAME = 'other_domain_id';
 }
