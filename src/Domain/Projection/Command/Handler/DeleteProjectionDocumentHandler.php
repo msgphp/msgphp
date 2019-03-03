@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Command\Handler;
+namespace MsgPhp\Domain\Projection\Command\Handler;
 
-use MsgPhp\Domain\Command\DeleteProjectionDocumentCommand;
 use MsgPhp\Domain\Event\ProjectionDocumentDeletedEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
+use MsgPhp\Domain\Projection\Command\DeleteProjectionDocumentCommand;
 use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
 
 /**

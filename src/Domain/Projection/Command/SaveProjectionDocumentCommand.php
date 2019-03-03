@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Command;
+namespace MsgPhp\Domain\Projection\Command;
 
 use MsgPhp\Domain\Projection\ProjectionDocument;
 
