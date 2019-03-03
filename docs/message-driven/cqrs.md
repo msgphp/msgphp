@@ -1,29 +1,22 @@
 # Command Query Responsibility Segregation
 
-Commands are domain objects and provided per domain layer. They usually follow a [POPO] design. Its purpose is to
-describe an action to be taken. For commands being messages they can be dispatched using any [message bus](message-bus.md).
+Commands are a type of message objects and provided per domain layer. Its purpose is to describe an action to be taken
+within its domain. As such the domain layer can be consumed and operated by dispatching commands.
 
 ## Event-Sourcing Command Handler
 
-An event-sourcing command handler utility trait is provided by `MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait`.
-Its purpose is to ease the handling of command messages by sourcing a [domain event](../event-sourcing/events.md) to its
-[event handler](../event-sourcing/event-handlers.md).
-
-- `handle(object $command, callable $onHandled = null): void`
-    - `$command`: The command message to be handled
-    - `$onHandled`: Callable to be invoked in case the triggered domain event is handled. It receives the event handler
-      as first argument.
-- `abstract getDomainEvent(object $command): DomainEventInterface`
-- `abstract getDomainEventHandler(object $command): DomainEventHandlerInterface`
+An event-sourcing command handler trait is provided by `MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait`. Its
+purpose is to ease the handling of command messages by sourcing a [domain event](../event-sourcing/events.md) to a
+[event handler](../event-sourcing/event-handlers.md), derived from the command message.
 
 ### Basic Example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Command\EventSourcingCommandHandlerTrait; 
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 
 // --- SETUP ---
@@ -79,5 +72,3 @@ $bus = ...;
 
 $bus->dispatch(new MyCommand());
 ```
-
-[POPO]: https://stackoverflow.com/questions/41188002/what-does-the-term-plain-old-php-object-popo-exactly-mean

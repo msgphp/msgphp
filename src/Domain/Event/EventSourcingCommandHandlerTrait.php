@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Command;
-
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
-use MsgPhp\Domain\Event\DomainEventInterface;
+namespace MsgPhp\Domain\Event;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
