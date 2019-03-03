@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Entity\Features;
 
-use MsgPhp\Domain\Entity\Fields\EnabledField;
 use MsgPhp\Domain\Event\DisableEvent;
 use MsgPhp\Domain\Event\EnableEvent;
 
@@ -13,7 +12,15 @@ use MsgPhp\Domain\Event\EnableEvent;
  */
 trait CanBeEnabled
 {
-    use EnabledField;
+    /**
+     * @var bool
+     */
+    private $enabled = false;
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
 
     public function enable(): void
     {

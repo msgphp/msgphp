@@ -28,14 +28,14 @@ final class ObjectMappings implements ObjectMappingProviderInterface
                 'nullable' => true,
             ],
         ];
+        yield Features\CanBeEnabled::class => [
+            'enabled' => [
+                'type' => 'boolean',
+            ],
+        ];
         yield Fields\CreatedAtField::class => [
             'createdAt' => [
                 'type' => 'datetime',
-            ],
-        ];
-        yield Fields\EnabledField::class => [
-            'enabled' => [
-                'type' => 'boolean',
             ],
         ];
         yield Fields\LastUpdatedAtField::class => [

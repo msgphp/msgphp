@@ -37,9 +37,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(false);
 
-        self::assertTrue($object->handleEnableEvent($this->createMock(EnableEvent::class)));
+        self::assertTrue($object->handleEnableEvent(new EnableEvent()));
         self::assertTrue($object->isEnabled());
-        self::assertFalse($object->handleEnableEvent($this->createMock(EnableEvent::class)));
+        self::assertFalse($object->handleEnableEvent(new EnableEvent()));
         self::assertTrue($object->isEnabled());
     }
 
@@ -47,9 +47,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(true);
 
-        self::assertTrue($object->handleDisableEvent($this->createMock(DisableEvent::class)));
+        self::assertTrue($object->handleDisableEvent(new DisableEvent()));
         self::assertFalse($object->isEnabled());
-        self::assertFalse($object->handleDisableEvent($this->createMock(DisableEvent::class)));
+        self::assertFalse($object->handleDisableEvent(new DisableEvent()));
         self::assertFalse($object->isEnabled());
     }
 

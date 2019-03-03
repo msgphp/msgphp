@@ -8,7 +8,6 @@ are provided in the form of PHP [traits].
 Use entity fields to provide _read operations_ for common entity fields. Built-in fields are:
 
 - `Msgphp\Domain\Entity\Fields\CreatedAtField`
-- `Msgphp\Domain\Entity\Fields\EnabledField`
 - `Msgphp\Domain\Entity\Fields\LastUpdatedAtField`
 
 ## Entity Features

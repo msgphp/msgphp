@@ -29,11 +29,11 @@ final class CanBeConfirmedTest extends TestCase
     {
         $object = $this->getObject('foo', null);
 
-        self::assertTrue($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
+        self::assertTrue($object->handleConfirmEvent(new ConfirmEvent()));
         self::assertNull($prevToken = $object->getConfirmationToken());
         self::assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
         self::assertTrue($object->isConfirmed());
-        self::assertFalse($object->handleConfirmEvent($this->createMock(ConfirmEvent::class)));
+        self::assertFalse($object->handleConfirmEvent(new ConfirmEvent()));
         self::assertTrue($object->isConfirmed());
     }
 
