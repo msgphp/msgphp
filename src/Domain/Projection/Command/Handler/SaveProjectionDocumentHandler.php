@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Projection\Command\Handler;
 
-use MsgPhp\Domain\Event\ProjectionDocumentSavedEvent;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\Domain\Projection\Command\SaveProjectionDocumentCommand;
+use MsgPhp\Domain\Projection\Event\ProjectionDocumentSavedEvent;
 use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
 
