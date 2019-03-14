@@ -27,7 +27,7 @@ Returns the actual class name the factory uses for a given class name.
 
 ## Implementations
 
-### `MsgPhp\Domain\Factory\DomainObjectFactory`
+### `MsgPhp\Domain\Factory\GenericDomainObjectFactory`
 
 A generic object factory. It initializes a class by reading its [constructor] arguments. If the class is a sub class
 of `MsgPhp\Domain\DomainIdInterface` or `MsgPhp\Domain\DomainCollectionInterface` its static `fromValue` constructor
@@ -38,17 +38,12 @@ nested context may be provided to initialize the object with.
 
 To map interfaces and abstract classes to concrete classes a global class mapping can be provided.
 
-- `__construct(array $classMapping = [])`
-    - `$classMapping`: The class mapping (`['SourceType' => 'TargetType']`)`
-- `setNestedFactory(?DomainObjectFactoryInterface $factory): void`
-    - `$factory`: The factory to use for creating nested objects, or `null` to use the current instance
-
 #### Basic example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 
 // --- SETUP ---
 
@@ -70,9 +65,12 @@ class Subject
     }
 }
 
-$factory = new DomainObjectFactory([
+$factory = new GenericDomainObjectFactory([
     KnownInterface::class => Some::class,
 ]);
+
+// Optionally set the factory to use for nested objects, or use the current factory by default.
+// $factory->setNestedFactory(...);
 
 // --- USAGE ---
 
@@ -95,7 +93,7 @@ $object = $factory->reference(Subject::class);
 ```
 
 !!! note
-    `DomainObjectFactory::reference()` requires [symfony/var-exporter]
+    `GenericDomainObjectFactory::reference()` requires [symfony/var-exporter]
 
 ### `MsgPhp\Domain\Infra\Doctrine\DomainObjectFactory`
 

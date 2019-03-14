@@ -6,16 +6,16 @@ namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use PHPUnit\Framework\TestCase;
 
-final class DomainObjectFactoryTest extends TestCase
+final class GenericDomainObjectFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $object = (new DomainObjectFactory())->create(TestObject::class, ['argB' => 'foo', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 1]);
+        $object = (new GenericDomainObjectFactory())->create(TestObject::class, ['argB' => 'foo', 'arg_a' => 'ignore', 0 => 'ignore', 'argA' => 1]);
 
         self::assertInstanceOf(TestObject::class, $object);
         self::assertSame(1, $object->a);
@@ -24,7 +24,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateDefaultsConstructorArguments(): void
     {
-        $object = (new DomainObjectFactory())->create(TestObject::class);
+        $object = (new GenericDomainObjectFactory())->create(TestObject::class);
 
         self::assertInstanceOf(TestObject::class, $object);
         self::assertNull($object->a);
@@ -33,7 +33,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreatePreservesContext(): void
     {
-        $object = (new DomainObjectFactory())->create(TestObject::class, ['argB' => null]);
+        $object = (new GenericDomainObjectFactory())->create(TestObject::class, ['argB' => null]);
 
         self::assertInstanceOf(TestObject::class, $object);
         self::assertNull($object->b);
@@ -41,7 +41,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithAlias(): void
     {
-        $object = (new DomainObjectFactory([
+        $object = (new GenericDomainObjectFactory([
             TestEmptyObject::class => TestExtendedEmptyObject::class,
         ]))->create(TestEmptyObject::class);
 
@@ -50,7 +50,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDomainId(): void
     {
-        $id = (new DomainObjectFactory())->create(TestDomainId::class, ['value' => 123]);
+        $id = (new GenericDomainObjectFactory())->create(TestDomainId::class, ['value' => 123]);
 
         self::assertInstanceOf(TestDomainId::class, $id);
         self::assertSame('123', $id->toString());
@@ -58,7 +58,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDomainCollection(): void
     {
-        $collection = (new DomainObjectFactory())->create(DomainCollection::class, ['value' => [1, 2, 3]]);
+        $collection = (new GenericDomainObjectFactory())->create(DomainCollection::class, ['value' => [1, 2, 3]]);
 
         self::assertInstanceOf(DomainCollection::class, $collection);
         self::assertSame([1, 2, 3], iterator_to_array($collection));
@@ -66,7 +66,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithUnknownObject(): void
     {
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
 
         $this->expectException(InvalidClassException::class);
 
@@ -75,7 +75,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithUnknownNestedObject(): void
     {
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
 
         self::assertInstanceOf(TestKnownObject::class, $factory->create(TestKnownObject::class));
         self::assertInstanceOf(TestKnownObject::class, $factory->create(TestKnownObject::class, ['unknown' => 'foo']));
@@ -87,12 +87,12 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithoutConstructor(): void
     {
-        self::assertInstanceOf(TestEmptyObject::class, (new DomainObjectFactory())->create(TestEmptyObject::class, ['arg']));
+        self::assertInstanceOf(TestEmptyObject::class, (new GenericDomainObjectFactory())->create(TestEmptyObject::class, ['arg']));
     }
 
     public function testCreateWithPrivateConstructor(): void
     {
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
 
         $this->expectException(\Error::class);
 
@@ -101,7 +101,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testNestedCreate(): void
     {
-        $object = (new DomainObjectFactory())->create(TestNestedObject::class, [
+        $object = (new GenericDomainObjectFactory())->create(TestNestedObject::class, [
             'test' => ['argA' => 'nested_a', 'argB' => 'nested_b', 'arg_b' => 'ignore'],
             'self' => ['test' => ['argA' => 'foo', 'argB' => 'bar'], 'other' => $other = new TestObject(1, 2)],
         ]);
@@ -118,7 +118,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testNestedCreateWithoutRequiredContext(): void
     {
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
 
         $this->expectException(\LogicException::class);
 
@@ -133,7 +133,7 @@ final class DomainObjectFactoryTest extends TestCase
             ->willReturn($nested = new TestObject(1, 2))
         ;
 
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
         $factory->setNestedFactory($nestedFactory);
 
         self::assertInstanceOf(TestNestedObject::class, $object = $factory->create(TestNestedObject::class, ['test' => null]));
@@ -148,7 +148,7 @@ final class DomainObjectFactoryTest extends TestCase
             ->willThrowException(new \RuntimeException())
         ;
 
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
         $factory->setNestedFactory($nestedFactory);
 
         $this->expectException(\RuntimeException::class);
@@ -158,7 +158,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testReference(): void
     {
-        $reference = (new DomainObjectFactory())->reference(TestReferenceObject::class, ['fieldA' => 1, 'fieldB' => 2]);
+        $reference = (new GenericDomainObjectFactory())->reference(TestReferenceObject::class, ['fieldA' => 1, 'fieldB' => 2]);
 
         self::assertInstanceOf(TestReferenceObject::class, $reference);
         self::assertSame([1, 2], $reference->get());
@@ -166,7 +166,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testReferenceWithUnknownClass(): void
     {
-        $factory = new DomainObjectFactory();
+        $factory = new GenericDomainObjectFactory();
 
         $this->expectException(InvalidClassException::class);
 
@@ -175,7 +175,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testGetClass(): void
     {
-        $factory = new DomainObjectFactory([
+        $factory = new GenericDomainObjectFactory([
             TestEmptyObject::class => TestExtendedEmptyObject::class,
         ]);
 

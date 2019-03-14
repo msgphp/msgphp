@@ -13,7 +13,7 @@ use Symfony\Component\VarExporter\Instantiator;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainObjectFactory implements DomainObjectFactoryInterface
+final class GenericDomainObjectFactory implements DomainObjectFactoryInterface
 {
     /**
      * @psalm-var array<class-string, class-string>

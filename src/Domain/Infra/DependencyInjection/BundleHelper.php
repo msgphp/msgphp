@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infra\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
-use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\Infra\Console as ConsoleInfra;
 use MsgPhp\Domain\Infra\Doctrine as DoctrineInfra;
 use MsgPhp\Domain\Infra\Messenger as MessengerInfra;
@@ -74,18 +74,18 @@ final class BundleHelper
 
     private static function initObjectFactory(ContainerBuilder $container): void
     {
-        $container->register(DomainObjectFactory::class)
+        $container->register(GenericDomainObjectFactory::class)
             ->setPublic(false)
             ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
             ->addMethodCall('setNestedFactory', [new Reference(DomainObjectFactoryInterface::class)])
         ;
 
-        $container->setAlias(DomainObjectFactoryInterface::class, new Alias(DomainObjectFactory::class, false));
+        $container->setAlias(DomainObjectFactoryInterface::class, new Alias(GenericDomainObjectFactory::class, false));
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $container->register(DoctrineInfra\DomainObjectFactory::class)
                 ->setPublic(false)
-                ->setDecoratedService(DomainObjectFactory::class)
+                ->setDecoratedService(GenericDomainObjectFactory::class)
                 ->setArgument('$factory', new Reference(DoctrineInfra\DomainObjectFactory::class.'.inner'))
                 ->setArgument('$em', new Reference('msgphp.doctrine.entity_manager'))
             ;
