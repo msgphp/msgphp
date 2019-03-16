@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
@@ -39,7 +38,7 @@ final class ChangeUserCredentialHandler
     public function __invoke(ChangeUserCredentialCommand $command): void
     {
         /** @var User $handler */
-        $handler = $this->getDomainEventHandler($command);
+        $handler = $this->getDomainEventTarget($command);
         $oldCredential = $handler->getCredential();
 
         $this->handle($command, function (User $user) use ($oldCredential): void {
@@ -57,7 +56,7 @@ final class ChangeUserCredentialHandler
         return $this->factory->create(ChangeCredentialEvent::class, compact('fields'));
     }
 
-    protected function getDomainEventHandler(ChangeUserCredentialCommand $command): DomainEventHandlerInterface
+    protected function getDomainEventTarget(ChangeUserCredentialCommand $command): User
     {
         return $this->repository->find($command->userId);
     }

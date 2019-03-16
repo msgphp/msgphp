@@ -35,7 +35,7 @@ final class ProjectionSynchronization
     }
 
     /**
-     * @return ProjectionDocument[]
+     * @return iterable|ProjectionDocument[]
      */
     public function synchronize(): iterable
     {

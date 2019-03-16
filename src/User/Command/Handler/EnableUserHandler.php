@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Event\EnableEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
@@ -49,7 +48,7 @@ final class EnableUserHandler
         return $this->factory->create(EnableEvent::class);
     }
 
-    protected function getDomainEventHandler(EnableUserCommand $command): DomainEventHandlerInterface
+    protected function getDomainEventTarget(EnableUserCommand $command): User
     {
         return $this->repository->find($command->userId);
     }

@@ -115,7 +115,7 @@ final class UsernameListener
     /**
      * @param object $entity
      *
-     * @return Username[]
+     * @return iterable|Username[]
      */
     private function createUsernames($entity, EntityManagerInterface $em): iterable
     {

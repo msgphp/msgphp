@@ -33,7 +33,7 @@ final class PackageMetadata
     }
 
     /**
-     * @return string[]
+     * @return iterable|string[]
      */
     public function findPaths(string $baseDir = null): iterable
     {

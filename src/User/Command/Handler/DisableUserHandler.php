@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Event\DisableEvent;
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
@@ -49,7 +48,7 @@ final class DisableUserHandler
         return $this->factory->create(DisableEvent::class);
     }
 
-    protected function getDomainEventHandler(DisableUserCommand $command): DomainEventHandlerInterface
+    protected function getDomainEventTarget(DisableUserCommand $command): User
     {
         return $this->repository->find($command->userId);
     }

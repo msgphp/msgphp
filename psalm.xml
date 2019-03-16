@@ -26,8 +26,6 @@
                 <referencedClass name="MsgPhp\Domain\Tests\Factory\testclasswrongcase" />
             </errorLevel>
         </InvalidClass>
-        <InvalidReturnType errorLevel="info" />
-        <InvalidReturnStatement errorLevel="info" />
         <LessSpecificReturnStatement>
             <errorLevel type="info">
                 <file name="src/*/Infra/Doctrine/Repository/*Repository.php" />

@@ -31,8 +31,7 @@ parameters:
 
         # msgphp
         - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\Entity\\.+ but returns object\.#'
-        - '#Method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEventHandler\(\) should return MsgPhp\\Domain\\Event\\DomainEventHandlerInterface but returns MsgPhp\\.+\\Entity\\.+\.#'
-        - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Handler)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
+        - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Target)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
         - '#Return type \(MsgPhp\\Domain\\Infra\\Config\\ClassMappingNode\) of method MsgPhp\\Domain\\Infra\\Config\\ClassMappingNodeDefinition::instantiateNode\(\) should be compatible with return type \(Symfony\\Component\\Config\\Definition\\VariableNode\) of method Symfony\\Component\\Config\\Definition\\Builder\\VariableNodeDefinition::instantiateNode\(\)#'
         - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
         - '#Method MsgPhp\\Domain\\Infra\\Elasticsearch\\ProjectionTypeRegistry::all\(\) should return array<string> but returns array<int\|string>.#'

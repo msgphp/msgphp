@@ -59,7 +59,7 @@ class MyCommandHandler
         return new MyDomainEvent();
     }
 
-    protected function getDomainEventHandler(MyCommand $command): DomainEventHandlerInterface
+    protected function getDomainEventTarget(MyCommand $command): MyEntity
     {
         return new MyEntity();
     }

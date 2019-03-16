@@ -15,9 +15,13 @@ trait EventSourcingCommandHandlerTrait
     abstract protected function getDomainEvent($command): DomainEventInterface;
 
     /**
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     *
      * @param object $command
+     *
+     * @return object
      */
-    abstract protected function getDomainEventHandler($command): DomainEventHandlerInterface;
+    abstract protected function getDomainEventTarget($command);
 
     /**
      * @param object $command
@@ -27,10 +31,14 @@ trait EventSourcingCommandHandlerTrait
         /** @psalm-suppress TypeCoercion */
         $event = $this->getDomainEvent($command);
         /** @psalm-suppress TypeCoercion */
-        $handler = $this->getDomainEventHandler($command);
+        $target = $this->getDomainEventTarget($command);
 
-        if ($handler->handleEvent($event) && null !== $onHandled) {
-            $onHandled($handler);
+        if (!$target instanceof DomainEventHandlerInterface) {
+            throw new \LogicException(sprintf('Event target "%s" must be an instance of "%s" to handle event "%s".', \get_class($target), DomainEventHandlerInterface::class, \get_class($event)));
+        }
+
+        if ($target->handleEvent($event) && null !== $onHandled) {
+            $onHandled($target);
         }
     }
 }

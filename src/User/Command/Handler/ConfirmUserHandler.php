@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Event\ConfirmEvent;
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventInterface;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
@@ -49,7 +48,7 @@ final class ConfirmUserHandler
         return $this->factory->create(ConfirmEvent::class);
     }
 
-    protected function getDomainEventHandler(ConfirmUserCommand $command): DomainEventHandlerInterface
+    protected function getDomainEventTarget(ConfirmUserCommand $command): User
     {
         return $this->repository->find($command->userId);
     }
