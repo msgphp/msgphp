@@ -6,6 +6,7 @@ namespace MsgPhp\User\Entity\Credential;
 
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity\Credential\Features\EmailAsUsername;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -19,8 +20,12 @@ final class Email implements CredentialInterface
         $this->email = $email;
     }
 
-    public function withEmail(string $email): self
+    public function __invoke(ChangeCredentialEvent $event): bool
     {
-        return new self($email);
+        if ($emailChanged = ($this->email !== $email = $event->getStringField('email'))) {
+            $this->email = $email;
+        }
+
+        return $emailChanged;
     }
 }

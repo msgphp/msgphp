@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Entity\Credential;
 
 use MsgPhp\User\CredentialInterface;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -21,6 +22,15 @@ final class Token implements CredentialInterface
         $this->token = $token;
     }
 
+    public function __invoke(ChangeCredentialEvent $event): bool
+    {
+        if ($tokenChanged = ($this->token !== $token = $event->getStringField('token'))) {
+            $this->token = $token;
+        }
+
+        return $tokenChanged;
+    }
+
     public static function getUsernameField(): string
     {
         return 'token';
@@ -29,15 +39,5 @@ final class Token implements CredentialInterface
     public function getUsername(): string
     {
         return $this->token;
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
-    }
-
-    public function withToken(string $token): self
-    {
-        return new self($token);
     }
 }

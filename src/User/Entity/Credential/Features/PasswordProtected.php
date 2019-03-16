@@ -25,6 +25,4 @@ trait PasswordProtected
     {
         return null;
     }
-
-    abstract public function withPassword(string $password): self;
 }

@@ -7,6 +7,7 @@ namespace MsgPhp\User\Entity\Credential;
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity\Credential\Features\NicknameAsUsername;
 use MsgPhp\User\Entity\Credential\Features\PasswordProtected;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 use MsgPhp\User\Password\PasswordProtectedInterface;
 
 /**
@@ -23,13 +24,15 @@ final class NicknamePassword implements CredentialInterface, PasswordProtectedIn
         $this->password = $password;
     }
 
-    public function withNickname(string $nickname): self
+    public function __invoke(ChangeCredentialEvent $event): bool
     {
-        return new self($nickname, $this->password);
-    }
+        if ($nicknameChanged = ($this->nickname !== $nickname = $event->getStringField('nickname'))) {
+            $this->nickname = $nickname;
+        }
+        if ($passwordChanged = ($this->password !== $password = $event->getStringField('password'))) {
+            $this->password = $password;
+        }
 
-    public function withPassword(string $password): self
-    {
-        return new self($this->nickname, $password);
+        return $nicknameChanged || $passwordChanged;
     }
 }

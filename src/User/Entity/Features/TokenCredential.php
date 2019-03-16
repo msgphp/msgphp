@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Entity\Features;
 
 use MsgPhp\User\Entity\Credential\Token;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -25,11 +26,11 @@ trait TokenCredential
 
     public function getToken(): string
     {
-        return $this->credential->getToken();
+        return $this->credential->getUsername();
     }
 
     public function changeToken(string $token): void
     {
-        $this->credential = $this->credential->withToken($token);
+        ($this->credential)(new ChangeCredentialEvent([Token::getUsernameField() => $token]));
     }
 }

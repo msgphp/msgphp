@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Entity\Features;
 
 use MsgPhp\User\Entity\Credential\Nickname;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -25,11 +26,11 @@ trait NicknameCredential
 
     public function getNickname(): string
     {
-        return $this->credential->getNickname();
+        return $this->credential->getUsername();
     }
 
     public function changeNickname(string $nickname): void
     {
-        $this->credential = $this->credential->withNickname($nickname);
+        ($this->credential)(new ChangeCredentialEvent([Nickname::getUsernameField() => $nickname]));
     }
 }

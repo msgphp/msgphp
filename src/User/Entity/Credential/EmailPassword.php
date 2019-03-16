@@ -7,6 +7,7 @@ namespace MsgPhp\User\Entity\Credential;
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity\Credential\Features\EmailAsUsername;
 use MsgPhp\User\Entity\Credential\Features\PasswordProtected;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 use MsgPhp\User\Password\PasswordProtectedInterface;
 
 /**
@@ -23,13 +24,15 @@ final class EmailPassword implements CredentialInterface, PasswordProtectedInter
         $this->password = $password;
     }
 
-    public function withEmail(string $email): self
+    public function __invoke(ChangeCredentialEvent $event): bool
     {
-        return new self($email, $this->password);
-    }
+        if ($emailChanged = ($this->email !== $email = $event->getStringField('email'))) {
+            $this->email = $email;
+        }
+        if ($passwordChanged = ($this->password !== $password = $event->getStringField('password'))) {
+            $this->password = $password;
+        }
 
-    public function withPassword(string $password): self
-    {
-        return new self($this->email, $password);
+        return $emailChanged || $passwordChanged;
     }
 }

@@ -6,6 +6,7 @@ namespace MsgPhp\User\Entity\Credential;
 
 use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Entity\Credential\Features\NicknameAsUsername;
+use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -19,8 +20,12 @@ final class Nickname implements CredentialInterface
         $this->nickname = $nickname;
     }
 
-    public function withNickname(string $nickname): self
+    public function __invoke(ChangeCredentialEvent $event): bool
     {
-        return new self($nickname);
+        if ($nicknameChanged = ($this->nickname !== $nickname = $event->getStringField('nickname'))) {
+            $this->nickname = $nickname;
+        }
+
+        return $nicknameChanged;
     }
 }
