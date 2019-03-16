@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infra\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use MsgPhp\Domain\PaginatedDomainCollection;
+use MsgPhp\Domain\GenericPaginatedDomainCollection;
 use MsgPhp\Domain\PaginatedDomainCollectionInterface;
 use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
@@ -55,7 +55,7 @@ final class ProjectionRepository implements ProjectionRepositoryInterface
         $count = \count($documents);
         $totalCount = $result['hits']['total'] ?? $count;
 
-        return new PaginatedDomainCollection((function () use ($documents): iterable {
+        return new GenericPaginatedDomainCollection((function () use ($documents): iterable {
             foreach ($documents as $document) {
                 yield $this->createDocument($document);
             }

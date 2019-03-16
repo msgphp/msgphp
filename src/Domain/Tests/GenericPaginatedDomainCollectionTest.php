@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\PaginatedDomainCollection;
+use MsgPhp\Domain\GenericPaginatedDomainCollection;
 
-final class PaginatedDomainCollectionTest extends DomainCollectionTestCase
+final class GenericPaginatedDomainCollectionTest extends DomainCollectionTestCase
 {
     public function testDefaultPagination(): void
     {
-        $collection = new PaginatedDomainCollection([1, 2, 3, 4]);
+        $collection = new GenericPaginatedDomainCollection([1, 2, 3, 4]);
 
         self::assertSame(0., $collection->getOffset());
         self::assertSame(0., $collection->getLimit());
@@ -23,7 +23,7 @@ final class PaginatedDomainCollectionTest extends DomainCollectionTestCase
 
     public function testPagination(): void
     {
-        $collection = new PaginatedDomainCollection([], 8., 2., 2., 12.);
+        $collection = new GenericPaginatedDomainCollection([], 8., 2., 2., 12.);
 
         self::assertSame(8., $collection->getOffset());
         self::assertSame(2., $collection->getLimit());
@@ -35,6 +35,6 @@ final class PaginatedDomainCollectionTest extends DomainCollectionTestCase
 
     protected static function createCollection(array $elements): DomainCollectionInterface
     {
-        return new PaginatedDomainCollection($elements);
+        return new GenericPaginatedDomainCollection($elements);
     }
 }

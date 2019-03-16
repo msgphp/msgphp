@@ -7,7 +7,7 @@ namespace MsgPhp\Domain;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class PaginatedDomainCollection implements PaginatedDomainCollectionInterface
+final class GenericPaginatedDomainCollection implements PaginatedDomainCollectionInterface
 {
     /**
      * @var DomainCollectionInterface

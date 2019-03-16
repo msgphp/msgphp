@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Infra\ApiPlatform;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use MsgPhp\Domain\PaginatedDomainCollection;
+use MsgPhp\Domain\GenericPaginatedDomainCollection;
 use MsgPhp\Domain\Projection\ProjectionInterface;
 use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
 use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
@@ -47,7 +47,7 @@ final class ProjectionDataProvider implements CollectionDataProviderInterface, I
     {
         $collection = $this->repository->findAll($resourceClass);
 
-        return new Paginator(new PaginatedDomainCollection((function () use ($collection): iterable {
+        return new Paginator(new GenericPaginatedDomainCollection((function () use ($collection): iterable {
             foreach ($collection as $document) {
                 yield $document->toProjection();
             }
