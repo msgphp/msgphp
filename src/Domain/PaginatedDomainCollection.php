@@ -40,7 +40,7 @@ final class PaginatedDomainCollection implements PaginatedDomainCollectionInterf
             $count = (int) $count;
         }
 
-        $this->collection = $elements instanceof DomainCollectionInterface ? $elements : DomainCollection::fromValue($elements);
+        $this->collection = $elements instanceof DomainCollectionInterface ? $elements : GenericDomainCollection::fromValue($elements);
         $this->offset = $offset;
         $this->limit = $limit;
         $this->count = $count;

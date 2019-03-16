@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Entity\Username;
 use MsgPhp\User\Infra\Doctrine\UsernameLookup;
@@ -44,7 +44,7 @@ final class UsernameRepository implements UsernameRepositoryInterface
      */
     public function lookup(): DomainCollectionInterface
     {
-        return new DomainCollection($this->lookup->lookup());
+        return new GenericDomainCollection($this->lookup->lookup());
     }
 
     /**

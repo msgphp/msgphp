@@ -10,7 +10,7 @@ use MsgPhp\Domain\Exception\UnknownCollectionElementException;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainCollection implements DomainCollectionInterface
+final class GenericDomainCollection implements DomainCollectionInterface
 {
     /**
      * @var iterable

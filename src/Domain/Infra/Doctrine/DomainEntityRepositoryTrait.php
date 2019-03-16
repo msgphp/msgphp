@@ -9,12 +9,12 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\DomainIdInterface;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\GenericDomainCollection;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -175,7 +175,7 @@ trait DomainEntityRepositoryTrait
             $query->setMaxResults(0 === $limit ? null : $limit);
         }
 
-        return new DomainCollection($query->getResult($hydrate));
+        return new GenericDomainCollection($query->getResult($hydrate));
     }
 
     private function createQueryBuilder(): QueryBuilder

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Role;
 
-use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\User\Entity\User;
 use MsgPhp\User\Entity\UserRole;
 use MsgPhp\User\Repository\UserRoleRepositoryInterface;
@@ -30,7 +30,7 @@ final class UserRoleProviderTest extends TestCase
         $repository->expects(self::once())
             ->method('findAllByUserId')
             ->with($id)
-            ->willReturn(new DomainCollection(['foo' => $userRole]))
+            ->willReturn(new GenericDomainCollection(['foo' => $userRole]))
         ;
 
         self::assertSame(['ROLE_USER'], (new UserRoleProvider($repository))->getRoles($user));

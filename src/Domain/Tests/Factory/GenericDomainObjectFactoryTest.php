@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
-use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
+use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use PHPUnit\Framework\TestCase;
 
@@ -58,9 +58,9 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDomainCollection(): void
     {
-        $collection = (new GenericDomainObjectFactory())->create(DomainCollection::class, ['value' => [1, 2, 3]]);
+        $collection = (new GenericDomainObjectFactory())->create(GenericDomainCollection::class, ['value' => [1, 2, 3]]);
 
-        self::assertInstanceOf(DomainCollection::class, $collection);
+        self::assertInstanceOf(GenericDomainCollection::class, $collection);
         self::assertSame([1, 2, 3], iterator_to_array($collection));
     }
 

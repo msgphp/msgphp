@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Exception\EmptyCollectionException;
 use MsgPhp\Domain\Exception\UnknownCollectionElementException;
+use MsgPhp\Domain\GenericDomainCollection;
 
-final class DomainCollectionTest extends DomainCollectionTestCase
+final class GenericDomainCollectionTest extends DomainCollectionTestCase
 {
     public function testLazyFromValue(): void
     {
-        self::assertEquals(new DomainCollection($generator = self::getGenerator([])), DomainCollection::fromValue($generator));
+        self::assertEquals(new GenericDomainCollection($generator = self::getGenerator([])), GenericDomainCollection::fromValue($generator));
     }
 
     public function testLazyGetIterator(): void
@@ -194,12 +194,12 @@ final class DomainCollectionTest extends DomainCollectionTestCase
 
     protected static function createCollection(array $elements): DomainCollectionInterface
     {
-        return new DomainCollection($elements);
+        return new GenericDomainCollection($elements);
     }
 
-    private static function createLazyCollection(array $elements, array &$visited = null): DomainCollection
+    private static function createLazyCollection(array $elements, array &$visited = null): GenericDomainCollection
     {
-        return new DomainCollection(self::getGenerator($elements, $visited));
+        return new GenericDomainCollection(self::getGenerator($elements, $visited));
     }
 
     private static function getGenerator(array $elements, array &$visited = null): \Generator
