@@ -13,5 +13,5 @@ interface PasswordProtectedInterface
 {
     public function getPassword(): string;
 
-    public function getPasswordAlgorithm(): PasswordAlgorithm;
+    public function getPasswordAlgorithm(): ?PasswordAlgorithm;
 }

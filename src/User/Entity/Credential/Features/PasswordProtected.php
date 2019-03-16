@@ -21,9 +21,9 @@ trait PasswordProtected
         return $this->password;
     }
 
-    public function getPasswordAlgorithm(): PasswordAlgorithm
+    public function getPasswordAlgorithm(): ?PasswordAlgorithm
     {
-        return PasswordAlgorithm::create();
+        return null;
     }
 
     abstract public function withPassword(string $password): self;

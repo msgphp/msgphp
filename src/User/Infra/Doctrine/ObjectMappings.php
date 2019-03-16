@@ -24,10 +24,8 @@ final class ObjectMappings implements ObjectMappingProviderInterface
     private const CREDENTIALS = [
         Features\EmailCredential::class => Credential\Email::class,
         Features\EmailPasswordCredential::class => Credential\EmailPassword::class,
-        Features\EmailSaltedPasswordCredential::class => Credential\EmailSaltedPassword::class,
         Features\NicknameCredential::class => Credential\Nickname::class,
         Features\NicknamePasswordCredential::class => Credential\NicknamePassword::class,
-        Features\NicknameSaltedPasswordCredential::class => Credential\NicknameSaltedPassword::class,
         Features\TokenCredential::class => Credential\Token::class,
     ];
 

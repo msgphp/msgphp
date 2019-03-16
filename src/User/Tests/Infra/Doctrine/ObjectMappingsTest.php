@@ -18,8 +18,7 @@ final class ObjectMappingsTest extends TestCase
         }, array_merge(glob(\dirname(__DIR__, 3).'/Entity/Features/*.php'), glob(\dirname(__DIR__, 3).'/Entity/Fields/*.php'))));
         unset(
             $available[Features\AbstractCredential::class],
-            $available[Features\AbstractPasswordCredential::class],
-            $available[Features\AbstractSaltedPasswordCredential::class]
+            $available[Features\AbstractPasswordCredential::class]
         );
 
         $mappings = ObjectMappings::provideObjectMappings(new MappingConfig([]));
