@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
-use MsgPhp\User\Entity\Features;
 use MsgPhp\User\Infra\Doctrine\ObjectMappings;
+use MsgPhp\User\Model;
 use PHPUnit\Framework\TestCase;
 
 final class ObjectMappingsTest extends TestCase
@@ -14,11 +14,11 @@ final class ObjectMappingsTest extends TestCase
     public function testMapping(): void
     {
         $available = array_flip(array_map(function (string $file): string {
-            return 'MsgPhp\\User\\Entity\\'.basename(\dirname($file)).'\\'.basename($file, '.php');
-        }, array_merge(glob(\dirname(__DIR__, 3).'/Entity/Features/*.php'), glob(\dirname(__DIR__, 3).'/Entity/Fields/*.php'))));
+            return 'MsgPhp\\User\\Model\\'.basename($file, '.php');
+        }, glob(\dirname(__DIR__, 3).'/Model/*.php')));
         unset(
-            $available[Features\AbstractCredential::class],
-            $available[Features\AbstractPasswordCredential::class]
+            $available[Model\AbstractCredential::class],
+            $available[Model\AbstractPasswordCredential::class]
         );
 
         $mappings = ObjectMappings::provideObjectMappings(new MappingConfig([]));

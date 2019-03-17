@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Entity;
 
 use MsgPhp\Eav\Entity\AttributeValue;
-use MsgPhp\Eav\Entity\Features\EntityAttributeValue;
-use MsgPhp\User\Entity\Fields\UserField;
+use MsgPhp\Eav\Model\EntityAttributeValue;
+use MsgPhp\User\Model\UserField;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

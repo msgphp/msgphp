@@ -19,7 +19,7 @@ A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpo
 ```php
 <?php
 
-use MsgPhp\Domain\Entity\Features\CanBeEnabled;
+use MsgPhp\Domain\Model\CanBeEnabled;
 use MsgPhp\Domain\Event\DomainEventHandlerInterface;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 use MsgPhp\Domain\Event\EnableEvent;

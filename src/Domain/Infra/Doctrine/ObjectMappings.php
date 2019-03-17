@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infra\Doctrine;
 
-use MsgPhp\Domain\Entity\Features;
-use MsgPhp\Domain\Entity\Fields;
+use MsgPhp\Domain\Model;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -16,7 +15,7 @@ final class ObjectMappings implements ObjectMappingProviderInterface
 {
     public static function provideObjectMappings(MappingConfig $config): iterable
     {
-        yield Features\CanBeConfirmed::class => [
+        yield Model\CanBeConfirmed::class => [
             'confirmationToken' => [
                 'type' => 'string',
                 'unique' => true,
@@ -28,17 +27,17 @@ final class ObjectMappings implements ObjectMappingProviderInterface
                 'nullable' => true,
             ],
         ];
-        yield Features\CanBeEnabled::class => [
+        yield Model\CanBeEnabled::class => [
             'enabled' => [
                 'type' => 'boolean',
             ],
         ];
-        yield Fields\CreatedAtField::class => [
+        yield Model\CreatedAtField::class => [
             'createdAt' => [
                 'type' => 'datetime',
             ],
         ];
-        yield Fields\LastUpdatedAtField::class => [
+        yield Model\LastUpdatedAtField::class => [
             'lastUpdatedAt' => [
                 'type' => 'datetime',
             ],

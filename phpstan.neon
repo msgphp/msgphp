@@ -48,10 +48,7 @@ parameters:
         - '#Static property MsgPhp\\.+\\Tests\\.+Test::\$bus \(Symfony\\Component\\Messenger\\MessageBusInterface\) does not accept null\.#'
         -
             message: '#Call to an undefined method object::.+\(\)\.#'
-            path: *src/*/Tests/Entity/Fields/*Test.php
-        -
-            message: '#Call to an undefined method object::.+\(\)\.#'
-            path: *src/*/Tests/Entity/Features/*Test.php
+            path: *src/*/Tests/Model/*Test.php
         -
             message: '#Call to an undefined method object::dispatch\(\)\.#'
             path: src/Domain/Tests/Message/MessageDispatchingTraitTest.php

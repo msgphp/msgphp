@@ -7,23 +7,23 @@ are provided in the form of PHP [traits].
 
 Use entity fields to provide _read operations_ for common entity fields. Built-in fields are:
 
-- `Msgphp\Domain\Entity\Fields\CreatedAtField`
-- `Msgphp\Domain\Entity\Fields\LastUpdatedAtField`
+- `Msgphp\Domain\Model\CreatedAtField`
+- `Msgphp\Domain\Model\LastUpdatedAtField`
 
 ## Entity Features
 
 Use entity features to provide _write operations_ for common entity fields. Built-in features are:
 
-- `MsgPhp\Domain\Entity\Features\CanBeConfirmed`
-- `MsgPhp\Domain\Entity\Features\CanBeEnabled`
+- `MsgPhp\Domain\Model\CanBeConfirmed`
+- `MsgPhp\Domain\Model\CanBeEnabled`
 
 ## Basic Example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Entity\Fields\CreatedAtField;
-use MsgPhp\Domain\Entity\Features\CanBeEnabled;
+use MsgPhp\Domain\Model\CreatedAtField;
+use MsgPhp\Domain\Model\CanBeEnabled;
 
 // --- SETUP ---
 
