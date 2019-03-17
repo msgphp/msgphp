@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infra\Security;
 
 use MsgPhp\User\Entity\User;
+use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\Password\PasswordProtectedInterface;
 use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
@@ -36,9 +37,9 @@ final class SecurityUser implements UserInterface, EquatableInterface
     private $password;
 
     /**
-     * @var string|null
+     * @var PasswordAlgorithm|null
      */
-    private $passwordSalt;
+    private $passwordAlgorithm;
 
     /**
      * @param string[] $roles
@@ -58,7 +59,7 @@ final class SecurityUser implements UserInterface, EquatableInterface
 
         if ($credential instanceof PasswordProtectedInterface) {
             $this->password = $credential->getPassword();
-            $this->passwordSalt = $credential->getPasswordAlgorithm()->salt->token ?? null;
+            $this->passwordAlgorithm = $credential->getPasswordAlgorithm();
         }
     }
 
@@ -90,14 +91,19 @@ final class SecurityUser implements UserInterface, EquatableInterface
         return $this->password ?? '';
     }
 
+    public function getPasswordAlgorithm(): ?PasswordAlgorithm
+    {
+        return $this->passwordAlgorithm;
+    }
+
     public function getSalt(): ?string
     {
-        return $this->passwordSalt;
+        return $this->passwordAlgorithm->salt->token ?? null;
     }
 
     public function eraseCredentials(): void
     {
-        $this->password = $this->passwordSalt = null;
+        $this->password = $this->passwordAlgorithm = null;
     }
 
     public function isEqualTo(UserInterface $user)

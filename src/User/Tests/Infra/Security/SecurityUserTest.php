@@ -18,63 +18,74 @@ final class SecurityUserTest extends TestCase
 {
     public function testCreate(): void
     {
-        $user = new SecurityUser($entity = $this->createUser('id'), null, ['ROLE_FOO']);
+        $user = new SecurityUser($entity = $this->createUser(), null, ['ROLE_FOO']);
 
         self::assertSame($entity->getId(), $user->getUserId());
         self::assertSame('id', $user->getUsername());
         self::assertNull($user->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $user->getRoles());
         self::assertSame('', $user->getPassword());
+        self::assertNull($user->getPasswordAlgorithm());
         self::assertNull($user->getSalt());
     }
 
     public function testCreateWithOriginUsername(): void
     {
-        self::assertSame('origin-username', (new SecurityUser($this->createUser('id'), 'origin-username'))->getOriginUsername());
+        self::assertSame('origin-username', (new SecurityUser($this->createUser(), 'origin-username'))->getOriginUsername());
     }
 
-    public function testCreateWithPassword(): void
+    /**
+     * @dataProvider providePasswordAlgorithms
+     */
+    public function testCreateWithPassword(PasswordAlgorithm $algorithm, ?string $salt): void
     {
-        $user = new SecurityUser($this->createUser('id', 'password'));
+        $user = new SecurityUser($this->createUser('password', $algorithm));
 
         self::assertSame('password', $user->getPassword());
+        self::assertSame($algorithm, $user->getPasswordAlgorithm());
+        self::assertSame($salt, $user->getSalt());
+    }
+
+    /**
+     * @dataProvider providePasswordAlgorithms
+     */
+    public function testEraseCredentials(PasswordAlgorithm $algorithm): void
+    {
+        $user = new SecurityUser($this->createUser('password', $algorithm));
+        $user->eraseCredentials();
+
+        self::assertSame('', $user->getPassword());
+        self::assertNull($user->getPasswordAlgorithm());
         self::assertNull($user->getSalt());
     }
 
-    public function testCreateWithSaltedPassword(): void
+    public function providePasswordAlgorithms(): iterable
     {
-        $user = new SecurityUser($this->createUser('id', 'password', 'salt'));
-
-        self::assertSame('password', $user->getPassword());
-        self::assertSame('salt', $user->getSalt());
+        yield [PasswordAlgorithm::create(), null];
+        yield [PasswordAlgorithm::createLegacySalted(new PasswordSalt('salt')), 'salt'];
     }
 
     public function testCreateWithEmptyId(): void
     {
-        $user = $this->createUser();
+        $user = $this->createMock(User::class);
+        $user->expects(self::once())
+            ->method('getId')
+            ->willReturn(new ScalarUserId())
+        ;
 
         $this->expectException(\LogicException::class);
 
         new SecurityUser($user);
     }
 
-    public function testEraseCredentials(): void
-    {
-        $user = new SecurityUser($this->createUser('id', 'password', 'salt'));
-        $user->eraseCredentials();
-
-        self::assertSame('', $user->getPassword());
-        self::assertNull($user->getSalt());
-    }
-
     public function testIsEqualTo(): void
     {
-        $user = new SecurityUser($this->createUser('id'));
+        $user = new SecurityUser($this->createUser());
 
         self::assertTrue($user->isEqualTo($user));
-        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id'))));
-        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('id', 'password', 'salt'))));
-        self::assertFalse($user->isEqualTo(new SecurityUser($this->createUser('other-id'))));
+        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser())));
+        self::assertTrue($user->isEqualTo(new SecurityUser($this->createUser('password'))));
+        self::assertFalse($user->isEqualTo(new SecurityUser($this->createUser(null, null, 'other-id'))));
     }
 
     public function testIsEqualToWithOtherUserType(): void
@@ -85,22 +96,22 @@ final class SecurityUserTest extends TestCase
             ->willReturn('id')
         ;
 
-        self::assertFalse((new SecurityUser($this->createUser('id')))->isEqualTo($other));
+        self::assertFalse((new SecurityUser($this->createUser()))->isEqualTo($other));
     }
 
     public function testIsEqualToWithOtherOriginUsername(): void
     {
-        self::assertTrue((new SecurityUser($this->createUser('id')))->isEqualTo(new SecurityUser($this->createUser('id'), 'origin-username')));
+        self::assertTrue((new SecurityUser($this->createUser()))->isEqualTo(new SecurityUser($this->createUser(), 'origin-username')));
     }
 
     public function testSerialize(): void
     {
-        $user = new SecurityUser($this->createUser('id', 'password', 'salt'), 'origin-username', ['ROLE_FOO']);
+        $user = new SecurityUser($this->createUser('password'), 'origin-username', ['ROLE_FOO']);
 
         self::assertEquals($user, unserialize(serialize($user)));
     }
 
-    private function createUser(string $id = null, string $password = null, string $salt = null): User
+    private function createUser(string $password = null, PasswordAlgorithm $passwordAlgorithm = null, string $id = 'id'): User
     {
         $user = $this->createMock(User::class);
         $user->expects(self::any())
@@ -118,7 +129,7 @@ final class SecurityUserTest extends TestCase
             ;
             $credential->expects(self::any())
                 ->method('getPasswordAlgorithm')
-                ->willReturn(null === $salt ? PasswordAlgorithm::create() : PasswordAlgorithm::createLegacySalted(new PasswordSalt($salt)))
+                ->willReturn($passwordAlgorithm ?? PasswordAlgorithm::create())
             ;
         }
 

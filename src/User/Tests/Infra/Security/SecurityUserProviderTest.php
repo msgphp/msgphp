@@ -11,6 +11,7 @@ use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Infra\Security\SecurityUserProvider;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\Role\RoleProviderInterface;
+use MsgPhp\User\ScalarUserId;
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -64,6 +65,7 @@ final class SecurityUserProviderTest extends TestCase
         self::assertSame('username', $user->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $user->getRoles());
         self::assertSame('', $user->getPassword());
+        self::assertNull($user->getPasswordAlgorithm());
         self::assertNull($user->getSalt());
     }
 
@@ -80,26 +82,26 @@ final class SecurityUserProviderTest extends TestCase
     {
         $provider = new SecurityUserProvider($this->createRepository($this->createUser()));
 
-        /** @var SecurityUser $user */
-        $user = $provider->refreshUser($originUser = $provider->loadUserByUsername('username'));
+        /** @var SecurityUser $refreshedUser */
+        $refreshedUser = $provider->refreshUser($user = $provider->loadUserByUsername('username'));
 
-        self::assertInstanceOf(SecurityUser::class, $user);
-        self::assertEquals($originUser, $user);
-        self::assertNotSame($originUser, $user);
-        self::assertSame('username', $user->getOriginUsername());
+        self::assertInstanceOf(SecurityUser::class, $refreshedUser);
+        self::assertEquals($user, $refreshedUser);
+        self::assertNotSame($user, $refreshedUser);
+        self::assertSame('username', $refreshedUser->getOriginUsername());
     }
 
     public function testRefreshUserWithOriginUsername(): void
     {
         $provider = new SecurityUserProvider($this->createRepository($this->createUser()));
 
-        /** @var SecurityUser $user */
-        $user = $provider->refreshUser($originUser = $provider->loadUserByUsername('origin-username'));
+        /** @var SecurityUser $refreshedUser */
+        $refreshedUser = $provider->refreshUser($user = $provider->loadUserByUsername('origin-username'));
 
-        self::assertInstanceOf(SecurityUser::class, $user);
-        self::assertEquals($originUser, $user);
-        self::assertNotSame($originUser, $user);
-        self::assertSame('origin-username', $user->getOriginUsername());
+        self::assertInstanceOf(SecurityUser::class, $refreshedUser);
+        self::assertEquals($user, $refreshedUser);
+        self::assertNotSame($user, $refreshedUser);
+        self::assertSame('origin-username', $refreshedUser->getOriginUsername());
     }
 
     public function testRefreshUserWithUnknownUser(): void
@@ -144,6 +146,7 @@ final class SecurityUserProviderTest extends TestCase
         self::assertNull($securityUser->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $securityUser->getRoles());
         self::assertSame('', $securityUser->getPassword());
+        self::assertNull($securityUser->getPasswordAlgorithm());
         self::assertNull($securityUser->getSalt());
     }
 
@@ -182,22 +185,16 @@ final class SecurityUserProviderTest extends TestCase
         return $repository;
     }
 
-    private function createUser(string $id = 'id', string $username = 'username'): User
+    private function createUser(): User
     {
         $user = $this->createMock(User::class);
-
         $user->expects(self::any())
             ->method('getId')
-            ->willReturn($userId = $this->createMock(UserIdInterface::class))
+            ->willReturn(new ScalarUserId('id'))
         ;
-        $userId->expects(self::any())
-            ->method('toString')
-            ->willReturn($id)
-        ;
-
         $user->expects(self::any())
             ->method('getCredential')
-            ->willReturn($credential = $this->createMock(CredentialInterface::class))
+            ->willReturn($this->createMock(CredentialInterface::class))
         ;
 
         return $user;
