@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Password;
 
+use MsgPhp\User\Password\GenericPasswordHashing;
 use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashing;
 use MsgPhp\User\Password\PasswordSalt;
 use PHPUnit\Framework\TestCase;
 
-final class PasswordHashingTest extends TestCase
+final class GenericPasswordHashingTest extends TestCase
 {
     /**
      * @dataProvider provideLegacyApiModes
      */
     public function testHash(bool $deprecateLegacyApi): void
     {
-        $hashing = new PasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
+        $hashing = new GenericPasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
 
         self::assertNotSame($hashing->hash('password'), $hashing->hash('password'));
         self::assertNotSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
@@ -36,7 +36,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testIsValid(bool $deprecateLegacyApi): void
     {
-        $hashing = new PasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
+        $hashing = new GenericPasswordHashing($algorithm = self::createAlgorithm(), $deprecateLegacyApi);
 
         self::assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
         self::assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
@@ -61,7 +61,7 @@ final class PasswordHashingTest extends TestCase
 
     public function testHashWithLegacyApi(): void
     {
-        $hashing = new PasswordHashing($algorithm = self::createAlgorithm(true), false);
+        $hashing = new GenericPasswordHashing($algorithm = self::createAlgorithm(true), false);
 
         self::assertSame($hashing->hash('password'), $hashing->hash('password'));
         self::assertSame($hashing->hash('password'), $hashing->hash('password', $algorithm));
@@ -74,7 +74,7 @@ final class PasswordHashingTest extends TestCase
 
     public function testIsValidWithLegacyApi(): void
     {
-        $hashing = new PasswordHashing($algorithm = self::createAlgorithm(true), false);
+        $hashing = new GenericPasswordHashing($algorithm = self::createAlgorithm(true), false);
 
         self::assertTrue($hashing->isValid($hashing->hash('password'), 'password'));
         self::assertTrue($hashing->isValid($hashing->hash('password'), 'password', $algorithm));
@@ -89,7 +89,7 @@ final class PasswordHashingTest extends TestCase
 
     public function testBase64EncodedAlgorithm(): void
     {
-        $hashing = new PasswordHashing(self::createAlgorithm(true), false);
+        $hashing = new GenericPasswordHashing(self::createAlgorithm(true), false);
         $algorithm = PasswordAlgorithm::createLegacyBase64Encoded('md5');
         $algorithm2 = PasswordAlgorithm::createLegacyBase64Encoded('sha1');
 
@@ -107,7 +107,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testSaltedAlgorithm(PasswordSalt $otherSalt): void
     {
-        $hashing = new PasswordHashing(self::createAlgorithm(true), false);
+        $hashing = new GenericPasswordHashing(self::createAlgorithm(true), false);
         $algorithm = PasswordAlgorithm::createLegacySalted($salt = new PasswordSalt('token', 1), false, 'md5');
         $algorithm2 = PasswordAlgorithm::createLegacySalted($salt, false, 'sha1');
         $algorithmBase64 = PasswordAlgorithm::createLegacySalted($salt, true, 'md5');
@@ -138,7 +138,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testSaltedAlgorithmWithInvalidIteration(int $iteration): void
     {
-        $hashing = new PasswordHashing(PasswordAlgorithm::createLegacySalted(new PasswordSalt('token', $iteration), false, 'md5'), false);
+        $hashing = new GenericPasswordHashing(PasswordAlgorithm::createLegacySalted(new PasswordSalt('token', $iteration), false, 'md5'), false);
 
         $this->expectException(\LogicException::class);
 
@@ -156,7 +156,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testSaltedAlgorithmWithInvalidFormat(string $format): void
     {
-        $hashing = new PasswordHashing(PasswordAlgorithm::createLegacySalted(new PasswordSalt('token', 1, $format), false, 'md5'), false);
+        $hashing = new GenericPasswordHashing(PasswordAlgorithm::createLegacySalted(new PasswordSalt('token', 1, $format), false, 'md5'), false);
 
         $this->expectException(\LogicException::class);
 
@@ -178,7 +178,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testHashWithLegacyAlgorithm(): void
     {
-        $hashing = new PasswordHashing();
+        $hashing = new GenericPasswordHashing();
 
         self::assertNotSame('password', $hashing->hash('password', self::createAlgorithm(true)));
     }
@@ -191,7 +191,7 @@ final class PasswordHashingTest extends TestCase
      */
     public function testIsValidhWithLegacyAlgorithm(): void
     {
-        $hashing = new PasswordHashing();
+        $hashing = new GenericPasswordHashing();
         $algorithm = self::createAlgorithm(true);
 
         self::assertTrue($hashing->isValid($hashing->hash('password', $algorithm), 'password', $algorithm));

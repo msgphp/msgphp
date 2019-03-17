@@ -7,7 +7,7 @@ namespace MsgPhp\User\Password;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class PasswordHashing implements PasswordHashingInterface
+final class GenericPasswordHashing implements PasswordHashingInterface
 {
     /**
      * @var PasswordAlgorithm
