@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\Password\PasswordProtectedInterface;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

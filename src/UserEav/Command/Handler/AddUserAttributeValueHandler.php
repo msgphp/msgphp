@@ -7,13 +7,13 @@ namespace MsgPhp\User\Command\Handler;
 use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
+use MsgPhp\Eav\Attribute;
 use MsgPhp\Eav\AttributeValueIdInterface;
-use MsgPhp\Eav\Entity\Attribute;
 use MsgPhp\User\Command\AddUserAttributeValueCommand;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserAttributeValue;
 use MsgPhp\User\Event\UserAttributeValueAddedEvent;
 use MsgPhp\User\Repository\UserAttributeValueRepositoryInterface;
+use MsgPhp\User\User;
+use MsgPhp\User\UserAttributeValue;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

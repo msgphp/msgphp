@@ -20,7 +20,7 @@ composer require msgphp/user-bundle
 namespace App\Entity\User;
 
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\User\Entity\User as BaseUser;
+use MsgPhp\User\User as BaseUser;
 use MsgPhp\User\UserIdInterface;
 
 /**
@@ -48,7 +48,7 @@ class User extends BaseUser
 
 msgphp_user:
     class_mapping:
-        MsgPhp\User\Entity\User: App\Entity\User\User
+        MsgPhp\User\User: App\Entity\User\User
 ```
 
 !!! note
@@ -98,7 +98,7 @@ If for some reason the default mapping needs to be customized, create the file `
 
 ```xml
 <doctrine-mapping>
-    <mapped-superclass name="MsgPhp\User\Entity\User">
+    <mapped-superclass name="MsgPhp\User\User">
         <!-- ... -->    
     </mapped-superclass>
 </doctrine-mapping>

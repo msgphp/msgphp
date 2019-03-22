@@ -23,16 +23,9 @@ final class ExtensionHelper
     {
     }
 
-    public static function configureDomain(ContainerBuilder $container, array $classMapping, array $identityMapping): void
+    public static function configureDomain(ContainerBuilder $container, array $classMapping): void
     {
-        foreach ($identityMapping as $class => $mapping) {
-            if (isset($classMapping[$class]) && !isset($identityMapping[$classMapping[$class]])) {
-                $identityMapping[$classMapping[$class]] = $mapping;
-            }
-        }
-
         $container->setParameter($param = 'msgphp.domain.class_mapping', $container->hasParameter($param) ? $classMapping + $container->getParameter($param) : $classMapping);
-        $container->setParameter($param = 'msgphp.domain.identity_mapping', $container->hasParameter($param) ? $identityMapping + $container->getParameter($param) : $identityMapping);
     }
 
     public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping, array $mappingFiles): void

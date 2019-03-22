@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\User\Entity\User;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 
 /**

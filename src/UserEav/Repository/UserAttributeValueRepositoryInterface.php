@@ -7,7 +7,7 @@ namespace MsgPhp\User\Repository;
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Eav\AttributeIdInterface;
 use MsgPhp\Eav\AttributeValueIdInterface;
-use MsgPhp\User\Entity\UserAttributeValue;
+use MsgPhp\User\UserAttributeValue;
 use MsgPhp\User\UserIdInterface;
 
 /**

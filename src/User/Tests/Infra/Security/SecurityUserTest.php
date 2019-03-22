@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\User\CredentialInterface;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\Password\PasswordProtectedInterface;
 use MsgPhp\User\Password\PasswordSalt;
 use MsgPhp\User\ScalarUserId;
+use MsgPhp\User\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 

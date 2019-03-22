@@ -31,11 +31,6 @@ final class ContainerHelper
         return \in_array($class, $container->getParameter('kernel.bundles'), true);
     }
 
-    public static function getBundles(ContainerInterface $container): array
-    {
-        return array_flip($container->getParameter('kernel.bundles'));
-    }
-
     public static function getClassReflection(ContainerBuilder $container, ?string $class): \ReflectionClass
     {
         if (!$class || !($reflection = $container->getReflectionClass($class))) {

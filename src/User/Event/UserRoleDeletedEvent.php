@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Event;
 
-use MsgPhp\User\Entity\UserRole;
+use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

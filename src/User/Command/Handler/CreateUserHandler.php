@@ -8,9 +8,9 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\CreateUserCommand;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserCreatedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 
 /**

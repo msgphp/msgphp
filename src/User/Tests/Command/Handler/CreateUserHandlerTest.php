@@ -8,10 +8,10 @@ use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\User\Command\CreateUserCommand;
 use MsgPhp\User\Command\Handler\CreateUserHandler;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserCreatedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
 use MsgPhp\User\ScalarUserId;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 use PHPUnit\Framework\TestCase;
 

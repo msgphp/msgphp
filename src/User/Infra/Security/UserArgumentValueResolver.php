@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
-use MsgPhp\User\Entity\User;
+use MsgPhp\User\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

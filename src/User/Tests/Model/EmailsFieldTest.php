@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Model;
 
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\User\Entity\UserEmail;
 use MsgPhp\User\Model\EmailsField;
+use MsgPhp\User\UserEmail;
 use PHPUnit\Framework\TestCase;
 
 final class EmailsFieldTest extends TestCase

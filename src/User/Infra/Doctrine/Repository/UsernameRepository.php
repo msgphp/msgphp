@@ -8,9 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\Username;
 use MsgPhp\User\Infra\Doctrine\UsernameLookup;
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
+use MsgPhp\User\Username;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

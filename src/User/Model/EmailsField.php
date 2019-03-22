@@ -6,7 +6,7 @@ namespace MsgPhp\User\Model;
 
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\GenericDomainCollection;
-use MsgPhp\User\Entity\UserEmail;
+use MsgPhp\User\UserEmail;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

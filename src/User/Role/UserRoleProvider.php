@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Role;
 
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserRole;
 use MsgPhp\User\Repository\UserRoleRepositoryInterface;
+use MsgPhp\User\User;
+use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

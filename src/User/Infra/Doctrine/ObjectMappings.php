@@ -6,12 +6,12 @@ namespace MsgPhp\User\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
 use MsgPhp\Domain\Infra\Doctrine\ObjectMappingProviderInterface;
-use MsgPhp\User\Entity\Credential;
-use MsgPhp\User\Entity\Role;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserEmail;
-use MsgPhp\User\Entity\UserRole;
+use MsgPhp\User\Credential;
 use MsgPhp\User\Model;
+use MsgPhp\User\Role;
+use MsgPhp\User\User;
+use MsgPhp\User\UserEmail;
+use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

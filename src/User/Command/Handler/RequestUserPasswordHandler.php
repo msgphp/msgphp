@@ -10,10 +10,10 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\RequestUserPasswordCommand;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\Domain\RequestPasswordEvent;
 use MsgPhp\User\Event\UserPasswordRequestedEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\User;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

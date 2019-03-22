@@ -8,8 +8,8 @@ use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Eav\AttributeIdInterface;
 use MsgPhp\Eav\AttributeValueIdInterface;
 use MsgPhp\Eav\Infra\Doctrine\Repository\EntityAttributeValueRepositoryTrait;
-use MsgPhp\User\Entity\UserAttributeValue;
 use MsgPhp\User\Repository\UserAttributeValueRepositoryInterface;
+use MsgPhp\User\UserAttributeValue;
 use MsgPhp\User\UserIdInterface;
 
 /**

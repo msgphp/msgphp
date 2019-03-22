@@ -11,9 +11,9 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\ConfirmUserEmailCommand;
-use MsgPhp\User\Entity\UserEmail;
 use MsgPhp\User\Event\UserEmailConfirmedEvent;
 use MsgPhp\User\Repository\UserEmailRepositoryInterface;
+use MsgPhp\User\UserEmail;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

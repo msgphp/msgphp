@@ -6,8 +6,8 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\UserEmail;
 use MsgPhp\User\Repository\UserEmailRepositoryInterface;
+use MsgPhp\User\UserEmail;
 use MsgPhp\User\UserIdInterface;
 
 /**

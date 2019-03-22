@@ -6,9 +6,9 @@ namespace MsgPhp\User\Infra\Doctrine\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
 use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Entity\UserRole;
 use MsgPhp\User\Repository\UserRoleRepositoryInterface;
 use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Model;
 
-use MsgPhp\User\Entity\Role;
 use MsgPhp\User\Model\RoleField;
+use MsgPhp\User\Role;
 use PHPUnit\Framework\TestCase;
 
 final class RoleFieldTest extends TestCase

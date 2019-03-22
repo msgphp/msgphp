@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Entity\Credential\Token;
+use MsgPhp\User\Credential\Token;
 use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**

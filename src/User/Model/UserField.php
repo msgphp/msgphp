@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Entity\User;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 
 /**

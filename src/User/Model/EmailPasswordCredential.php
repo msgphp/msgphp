@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Entity\Credential\EmailPassword;
+use MsgPhp\User\Credential\EmailPassword;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

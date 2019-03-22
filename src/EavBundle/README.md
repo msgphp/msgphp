@@ -16,7 +16,8 @@ composer require msgphp/eav-bundle
 <?php
 // config/packages/msgphp_eav.php
 
-use MsgPhp\Eav\Entity\{Attribute, AttributeValue};
+use MsgPhp\Eav\Attribute;
+use MsgPhp\Eav\AttributeValue;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $container) {

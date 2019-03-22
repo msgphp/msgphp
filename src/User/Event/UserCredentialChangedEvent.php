@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Event;
 
 use MsgPhp\User\CredentialInterface;
-use MsgPhp\User\Entity\User;
+use MsgPhp\User\User;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

@@ -11,9 +11,9 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\EnableUserCommand;
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Event\UserEnabledEvent;
 use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\User;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

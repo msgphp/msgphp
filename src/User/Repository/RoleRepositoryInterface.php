@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Repository;
 
 use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\User\Entity\Role;
+use MsgPhp\User\Role;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

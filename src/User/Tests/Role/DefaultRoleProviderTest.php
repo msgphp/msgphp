@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Role;
 
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Role\DefaultRoleProvider;
+use MsgPhp\User\User;
 use PHPUnit\Framework\TestCase;
 
 final class DefaultRoleProviderTest extends TestCase

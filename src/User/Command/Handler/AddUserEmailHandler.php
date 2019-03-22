@@ -8,10 +8,10 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\AddUserEmailCommand;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserEmail;
 use MsgPhp\User\Event\UserEmailAddedEvent;
 use MsgPhp\User\Repository\UserEmailRepositoryInterface;
+use MsgPhp\User\User;
+use MsgPhp\User\UserEmail;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

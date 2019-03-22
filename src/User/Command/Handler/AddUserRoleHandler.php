@@ -8,11 +8,11 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\AddUserRoleCommand;
-use MsgPhp\User\Entity\Role;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserRole;
 use MsgPhp\User\Event\UserRoleAddedEvent;
 use MsgPhp\User\Repository\UserRoleRepositoryInterface;
+use MsgPhp\User\Role;
+use MsgPhp\User\User;
+use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

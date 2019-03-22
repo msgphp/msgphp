@@ -9,10 +9,11 @@ use MsgPhp\Domain\Infra\Config\NodeBuilder;
 use MsgPhp\Domain\Infra\Config\TreeBuilderHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
 use MsgPhp\Domain\Infra\DependencyInjection\PackageMetadata;
+use MsgPhp\Eav\Attribute;
 use MsgPhp\Eav\AttributeIdInterface;
+use MsgPhp\Eav\AttributeValue;
 use MsgPhp\Eav\AttributeValueIdInterface;
 use MsgPhp\Eav\Command;
-use MsgPhp\Eav\Entity;
 use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
 use MsgPhp\Eav\Infra\Uuid as UuidInfra;
 use MsgPhp\Eav\ScalarAttributeId;
@@ -28,23 +29,25 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
-    public const IDENTITY_MAPPING = [
-        Entity\Attribute::class => ['id'],
-        Entity\AttributeValue::class => ['id'],
-    ];
     public const DOCTRINE_TYPE_MAPPING = [
         AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
         AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
     ];
     public const DOCTRINE_REPOSITORY_MAPPING = [
-        Entity\Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
+        Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
     ];
     private const ID_TYPE_MAPPING = [
-        AttributeIdInterface::class => ['scalar' => ScalarAttributeId::class, 'uuid' => UuidInfra\AttributeUuid::class],
-        AttributeValueIdInterface::class => ['scalar' => ScalarAttributeValueId::class, 'uuid' => UuidInfra\AttributeValueUuid::class],
+        AttributeIdInterface::class => [
+            'scalar' => ScalarAttributeId::class,
+            'uuid' => UuidInfra\AttributeUuid::class,
+        ],
+        AttributeValueIdInterface::class => [
+            'scalar' => ScalarAttributeValueId::class,
+            'uuid' => UuidInfra\AttributeValueUuid::class,
+        ],
     ];
     private const COMMAND_MAPPING = [
-        Entity\Attribute::class => [
+        Attribute::class => [
             Command\CreateAttributeCommand::class => true,
             Command\DeleteAttributeCommand::class => true,
         ],
@@ -73,7 +76,7 @@ final class Configuration implements ConfigurationInterface
         /** @psalm-suppress PossiblyNullReference */
         $children
             ->classMappingNode('class_mapping')
-                ->requireClasses([Entity\Attribute::class, Entity\AttributeValue::class])
+                ->requireClasses([Attribute::class, AttributeValue::class])
                 ->subClassValues()
             ->end()
             ->classMappingNode('id_type_mapping')

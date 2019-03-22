@@ -8,9 +8,9 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 use MsgPhp\Domain\Message\DomainMessageBusInterface;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\CreateRoleCommand;
-use MsgPhp\User\Entity\Role;
 use MsgPhp\User\Event\RoleCreatedEvent;
 use MsgPhp\User\Repository\RoleRepositoryInterface;
+use MsgPhp\User\Role;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>

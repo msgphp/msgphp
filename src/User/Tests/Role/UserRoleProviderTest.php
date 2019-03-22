@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Role;
 
 use MsgPhp\Domain\GenericDomainCollection;
-use MsgPhp\User\Entity\User;
-use MsgPhp\User\Entity\UserRole;
 use MsgPhp\User\Repository\UserRoleRepositoryInterface;
 use MsgPhp\User\Role\UserRoleProvider;
+use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserRole;
 use PHPUnit\Framework\TestCase;
 
 final class UserRoleProviderTest extends TestCase

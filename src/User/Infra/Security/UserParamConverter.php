@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
-use MsgPhp\User\Entity\User;
+use MsgPhp\User\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;

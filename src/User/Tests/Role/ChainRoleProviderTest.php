@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Role;
 
-use MsgPhp\User\Entity\User;
 use MsgPhp\User\Role\ChainRoleProvider;
 use MsgPhp\User\Role\RoleProviderInterface;
+use MsgPhp\User\User;
 use PHPUnit\Framework\TestCase;
 
 final class ChainRoleProviderTest extends TestCase

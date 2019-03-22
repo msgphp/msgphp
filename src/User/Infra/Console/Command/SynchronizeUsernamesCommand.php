@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Console\Command;
 
-use MsgPhp\User\Entity\Username;
 use MsgPhp\User\Repository\UsernameRepositoryInterface;
+use MsgPhp\User\Username;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
