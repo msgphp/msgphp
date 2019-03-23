@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\CredentialInterface;
+use MsgPhp\User\Credential\CredentialInterface;
 use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @internal
  */
 trait AbstractCredential
 {

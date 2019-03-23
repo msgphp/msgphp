@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Credential;
 
-use MsgPhp\User\Credential\Features\NicknameAsUsername;
-use MsgPhp\User\Credential\Features\PasswordProtection;
-use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
-use MsgPhp\User\Password\PasswordProtectedInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class NicknamePassword implements CredentialInterface, PasswordProtectedInterface
+final class NicknamePassword implements PasswordProtectedCredentialInterface
 {
     use NicknameAsUsername;
     use PasswordProtection;

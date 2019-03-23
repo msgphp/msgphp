@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\User\CredentialInterface;
+use MsgPhp\User\Credential\CredentialInterface;
 use MsgPhp\User\Infra\Security\SecurityUser;
 use MsgPhp\User\Infra\Security\SecurityUserProvider;
 use MsgPhp\User\Repository\UserRepositoryInterface;

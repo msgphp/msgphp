@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\CredentialInterface;
+use MsgPhp\User\Credential\PasswordProtectedCredentialInterface;
 use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
-use MsgPhp\User\Password\PasswordProtectedInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @internal
  */
 trait AbstractPasswordCredential
 {
     use AbstractCredential;
 
     /**
-     * @var CredentialInterface&PasswordProtectedInterface
+     * @var PasswordProtectedCredentialInterface
      */
     private $credential;
 

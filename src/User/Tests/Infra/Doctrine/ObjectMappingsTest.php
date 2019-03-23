@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infra\Doctrine;
 
 use MsgPhp\Domain\Infra\Doctrine\MappingConfig;
+use MsgPhp\User\Credential;
 use MsgPhp\User\Infra\Doctrine\ObjectMappings;
 use MsgPhp\User\Model;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,12 @@ final class ObjectMappingsTest extends TestCase
 {
     public function testMapping(): void
     {
-        $available = array_flip(array_map(function (string $file): string {
+        $available = array_flip([
+            Credential\EmailAsUsername::class,
+            Credential\NicknameAsUsername::class,
+            Credential\PasswordProtection::class,
+        ]);
+        $available += array_flip(array_map(function (string $file): string {
             return 'MsgPhp\\User\\Model\\'.basename($file, '.php');
         }, glob(\dirname(__DIR__, 3).'/Model/*.php')));
         unset(

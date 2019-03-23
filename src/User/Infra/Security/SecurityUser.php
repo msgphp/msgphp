@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infra\Security;
 
+use MsgPhp\User\Credential\PasswordProtectedCredentialInterface;
 use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordProtectedInterface;
 use MsgPhp\User\User;
 use MsgPhp\User\UserIdInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
@@ -57,7 +57,7 @@ final class SecurityUser implements UserInterface, EquatableInterface
 
         $credential = $user->getCredential();
 
-        if ($credential instanceof PasswordProtectedInterface) {
+        if ($credential instanceof PasswordProtectedCredentialInterface) {
             $this->password = $credential->getPassword();
             $this->passwordAlgorithm = $credential->getPasswordAlgorithm();
         }

@@ -21,16 +21,16 @@ class ChangeCredentialEvent implements DomainEventInterface
         $this->fields = $fields;
     }
 
-    public function getStringField(string $field): string
+    public function getStringField(string $field, string $default = null): string
     {
-        if (!isset($this->fields[$field])) {
-            throw new \LogicException(sprintf('Field "%s" does not exists.', $field));
+        if (null === $value = $this->fields[$field] ?? $default) {
+            throw new \LogicException(sprintf('No value available for field "%s".', $field));
         }
 
-        if (!\is_string($this->fields[$field])) {
-            throw new \LogicException(sprintf('Field "%s" must be a string, got "%s".', $field, \gettype($this->fields[$field])));
+        if (!\is_string($value)) {
+            throw new \LogicException(sprintf('Field value for "%s" must be a string, got "%s".', $field, \gettype($value)));
         }
 
-        return $this->fields[$field];
+        return $value;
     }
 }

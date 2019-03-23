@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Credential\Features;
+namespace MsgPhp\User\Credential;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-trait EmailAsUsername
+trait NicknameAsUsername
 {
     /**
      * @var string
      */
-    private $email;
+    private $nickname;
 
     public static function getUsernameField(): string
     {
-        return 'email';
+        return 'nickname';
     }
 
     public function getUsername(): string
     {
-        return $this->email;
+        return $this->nickname;
     }
 }

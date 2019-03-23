@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Credential;
 
-use MsgPhp\User\Credential\Features\NicknameAsUsername;
-use MsgPhp\User\CredentialInterface;
 use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 
 /**

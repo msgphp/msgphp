@@ -30,8 +30,8 @@ final class ObjectMappings implements ObjectMappingProviderInterface
 
     public static function provideObjectMappings(MappingConfig $config): iterable
     {
-        foreach (self::CREDENTIALS as $object => $credential) {
-            yield $object => [
+        foreach (self::CREDENTIALS as $model => $credential) {
+            yield $model => [
                 'credential' => [
                     'type' => self::TYPE_EMBEDDED,
                     'class' => $credential,
@@ -39,6 +39,28 @@ final class ObjectMappings implements ObjectMappingProviderInterface
                 ],
             ];
         }
+
+        yield Credential\EmailAsUsername::class => [
+            'email' => [
+                'type' => 'string',
+                'unique' => true,
+                'length' => $config->keyMaxLength,
+            ],
+        ];
+
+        yield Credential\NicknameAsUsername::class => [
+            'nickname' => [
+                'type' => 'string',
+                'unique' => true,
+                'length' => $config->keyMaxLength,
+            ],
+        ];
+
+        yield Credential\PasswordProtection::class => [
+            'password' => [
+                'type' => 'string',
+            ],
+        ];
 
         yield Model\ResettablePassword::class => [
             'passwordResetToken' => [

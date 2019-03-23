@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Event;
 
-use MsgPhp\User\CredentialInterface;
+use MsgPhp\User\Credential\CredentialInterface;
 use MsgPhp\User\User;
 
 /**

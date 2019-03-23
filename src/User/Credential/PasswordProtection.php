@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Credential\Features;
+namespace MsgPhp\User\Credential;
 
 use MsgPhp\User\Password\PasswordAlgorithm;
 
