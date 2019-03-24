@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Repository\UsernameRepositoryInterface;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Repository\UsernameRepository;
+use MsgPhp\User\Repository\UserRepository as BaseUserRepository;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserRepository implements UserRepositoryInterface
+final class UserRepository implements BaseUserRepository
 {
     use DomainEntityRepositoryTrait;
 
@@ -25,14 +25,14 @@ final class UserRepository implements UserRepositoryInterface
     private $usernameField;
 
     /**
-     * @var UsernameRepositoryInterface|null
+     * @var UsernameRepository|null
      */
     private $usernameRepository;
 
     /**
      * @psalm-param class-string $class
      */
-    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null, UsernameRepositoryInterface $usernameRepository = null)
+    public function __construct(string $class, EntityManagerInterface $em, string $usernameField = null, UsernameRepository $usernameRepository = null)
     {
         $this->class = $class;
         $this->em = $em;
@@ -41,14 +41,14 @@ final class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @return DomainCollectionInterface|User[]
+     * @return DomainCollection|User[]
      */
-    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->doFindAll($offset, $limit);
     }
 
-    public function find(UserIdInterface $id): User
+    public function find(UserId $id): User
     {
         return $this->doFind($id);
     }
@@ -66,7 +66,7 @@ final class UserRepository implements UserRepositoryInterface
         return $this->doFindByFields([$this->usernameField => $username]);
     }
 
-    public function exists(UserIdInterface $id): bool
+    public function exists(UserId $id): bool
     {
         return $this->doExists($id);
     }

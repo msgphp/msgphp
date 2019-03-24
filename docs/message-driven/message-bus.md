@@ -1,7 +1,7 @@
 # Message Bus
 
-A domain message bus is bound to `MsgPhp\Domain\Message\DomainMessageBusInterface`. Its purpose is to dispatch any type
-of message object and helps you to use [CQRS](cqrs.md) and [event sourcing](../event-sourcing/event-handlers.md).
+A domain message bus is bound to `MsgPhp\Domain\Message\DomainMessageBus`. Its purpose is to dispatch any type of
+message object and helps you to use [CQRS](cqrs.md) and [event sourcing](../event-sourcing/event-handlers.md).
 
 ## API
 

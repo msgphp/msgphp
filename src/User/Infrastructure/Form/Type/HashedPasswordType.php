@@ -6,7 +6,7 @@ namespace MsgPhp\User\Infrastructure\Form\Type;
 
 use MsgPhp\User\Password\GenericPasswordHashing;
 use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashingInterface;
+use MsgPhp\User\Password\PasswordHashing;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -24,11 +24,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 final class HashedPasswordType extends AbstractType
 {
     /**
-     * @var PasswordHashingInterface|null
+     * @var PasswordHashing|null
      */
     private $hashing;
 
-    public function __construct(PasswordHashingInterface $hashing = null)
+    public function __construct(PasswordHashing $hashing = null)
     {
         $this->hashing = $hashing;
     }
@@ -122,7 +122,7 @@ final class HashedPasswordType extends AbstractType
             },
         ]);
 
-        $resolver->setAllowedTypes('password_hashing', ['null', PasswordHashingInterface::class]);
+        $resolver->setAllowedTypes('password_hashing', ['null', PasswordHashing::class]);
         $resolver->setAllowedTypes('password_algorithm', ['null', 'callable', 'int', 'string', PasswordAlgorithm::class]);
         $resolver->setAllowedTypes('password_confirm', ['bool']);
         $resolver->setAllowedTypes('password_confirm_options', ['null', 'array']);
@@ -169,7 +169,7 @@ final class HashedPasswordType extends AbstractType
 final class Password
 {
     /**
-     * @var PasswordHashingInterface
+     * @var PasswordHashing
      */
     public $hashing;
 
@@ -183,7 +183,7 @@ final class Password
      */
     public $hash;
 
-    public function __construct(PasswordHashingInterface $hashing, ?PasswordAlgorithm $algorithm)
+    public function __construct(PasswordHashing $hashing, ?PasswordAlgorithm $algorithm)
     {
         $this->hashing = $hashing;
         $this->algorithm = $algorithm;

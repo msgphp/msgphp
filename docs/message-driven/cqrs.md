@@ -14,10 +14,10 @@ purpose is to ease the handling of command messages by sourcing a [domain event]
 ```php
 <?php
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
-use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\DomainEvent;
+use MsgPhp\Domain\Event\DomainEventHandler;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBus;
 
 // --- SETUP ---
 
@@ -25,13 +25,13 @@ class MyCommand
 {
 }
 
-class MyDomainEvent implements DomainEventInterface
+class MyDomainEvent implements DomainEvent
 {
 }
 
-class MyEntity implements DomainEventHandlerInterface
+class MyEntity implements DomainEventHandler
 {
-    public function handleEvent(DomainEventInterface $event): bool
+    public function handleEvent(DomainEvent $event): bool
     {
         if ($event instanceof MyDomainEvent) {
             // do something
@@ -54,7 +54,7 @@ class MyCommandHandler
         });
     }
 
-    protected function getDomainEvent(MyCommand $command): DomainEventInterface
+    protected function getDomainEvent(MyCommand $command): DomainEvent
     {
         return new MyDomainEvent();
     }
@@ -67,7 +67,7 @@ class MyCommandHandler
 
 // --- USAGE ---
 
-/** @var DomainMessageBusInterface $bus */
+/** @var DomainMessageBus $bus */
 $bus = ...;
 
 $bus->dispatch(new MyCommand());

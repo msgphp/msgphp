@@ -1,7 +1,7 @@
 # Events
 
-A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpose is to represent any action that can
- _happen_ regarding the domain. When handled it might lead to an application state change.
+A domain event is bound to `MsgPhp\Domain\Event\DomainEvent`. Its purpose is to represent any action that can _happen_
+regarding the domain. When handled it might lead to an application state change.
 
 ## API
 
@@ -10,9 +10,9 @@ A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpo
 
 ## Implementations
 
-- `MsgPhp\Domain\Event\ConfirmEvent`
-- `MsgPhp\Domain\Event\DisableEvent`
-- `MsgPhp\Domain\Event\EnableEvent`
+- `MsgPhp\Domain\Event\Confirm`
+- `MsgPhp\Domain\Event\Disable`
+- `MsgPhp\Domain\Event\Enable`
 
 ## Basic Example
 
@@ -20,13 +20,13 @@ A domain event is bound to `MsgPhp\Domain\Event\DomainEventInterface`. Its purpo
 <?php
 
 use MsgPhp\Domain\Model\CanBeEnabled;
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\Enable;
+use MsgPhp\Domain\Event\DomainEventHandler;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
-use MsgPhp\Domain\Event\EnableEvent;
 
 // --- SETUP ---
 
-class MyEntity implements DomainEventHandlerInterface
+class MyEntity implements DomainEventHandler
 {
     use CanBeEnabled;
     use DomainEventHandlerTrait;
@@ -36,8 +36,8 @@ class MyEntity implements DomainEventHandlerInterface
 
 $entity = new MyEntity();
 $entity->isEnabled(); // false
-$entity->handleEvent(new EnableEvent()); // true
-$entity->handleEvent(new EnableEvent()); // false
+$entity->handleEvent(new Enable()); // true
+$entity->handleEvent(new Enable()); // false
 $entity->isEnabled(); // true
 ```
 

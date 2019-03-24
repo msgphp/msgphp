@@ -9,7 +9,7 @@ use MsgPhp\User\User;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DefaultRoleProvider implements RoleProviderInterface
+final class DefaultRoleProvider implements RoleProvider
 {
     /**
      * @var string[]

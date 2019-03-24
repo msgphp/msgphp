@@ -116,8 +116,8 @@ $otherEntity = $factory->create(MyEntity::class, [
 When working with [domain identifiers](../ddd/identifiers.md) and its corresponding [type](doctrine-dbal.md#domain-identifier-type)
 a problem can occur when hydrating scalar values, e.g. with `Query::getScalarResult()`.
 
-It would use instances of `MsgPhp\Domain\DomainIdInterface` that can only be casted to string as its (true) scalar
-value (due to `__toString()`). In case the underlying data type is e.g. `integer` it will be lost.
+It would use instances of `MsgPhp\Domain\DomainId` that can only be casted to string as its (true) scalar value (due to
+`__toString()`). In case the underlying data type is e.g. `integer` it will be lost.
 
 To overcome, two hydration modes are available to hydrate the primitive identifier value instead.
 

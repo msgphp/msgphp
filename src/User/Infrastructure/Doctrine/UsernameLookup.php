@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\User;
 use MsgPhp\User\Username;
 
@@ -15,7 +15,7 @@ use MsgPhp\User\Username;
 final class UsernameLookup
 {
     /**
-     * @var DomainObjectFactoryInterface
+     * @var DomainObjectFactory
      */
     private $factory;
 
@@ -32,7 +32,7 @@ final class UsernameLookup
     /**
      * @param array[] $mapping
      */
-    public function __construct(DomainObjectFactoryInterface $factory, EntityManagerInterface $em, array $mapping)
+    public function __construct(DomainObjectFactory $factory, EntityManagerInterface $em, array $mapping)
     {
         $this->factory = $factory;
         $this->em = $em;

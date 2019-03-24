@@ -16,10 +16,10 @@ Yields all projection documents attempted to be synchronized. The actual documen
 
 use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionDocumentProvider;
-use MsgPhp\Domain\Projection\ProjectionDocumentTransformerInterface;
-use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
+use MsgPhp\Domain\Projection\ProjectionDocumentTransformer;
+use MsgPhp\Domain\Projection\ProjectionRepository;
 use MsgPhp\Domain\Projection\ProjectionSynchronization;
-use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistry;
 
 // --- SETUP ---
 
@@ -33,11 +33,11 @@ class MyEntity
     }
 }
 
-/** @var ProjectionTypeRegistryInterface $typeRegistry */
+/** @var ProjectionTypeRegistry $typeRegistry */
 $typeRegistry = ...;
-/** @var ProjectionRepositoryInterface $repository */
+/** @var ProjectionRepository $repository */
 $repository = ...;
-/** @var ProjectionDocumentTransformerInterface $transformer */
+/** @var ProjectionDocumentTransformer $transformer */
 $transformer = ...;
 $provider = new ProjectionDocumentProvider($transformer, [
     function (): iterable {

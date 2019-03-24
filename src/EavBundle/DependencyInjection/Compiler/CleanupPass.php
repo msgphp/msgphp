@@ -19,7 +19,7 @@ final class CleanupPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        ContainerHelper::removeIf($container, !$container->has(Repository\AttributeRepositoryInterface::class), [
+        ContainerHelper::removeIf($container, !$container->has(Repository\AttributeRepository::class), [
             Command\Handler\CreateAttributeHandler::class,
             Command\Handler\DeleteAttributeHandler::class,
         ]);

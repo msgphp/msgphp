@@ -6,15 +6,15 @@ namespace MsgPhp\Domain\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainObjectFactory implements DomainObjectFactoryInterface
+final class DomainObjectFactory implements BaseDomainObjectFactory
 {
     /**
-     * @var DomainObjectFactoryInterface
+     * @var BaseDomainObjectFactory
      */
     private $factory;
 
@@ -23,7 +23,7 @@ final class DomainObjectFactory implements DomainObjectFactoryInterface
      */
     private $em;
 
-    public function __construct(DomainObjectFactoryInterface $factory, EntityManagerInterface $em)
+    public function __construct(BaseDomainObjectFactory $factory, EntityManagerInterface $em)
     {
         $this->factory = $factory;
         $this->em = $em;

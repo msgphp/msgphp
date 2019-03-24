@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Doctrine;
 
 use MsgPhp\Domain\Infrastructure\Doctrine\MappingConfig;
-use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProviderInterface;
+use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProvider;
 use MsgPhp\User\Model;
 use MsgPhp\User\UserAttributeValue;
 
@@ -14,7 +14,7 @@ use MsgPhp\User\UserAttributeValue;
  *
  * @internal
  */
-final class EavObjectMappings implements ObjectMappingProviderInterface
+final class EavObjectMappings implements ObjectMappingProvider
 {
     public static function provideObjectMappings(MappingConfig $config): iterable
     {

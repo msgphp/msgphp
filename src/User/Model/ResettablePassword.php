@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Event\Domain\RequestPasswordEvent;
+use MsgPhp\User\Event\Domain\RequestPassword;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -43,7 +43,7 @@ trait ResettablePassword
         $this->passwordRequestedAt = null;
     }
 
-    private function handleRequestPasswordEvent(RequestPasswordEvent $event): bool
+    private function handleRequestPasswordEvent(RequestPassword $event): bool
     {
         if (null === $event->token || $event->token !== $this->passwordResetToken) {
             $this->requestPassword($event->token);

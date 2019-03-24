@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Console\Command;
 
-use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,11 +19,11 @@ final class InitializeProjectionTypesCommand extends Command
     protected static $defaultName = 'projection:initialize-types';
 
     /**
-     * @var ProjectionTypeRegistryInterface
+     * @var ProjectionTypeRegistry
      */
     private $typeRegistry;
 
-    public function __construct(ProjectionTypeRegistryInterface $typeRegistry)
+    public function __construct(ProjectionTypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
 

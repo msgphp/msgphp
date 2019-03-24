@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Credential\PasswordProtectedCredentialInterface;
-use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
+use MsgPhp\User\Credential\PasswordProtectedCredential;
+use MsgPhp\User\Event\Domain\ChangeCredential;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -15,7 +15,7 @@ trait AbstractPasswordCredential
     use AbstractCredential;
 
     /**
-     * @var PasswordProtectedCredentialInterface
+     * @var PasswordProtectedCredential
      */
     private $credential;
 
@@ -26,6 +26,6 @@ trait AbstractPasswordCredential
 
     public function changePassword(string $password): void
     {
-        ($this->credential)(new ChangeCredentialEvent(['password' => $password]));
+        ($this->credential)(new ChangeCredential(['password' => $password]));
     }
 }

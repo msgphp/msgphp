@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DisableEvent;
-use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\Disable;
+use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\DisableUserCommand;
-use MsgPhp\User\Event\UserDisabledEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Command\DisableUser;
+use MsgPhp\User\Event\UserDisabled;
+use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 
 /**
@@ -24,31 +24,31 @@ final class DisableUserHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(DisableUserCommand $command): void
+    public function __invoke(DisableUser $command): void
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserDisabledEvent::class, compact('user'));
+            $this->dispatch(UserDisabled::class, compact('user'));
         });
     }
 
-    protected function getDomainEvent(DisableUserCommand $command): DomainEventInterface
+    protected function getDomainEvent(DisableUser $command): DomainEvent
     {
-        return $this->factory->create(DisableEvent::class);
+        return $this->factory->create(Disable::class);
     }
 
-    protected function getDomainEventTarget(DisableUserCommand $command): User
+    protected function getDomainEventTarget(DisableUser $command): User
     {
         return $this->repository->find($command->userId);
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Model;
 
-use MsgPhp\Domain\Event\ConfirmEvent;
+use MsgPhp\Domain\Event\Confirm;
 use MsgPhp\Domain\Model\CanBeConfirmed;
 use PHPUnit\Framework\TestCase;
 
@@ -29,11 +29,11 @@ final class CanBeConfirmedTest extends TestCase
     {
         $object = $this->getObject('foo', null);
 
-        self::assertTrue($object->handleConfirmEvent(new ConfirmEvent()));
+        self::assertTrue($object->handleConfirmEvent(new Confirm()));
         self::assertNull($prevToken = $object->getConfirmationToken());
         self::assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
         self::assertTrue($object->isConfirmed());
-        self::assertFalse($object->handleConfirmEvent(new ConfirmEvent()));
+        self::assertFalse($object->handleConfirmEvent(new Confirm()));
         self::assertTrue($object->isConfirmed());
     }
 

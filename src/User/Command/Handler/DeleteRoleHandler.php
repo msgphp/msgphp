@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\DeleteRoleCommand;
-use MsgPhp\User\Event\RoleDeletedEvent;
-use MsgPhp\User\Repository\RoleRepositoryInterface;
+use MsgPhp\User\Command\DeleteRole;
+use MsgPhp\User\Event\RoleDeleted;
+use MsgPhp\User\Repository\RoleRepository;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -20,18 +20,18 @@ final class DeleteRoleHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var RoleRepositoryInterface
+     * @var RoleRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, RoleRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, RoleRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(DeleteRoleCommand $command): void
+    public function __invoke(DeleteRole $command): void
     {
         try {
             $role = $this->repository->find($command->roleName);
@@ -40,6 +40,6 @@ final class DeleteRoleHandler
         }
 
         $this->repository->delete($role);
-        $this->dispatch(RoleDeletedEvent::class, compact('role'));
+        $this->dispatch(RoleDeleted::class, compact('role'));
     }
 }

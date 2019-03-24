@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infrastructure\Doctrine;
 
 use Doctrine\ORM\Proxy\Proxy;
-use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainObjectFactory;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreate(): void
     {
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('create')
             ->with(Entities\TestEntity::class, ['foo' => 'bar'])
@@ -34,7 +34,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDiscriminator(): void
     {
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('create')
             ->with(Entities\TestChildEntity::class, ['foo' => 'bar', 'discriminator' => 'child'])
@@ -51,7 +51,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testCreateWithObject(): void
     {
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('create')
             ->with(\stdClass::class)
@@ -69,14 +69,14 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testReference(): void
     {
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('getClass')
             ->willReturnArgument(0)
         ;
         $factory = new DomainObjectFactory($innerFactory, self::$em);
 
-        self::assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, ['id' => $id = $this->createMock(DomainIdInterface::class)]));
+        self::assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, ['id' => $id = $this->createMock(DomainId::class)]));
         self::assertInstanceOf(Entities\TestEntity::class, $ref);
         self::assertSame($id, $ref->getId());
     }
@@ -87,7 +87,7 @@ final class DomainObjectFactoryTest extends TestCase
         self::$em->flush();
         self::$em->clear();
 
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('getClass')
             ->willReturnArgument(0)
@@ -100,7 +100,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testReferenceWithUnknownClass(): void
     {
-        $innerFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $innerFactory = $this->createMock(BaseDomainObjectFactory::class);
         $innerFactory->expects(self::once())
             ->method('reference')
             ->with(\stdClass::class, ['foo' => 'bar'])

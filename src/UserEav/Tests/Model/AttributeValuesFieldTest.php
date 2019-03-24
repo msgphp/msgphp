@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Model;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\User\Model\AttributeValuesField;
 use MsgPhp\User\UserAttributeValue;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class AttributeValuesFieldTest extends TestCase
 
         self::assertSame($attributeValues, iterator_to_array($object->getAttributeValues()));
 
-        $object = $this->getObject($attributeValues = $this->createMock(DomainCollectionInterface::class));
+        $object = $this->getObject($attributeValues = $this->createMock(DomainCollection::class));
 
         self::assertNotSame($attributeValues, $object->getAttributeValues());
     }

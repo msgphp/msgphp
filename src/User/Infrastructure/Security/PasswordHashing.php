@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security;
 
 use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashingInterface;
+use MsgPhp\User\Password\PasswordHashing as BasePasswordHashing;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class PasswordHashing implements PasswordHashingInterface
+final class PasswordHashing implements BasePasswordHashing
 {
     /**
      * @var PasswordEncoderInterface

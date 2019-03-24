@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
-use MsgPhp\User\Repository\RoleRepositoryInterface;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
+use MsgPhp\User\Repository\RoleRepository;
+use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
@@ -17,7 +17,7 @@ abstract class UserRoleCommand extends UserCommand
 {
     use RoleAwareTrait;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $userRepository, RoleRepository $roleRepository)
     {
         parent::__construct($factory, $bus, $userRepository);
 

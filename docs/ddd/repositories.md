@@ -7,13 +7,13 @@ This page describes the API provided by default [implementations](#implementatio
 
 ## API
 
-### `doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface`
+### `doFindAll(int $offset = 0, int $limit = 0): DomainCollection`
 
 Finds all entities available. An unlimited collection is implied by `$limit` set to zero.
 
 ---
 
-### `doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface`
+### `doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollection`
 
 Finds all entities matching the specified fields. Supported field values should be `null`, `scalar`, `scalar[]` (i.e. 
 one of) and `object` (i.e. another entity or its [identifier](identifiers.md)). An unlimited collection is implied by

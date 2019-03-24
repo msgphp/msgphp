@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Command\DeleteUserCommand as DeleteUserDomainCommand;
-use MsgPhp\User\Event\UserDeletedEvent;
+use MsgPhp\User\Command\DeleteUser as DeleteUserDomainCommand;
+use MsgPhp\User\Event\UserDeleted;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -25,7 +25,7 @@ final class DeleteUserCommand extends UserCommand
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof UserDeletedEvent) {
+        if ($message instanceof UserDeleted) {
             $this->io->success('Deleted user '.$message->user->getCredential()->getUsername());
         }
     }

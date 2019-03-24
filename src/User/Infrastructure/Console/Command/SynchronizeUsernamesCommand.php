@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Repository\UsernameRepositoryInterface;
+use MsgPhp\User\Repository\UsernameRepository;
 use MsgPhp\User\Username;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,11 +20,11 @@ final class SynchronizeUsernamesCommand extends Command
     protected static $defaultName = 'user:synchronize-usernames';
 
     /**
-     * @var UsernameRepositoryInterface
+     * @var UsernameRepository
      */
     private $repository;
 
-    public function __construct(UsernameRepositoryInterface $repository)
+    public function __construct(UsernameRepository $repository)
     {
         $this->repository = $repository;
 

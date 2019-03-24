@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\User\Repository\UserRepositoryInterface;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\Repository\UserRepository;
+use MsgPhp\User\UserId;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector as BaseDataCollector;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,11 +30,11 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 final class DataCollector extends BaseDataCollector
 {
     /**
-     * @var UserRepositoryInterface|null
+     * @var UserRepository|null
      */
     private $repository;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, UserRepositoryInterface $repository = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, UserRepository $repository = null)
     {
         parent::__construct($tokenStorage, $roleHierarchy, $logoutUrlGenerator, $accessDecisionManager, $firewallMap, $firewall);
 
@@ -73,7 +73,7 @@ final class DataCollector extends BaseDataCollector
         }
     }
 
-    private function getUsername(UserIdInterface $id): string
+    private function getUsername(UserId $id): string
     {
         if (null === $this->repository) {
             return $id->toString();

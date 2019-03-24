@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\User\Credential\CredentialInterface;
-use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
+use MsgPhp\User\Credential\Credential;
+use MsgPhp\User\Event\Domain\ChangeCredential;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -13,11 +13,11 @@ use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
 trait AbstractCredential
 {
     /**
-     * @var CredentialInterface
+     * @var Credential
      */
     private $credential;
 
-    private function handleChangeCredentialEvent(ChangeCredentialEvent $event): bool
+    private function handleChangeCredentialEvent(ChangeCredential $event): bool
     {
         if (!\is_callable($this->credential)) {
             throw new \LogicException(sprintf('Credential "%s" must be an invokable to apply event "%s".', \get_class($this->credential), \get_class($event)));

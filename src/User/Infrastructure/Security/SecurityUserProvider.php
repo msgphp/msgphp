@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\User\Repository\UserRepositoryInterface;
-use MsgPhp\User\Role\RoleProviderInterface;
+use MsgPhp\User\Repository\UserRepository;
+use MsgPhp\User\Role\RoleProvider;
 use MsgPhp\User\User;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -19,16 +19,16 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 final class SecurityUserProvider implements UserProviderInterface
 {
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
     /**
-     * @var RoleProviderInterface|null
+     * @var RoleProvider|null
      */
     private $roleProvider;
 
-    public function __construct(UserRepositoryInterface $repository, RoleProviderInterface $roleProvider = null)
+    public function __construct(UserRepository $repository, RoleProvider $roleProvider = null)
     {
         $this->repository = $repository;
         $this->roleProvider = $roleProvider;

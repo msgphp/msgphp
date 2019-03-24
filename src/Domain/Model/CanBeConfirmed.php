@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Model;
 
-use MsgPhp\Domain\Event\ConfirmEvent;
+use MsgPhp\Domain\Event\Confirm;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -42,7 +42,7 @@ trait CanBeConfirmed
         $this->confirmedAt = new \DateTimeImmutable();
     }
 
-    private function handleConfirmEvent(ConfirmEvent $event): bool
+    private function handleConfirmEvent(Confirm $event): bool
     {
         if (null === $this->confirmedAt) {
             $this->confirm();

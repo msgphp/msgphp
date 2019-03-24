@@ -6,7 +6,7 @@ namespace MsgPhp\User\Tests\Infrastructure\Form\Type;
 
 use MsgPhp\User\Infrastructure\Form\Type\HashedPasswordType;
 use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashingInterface;
+use MsgPhp\User\Password\PasswordHashing;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -145,7 +145,7 @@ final class HashedPasswordTypeTest extends TypeTestCase
 
     public function testCustomHashing(): void
     {
-        $hashing = $this->createMock(PasswordHashingInterface::class);
+        $hashing = $this->createMock(PasswordHashing::class);
         $hashing->expects(self::once())
             ->method('hash')
             ->with('secret', $algorithm = PasswordAlgorithm::create())
@@ -177,7 +177,7 @@ final class HashedPasswordTypeTest extends TypeTestCase
 
     protected function getExtensions(): array
     {
-        $hashing = $this->createMock(PasswordHashingInterface::class);
+        $hashing = $this->createMock(PasswordHashing::class);
         $hashing->expects(self::any())
             ->method('hash')
             ->willReturnCallback($hasher = function (string $plainPassword, ?PasswordAlgorithm $algorithm): string {

@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Exception;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class EmptyCollectionException extends \RuntimeException implements DomainExceptionInterface
+final class EmptyCollectionException extends \RuntimeException implements DomainException
 {
     public static function create(): self
     {

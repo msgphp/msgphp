@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Model;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\User\Model\EmailsField;
 use MsgPhp\User\UserEmail;
 use PHPUnit\Framework\TestCase;
@@ -15,9 +15,9 @@ final class EmailsFieldTest extends TestCase
     {
         $object = $this->getObject($emails = [$this->createMock(UserEmail::class)]);
 
-        self::assertInstanceOf(DomainCollectionInterface::class, $collection = $object->getEmails());
+        self::assertInstanceOf(DomainCollection::class, $collection = $object->getEmails());
         self::assertSame($emails, iterator_to_array($collection));
-        self::assertNotSame($collection = $this->createMock(DomainCollectionInterface::class), $this->getObject($collection)->getEmails());
+        self::assertNotSame($collection = $this->createMock(DomainCollection::class), $this->getObject($collection)->getEmails());
     }
 
     /**

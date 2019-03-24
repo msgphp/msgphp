@@ -9,7 +9,7 @@ namespace MsgPhp\Domain\Event;
  */
 trait DomainEventHandlerTrait
 {
-    public function handleEvent(DomainEventInterface $event): bool
+    public function handleEvent(DomainEvent $event): bool
     {
         $method = 'handle'.(false === ($pos = strrpos($class = \get_class($event), '\\')) ? $class : substr($class, $pos + 1));
         if ('Event' !== substr($method, -5)) {

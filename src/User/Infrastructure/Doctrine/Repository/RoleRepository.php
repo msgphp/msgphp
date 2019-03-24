@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Repository\RoleRepositoryInterface;
+use MsgPhp\User\Repository\RoleRepository as BaseRoleRepository;
 use MsgPhp\User\Role;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class RoleRepository implements RoleRepositoryInterface
+final class RoleRepository implements BaseRoleRepository
 {
     use DomainEntityRepositoryTrait;
 
     /**
-     * @return DomainCollectionInterface|Role[]
+     * @return DomainCollection|Role[]
      */
-    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->doFindAll($offset, $limit);
     }

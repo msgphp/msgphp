@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Exception\EmptyCollectionException;
 use MsgPhp\Domain\Exception\UnknownCollectionElementException;
 use PHPUnit\Framework\TestCase;
@@ -156,5 +156,5 @@ abstract class DomainCollectionTestCase extends TestCase
         self::assertCount(3, static::createCollection([1, 'k' => null, 2]));
     }
 
-    abstract protected static function createCollection(array $elements): DomainCollectionInterface;
+    abstract protected static function createCollection(array $elements): DomainCollection;
 }

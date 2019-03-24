@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Messenger;
 
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBus as BaseDomainMessageBus;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainMessageBus implements DomainMessageBusInterface
+final class DomainMessageBus implements BaseDomainMessageBus
 {
     /**
      * @var MessageBusInterface

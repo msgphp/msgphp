@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\ConfirmEvent;
-use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\Confirm;
+use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\ConfirmUserEmailCommand;
-use MsgPhp\User\Event\UserEmailConfirmedEvent;
-use MsgPhp\User\Repository\UserEmailRepositoryInterface;
+use MsgPhp\User\Command\ConfirmUserEmail;
+use MsgPhp\User\Event\UserEmailConfirmed;
+use MsgPhp\User\Repository\UserEmailRepository;
 use MsgPhp\User\UserEmail;
 
 /**
@@ -24,31 +24,31 @@ final class ConfirmUserEmailHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var UserEmailRepositoryInterface
+     * @var UserEmailRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserEmailRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserEmailRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(ConfirmUserEmailCommand $command): void
+    public function __invoke(ConfirmUserEmail $command): void
     {
         $this->handle($command, function (UserEmail $userEmail): void {
             $this->repository->save($userEmail);
-            $this->dispatch(UserEmailConfirmedEvent::class, compact('userEmail'));
+            $this->dispatch(UserEmailConfirmed::class, compact('userEmail'));
         });
     }
 
-    protected function getDomainEvent(ConfirmUserEmailCommand $command): DomainEventInterface
+    protected function getDomainEvent(ConfirmUserEmail $command): DomainEvent
     {
-        return $this->factory->create(ConfirmEvent::class);
+        return $this->factory->create(Confirm::class);
     }
 
-    protected function getDomainEventTarget(ConfirmUserEmailCommand $command): UserEmail
+    protected function getDomainEventTarget(ConfirmUserEmail $command): UserEmail
     {
         return $this->repository->find($command->email);
     }

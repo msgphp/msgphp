@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Projection\Command\Handler;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\Domain\Projection\Command\SaveProjectionDocumentCommand;
 use MsgPhp\Domain\Projection\Event\ProjectionDocumentSavedEvent;
 use MsgPhp\Domain\Projection\ProjectionDocument;
-use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
+use MsgPhp\Domain\Projection\ProjectionRepository;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -20,11 +20,11 @@ final class SaveProjectionDocumentHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var ProjectionRepositoryInterface
+     * @var ProjectionRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ProjectionRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, ProjectionRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;

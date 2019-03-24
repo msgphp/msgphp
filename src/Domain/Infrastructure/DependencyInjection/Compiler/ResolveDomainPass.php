@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection\Compiler;
 
-use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\FeatureDetection;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -23,10 +23,10 @@ final class ResolveDomainPass implements CompilerPassInterface
         $container->setParameter($param = 'msgphp.domain.event_classes', array_merge(($container->hasParameter($param) ? $container->getParameter($param) : []), array_values(array_filter(array_map(function (string $file): string {
             return 'MsgPhp\\Domain\\Event\\'.basename($file, '.php');
         }, glob(\dirname(__DIR__, 3).'/Event/*Event.php')), function (string $class): bool {
-            return !is_subclass_of($class, DomainEventInterface::class);
+            return !is_subclass_of($class, DomainEvent::class);
         }))));
 
-        if ($container->has(DomainMessageBusInterface::class)) {
+        if ($container->has(DomainMessageBus::class)) {
             $commandBus = $container->findDefinition($alias = 'msgphp.command_bus');
             $commandBusId = null;
             $container->removeAlias($alias);

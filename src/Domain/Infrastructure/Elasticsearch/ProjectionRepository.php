@@ -7,14 +7,14 @@ namespace MsgPhp\Domain\Infrastructure\Elasticsearch;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use MsgPhp\Domain\GenericPaginatedDomainCollection;
-use MsgPhp\Domain\PaginatedDomainCollectionInterface;
+use MsgPhp\Domain\PaginatedDomainCollection;
 use MsgPhp\Domain\Projection\ProjectionDocument;
-use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
+use MsgPhp\Domain\Projection\ProjectionRepository as BaseProjectionRepository;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ProjectionRepository implements ProjectionRepositoryInterface
+final class ProjectionRepository implements BaseProjectionRepository
 {
     /**
      * @var Client
@@ -33,9 +33,9 @@ final class ProjectionRepository implements ProjectionRepositoryInterface
     }
 
     /**
-     * @return PaginatedDomainCollectionInterface|ProjectionDocument[]
+     * @return PaginatedDomainCollection|ProjectionDocument[]
      */
-    public function findAll(string $type, int $offset = 0, int $limit = 0): PaginatedDomainCollectionInterface
+    public function findAll(string $type, int $offset = 0, int $limit = 0): PaginatedDomainCollection
     {
         $params = [
             'index' => $this->index,

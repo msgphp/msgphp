@@ -6,14 +6,14 @@ namespace MsgPhp\User\Tests;
 
 use MsgPhp\User\Credential;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase
 {
     public function testGetCredential(): void
     {
-        self::assertInstanceOf(Credential\Anonymous::class, $this->createEntity($this->createMock(UserIdInterface::class))->getCredential());
+        self::assertInstanceOf(Credential\Anonymous::class, $this->createEntity($this->createMock(UserId::class))->getCredential());
     }
 
     private function createEntity($id): User
@@ -26,7 +26,7 @@ final class UserTest extends TestCase
                 $this->id = $id;
             }
 
-            public function getId(): UserIdInterface
+            public function getId(): UserId
             {
                 return $this->id;
             }

@@ -6,14 +6,14 @@ namespace MsgPhp\Domain\Infrastructure\Doctrine;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection as BaseDomainCollection;
 use MsgPhp\Domain\Exception\EmptyCollectionException;
 use MsgPhp\Domain\Exception\UnknownCollectionElementException;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DomainCollection implements DomainCollectionInterface
+final class DomainCollection implements BaseDomainCollection
 {
     /**
      * @var Collection
@@ -25,7 +25,7 @@ final class DomainCollection implements DomainCollectionInterface
         $this->collection = $collection;
     }
 
-    public static function fromValue(?iterable $value): DomainCollectionInterface
+    public static function fromValue(?iterable $value): BaseDomainCollection
     {
         if ($value instanceof Collection) {
             return new self($value);
@@ -85,17 +85,17 @@ final class DomainCollection implements DomainCollectionInterface
         return $this->collection->get($key);
     }
 
-    public function filter(callable $filter): DomainCollectionInterface
+    public function filter(callable $filter): BaseDomainCollection
     {
         return new self($this->collection->filter(\Closure::fromCallable($filter)));
     }
 
-    public function slice(int $offset, int $limit = 0): DomainCollectionInterface
+    public function slice(int $offset, int $limit = 0): BaseDomainCollection
     {
         return new self(new ArrayCollection($this->collection->slice($offset, $limit ?: null)));
     }
 
-    public function map(callable $mapper): DomainCollectionInterface
+    public function map(callable $mapper): BaseDomainCollection
     {
         return new self($this->collection->map(\Closure::fromCallable($mapper)));
     }

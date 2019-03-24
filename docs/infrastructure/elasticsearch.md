@@ -22,16 +22,16 @@ It works directly with any [`Client`][api-client] and a known configuration of t
 
 use Elasticsearch\Client;
 use MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry;
-use MsgPhp\Domain\Projection\ProjectionInterface;
+use MsgPhp\Domain\Projection\Projection;
 
 // --- SETUP ---
 
-class MyProjection implements ProjectionInterface
+class MyProjection implements Projection
 {
     public $someField;
     public $otherField;
 
-    public static function fromDocument(array $document): ProjectionInterface
+    public static function fromDocument(array $document): Projection
     {
         $projection = new static();
         $projection->someField = $document['some_field'] ?? null;
@@ -59,17 +59,17 @@ $typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infrastructure\Elasticsearch\DocumentMappingProviderInterface;
+use MsgPhp\Domain\Infrastructure\Elasticsearch\DocumentMappingProvider;
 use MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry;
-use MsgPhp\Domain\Projection\ProjectionInterface;
+use MsgPhp\Domain\Projection\Projection;
 
 // --- SETUP ---
 
-class MyProjection implements ProjectionInterface, DocumentMappingProviderInterface
+class MyProjection implements Projection, DocumentMappingProvider
 {
     // ...
 
-    public static function fromDocument(array $document): ProjectionInterface
+    public static function fromDocument(array $document): Projection
     {
         // ...
     }

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infrastructure\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\User\Credential\CredentialInterface;
+use MsgPhp\User\Credential\Credential;
 use MsgPhp\User\Infrastructure\Security\SecurityUser;
 use MsgPhp\User\Infrastructure\Security\SecurityUserProvider;
-use MsgPhp\User\Repository\UserRepositoryInterface;
-use MsgPhp\User\Role\RoleProviderInterface;
+use MsgPhp\User\Repository\UserRepository;
+use MsgPhp\User\Role\RoleProvider;
 use MsgPhp\User\ScalarUserId;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -50,7 +50,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameWithRoles(): void
     {
-        $roleProvider = $this->createMock(RoleProviderInterface::class);
+        $roleProvider = $this->createMock(RoleProvider::class);
         $roleProvider->expects(self::any())
             ->method('getRoles')
             ->willReturn(['ROLE_FOO'])
@@ -115,7 +115,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithUnsupportedUser(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class));
+        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
 
         $this->expectException(UnsupportedUserException::class);
 
@@ -124,7 +124,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testSupportsClass(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class));
+        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
 
         self::assertTrue($provider->supportsClass(SecurityUser::class));
         self::assertFalse($provider->supportsClass(UserInterface::class));
@@ -132,13 +132,13 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testFromUser(): void
     {
-        $roleProvider = $this->createMock(RoleProviderInterface::class);
+        $roleProvider = $this->createMock(RoleProvider::class);
         $roleProvider->expects(self::once())
             ->method('getRoles')
             ->willReturn(['ROLE_FOO'])
         ;
 
-        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class), $roleProvider);
+        $provider = new SecurityUserProvider($this->createMock(UserRepository::class), $roleProvider);
         $securityUser = $provider->fromUser($user = $this->createUser());
 
         self::assertSame($user->getId(), $securityUser->getUserId());
@@ -152,18 +152,18 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testFromUserWithOriginUsername(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepositoryInterface::class));
+        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
         $securityUser = $provider->fromUser($user = $this->createUser(), 'origin-username');
 
         self::assertSame('origin-username', $securityUser->getOriginUsername());
     }
 
-    private function createRepository(User $user = null): UserRepositoryInterface
+    private function createRepository(User $user = null): UserRepository
     {
-        $repository = $this->createMock(UserRepositoryInterface::class);
+        $repository = $this->createMock(UserRepository::class);
         $repository->expects(self::any())
             ->method('find')
-            ->willReturnCallback(function (UserIdInterface $id) use ($user) {
+            ->willReturnCallback(function (UserId $id) use ($user) {
                 if (null === $user || $id->toString() !== $user->getId()->toString()) {
                     throw EntityNotFoundException::createForId(User::class, $id->toString());
                 }
@@ -194,7 +194,7 @@ final class SecurityUserProviderTest extends TestCase
         ;
         $user->expects(self::any())
             ->method('getCredential')
-            ->willReturn($this->createMock(CredentialInterface::class))
+            ->willReturn($this->createMock(Credential::class))
         ;
 
         return $user;

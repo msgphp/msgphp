@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
-use MsgPhp\User\Command\AddUserRoleCommand as AddUserRoleDomainCommand;
-use MsgPhp\User\Event\RoleCreatedEvent;
-use MsgPhp\User\Event\UserRoleAddedEvent;
-use MsgPhp\User\Repository\RoleRepositoryInterface;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
+use MsgPhp\User\Command\AddUserRole as AddUserRoleDomainCommand;
+use MsgPhp\User\Event\RoleCreated;
+use MsgPhp\User\Event\UserRoleAdded;
+use MsgPhp\User\Repository\RoleRepository;
+use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +27,7 @@ final class AddUserRoleCommand extends UserRoleCommand
     protected static $defaultName = 'user:role:add';
 
     /**
-     * @var ContextFactoryInterface
+     * @var ContextFactory
      */
     private $contextFactory;
 
@@ -36,7 +36,7 @@ final class AddUserRoleCommand extends UserRoleCommand
      */
     private $io;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $userRepository, RoleRepository $roleRepository, ContextFactory $contextFactory)
     {
         $this->contextFactory = $contextFactory;
 
@@ -45,10 +45,10 @@ final class AddUserRoleCommand extends UserRoleCommand
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof RoleCreatedEvent) {
+        if ($message instanceof RoleCreated) {
             $this->io->success('Created role '.$message->role->getName());
         }
-        if ($message instanceof UserRoleAddedEvent) {
+        if ($message instanceof UserRoleAdded) {
             $this->io->success(sprintf('Added role %s to user %s', $message->userRole->getRoleName(), $message->userRole->getUser()->getCredential()->getUsername()));
         }
     }

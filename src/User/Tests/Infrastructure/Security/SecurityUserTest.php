@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infrastructure\Security;
 
-use MsgPhp\User\Credential\CredentialInterface;
-use MsgPhp\User\Credential\PasswordProtectedCredentialInterface;
+use MsgPhp\User\Credential\Credential;
+use MsgPhp\User\Credential\PasswordProtectedCredential;
 use MsgPhp\User\Infrastructure\Security\SecurityUser;
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\Password\PasswordSalt;
@@ -120,9 +120,9 @@ final class SecurityUserTest extends TestCase
         ;
 
         if (null === $password) {
-            $credential = $this->createMock(CredentialInterface::class);
+            $credential = $this->createMock(Credential::class);
         } else {
-            $credential = $this->createMock(PasswordProtectedCredentialInterface::class);
+            $credential = $this->createMock(PasswordProtectedCredential::class);
             $credential->expects(self::any())
                 ->method('getPassword')
                 ->willReturn($password)

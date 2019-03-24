@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console as ConsoleInfrastructure;
 use MsgPhp\Domain\Infrastructure\Doctrine as DoctrineInfrastructure;
 use MsgPhp\Domain\Infrastructure\Messenger as MessengerInfrastructure;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -77,10 +77,10 @@ final class BundleHelper
         $container->register(GenericDomainObjectFactory::class)
             ->setPublic(false)
             ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
-            ->addMethodCall('setNestedFactory', [new Reference(DomainObjectFactoryInterface::class)])
+            ->addMethodCall('setNestedFactory', [new Reference(DomainObjectFactory::class)])
         ;
 
-        $container->setAlias(DomainObjectFactoryInterface::class, new Alias(GenericDomainObjectFactory::class, false));
+        $container->setAlias(DomainObjectFactory::class, new Alias(GenericDomainObjectFactory::class, false));
 
         if (FeatureDetection::isDoctrineOrmAvailable($container)) {
             $container->register(DoctrineInfrastructure\DomainObjectFactory::class)
@@ -104,7 +104,7 @@ final class BundleHelper
                 ->setArgument('$eventBus', new Reference('msgphp.messenger.event_bus'))
                 ->setArgument('$eventClasses', '%msgphp.domain.event_classes%')
             ;
-            $container->setAlias(DomainMessageBusInterface::class, new Alias(MessengerInfrastructure\DomainMessageBus::class, false));
+            $container->setAlias(DomainMessageBus::class, new Alias(MessengerInfrastructure\DomainMessageBus::class, false));
 
             if (FeatureDetection::isConsoleAvailable($container)) {
                 $container->autowire('msgphp.messenger.console_message_receiver', MessengerInfrastructure\Middleware\ConsoleMessageReceiverMiddleware::class)
@@ -153,7 +153,7 @@ final class BundleHelper
             ->addTag('doctrine.event_listener', ['event' => DoctrineOrmEvents::loadClassMetadata])
         ;
 
-        $container->registerForAutoconfiguration(DoctrineInfrastructure\ObjectMappingProviderInterface::class)
+        $container->registerForAutoconfiguration(DoctrineInfrastructure\ObjectMappingProvider::class)
             ->addTag('msgphp.doctrine.object_mapping_provider')
         ;
 
@@ -174,12 +174,6 @@ final class BundleHelper
             ->setArgument('$method', '__construct')
             ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
         ;
-
-        $container->register(ConsoleInfrastructure\Context\ClassContextElementFactory::class)
-            ->setPublic(false)
-        ;
-
-        $container->setAlias(ConsoleInfrastructure\Context\ClassContextElementFactoryInterface::class, new Alias(ConsoleInfrastructure\Context\ClassContextElementFactory::class, false));
 
         $container->register(ConsoleInfrastructure\MessageReceiver::class)
             ->setPublic(false)

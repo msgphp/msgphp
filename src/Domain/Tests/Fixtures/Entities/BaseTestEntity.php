@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 
 abstract class BaseTestEntity
 {
@@ -33,7 +33,7 @@ abstract class BaseTestEntity
         foreach ($entity::getIdFields() as $field) {
             $ids[$field] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->{$method}() : $entity->{$field};
 
-            if ($id instanceof DomainIdInterface) {
+            if ($id instanceof DomainId) {
                 $primitives[$field] = $id->isEmpty() ? null : $id->toString();
             } elseif ($id instanceof self) {
                 self::getPrimaryIds($id, $nestedPrimitives);

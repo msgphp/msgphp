@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Uuid;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -31,7 +31,7 @@ trait DomainIdTrait
     /**
      * @return static
      */
-    public static function fromValue($value): DomainIdInterface
+    public static function fromValue($value): DomainId
     {
         if (null !== $value && !$value instanceof UuidInterface) {
             $value = Uuid::fromString((string) $value);
@@ -45,7 +45,7 @@ trait DomainIdTrait
         return false;
     }
 
-    public function equals(DomainIdInterface $id): bool
+    public function equals(DomainId $id): bool
     {
         if ($id === $this) {
             return true;

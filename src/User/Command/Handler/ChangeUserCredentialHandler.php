@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DomainEventInterface;
+use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\ChangeUserCredentialCommand;
-use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
-use MsgPhp\User\Event\UserCredentialChangedEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Command\ChangeUserCredential;
+use MsgPhp\User\Event\Domain\ChangeCredential;
+use MsgPhp\User\Event\UserCredentialChanged;
+use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 
 /**
@@ -24,18 +24,18 @@ final class ChangeUserCredentialHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(ChangeUserCredentialCommand $command): void
+    public function __invoke(ChangeUserCredential $command): void
     {
         /** @var User $handler */
         $handler = $this->getDomainEventTarget($command);
@@ -45,18 +45,18 @@ final class ChangeUserCredentialHandler
             $newCredential = $user->getCredential();
 
             $this->repository->save($user);
-            $this->dispatch(UserCredentialChangedEvent::class, compact('user', 'oldCredential', 'newCredential'));
+            $this->dispatch(UserCredentialChanged::class, compact('user', 'oldCredential', 'newCredential'));
         });
     }
 
-    protected function getDomainEvent(ChangeUserCredentialCommand $command): DomainEventInterface
+    protected function getDomainEvent(ChangeUserCredential $command): DomainEvent
     {
         $fields = $command->fields;
 
-        return $this->factory->create(ChangeCredentialEvent::class, compact('fields'));
+        return $this->factory->create(ChangeCredential::class, compact('fields'));
     }
 
-    protected function getDomainEventTarget(ChangeUserCredentialCommand $command): User
+    protected function getDomainEventTarget(ChangeUserCredential $command): User
     {
         return $this->repository->find($command->userId);
     }

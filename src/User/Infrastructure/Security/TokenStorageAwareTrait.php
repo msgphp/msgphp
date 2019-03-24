@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Security;
 
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -21,11 +21,11 @@ trait TokenStorageAwareTrait
     private $tokenStorage;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserRepositoryInterface $repository)
+    public function __construct(TokenStorageInterface $tokenStorage, UserRepository $repository)
     {
         $this->tokenStorage = $tokenStorage;
         $this->repository = $repository;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Model;
 
-use MsgPhp\Domain\Event\DisableEvent;
-use MsgPhp\Domain\Event\EnableEvent;
+use MsgPhp\Domain\Event\Disable;
+use MsgPhp\Domain\Event\Enable;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -32,7 +32,7 @@ trait CanBeEnabled
         $this->enabled = false;
     }
 
-    private function handleEnableEvent(EnableEvent $event): bool
+    private function handleEnableEvent(Enable $event): bool
     {
         if (!$this->enabled) {
             $this->enable();
@@ -43,7 +43,7 @@ trait CanBeEnabled
         return false;
     }
 
-    private function handleDisableEvent(DisableEvent $event): bool
+    private function handleDisableEvent(Disable $event): bool
     {
         if ($this->enabled) {
             $this->disable();

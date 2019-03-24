@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Repository\RoleRepositoryInterface;
+use MsgPhp\User\Repository\RoleRepository;
 use MsgPhp\User\Role;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\StyleInterface;
 trait RoleAwareTrait
 {
     /**
-     * @var RoleRepositoryInterface
+     * @var RoleRepository
      */
     private $repository;
 

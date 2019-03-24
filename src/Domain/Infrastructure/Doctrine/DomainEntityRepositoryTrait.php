@@ -9,8 +9,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Exception\InvalidClassException;
@@ -52,12 +52,12 @@ trait DomainEntityRepositoryTrait
         return $this->alias ?? ($this->alias = strtolower((string) preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], (string) (false === ($i = strrpos($this->class, '\\')) ? $this->class : substr($this->class, $i + 1)))));
     }
 
-    private function doFindAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    private function doFindAll(int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->createResultSet($this->createQueryBuilder()->getQuery(), $offset, $limit);
     }
 
-    private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    private function doFindAllByFields(array $fields, int $offset = 0, int $limit = 0): DomainCollection
     {
         if (!$fields) {
             throw new \LogicException('No fields provided.');
@@ -165,7 +165,7 @@ trait DomainEntityRepositoryTrait
     /**
      * @param string|int $hydrate
      */
-    private function createResultSet(Query $query, int $offset = null, int $limit = null, $hydrate = Query::HYDRATE_OBJECT): DomainCollectionInterface
+    private function createResultSet(Query $query, int $offset = null, int $limit = null, $hydrate = Query::HYDRATE_OBJECT): DomainCollection
     {
         if (null !== $offset || !$query->getFirstResult()) {
             $query->setFirstResult($offset ?? 0);
@@ -258,7 +258,7 @@ trait DomainEntityRepositoryTrait
         }
 
         foreach ($id as $field => $value) {
-            if (\is_object($value) && !$value instanceof DomainIdInterface) {
+            if (\is_object($value) && !$value instanceof DomainId) {
                 try {
                     $value = $this->em->getUnitOfWork()->getSingleIdentifierValue($value);
                 } catch (MappingException $e) {

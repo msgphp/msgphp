@@ -9,15 +9,15 @@ use MsgPhp\User\User;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ChainRoleProvider implements RoleProviderInterface
+final class ChainRoleProvider implements RoleProvider
 {
     /**
-     * @var iterable|RoleProviderInterface[]
+     * @var iterable|RoleProvider[]
      */
     private $providers;
 
     /**
-     * @param RoleProviderInterface[] $providers
+     * @param RoleProvider[] $providers
      */
     public function __construct(iterable $providers)
     {

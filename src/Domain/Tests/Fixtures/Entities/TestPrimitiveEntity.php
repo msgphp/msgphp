@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
@@ -13,7 +13,7 @@ use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 class TestPrimitiveEntity extends BaseTestEntity
 {
     /**
-     * @var DomainIdInterface
+     * @var DomainId
      * @Doctrine\ORM\Mapping\Id()
      * @Doctrine\ORM\Mapping\Column(type="domain_id")
      */

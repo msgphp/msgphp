@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Security;
 
-use MsgPhp\User\Credential\PasswordProtectedCredentialInterface;
+use MsgPhp\User\Credential\PasswordProtectedCredential;
 use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class SecurityUser implements UserInterface, EquatableInterface
 {
     /**
-     * @var UserIdInterface
+     * @var UserId
      */
     private $id;
 
@@ -57,13 +57,13 @@ final class SecurityUser implements UserInterface, EquatableInterface
 
         $credential = $user->getCredential();
 
-        if ($credential instanceof PasswordProtectedCredentialInterface) {
+        if ($credential instanceof PasswordProtectedCredential) {
             $this->password = $credential->getPassword();
             $this->passwordAlgorithm = $credential->getPasswordAlgorithm();
         }
     }
 
-    public function getUserId(): UserIdInterface
+    public function getUserId(): UserId
     {
         return $this->id;
     }

@@ -38,19 +38,19 @@ namespace App\Api\Projection;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use MsgPhp\Domain\Projection\ProjectionInterface;
+use MsgPhp\Domain\Projection\Projection;
 
 /**
  * @ApiResource(shortName="Some")
  */
-class SomeProjection implements ProjectionInterface
+class SomeProjection implements Projection
 {
     /**
      * @ApiProperty(identifier=true)
      */
     public $id;
 
-    public static function fromDocument(array $document): ProjectionInterface
+    public static function fromDocument(array $document): Projection
     {
         $projection = new self();
         $projection->id = $document['id'] ?? null;

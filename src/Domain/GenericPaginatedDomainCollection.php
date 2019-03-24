@@ -7,10 +7,10 @@ namespace MsgPhp\Domain;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class GenericPaginatedDomainCollection implements PaginatedDomainCollectionInterface
+final class GenericPaginatedDomainCollection implements PaginatedDomainCollection
 {
     /**
-     * @var DomainCollectionInterface
+     * @var DomainCollection
      */
     private $collection;
 
@@ -40,14 +40,14 @@ final class GenericPaginatedDomainCollection implements PaginatedDomainCollectio
             $count = (int) $count;
         }
 
-        $this->collection = $elements instanceof DomainCollectionInterface ? $elements : GenericDomainCollection::fromValue($elements);
+        $this->collection = $elements instanceof DomainCollection ? $elements : GenericDomainCollection::fromValue($elements);
         $this->offset = $offset;
         $this->limit = $limit;
         $this->count = $count;
         $this->totalCount = $totalCount;
     }
 
-    public static function fromValue(?iterable $value): DomainCollectionInterface
+    public static function fromValue(?iterable $value): DomainCollection
     {
         return new self($value ?? []);
     }
@@ -87,17 +87,17 @@ final class GenericPaginatedDomainCollection implements PaginatedDomainCollectio
         return $this->collection->get($key);
     }
 
-    public function filter(callable $filter): DomainCollectionInterface
+    public function filter(callable $filter): DomainCollection
     {
         return $this->collection->filter($filter);
     }
 
-    public function slice(int $offset, int $limit = 0): DomainCollectionInterface
+    public function slice(int $offset, int $limit = 0): DomainCollection
     {
         return $this->collection->slice($offset, $limit);
     }
 
-    public function map(callable $mapper): DomainCollectionInterface
+    public function map(callable $mapper): DomainCollection
     {
         return $this->collection->map($mapper);
     }

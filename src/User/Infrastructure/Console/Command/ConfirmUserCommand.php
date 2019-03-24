@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Command\ConfirmUserCommand as ConfirmUserDomainCommand;
-use MsgPhp\User\Event\UserConfirmedEvent;
+use MsgPhp\User\Command\ConfirmUser as ConfirmUserDomainCommand;
+use MsgPhp\User\Event\UserConfirmed;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -25,7 +25,7 @@ final class ConfirmUserCommand extends UserCommand
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof UserConfirmedEvent) {
+        if ($message instanceof UserConfirmed) {
             $this->io->success('Confirmed user '.$message->user->getCredential()->getUsername());
         }
     }

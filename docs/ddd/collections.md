@@ -1,7 +1,7 @@
 # Collections
 
-A domain collection is a [traversable] and bound to `MsgPhp\Domain\DomainCollectionInterface`. Its purpose is to utilize
-a primitive iterable value. It may hold any type of element values.
+A domain collection is a [traversable] and bound to `MsgPhp\Domain\DomainCollection`. Its purpose is to utilize a
+primitive iterable value. It may hold any type of element values.
 
 ## API
 
@@ -12,7 +12,7 @@ a primitive iterable value. It may hold any type of element values.
 
 ---
 
-### `static fromValue(?iterable $value): DomainCollectionInterface`
+### `static fromValue(?iterable $value): DomainCollection`
 
 Returns a factorized collection from any primitive iterable. Using `null` implies an empty collection.
 
@@ -54,31 +54,31 @@ Returns the element at the given key from a collection.
 
 ---
 
-### `filter(callable $filter): DomainCollectionInterface`
+### `filter(callable $filter): DomainCollection`
 
 Returns a **new** collection containing only elements for which `$filter` returns `true`. Keys are preserved.
 
 ---
 
-### `slice(int $offset, int $limit = 0): DomainCollectionInterface`
+### `slice(int $offset, int $limit = 0): DomainCollection`
 
 Returns a **new** collection containing a slice of elements. By default the slice has no limit, implied by integer `0`.
 Keys are preserved.
 
 ---
 
-### `map(callable $mapper): DomainCollectionInterface`
+### `map(callable $mapper): DomainCollection`
 
 Returns a **new** collection containing each collection element as returned by `$mapper`. Keys are preserved.
 
 ## Pagination API
 
-A collection that is part of a paginated result set is bound to `MsgPhp\Domain\PaginatedDomainCollectionInterface`. Its
-purpose is to expose the current pagination.
+A collection that is part of a paginated result set is bound to `MsgPhp\Domain\PaginatedDomainCollection`. Its purpose
+is to expose the current pagination.
 
 ### Extends
 
-- [`DomainCollectionInterface`](#collections)
+- [`DomainCollection`](#collections)
 
 ---
 

@@ -10,7 +10,7 @@ use MsgPhp\Domain\Exception\UnknownCollectionElementException;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class GenericDomainCollection implements DomainCollectionInterface
+final class GenericDomainCollection implements DomainCollection
 {
     /**
      * @var iterable
@@ -22,7 +22,7 @@ final class GenericDomainCollection implements DomainCollectionInterface
         $this->elements = $elements;
     }
 
-    public static function fromValue(?iterable $value): DomainCollectionInterface
+    public static function fromValue(?iterable $value): DomainCollection
     {
         return new self($value ?? []);
     }
@@ -142,7 +142,7 @@ final class GenericDomainCollection implements DomainCollectionInterface
         throw UnknownCollectionElementException::createForKey($key);
     }
 
-    public function filter(callable $filter): DomainCollectionInterface
+    public function filter(callable $filter): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
             return new self((function () use ($filter): iterable {
@@ -157,7 +157,7 @@ final class GenericDomainCollection implements DomainCollectionInterface
         return new self(array_filter($this->elements, $filter));
     }
 
-    public function slice(int $offset, int $limit = 0): DomainCollectionInterface
+    public function slice(int $offset, int $limit = 0): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
             return new self((function () use ($offset, $limit): iterable {
@@ -179,7 +179,7 @@ final class GenericDomainCollection implements DomainCollectionInterface
         return new self(\array_slice($this->elements, $offset, $limit ?: null, true));
     }
 
-    public function map(callable $mapper): DomainCollectionInterface
+    public function map(callable $mapper): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
             return new self((function () use ($mapper): iterable {

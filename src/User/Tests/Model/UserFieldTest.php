@@ -6,7 +6,7 @@ namespace MsgPhp\User\Tests\Model;
 
 use MsgPhp\User\Model\UserField;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 use PHPUnit\Framework\TestCase;
 
 final class UserFieldTest extends TestCase
@@ -16,7 +16,7 @@ final class UserFieldTest extends TestCase
         $value = $this->createMock(User::class);
         $value->expects(self::any())
             ->method('getId')
-            ->willReturn($this->createMock(UserIdInterface::class))
+            ->willReturn($this->createMock(UserId::class))
         ;
 
         $object = $this->getObject($value);

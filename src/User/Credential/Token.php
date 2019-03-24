@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Credential;
 
-use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
+use MsgPhp\User\Event\Domain\ChangeCredential;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class Token implements CredentialInterface
+final class Token implements Credential
 {
     /**
      * @var string
@@ -21,7 +21,7 @@ final class Token implements CredentialInterface
         $this->token = $token;
     }
 
-    public function __invoke(ChangeCredentialEvent $event): bool
+    public function __invoke(ChangeCredential $event): bool
     {
         if ($tokenChanged = ($this->token !== $token = $event->getStringField('token'))) {
             $this->token = $token;

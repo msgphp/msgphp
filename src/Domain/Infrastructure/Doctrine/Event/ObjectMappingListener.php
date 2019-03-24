@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use MsgPhp\Domain\Infrastructure\Doctrine\MappingConfig;
-use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProviderInterface;
+use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProvider;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -16,7 +16,7 @@ use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProviderInterface;
 final class ObjectMappingListener
 {
     /**
-     * @var iterable|ObjectMappingProviderInterface[]
+     * @var iterable|ObjectMappingProvider[]
      */
     private $providers;
 
@@ -45,8 +45,8 @@ final class ObjectMappingListener
     /**
      * @psalm-param array<class-string, class-string> $classMapping
      *
-     * @param iterable|ObjectMappingProviderInterface[] $providers
-     * @param string[]                                  $classMapping
+     * @param iterable|ObjectMappingProvider[] $providers
+     * @param string[]                         $classMapping
      */
     public function __construct(iterable $providers, MappingConfig $mappingConfig, array $classMapping = [])
     {

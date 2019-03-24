@@ -31,7 +31,7 @@ trait DomainIdTrait
     /**
      * @return static
      */
-    public static function fromValue($value): DomainIdInterface
+    public static function fromValue($value): DomainId
     {
         if (null !== $value && !\is_string($value)) {
             $value = (string) $value;
@@ -45,7 +45,7 @@ trait DomainIdTrait
         return null === $this->id;
     }
 
-    public function equals(DomainIdInterface $id): bool
+    public function equals(DomainId $id): bool
     {
         if ($id === $this) {
             return true;

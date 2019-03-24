@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Command\DisableUserCommand as DisableUserDomainCommand;
-use MsgPhp\User\Event\UserDisabledEvent;
+use MsgPhp\User\Command\DisableUser as DisableUserDomainCommand;
+use MsgPhp\User\Event\UserDisabled;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -25,7 +25,7 @@ final class DisableUserCommand extends UserCommand
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof UserDisabledEvent) {
+        if ($message instanceof UserDisabled) {
             $this->io->success('Disabled user '.$message->user->getCredential()->getUsername());
         }
     }

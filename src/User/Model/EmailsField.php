@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\User\UserEmail;
 
@@ -19,9 +19,9 @@ trait EmailsField
     private $emails = [];
 
     /**
-     * @return DomainCollectionInterface|UserEmail[]
+     * @return DomainCollection|UserEmail[]
      */
-    public function getEmails(): DomainCollectionInterface
+    public function getEmails(): DomainCollection
     {
         return new GenericDomainCollection($this->emails);
     }

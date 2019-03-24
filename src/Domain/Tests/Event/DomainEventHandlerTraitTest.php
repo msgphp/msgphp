@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Event;
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEvent;
+use MsgPhp\Domain\Event\DomainEventHandler;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
-use MsgPhp\Domain\Event\DomainEventInterface;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEventHandlerTraitTest extends TestCase
@@ -20,7 +20,7 @@ final class DomainEventHandlerTraitTest extends TestCase
         self::assertTrue($object->handleEvent($event = new TestEventDifferentSuffix()));
         self::assertTrue($event->handled);
 
-        $event = $this->getMockBuilder(DomainEventInterface::class)
+        $event = $this->getMockBuilder(DomainEvent::class)
             ->setMockClassName('MsgPhp_Test_Root_Event')
             ->getMock()
         ;
@@ -33,12 +33,12 @@ final class DomainEventHandlerTraitTest extends TestCase
 
         $this->expectException(\LogicException::class);
 
-        $object->handleEvent($this->createMock(DomainEventInterface::class));
+        $object->handleEvent($this->createMock(DomainEvent::class));
     }
 
-    private function getObject(): DomainEventHandlerInterface
+    private function getObject(): DomainEventHandler
     {
-        return new class() implements DomainEventHandlerInterface {
+        return new class() implements DomainEventHandler {
             use DomainEventHandlerTrait;
 
             private function handleTestEvent(TestEvent $event): bool
@@ -55,7 +55,7 @@ final class DomainEventHandlerTraitTest extends TestCase
                 return true;
             }
 
-            private function handleMsgPhp_Test_Root_Event(DomainEventInterface $event): bool
+            private function handleMsgPhp_Test_Root_Event(DomainEvent $event): bool
             {
                 return false;
             }
@@ -63,7 +63,7 @@ final class DomainEventHandlerTraitTest extends TestCase
     }
 }
 
-class TestEvent implements DomainEventInterface
+class TestEvent implements DomainEvent
 {
     public $handled = false;
 }

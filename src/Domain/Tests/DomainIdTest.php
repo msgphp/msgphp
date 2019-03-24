@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainId;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +54,7 @@ final class DomainIdTest extends TestCase
     /**
      * @dataProvider provideIds
      */
-    public function testToString(DomainIdInterface $id, string $value): void
+    public function testToString(DomainId $id, string $value): void
     {
         self::assertSame($value, $id->toString());
         self::assertSame($value, (string) $id);
@@ -63,7 +63,7 @@ final class DomainIdTest extends TestCase
     /**
      * @dataProvider provideIds
      */
-    public function testSerialize(DomainIdInterface $id): void
+    public function testSerialize(DomainId $id): void
     {
         self::assertSame((array) $id, (array) unserialize(serialize($id)));
     }

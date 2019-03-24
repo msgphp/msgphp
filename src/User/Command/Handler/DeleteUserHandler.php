@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\DeleteUserCommand;
-use MsgPhp\User\Event\UserDeletedEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Command\DeleteUser;
+use MsgPhp\User\Event\UserDeleted;
+use MsgPhp\User\Repository\UserRepository;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -20,18 +20,18 @@ final class DeleteUserHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(DeleteUserCommand $command): void
+    public function __invoke(DeleteUser $command): void
     {
         try {
             $user = $this->repository->find($command->userId);
@@ -40,6 +40,6 @@ final class DeleteUserHandler
         }
 
         $this->repository->delete($user);
-        $this->dispatch(UserDeletedEvent::class, compact('user'));
+        $this->dispatch(UserDeleted::class, compact('user'));
     }
 }

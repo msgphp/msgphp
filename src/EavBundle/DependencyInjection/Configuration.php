@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection;
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infrastructure\Config\NodeBuilder;
 use MsgPhp\Domain\Infrastructure\Config\TreeBuilderHelper;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\ConfigHelper;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\PackageMetadata;
 use MsgPhp\Eav\Attribute;
-use MsgPhp\Eav\AttributeIdInterface;
+use MsgPhp\Eav\AttributeId;
 use MsgPhp\Eav\AttributeValue;
-use MsgPhp\Eav\AttributeValueIdInterface;
+use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\Eav\Command;
 use MsgPhp\Eav\Infrastructure\Doctrine as DoctrineInfrastructure;
 use MsgPhp\Eav\Infrastructure\Uuid as UuidInfrastructure;
@@ -30,26 +30,26 @@ final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
     public const DOCTRINE_TYPE_MAPPING = [
-        AttributeIdInterface::class => DoctrineInfrastructure\Type\AttributeIdType::class,
-        AttributeValueIdInterface::class => DoctrineInfrastructure\Type\AttributeValueIdType::class,
+        AttributeId::class => DoctrineInfrastructure\Type\AttributeIdType::class,
+        AttributeValueId::class => DoctrineInfrastructure\Type\AttributeValueIdType::class,
     ];
     public const DOCTRINE_REPOSITORY_MAPPING = [
         Attribute::class => DoctrineInfrastructure\Repository\AttributeRepository::class,
     ];
     private const ID_TYPE_MAPPING = [
-        AttributeIdInterface::class => [
+        AttributeId::class => [
             'scalar' => ScalarAttributeId::class,
             'uuid' => UuidInfrastructure\AttributeUuid::class,
         ],
-        AttributeValueIdInterface::class => [
+        AttributeValueId::class => [
             'scalar' => ScalarAttributeValueId::class,
             'uuid' => UuidInfrastructure\AttributeValueUuid::class,
         ],
     ];
     private const COMMAND_MAPPING = [
         Attribute::class => [
-            Command\CreateAttributeCommand::class => true,
-            Command\DeleteAttributeCommand::class => true,
+            Command\CreateAttribute::class => true,
+            Command\DeleteAttribute::class => true,
         ],
     ];
 
@@ -65,7 +65,7 @@ final class Configuration implements ConfigurationInterface
         }
 
         return self::$packageMetadata = new PackageMetadata(self::PACKAGE_NS, [
-            \dirname((string) (new \ReflectionClass(AttributeIdInterface::class))->getFileName()),
+            \dirname((string) (new \ReflectionClass(AttributeId::class))->getFileName()),
         ]);
     }
 
@@ -80,7 +80,7 @@ final class Configuration implements ConfigurationInterface
                 ->subClassValues()
             ->end()
             ->classMappingNode('id_type_mapping')
-                ->subClassKeys([DomainIdInterface::class])
+                ->subClassKeys([DomainId::class])
             ->end()
             ->classMappingNode('commands')
                 ->typeOfValues('boolean')

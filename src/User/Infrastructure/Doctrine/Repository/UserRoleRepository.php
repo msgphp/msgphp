@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Repository\UserRoleRepositoryInterface;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\Repository\UserRoleRepository as BaseUserRoleRepository;
+use MsgPhp\User\UserId;
 use MsgPhp\User\UserRole;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserRoleRepository implements UserRoleRepositoryInterface
+final class UserRoleRepository implements BaseUserRoleRepository
 {
     use DomainEntityRepositoryTrait;
 
     /**
-     * @return DomainCollectionInterface|UserRole[]
+     * @return DomainCollection|UserRole[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByUserId(UserId $userId, int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }
 
-    public function find(UserIdInterface $userId, string $roleName): UserRole
+    public function find(UserId $userId, string $roleName): UserRole
     {
         return $this->doFind(['user' => $userId, 'role' => $roleName]);
     }
 
-    public function exists(UserIdInterface $userId, string $roleName): bool
+    public function exists(UserId $userId, string $roleName): bool
     {
         return $this->doExists(['user' => $userId, 'role' => $roleName]);
     }

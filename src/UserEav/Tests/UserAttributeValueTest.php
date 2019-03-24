@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests;
 
 use MsgPhp\Eav\AttributeValue;
-use MsgPhp\Eav\AttributeValueIdInterface;
+use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\User\User;
 use MsgPhp\User\UserAttributeValue;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class UserAttributeValueTest extends TestCase
         $attributeValue = $this->createMock(AttributeValue::class);
         $attributeValue->expects(self::once())
             ->method('getId')
-            ->willReturn($id = $this->createMock(AttributeValueIdInterface::class))
+            ->willReturn($id = $this->createMock(AttributeValueId::class))
         ;
         $userAttributeValue = $this->createEntity($user = $this->createMock(User::class), $attributeValue);
 

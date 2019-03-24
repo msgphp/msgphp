@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Command\Handler;
 
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
-use MsgPhp\User\Command\CreateUserCommand;
+use MsgPhp\Domain\Message\DomainMessageBus;
+use MsgPhp\User\Command\CreateUser;
 use MsgPhp\User\Command\Handler\CreateUserHandler;
-use MsgPhp\User\Event\UserCreatedEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Event\UserCreated;
+use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\ScalarUserId;
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 use PHPUnit\Framework\TestCase;
 
 final class CreateUserHandlerTest extends TestCase
 {
     public function testHandler(): void
     {
-        $bus = $this->createMock(DomainMessageBusInterface::class);
+        $bus = $this->createMock(DomainMessageBus::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->with(self::callback(function (UserCreatedEvent $message): bool {
+            ->with(self::callback(function (UserCreated $message): bool {
                 self::assertInstanceOf(TestUser::class, $message->user);
                 self::assertTrue($message->user->getId()->isEmpty());
                 self::assertSame('value', $message->user->field);
@@ -32,7 +32,7 @@ final class CreateUserHandlerTest extends TestCase
                 return true;
             }))
         ;
-        $repository = $this->createMock(UserRepositoryInterface::class);
+        $repository = $this->createMock(UserRepository::class);
         $repository->expects(self::once())
             ->method('save')
             ->with(self::callback(function (TestUser $entity): bool {
@@ -41,18 +41,18 @@ final class CreateUserHandlerTest extends TestCase
                 return true;
             }))
         ;
-        (new CreateUserHandler(self::createFactory(), $bus, $repository))(new CreateUserCommand([
+        (new CreateUserHandler(self::createFactory(), $bus, $repository))(new CreateUser([
             'field' => 'value',
         ]));
     }
 
     public function testHandlerWithId(): void
     {
-        $id = $this->createMock(UserIdInterface::class);
-        $bus = $this->createMock(DomainMessageBusInterface::class);
+        $id = $this->createMock(UserId::class);
+        $bus = $this->createMock(DomainMessageBus::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->with(self::callback(function (UserCreatedEvent $message) use ($id): bool {
+            ->with(self::callback(function (UserCreated $message) use ($id): bool {
                 self::assertInstanceOf(TestUser::class, $message->user);
                 self::assertSame($id, $message->user->getId());
                 self::assertNull($message->user->field);
@@ -61,8 +61,8 @@ final class CreateUserHandlerTest extends TestCase
                 return true;
             }))
         ;
-        $repository = $this->createMock(UserRepositoryInterface::class);
-        (new CreateUserHandler(self::createFactory(), $bus, $repository))(new CreateUserCommand([
+        $repository = $this->createMock(UserRepository::class);
+        (new CreateUserHandler(self::createFactory(), $bus, $repository))(new CreateUser([
             'id' => $id,
         ]));
     }
@@ -70,7 +70,7 @@ final class CreateUserHandlerTest extends TestCase
     private static function createFactory(): GenericDomainObjectFactory
     {
         return new GenericDomainObjectFactory([
-            UserIdInterface::class => ScalarUserId::class,
+            UserId::class => ScalarUserId::class,
             User::class => TestUser::class,
         ]);
     }
@@ -89,7 +89,7 @@ class TestUser extends User
         $this->field = $field;
     }
 
-    public function getId(): UserIdInterface
+    public function getId(): UserId
     {
         return $this->id;
     }

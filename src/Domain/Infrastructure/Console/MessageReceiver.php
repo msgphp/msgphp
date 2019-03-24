@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Console;
 
-use MsgPhp\Domain\Message\MessageReceivingInterface;
+use MsgPhp\Domain\Message\MessageReceiving;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 final class MessageReceiver
 {
     /**
-     * @var MessageReceivingInterface|null
+     * @var MessageReceiving|null
      */
     private $receiver;
 
@@ -33,7 +33,7 @@ final class MessageReceiver
 
     public function onCommand(ConsoleCommandEvent $event): void
     {
-        $this->receiver = ($command = $event->getCommand()) instanceof MessageReceivingInterface ? $command : null;
+        $this->receiver = ($command = $event->getCommand()) instanceof MessageReceiving ? $command : null;
     }
 
     public function onTerminate(): void

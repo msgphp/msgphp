@@ -1,7 +1,7 @@
 # Projection Type Registry
 
-A projection type registry is bound to `MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface`. Its purpose is to
-manage all available [projection](models.md) type information.
+A projection type registry is bound to `MsgPhp\Domain\Projection\ProjectionTypeRegistry`. Its purpose is to manage all
+available [projection](models.md) type information.
 
 ## API
 
@@ -35,11 +35,11 @@ An Elasticsearch tailored projection type registry.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistry;
 
 // --- SETUP ---
 
-/** @var ProjectionTypeRegistryInterface $typeRegistry */
+/** @var ProjectionTypeRegistry $typeRegistry */
 $typeRegistry = ...;
 
 // --- USAGE ---

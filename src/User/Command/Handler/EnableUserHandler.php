@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DomainEventInterface;
-use MsgPhp\Domain\Event\EnableEvent;
+use MsgPhp\Domain\Event\DomainEvent;
+use MsgPhp\Domain\Event\Enable;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\User\Command\EnableUserCommand;
-use MsgPhp\User\Event\UserEnabledEvent;
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Command\EnableUser;
+use MsgPhp\User\Event\UserEnabled;
+use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 
 /**
@@ -24,31 +24,31 @@ final class EnableUserHandler
     use MessageDispatchingTrait;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, UserRepositoryInterface $repository)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
     {
         $this->factory = $factory;
         $this->bus = $bus;
         $this->repository = $repository;
     }
 
-    public function __invoke(EnableUserCommand $command): void
+    public function __invoke(EnableUser $command): void
     {
         $this->handle($command, function (User $user): void {
             $this->repository->save($user);
-            $this->dispatch(UserEnabledEvent::class, compact('user'));
+            $this->dispatch(UserEnabled::class, compact('user'));
         });
     }
 
-    protected function getDomainEvent(EnableUserCommand $command): DomainEventInterface
+    protected function getDomainEvent(EnableUser $command): DomainEvent
     {
-        return $this->factory->create(EnableEvent::class);
+        return $this->factory->create(Enable::class);
     }
 
-    protected function getDomainEventTarget(EnableUserCommand $command): User
+    protected function getDomainEventTarget(EnableUser $command): User
     {
         return $this->repository->find($command->userId);
     }

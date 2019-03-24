@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Doctrine;
 
 use MsgPhp\Domain\Infrastructure\Doctrine\MappingConfig;
-use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProviderInterface;
+use MsgPhp\Domain\Infrastructure\Doctrine\ObjectMappingProvider;
 use MsgPhp\User\Credential;
 use MsgPhp\User\Model;
 use MsgPhp\User\Role;
@@ -18,7 +18,7 @@ use MsgPhp\User\UserRole;
  *
  * @internal
  */
-final class ObjectMappings implements ObjectMappingProviderInterface
+final class ObjectMappings implements ObjectMappingProvider
 {
     private const CREDENTIALS = [
         Model\EmailCredential::class => Credential\Email::class,

@@ -1,7 +1,7 @@
 # Event Handlers
 
-A domain event handler is bound to `MsgPhp\Domain\Event\DomainEventHandlerInterface`. Its purpose is to implement the
-handling of [domain events](events.md) within a certain context.
+A domain event handler is bound to `MsgPhp\Domain\Event\DomainEventHandler`. Its purpose is to implement the handling of
+[domain events](events.md) within a certain context.
 
 Usually an entity implements it in order to mutate its own state (i.e. self-handling). It enforces the entity state to
 be valid by design as it encapsulates all write operations.
@@ -12,7 +12,7 @@ requires its history to be accessible.
 
 ## API
 
-### `handleEvent(DomainEventInterface $event): bool`
+### `handleEvent(DomainEvent $event): bool`
 
 Handles the given domain event for a known subject. A boolean return value tells if the domain event is actually handled
 yes or no.
@@ -29,13 +29,13 @@ A utility trait implementing the event handler API. By convention it maps events
 ```php
 <?php
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEvent;
+use MsgPhp\Domain\Event\DomainEventHandler;
 use MsgPhp\Domain\Event\DomainEventHandlerTrait;
-use MsgPhp\Domain\Event\DomainEventInterface;
 
 // --- SETUP ---
 
-class MyDomainEvent implements DomainEventInterface
+class MyDomainEvent implements DomainEvent
 {
     public $newValue;
     
@@ -45,7 +45,7 @@ class MyDomainEvent implements DomainEventInterface
     }
 }
 
-class MyEntity implements DomainEventHandlerInterface
+class MyEntity implements DomainEventHandler
 {
     use DomainEventHandlerTrait;
     

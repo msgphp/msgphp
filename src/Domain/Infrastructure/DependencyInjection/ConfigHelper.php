@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection;
 
-use MsgPhp\Domain\Event\DomainEventHandlerInterface;
+use MsgPhp\Domain\Event\DomainEventHandler;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -46,7 +46,7 @@ final class ConfigHelper
     {
         foreach ($commandMapping as $class => $features) {
             $available = isset($classMapping[$class]);
-            $handlerAvailable = $available && is_subclass_of($classMapping[$class], DomainEventHandlerInterface::class);
+            $handlerAvailable = $available && is_subclass_of($classMapping[$class], DomainEventHandler::class);
 
             foreach ($features as $feature => $info) {
                 if (!\is_array($info)) {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Credential;
 
-use MsgPhp\User\Event\Domain\ChangeCredentialEvent;
+use MsgPhp\User\Event\Domain\ChangeCredential;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class Email implements CredentialInterface
+final class Email implements Credential
 {
     use EmailAsUsername;
 
@@ -18,7 +18,7 @@ final class Email implements CredentialInterface
         $this->email = $email;
     }
 
-    public function __invoke(ChangeCredentialEvent $event): bool
+    public function __invoke(ChangeCredential $event): bool
     {
         if ($emailChanged = ($this->email !== $email = $event->getStringField('email'))) {
             $this->email = $email;

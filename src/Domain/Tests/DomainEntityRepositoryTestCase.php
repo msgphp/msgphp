@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\DuplicateEntityException;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainEntityRepository;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use PHPUnit\Framework\TestCase;
 
@@ -296,7 +296,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
             self::assertFalse($entity->getId()->isEmpty());
         }
 
-        self::assertInstanceOf(DomainIdInterface::class, $entity->getId());
+        self::assertInstanceOf(DomainId::class, $entity->getId());
         self::assertNull($entity->strField);
         self::assertSame(1, $entity->intField);
         self::assertSame(-1.23, $entity->floatField);
@@ -395,7 +395,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
     /**
      * @psalm-param class-string $class
      */
-    abstract protected static function createRepository(string $class): DomainEntityRepositoryTraitInterface;
+    abstract protected static function createRepository(string $class): TestDomainEntityRepository;
 
     /**
      * @param object[] $entities
@@ -404,7 +404,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
 
     final protected function assertEntityCollectionEquals(array $expected, $actual): void
     {
-        self::assertInstanceOf(DomainCollectionInterface::class, $actual);
+        self::assertInstanceOf(DomainCollection::class, $actual);
         self::assertCount(\count($expected), $actual);
 
         $equals = true;

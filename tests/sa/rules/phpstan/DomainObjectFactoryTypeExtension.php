@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\SA\PHPStan;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -18,7 +18,7 @@ final class DomainObjectFactoryTypeExtension implements DynamicMethodReturnTypeE
 {
     public function getClass(): string
     {
-        return DomainObjectFactoryInterface::class;
+        return DomainObjectFactory::class;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool

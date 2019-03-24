@@ -1,11 +1,11 @@
 # Identifiers
 
-A domain identifier is a value object and bound to `MsgPhp\Domain\DomainIdInterface`. Its purpose is to utilize a
-primitive identifier value, usually used to identity an entity with.
+A domain identifier is a value object and bound to `MsgPhp\Domain\DomainId`. Its purpose is to utilize a primitive
+identifier value, usually used to identity an entity with.
 
 ## API
 
-### `static fromValue($value): DomainIdInterface`
+### `static fromValue($value): DomainId`
 
 Returns a factorized identifier from any primitive value. Using `null` might imply an empty identifier.
 
@@ -17,7 +17,7 @@ Tells if an identifier value is considered empty, thus has no known primitive va
 
 ---
 
-### `equals(DomainIdInterface $id): bool`
+### `equals(DomainId $id): bool`
 
 Tells if an identifier strictly equals another identifier.
 
@@ -39,12 +39,12 @@ A first class citizen domain identifier trait.
 ```php
 <?php
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\DomainIdTrait;
 
 // --- SETUP ---
 
-class MyDomainId implements DomainIdInterface
+class MyDomainId implements DomainId
 {
     use DomainIdTrait;
 }

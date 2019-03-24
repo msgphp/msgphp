@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\GenericPaginatedDomainCollection;
 
 final class GenericPaginatedDomainCollectionTest extends DomainCollectionTestCase
@@ -33,7 +33,7 @@ final class GenericPaginatedDomainCollectionTest extends DomainCollectionTestCas
         self::assertCount(2, $collection);
     }
 
-    protected static function createCollection(array $elements): DomainCollectionInterface
+    protected static function createCollection(array $elements): DomainCollection
     {
         return new GenericPaginatedDomainCollection($elements);
     }

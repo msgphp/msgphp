@@ -7,8 +7,8 @@ namespace MsgPhp\Domain\Tests\Infrastructure\Doctrine;
 use Doctrine\DBAL\Types\Type;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\Domain\Tests\DomainEntityRepositoryTestCase;
-use MsgPhp\Domain\Tests\Fixtures\DomainEntityRepositoryTraitInterface;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
+use MsgPhp\Domain\Tests\Fixtures\TestDomainEntityRepository;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainIdType;
 
@@ -71,10 +71,10 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
     /**
      * @inheritdoc
      */
-    protected static function createRepository(string $class): DomainEntityRepositoryTraitInterface
+    protected static function createRepository(string $class): TestDomainEntityRepository
     {
         /** @psalm-suppress InaccessibleMethod */
-        return new class($class, self::$em) implements DomainEntityRepositoryTraitInterface {
+        return new class($class, self::$em) implements TestDomainEntityRepository {
             use DomainEntityRepositoryTrait {
                 doFindAll as public;
                 doFindAllByFields as public;

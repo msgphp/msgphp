@@ -10,12 +10,12 @@ namespace MsgPhp\Domain\Projection;
 final class ProjectionSynchronization
 {
     /**
-     * @var ProjectionTypeRegistryInterface
+     * @var ProjectionTypeRegistry
      */
     private $typeRegistry;
 
     /**
-     * @var ProjectionRepositoryInterface
+     * @var ProjectionRepository
      */
     private $repository;
 
@@ -27,7 +27,7 @@ final class ProjectionSynchronization
     /**
      * @param iterable|ProjectionDocument[] $documentProvider
      */
-    public function __construct(ProjectionTypeRegistryInterface $typeRegistry, ProjectionRepositoryInterface $repository, iterable $documentProvider)
+    public function __construct(ProjectionTypeRegistry $typeRegistry, ProjectionRepository $repository, iterable $documentProvider)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;

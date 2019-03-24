@@ -9,7 +9,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\MappingException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\User;
 use MsgPhp\User\Username;
 
@@ -19,7 +19,7 @@ use MsgPhp\User\Username;
 final class UsernameListener
 {
     /**
-     * @var DomainObjectFactoryInterface
+     * @var DomainObjectFactory
      */
     private $factory;
 
@@ -31,7 +31,7 @@ final class UsernameListener
     /**
      * @param array[] $mapping
      */
-    public function __construct(DomainObjectFactoryInterface $factory, array $mapping)
+    public function __construct(DomainObjectFactory $factory, array $mapping)
     {
         $this->factory = $factory;
         $this->mapping = $mapping;

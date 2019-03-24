@@ -13,13 +13,13 @@ A UUID tailored [domain identifier](../ddd/identifiers.md) trait is provided by 
 ```php
 <?php
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait;
 use Ramsey\Uuid\Uuid;
 
 // --- SETUP ---
 
-class MyDomainUuid implements DomainIdInterface
+class MyDomainUuid implements DomainId
 {
     use DomainIdTrait;
 }

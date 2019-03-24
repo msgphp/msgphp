@@ -28,7 +28,7 @@ bin/console projection:synchronize
 
 ## Context Factory
 
-A context factory is bound to `MsgPhp\Domain\Infrastructure\Console\Context\ContextFactoryInterface`. Its purpose is to leverage
+A context factory is bound to `MsgPhp\Domain\Infrastructure\Console\Context\ContextFactory`. Its purpose is to leverage
 a CLI command in an effort to interactively built an arbitrary array value (the context).
 
 ### API
@@ -59,7 +59,7 @@ bin/console command --optional-argument [--] required-argument
 In both cases a value is optional, if the actual class method argument is required and no value is given it will be
 asked interactively. If interaction is not possible an exception will be thrown instead.
 
-- `__construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactoryInterface $elementFactory = null)`
+- `__construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactory $elementFactory = null)`
     - `$class / $method`: The class method to resolve
     - `$classMapping`: Global class mapping. Usually used to map abstracts to concretes.
     - `$flags`: A bit mask value to toggle various flags
@@ -71,7 +71,7 @@ asked interactively. If interaction is not possible an exception will be thrown 
 
 ##### Customizing Context Elements
 
-Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infrastructure\Console\Context\ClassContextElementFactoryInterface`.
+Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infrastructure\Console\Context\ClassContextElementFactory`.
 
 - `getElement(string $class, string $method, string $argument): ContextElement`
     - Get a custom [`ContextElement`][api-contextelement] to apply to a specific class/method/argument pair
@@ -138,7 +138,7 @@ class MyCommand extends Command
 A [Doctrine](doctrine-orm.md) entity aware context factory. It decorates any context factory. Its purpose is to
 provide a discriminator value into the resulting context when working with [ORM inheritance].
 
-- `__construct(ContextFactoryInterface $factory, EntityManagerInterface $em, string $class)`
+- `__construct(ContextFactory $factory, EntityManagerInterface $em, string $class)`
     - `$factory`: The decorated context factory
     - `$em`: The entity manager to use
     - `$class`: The entity class to use

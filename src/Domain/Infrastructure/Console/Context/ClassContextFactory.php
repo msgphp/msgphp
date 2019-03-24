@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Console\Context;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Factory\ClassMethodResolver;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ClassContextFactory implements ContextFactoryInterface
+final class ClassContextFactory implements ContextFactory
 {
     public const ALWAYS_OPTIONAL = 1;
     public const NO_DEFAULTS = 2;
@@ -47,7 +47,7 @@ final class ClassContextFactory implements ContextFactoryInterface
     private $flags;
 
     /**
-     * @var ClassContextElementFactoryInterface
+     * @var ClassContextElementFactory
      */
     private $elementFactory;
 
@@ -72,13 +72,13 @@ final class ClassContextFactory implements ContextFactoryInterface
      *
      * @param string[] $classMapping
      */
-    public function __construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactoryInterface $elementFactory = null)
+    public function __construct(string $class, string $method, array $classMapping = [], int $flags = 0, ClassContextElementFactory $elementFactory = null)
     {
         $this->class = $class;
         $this->method = $method;
         $this->classMapping = $classMapping;
         $this->flags = $flags;
-        $this->elementFactory = $elementFactory ?? new ClassContextElementFactory();
+        $this->elementFactory = $elementFactory ?? new GenericClassContextElementFactory();
     }
 
     public static function getFieldName(string $argument, bool $isOption = true): string
@@ -264,7 +264,7 @@ final class ClassContextFactory implements ContextFactoryInterface
      */
     private function resolveNested(string $class, array $parentValue, ContextElement $parentElement): iterable
     {
-        $method = is_subclass_of($class, DomainCollectionInterface::class) || is_subclass_of($class, DomainIdInterface::class) ? 'fromValue' : '__construct';
+        $method = is_subclass_of($class, DomainCollection::class) || is_subclass_of($class, DomainId::class) ? 'fromValue' : '__construct';
         $resolved = [];
 
         foreach (ClassMethodResolver::resolve($class, $method) as $argument => $metadata) {

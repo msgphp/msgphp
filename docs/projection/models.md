@@ -1,7 +1,7 @@
 # Projections
 
-A projection is a model object and bound to `MsgPhp\Domain\Projection\ProjectionInterface`. Its purpose is to
-convert raw model data (a document) into a projection.
+A projection is a model object and bound to `MsgPhp\Domain\Projection\Projection`. Its purpose is to convert raw model
+data (a document) into a projection.
 
 The document is usually a transformation from a domain object (e.g. an entity) and therefor projections should be
 considered read-only and disposable, as they can be re-created / synchronized at any time from a source of truth.
@@ -14,7 +14,7 @@ entity. It enables decoupling and thus optimized API responses.
 
 ## API
 
-### `static fromDocument(array $document): ProjectionInterface`
+### `static fromDocument(array $document): Projection`
 
 Creates a projection from raw document data.
 
@@ -23,15 +23,15 @@ Creates a projection from raw document data.
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\ProjectionInterface;
+use MsgPhp\Domain\Projection\Projection;
 
 // --- SETUP ---
 
-class MyProjection implements ProjectionInterface
+class MyProjection implements Projection
 {
     public $someField;
 
-    public static function fromDocument(array $document): ProjectionInterface
+    public static function fromDocument(array $document): Projection
     {
         $projection = new static();
         $projection->someField = $document['some_field'] ?? null;

@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Exception;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class EntityNotFoundException extends \RuntimeException implements DomainExceptionInterface
+final class EntityNotFoundException extends \RuntimeException implements DomainException
 {
     /**
      * @param mixed $id

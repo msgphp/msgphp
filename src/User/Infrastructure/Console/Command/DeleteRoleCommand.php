@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\User\Command\DeleteRoleCommand as DeleteRoleDomainCommand;
-use MsgPhp\User\Event\RoleDeletedEvent;
+use MsgPhp\User\Command\DeleteRole as DeleteRoleDomainCommand;
+use MsgPhp\User\Event\RoleDeleted;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -25,7 +25,7 @@ final class DeleteRoleCommand extends RoleCommand
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof RoleDeletedEvent) {
+        if ($message instanceof RoleDeleted) {
             $this->io->success('Deleted role '.$message->role->getName());
         }
     }

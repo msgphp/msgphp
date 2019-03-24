@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\Domain\Message\MessageReceivingInterface;
-use MsgPhp\User\Command\CreateUserCommand as CreateUserDomainCommand;
-use MsgPhp\User\Event\UserCreatedEvent;
+use MsgPhp\Domain\Message\MessageReceiving;
+use MsgPhp\User\Command\CreateUser as CreateUserDomainCommand;
+use MsgPhp\User\Event\UserCreated;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,14 +20,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class CreateUserCommand extends Command implements MessageReceivingInterface
+final class CreateUserCommand extends Command implements MessageReceiving
 {
     use MessageDispatchingTrait;
 
     protected static $defaultName = 'user:create';
 
     /**
-     * @var ContextFactoryInterface
+     * @var ContextFactory
      */
     private $contextFactory;
 
@@ -36,7 +36,7 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
      */
     private $io;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus, ContextFactoryInterface $contextFactory)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, ContextFactory $contextFactory)
     {
         $this->factory = $factory;
         $this->bus = $bus;
@@ -47,7 +47,7 @@ final class CreateUserCommand extends Command implements MessageReceivingInterfa
 
     public function onMessageReceived($message): void
     {
-        if ($message instanceof UserCreatedEvent) {
+        if ($message instanceof UserCreated) {
             $this->io->success('Created user '.$message->user->getCredential()->getUsername());
         }
     }

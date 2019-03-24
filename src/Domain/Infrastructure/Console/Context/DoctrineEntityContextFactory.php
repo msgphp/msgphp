@@ -15,10 +15,10 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DoctrineEntityContextFactory implements ContextFactoryInterface
+final class DoctrineEntityContextFactory implements ContextFactory
 {
     /**
-     * @var ContextFactoryInterface
+     * @var ContextFactory
      */
     private $factory;
 
@@ -42,7 +42,7 @@ final class DoctrineEntityContextFactory implements ContextFactoryInterface
     /**
      * @psalm-param class-string $class
      */
-    public function __construct(ContextFactoryInterface $factory, EntityManagerInterface $em, string $class)
+    public function __construct(ContextFactory $factory, EntityManagerInterface $em, string $class)
     {
         $this->factory = $factory;
         $this->em = $em;

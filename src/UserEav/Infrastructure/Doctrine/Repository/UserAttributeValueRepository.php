@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Eav\AttributeIdInterface;
-use MsgPhp\Eav\AttributeValueIdInterface;
+use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Eav\AttributeId;
+use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\Eav\Infrastructure\Doctrine\Repository\EntityAttributeValueRepositoryTrait;
-use MsgPhp\User\Repository\UserAttributeValueRepositoryInterface;
+use MsgPhp\User\Repository\UserAttributeValueRepository as BaseUserAttributeValueRepository;
 use MsgPhp\User\UserAttributeValue;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserAttributeValueRepository implements UserAttributeValueRepositoryInterface
+final class UserAttributeValueRepository implements BaseUserAttributeValueRepository
 {
     use EntityAttributeValueRepositoryTrait;
 
     /**
-     * @return DomainCollectionInterface|UserAttributeValue[]
+     * @return DomainCollection|UserAttributeValue[]
      */
-    public function findAllByAttributeId(AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByAttributeId(AttributeId $attributeId, int $offset = 0, int $limit = 0): DomainCollection
     {
         $qb = $this->createQueryBuilder();
         $this->addAttributeCriteria($qb, $attributeId);
@@ -31,9 +31,9 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
     }
 
     /**
-     * @return DomainCollectionInterface|UserAttributeValue[]
+     * @return DomainCollection|UserAttributeValue[]
      */
-    public function findAllByAttributeIdAndValue(AttributeIdInterface $attributeId, $value, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByAttributeIdAndValue(AttributeId $attributeId, $value, int $offset = 0, int $limit = 0): DomainCollection
     {
         $qb = $this->createQueryBuilder();
         $this->addAttributeCriteria($qb, $attributeId, $value);
@@ -42,17 +42,17 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
     }
 
     /**
-     * @return DomainCollectionInterface|UserAttributeValue[]
+     * @return DomainCollection|UserAttributeValue[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByUserId(UserId $userId, int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }
 
     /**
-     * @return DomainCollectionInterface|UserAttributeValue[]
+     * @return DomainCollection|UserAttributeValue[]
      */
-    public function findAllByUserIdAndAttributeId(UserIdInterface $userId, AttributeIdInterface $attributeId, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByUserIdAndAttributeId(UserId $userId, AttributeId $attributeId, int $offset = 0, int $limit = 0): DomainCollection
     {
         $qb = $this->createQueryBuilder();
         $this->addFieldCriteria($qb, ['user' => $userId]);
@@ -61,12 +61,12 @@ final class UserAttributeValueRepository implements UserAttributeValueRepository
         return $this->createResultSet($qb->getQuery(), $offset, $limit);
     }
 
-    public function find(AttributeValueIdInterface $attributeValueId): UserAttributeValue
+    public function find(AttributeValueId $attributeValueId): UserAttributeValue
     {
         return $this->doFind($attributeValueId);
     }
 
-    public function exists(AttributeValueIdInterface $attributeValueId): bool
+    public function exists(AttributeValueId $attributeValueId): bool
     {
         return $this->doExists($attributeValueId);
     }

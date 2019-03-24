@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
 use MsgPhp\User\Infrastructure\Doctrine\UsernameLookup;
-use MsgPhp\User\Repository\UsernameRepositoryInterface;
+use MsgPhp\User\Repository\UsernameRepository as BaseUsernameRepository;
 use MsgPhp\User\Username;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UsernameRepository implements UsernameRepositoryInterface
+final class UsernameRepository implements BaseUsernameRepository
 {
     use DomainEntityRepositoryTrait;
 
@@ -40,17 +40,17 @@ final class UsernameRepository implements UsernameRepositoryInterface
     }
 
     /**
-     * @return DomainCollectionInterface|Username[]
+     * @return DomainCollection|Username[]
      */
-    public function lookup(): DomainCollectionInterface
+    public function lookup(): DomainCollection
     {
         return new GenericDomainCollection($this->lookup->lookup());
     }
 
     /**
-     * @return DomainCollectionInterface|Username[]
+     * @return DomainCollection|Username[]
      */
-    public function findAll(int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAll(int $offset = 0, int $limit = 0): DomainCollection
     {
         $qb = $this->createQueryBuilder();
         $qb->indexBy($this->getAlias(), 'username');

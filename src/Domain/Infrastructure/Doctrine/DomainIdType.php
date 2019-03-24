@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Infrastructure\Doctrine;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -22,19 +22,19 @@ abstract class DomainIdType extends Type
     private static $mapping = [];
 
     /**
-     * @psalm-param class-string<DomainIdInterface> $class
+     * @psalm-param class-string<DomainId> $class
      */
     final public static function setClass(string $class): void
     {
-        if (!is_subclass_of($class, DomainIdInterface::class)) {
-            throw new \LogicException(sprintf('Domain ID class must be a sub class of "%s", got "%s".', DomainIdInterface::class, $class));
+        if (!is_subclass_of($class, DomainId::class)) {
+            throw new \LogicException(sprintf('Domain ID class must be a sub class of "%s", got "%s".', DomainId::class, $class));
         }
 
         self::$mapping[static::class]['class'] = $class;
     }
 
     /**
-     * @psalm-return class-string<DomainIdInterface>
+     * @psalm-return class-string<DomainId>
      */
     final public static function getClass(): string
     {
@@ -70,7 +70,7 @@ abstract class DomainIdType extends Type
      */
     final public static function resolveName($value): ?string
     {
-        if ($value instanceof DomainIdInterface) {
+        if ($value instanceof DomainId) {
             $class = \get_class($value);
 
             /** @var string $type */
@@ -95,7 +95,7 @@ abstract class DomainIdType extends Type
      */
     final public static function resolveValue($value, AbstractPlatform $platform)
     {
-        if ($value instanceof DomainIdInterface) {
+        if ($value instanceof DomainId) {
             $class = \get_class($value);
             $type = Type::INTEGER;
 
@@ -124,7 +124,7 @@ abstract class DomainIdType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if ($value instanceof DomainIdInterface) {
+        if ($value instanceof DomainId) {
             $value = $value->isEmpty() ? null : $value->toString();
         }
 
@@ -135,7 +135,7 @@ abstract class DomainIdType extends Type
         }
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainIdInterface
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?DomainId
     {
         try {
             $value = static::getInnerType()->convertToPHPValue($value, $platform);

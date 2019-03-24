@@ -21,7 +21,7 @@ namespace App\Entity\User;
 
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\User\User as BaseUser;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 
 /**
  * @ORM\Entity()
@@ -31,12 +31,12 @@ class User extends BaseUser
     /** @ORM\Id() @ORM\GeneratedValue() @ORM\Column(type="msgphp_user_id", length=191) */
     private $id;
 
-    public function __construct(UserIdInterface $id)
+    public function __construct(UserId $id)
     {
         $this->id = $id;
     }
 
-    public function getId(): UserIdInterface
+    public function getId(): UserId
     {
         return $this->id;
     }
@@ -67,7 +67,7 @@ not have to be queried for it after. To disable it, use:
 
 public function __construct()
 {
-    $this->id = new MsgPhp\User\UserId(); // represents an "empty" ID (i.e. "new")
+    $this->id = new \MsgPhp\User\ScalarUserId(); // represents an "empty" ID (i.e. "new")
 }
 ```
 
@@ -86,9 +86,9 @@ private $id;
 
 // ...
 
-public function getId(): UserIdInterface
+public function getId(): UserId
 {
-    return MsgPhp\User\UserId::fromValue($this->id);
+    return \MsgPhp\User\ScalarUserId::fromValue($this->id);
 }
 ```
 
@@ -109,7 +109,7 @@ If for some reason the default mapping needs to be customized, create the file `
 
 ## Configure the User Identity
 
-The user is identified by a built-in [domain identifier](../../ddd/identifiers.md) of type `MsgPhp\User\UserIdInterface`.
+The user is identified by a built-in [domain identifier](../../ddd/identifiers.md) of type `MsgPhp\User\UserId`.
 
 The default data type is considered `integer` using a default implementation of type: `MsgPhp\User\UserId`.
 
@@ -120,9 +120,9 @@ Optionally change the data type and implementation used by MsgPHP:
 
 msgphp_user:
     id_type_mapping:
-        MsgPhp\User\UserIdInterface: bigint
+        MsgPhp\User\UserId: bigint
     class_mapping:
-        MsgPhp\User\UserIdInterface: App\Entity\User\UserId
+        MsgPhp\User\UserId: App\Entity\User\UserId
 ```
 
 ### Using a UUID identifier
@@ -132,7 +132,7 @@ msgphp_user:
 
 msgphp_user:
     id_type_mapping:
-        MsgPhp\User\UserIdInterface: uuid # uuid_binary, uuid_binary_ordered_time
+        MsgPhp\User\UserId: uuid # uuid_binary, uuid_binary_ordered_time
 ```
 
 This changes the default implementation used by MsgPHP to `MsgPhp\User\Infrastructure\Uuid\UserId`, a sub class of the default [UUID domain identifier](../../infrastructure/uuid.md#domain-identifier).

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Model;
 
-use MsgPhp\Domain\Event\DisableEvent;
-use MsgPhp\Domain\Event\EnableEvent;
+use MsgPhp\Domain\Event\Disable;
+use MsgPhp\Domain\Event\Enable;
 use MsgPhp\Domain\Model\CanBeEnabled;
 use PHPUnit\Framework\TestCase;
 
@@ -37,9 +37,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(false);
 
-        self::assertTrue($object->handleEnableEvent(new EnableEvent()));
+        self::assertTrue($object->handleEnableEvent(new Enable()));
         self::assertTrue($object->isEnabled());
-        self::assertFalse($object->handleEnableEvent(new EnableEvent()));
+        self::assertFalse($object->handleEnableEvent(new Enable()));
         self::assertTrue($object->isEnabled());
     }
 
@@ -47,9 +47,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(true);
 
-        self::assertTrue($object->handleDisableEvent(new DisableEvent()));
+        self::assertTrue($object->handleDisableEvent(new Disable()));
         self::assertFalse($object->isEnabled());
-        self::assertFalse($object->handleDisableEvent(new DisableEvent()));
+        self::assertFalse($object->handleDisableEvent(new Disable()));
         self::assertFalse($object->isEnabled());
     }
 

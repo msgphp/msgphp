@@ -8,9 +8,9 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use MsgPhp\Domain\GenericPaginatedDomainCollection;
-use MsgPhp\Domain\Projection\ProjectionInterface;
-use MsgPhp\Domain\Projection\ProjectionRepositoryInterface;
-use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\Projection;
+use MsgPhp\Domain\Projection\ProjectionRepository;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistry;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -18,16 +18,16 @@ use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
 final class ProjectionDataProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     /**
-     * @var ProjectionTypeRegistryInterface
+     * @var ProjectionTypeRegistry
      */
     private $typeRegistry;
 
     /**
-     * @var ProjectionRepositoryInterface
+     * @var ProjectionRepository
      */
     private $repository;
 
-    public function __construct(ProjectionTypeRegistryInterface $typeRegistry, ProjectionRepositoryInterface $repository)
+    public function __construct(ProjectionTypeRegistry $typeRegistry, ProjectionRepository $repository)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;
@@ -41,7 +41,7 @@ final class ProjectionDataProvider implements CollectionDataProviderInterface, I
     /**
      * @psalm-suppress ImplementedReturnTypeMismatch
      *
-     * @return iterable|ProjectionInterface[]
+     * @return iterable|Projection[]
      */
     public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
@@ -54,7 +54,7 @@ final class ProjectionDataProvider implements CollectionDataProviderInterface, I
         })(), $collection->getOffset(), $collection->getLimit(), (float) \count($collection), $collection->getTotalCount()));
     }
 
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?ProjectionInterface
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?Projection
     {
         if (!is_scalar($id)) {
             throw new \InvalidArgumentException('Document ID must be a scalar.');

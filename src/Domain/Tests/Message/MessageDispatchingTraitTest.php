@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Message;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
-use MsgPhp\Domain\Message\DomainMessageBusInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
+use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -13,13 +13,13 @@ final class MessageDispatchingTraitTest extends TestCase
 {
     public function testDispatch(): void
     {
-        $factory = $this->createMock(DomainObjectFactoryInterface::class);
+        $factory = $this->createMock(DomainObjectFactory::class);
         $factory->expects(self::once())
             ->method('create')
             ->with('class', ['context'])
             ->willReturn($message = new \stdClass())
         ;
-        $bus = $this->createMock(DomainMessageBusInterface::class);
+        $bus = $this->createMock(DomainMessageBus::class);
         $bus->expects(self::once())
             ->method('dispatch')
             ->with($message)
@@ -31,7 +31,7 @@ final class MessageDispatchingTraitTest extends TestCase
     /**
      * @return object
      */
-    private function getObject(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus)
+    private function getObject(DomainObjectFactory $factory, DomainMessageBus $bus)
     {
         return new class($factory, $bus) {
             use MessageDispatchingTrait {

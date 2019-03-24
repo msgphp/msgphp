@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\Elasticsearch;
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Projection\ProjectionTypeRegistryInterface;
+use MsgPhp\Domain\Projection\ProjectionTypeRegistry as BaseProjectionTypeRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class ProjectionTypeRegistry implements ProjectionTypeRegistryInterface
+final class ProjectionTypeRegistry implements BaseProjectionTypeRegistry
 {
     private const DEFAULT_PROPERTY_TYPE = 'text';
 
@@ -128,8 +128,8 @@ final class ProjectionTypeRegistry implements ProjectionTypeRegistryInterface
     {
         foreach ($this->mappings as $type => $mapping) {
             if (\is_string($mapping)) {
-                if (!class_exists($mapping) || !is_subclass_of($mapping, DocumentMappingProviderInterface::class)) {
-                    throw new \LogicException(sprintf('The class "%s" does not exists or is not a sub class of "%s".', $mapping, DocumentMappingProviderInterface::class));
+                if (!class_exists($mapping) || !is_subclass_of($mapping, DocumentMappingProvider::class)) {
+                    throw new \LogicException(sprintf('The class "%s" does not exists or is not a sub class of "%s".', $mapping, DocumentMappingProvider::class));
                 }
 
                 yield from $mapping::provideDocumentMappings();

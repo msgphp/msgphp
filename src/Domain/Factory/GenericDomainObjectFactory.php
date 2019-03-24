@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\DomainCollectionInterface;
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainCollection;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\InvalidClassException;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Instantiator;
@@ -13,7 +13,7 @@ use Symfony\Component\VarExporter\Instantiator;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class GenericDomainObjectFactory implements DomainObjectFactoryInterface
+final class GenericDomainObjectFactory implements DomainObjectFactory
 {
     /**
      * @psalm-var array<class-string, class-string>
@@ -23,7 +23,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactoryInterface
     private $classMapping;
 
     /**
-     * @var DomainObjectFactoryInterface|null
+     * @var DomainObjectFactory|null
      */
     private $factory;
 
@@ -37,7 +37,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactoryInterface
         $this->classMapping = $classMapping;
     }
 
-    public function setNestedFactory(?DomainObjectFactoryInterface $factory): void
+    public function setNestedFactory(?DomainObjectFactory $factory): void
     {
         $this->factory = $factory;
     }
@@ -49,7 +49,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactoryInterface
     {
         $class = $this->getClass($class, $context);
 
-        if (is_subclass_of($class, DomainIdInterface::class) || is_subclass_of($class, DomainCollectionInterface::class)) {
+        if (is_subclass_of($class, DomainId::class) || is_subclass_of($class, DomainCollection::class)) {
             return $class::fromValue(...$this->resolveArguments($class, 'fromValue', $context));
         }
 

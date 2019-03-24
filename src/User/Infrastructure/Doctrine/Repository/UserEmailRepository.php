@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Doctrine\Repository;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
-use MsgPhp\User\Repository\UserEmailRepositoryInterface;
+use MsgPhp\User\Repository\UserEmailRepository as BaseUserEmailRepository;
 use MsgPhp\User\UserEmail;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserEmailRepository implements UserEmailRepositoryInterface
+final class UserEmailRepository implements BaseUserEmailRepository
 {
     use DomainEntityRepositoryTrait;
 
     /**
-     * @return DomainCollectionInterface|UserEmail[]
+     * @return DomainCollection|UserEmail[]
      */
-    public function findAllByUserId(UserIdInterface $userId, int $offset = 0, int $limit = 0): DomainCollectionInterface
+    public function findAllByUserId(UserId $userId, int $offset = 0, int $limit = 0): DomainCollection
     {
         return $this->doFindAllByFields(['user' => $userId], $offset, $limit);
     }

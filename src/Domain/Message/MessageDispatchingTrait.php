@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Message;
 
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -12,16 +12,16 @@ use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
 trait MessageDispatchingTrait
 {
     /**
-     * @var DomainObjectFactoryInterface
+     * @var DomainObjectFactory
      */
     private $factory;
 
     /**
-     * @var DomainMessageBusInterface
+     * @var DomainMessageBus
      */
     private $bus;
 
-    public function __construct(DomainObjectFactoryInterface $factory, DomainMessageBusInterface $bus)
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus)
     {
         $this->factory = $factory;
         $this->bus = $bus;

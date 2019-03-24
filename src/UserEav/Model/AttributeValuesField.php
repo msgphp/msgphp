@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\User\UserAttributeValue;
 
@@ -19,9 +19,9 @@ trait AttributeValuesField
     private $attributeValues = [];
 
     /**
-     * @return DomainCollectionInterface|UserAttributeValue[]
+     * @return DomainCollection|UserAttributeValue[]
      */
-    public function getAttributeValues(): DomainCollectionInterface
+    public function getAttributeValues(): DomainCollection
     {
         return new GenericDomainCollection($this->attributeValues);
     }

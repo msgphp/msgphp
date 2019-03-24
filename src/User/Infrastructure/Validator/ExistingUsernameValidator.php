@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Validator;
 
-use MsgPhp\User\Repository\UserRepositoryInterface;
+use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -15,11 +15,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 final class ExistingUsernameValidator extends ConstraintValidator
 {
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $repository;
 
-    public function __construct(UserRepositoryInterface $repository)
+    public function __construct(UserRepository $repository)
     {
         $this->repository = $repository;
     }

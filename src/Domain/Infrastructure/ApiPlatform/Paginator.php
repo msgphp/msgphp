@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use MsgPhp\Domain\PaginatedDomainCollectionInterface;
+use MsgPhp\Domain\PaginatedDomainCollection;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -13,11 +13,11 @@ use MsgPhp\Domain\PaginatedDomainCollectionInterface;
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     /**
-     * @var PaginatedDomainCollectionInterface
+     * @var PaginatedDomainCollection
      */
     private $collection;
 
-    public function __construct(PaginatedDomainCollectionInterface $collection)
+    public function __construct(PaginatedDomainCollection $collection)
     {
         $this->collection = $collection;
     }

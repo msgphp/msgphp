@@ -1,7 +1,7 @@
 # Object Factory
 
-A domain object factory is bound to `MsgPhp\Domain\Factory\DomainObjectFactoryInterface`. Its purpose is to initialize
-any domain object based on a given class name and context.
+A domain object factory is bound to `MsgPhp\Domain\Factory\DomainObjectFactory`. Its purpose is to initialize any domain
+object based on a given class name and context.
 
 ## API
 
@@ -30,8 +30,7 @@ Returns the actual class name the factory uses for a given class name.
 ### `MsgPhp\Domain\Factory\GenericDomainObjectFactory`
 
 A generic object factory. It initializes a class by reading its [constructor] arguments. If the class is a sub class
-of `MsgPhp\Domain\DomainIdInterface` or `MsgPhp\Domain\DomainCollectionInterface` its static `fromValue` constructor
-will be used instead.
+of `MsgPhp\Domain\DomainId` or `MsgPhp\Domain\DomainCollection` its static `fromValue` constructor will be used instead.
 
 Context elements mapped by argument name will be used as argument value. In case of a type-hinted object argument a
 nested context may be provided to initialize the object with.
@@ -47,11 +46,11 @@ use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 
 // --- SETUP ---
 
-interface KnownInterface
+interface Known
 {
 }
 
-class Some implements KnownInterface
+class Some implements Known
 {
     public function __construct(int $a, ?int $b, ?int $c)
     {
@@ -60,13 +59,13 @@ class Some implements KnownInterface
 
 class Subject
 {
-    public function __construct(string $argument, KnownInterface $some, Subject $otherSubject = null)
+    public function __construct(string $argument, Known $some, Subject $otherSubject = null)
     {
     }
 }
 
 $factory = new GenericDomainObjectFactory([
-    KnownInterface::class => Some::class,
+    Known::class => Some::class,
 ]);
 
 // Optionally set the factory to use for nested objects, or use the current factory by default.
@@ -75,8 +74,8 @@ $factory = new GenericDomainObjectFactory([
 // --- USAGE ---
 
 /** @var Some $object */
-$object = $factory->create(KnownInterface::class, ['a' => 1]);
-$factory->getClass(KnownInterface::class); // "Some"
+$object = $factory->create(Known::class, ['a' => 1]);
+$factory->getClass(Known::class); // "Some"
 
 /** @var Subject $object */
 $object = $factory->create(Subject::class, [

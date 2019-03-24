@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use MsgPhp\Domain\DomainIdInterface;
+use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\DomainIdTrait;
 
-interface SomeIdInterface extends DomainIdInterface
+interface EntityId extends DomainId
 {
 }
 
-class SomeId implements SomeIdInterface
+class ScalarEntityId implements EntityId
 {
     use DomainIdTrait;
 
@@ -19,13 +19,13 @@ class SomeId implements SomeIdInterface
 }
 
 $test = new class() {
-    public function accept(SomeIdInterface $id): void
+    public function accept(EntityId $id): void
     {
     }
 };
 
-$test->accept(SomeId::fromValue('id'));
-$test->accept($id = SomeId::fromValue('id'));
+$test->accept(ScalarEntityId::fromValue('id'));
+$test->accept($id = ScalarEntityId::fromValue('id'));
 
 // test it autocompletes
 //$id->auto

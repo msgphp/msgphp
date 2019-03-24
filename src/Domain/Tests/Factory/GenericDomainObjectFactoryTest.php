@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Factory;
 
 use MsgPhp\Domain\Exception\InvalidClassException;
-use MsgPhp\Domain\Factory\DomainObjectFactoryInterface;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\GenericDomainCollection;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
@@ -127,7 +127,7 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
     public function testNestedCreateWithNestedFactory(): void
     {
-        $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $nestedFactory = $this->createMock(DomainObjectFactory::class);
         $nestedFactory->expects(self::once())
             ->method('create')
             ->willReturn($nested = new TestObject(1, 2))
@@ -142,7 +142,7 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
     public function testNestedCreateWithInvalidNestedFactory(): void
     {
-        $nestedFactory = $this->createMock(DomainObjectFactoryInterface::class);
+        $nestedFactory = $this->createMock(DomainObjectFactory::class);
         $nestedFactory->expects(self::once())
             ->method('create')
             ->willThrowException(new \RuntimeException())

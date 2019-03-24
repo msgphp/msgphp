@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests;
 
-use MsgPhp\Domain\DomainCollectionInterface;
+use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\Exception\EmptyCollectionException;
 use MsgPhp\Domain\Exception\UnknownCollectionElementException;
 use MsgPhp\Domain\GenericDomainCollection;
@@ -192,7 +192,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
         \count($collection);
     }
 
-    protected static function createCollection(array $elements): DomainCollectionInterface
+    protected static function createCollection(array $elements): DomainCollection
     {
         return new GenericDomainCollection($elements);
     }

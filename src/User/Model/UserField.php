@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Model;
 
 use MsgPhp\User\User;
-use MsgPhp\User\UserIdInterface;
+use MsgPhp\User\UserId;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -22,7 +22,7 @@ trait UserField
         return $this->user;
     }
 
-    public function getUserId(): UserIdInterface
+    public function getUserId(): UserId
     {
         return $this->user->getId();
     }
