@@ -6,7 +6,7 @@ An overview of available infrastructural code when using Elasticsearch's [PHP Ap
 
 ## Projection Type Registry
 
-An Elasticsearch tailored [projection type registry](../projection/type-registry.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry`.
+An Elasticsearch tailored [projection type registry](../projection/type-registry.md) is provided by `MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry`.
 It works directly with any [`Client`][api-client] and a known configuration of type information.
 
 - `__construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)`
@@ -21,7 +21,7 @@ It works directly with any [`Client`][api-client] and a known configuration of t
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry;
+use MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry;
 use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---
@@ -59,8 +59,8 @@ $typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\DocumentMappingProviderInterface;
-use MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry;
+use MsgPhp\Domain\Infrastructure\Elasticsearch\DocumentMappingProviderInterface;
+use MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry;
 use MsgPhp\Domain\Projection\ProjectionInterface;
 
 // --- SETUP ---
@@ -94,7 +94,7 @@ $typeRegistry = new ProjectionTypeRegistry($client, 'some_index', [
 
 ## Projection Repository
 
-An Elasticsearch tailored [projection repository](../projection/repositories.md) is provided by `MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository`.
+An Elasticsearch tailored [projection repository](../projection/repositories.md) is provided by `MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionRepository`.
 It works directly with any [`Client`][api-client].
 
 - `__construct(Client $client, string $index)`
@@ -107,7 +107,7 @@ It works directly with any [`Client`][api-client].
 <?php
 
 use Elasticsearch\Client;
-use MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository;
+use MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionRepository;
 
 // --- SETUP ---
 

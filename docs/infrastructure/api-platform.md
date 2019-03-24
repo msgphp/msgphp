@@ -6,7 +6,7 @@ An overview of available infrastructural code when using [API Platform].
 
 ## Projection Data Provider
 
-When working with [projections](../projection/models.md) an [API Data Provider] is provided by `MsgPhp\Domain\Infra\ApiPlatform\ProjectionDataProvider`.
+When working with [projections](../projection/models.md) an [API Data Provider] is provided by `MsgPhp\Domain\Infrastructure\ApiPlatform\ProjectionDataProvider`.
 It uses any [projection repository](../projection/repositories.md) in an effort to provide API resources. 
 
 ### Minimal Configuration
@@ -21,7 +21,7 @@ api_platform:
 services:
     # ..
 .
-    MsgPhp\Domain\Infra\ApiPlatform\ProjectionDataProvider:
+    MsgPhp\Domain\Infrastructure\ApiPlatform\ProjectionDataProvider:
         tags: [api_platform.collection_data_provider]
         autowire: true
 ```

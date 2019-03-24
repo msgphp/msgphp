@@ -27,7 +27,7 @@
         </InvalidClass>
         <LessSpecificReturnStatement>
             <errorLevel type="info">
-                <file name="src/*/Infra/Doctrine/Repository/*Repository.php" />
+                <file name="src/*/Infrastructure/Doctrine/Repository/*Repository.php" />
             </errorLevel>
         </LessSpecificReturnStatement>
         <MethodSignatureMismatch>
@@ -50,7 +50,7 @@
         </MissingPropertyType>
         <MoreSpecificReturnType>
             <errorLevel type="info">
-                <file name="src/*/Infra/Doctrine/Repository/*Repository.php" />
+                <file name="src/*/Infrastructure/Doctrine/Repository/*Repository.php" />
             </errorLevel>
         </MoreSpecificReturnType>
         <PossiblyUndefinedMethod>

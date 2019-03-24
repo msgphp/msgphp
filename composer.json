@@ -2,14 +2,6 @@
     "name": "msgphp/msgphp",
     "description": "Combined MsgPHP package for CI purposes",
     "require": {
-        "msgphp/domain": "*",
-        "msgphp/eav": "*",
-        "msgphp/eav-bundle": "*",
-        "msgphp/user": "*",
-        "msgphp/user-bundle": "*",
-        "msgphp/user-eav": "*"
-    },
-    "require-dev": {
         "api-platform/core": "^2.2",
         "doctrine/doctrine-bundle": "^1.8",
         "doctrine/orm": "^2.6",
@@ -41,20 +33,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MsgPhp\\": "src/"
-        }
-    },
-    "autoload-dev": {
+            "MsgPhp\\": "src/",
+            "MsgPhp\\User\\": "src/UserEav/"
+        },
         "classmap": [
             "tests/",
-            "var/phpunit/phpunit-7.5/src"
+            "var/phpunit/phpunit-7.5/src/"
         ]
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "src/*"
-        }
-    ],
     "minimum-stability": "dev"
 }

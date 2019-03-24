@@ -65,7 +65,7 @@ $id->toString(); // "1"
 $emptyId->toString(); // ""
 ```
 
-### `MsgPhp\Domain\Infra\Uuid\DomainIdTrait`
+### `MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait`
 
 A UUID tailored domain identifier trait.
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures;
 
-use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
+use MsgPhp\Domain\Infrastructure\Doctrine\DomainIdType;
 
 class TestDomainIdType extends DomainIdType
 {

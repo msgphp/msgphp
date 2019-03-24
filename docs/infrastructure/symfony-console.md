@@ -7,7 +7,7 @@ An overview of available infrastructural code when using [Symfony Console][conso
 ## Commands
 
 Various standard [console commands] are available and can be used depending on implemented domain infrastructure. They
-are defined in the `MsgPhp\Domain\Infra\Console\Command\` namespace.
+are defined in the `MsgPhp\Domain\Infrastructure\Console\Command\` namespace.
 
 ### `InitializeProjectionTypesCommand`
 
@@ -28,7 +28,7 @@ bin/console projection:synchronize
 
 ## Context Factory
 
-A context factory is bound to `MsgPhp\Domain\Infra\Console\Context\ContextFactoryInterface`. Its purpose is to leverage
+A context factory is bound to `MsgPhp\Domain\Infrastructure\Console\Context\ContextFactoryInterface`. Its purpose is to leverage
 a CLI command in an effort to interactively built an arbitrary array value (the context).
 
 ### API
@@ -47,7 +47,7 @@ Any element value provided by `$values` takes precedence and should be used as-i
 
 ### Implementations
 
-#### `MsgPhp\Domain\Infra\Console\Context\ClassContextFactory`
+#### `MsgPhp\Domain\Infrastructure\Console\Context\ClassContextFactory`
 
 Factorizes a context based on any class method signature. It configures the CLI signature by mapping required class
 method arguments to command arguments, whereas optional ones are mapped to command options.
@@ -71,12 +71,12 @@ asked interactively. If interaction is not possible an exception will be thrown 
 
 ##### Customizing Context Elements
 
-Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactoryInterface`.
+Per-element configuration can be provided by implementing a `MsgPhp\Domain\Infrastructure\Console\Context\ClassContextElementFactoryInterface`.
 
 - `getElement(string $class, string $method, string $argument): ContextElement`
     - Get a custom [`ContextElement`][api-contextelement] to apply to a specific class/method/argument pair
 
-A default implementation is provided by `MsgPhp\Domain\Infra\Console\Context\ClassContextElementFactory` which simply
+A default implementation is provided by `MsgPhp\Domain\Infrastructure\Console\Context\ClassContextElementFactory` which simply
 transforms argument names to human readable values so that `$argumentName` becomes `Argument Name`.
 
 ##### Basic Example
@@ -84,7 +84,7 @@ transforms argument names to human readable values so that `$argumentName` becom
 ```php
 <?php
 
-use MsgPhp\Domain\Infra\Console\Context\ClassContextFactory;
+use MsgPhp\Domain\Infrastructure\Console\Context\ClassContextFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -133,7 +133,7 @@ class MyCommand extends Command
 // $ bin/console my-command [--option=OPTION] [--] [<argument>]
 ```
 
-#### `MsgPhp\Domain\Infra\Console\Context\DoctrineEntityContextFactory`
+#### `MsgPhp\Domain\Infrastructure\Console\Context\DoctrineEntityContextFactory`
 
 A [Doctrine](doctrine-orm.md) entity aware context factory. It decorates any context factory. Its purpose is to
 provide a discriminator value into the resulting context when working with [ORM inheritance].

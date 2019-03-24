@@ -58,7 +58,7 @@ Removes an entity from the identity map. The entity will be unavailable on any s
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`
+### `MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait`
 
 A Doctrine tailored repository trait.
 

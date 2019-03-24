@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace MsgPhp\EavBundle\DependencyInjection;
 
 use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\Domain\Infra\Config\NodeBuilder;
-use MsgPhp\Domain\Infra\Config\TreeBuilderHelper;
-use MsgPhp\Domain\Infra\DependencyInjection\ConfigHelper;
-use MsgPhp\Domain\Infra\DependencyInjection\PackageMetadata;
+use MsgPhp\Domain\Infrastructure\Config\NodeBuilder;
+use MsgPhp\Domain\Infrastructure\Config\TreeBuilderHelper;
+use MsgPhp\Domain\Infrastructure\DependencyInjection\ConfigHelper;
+use MsgPhp\Domain\Infrastructure\DependencyInjection\PackageMetadata;
 use MsgPhp\Eav\Attribute;
 use MsgPhp\Eav\AttributeIdInterface;
 use MsgPhp\Eav\AttributeValue;
 use MsgPhp\Eav\AttributeValueIdInterface;
 use MsgPhp\Eav\Command;
-use MsgPhp\Eav\Infra\Doctrine as DoctrineInfra;
-use MsgPhp\Eav\Infra\Uuid as UuidInfra;
+use MsgPhp\Eav\Infrastructure\Doctrine as DoctrineInfrastructure;
+use MsgPhp\Eav\Infrastructure\Uuid as UuidInfrastructure;
 use MsgPhp\Eav\ScalarAttributeId;
 use MsgPhp\Eav\ScalarAttributeValueId;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -30,20 +30,20 @@ final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
     public const DOCTRINE_TYPE_MAPPING = [
-        AttributeIdInterface::class => DoctrineInfra\Type\AttributeIdType::class,
-        AttributeValueIdInterface::class => DoctrineInfra\Type\AttributeValueIdType::class,
+        AttributeIdInterface::class => DoctrineInfrastructure\Type\AttributeIdType::class,
+        AttributeValueIdInterface::class => DoctrineInfrastructure\Type\AttributeValueIdType::class,
     ];
     public const DOCTRINE_REPOSITORY_MAPPING = [
-        Attribute::class => DoctrineInfra\Repository\AttributeRepository::class,
+        Attribute::class => DoctrineInfrastructure\Repository\AttributeRepository::class,
     ];
     private const ID_TYPE_MAPPING = [
         AttributeIdInterface::class => [
             'scalar' => ScalarAttributeId::class,
-            'uuid' => UuidInfra\AttributeUuid::class,
+            'uuid' => UuidInfrastructure\AttributeUuid::class,
         ],
         AttributeValueIdInterface::class => [
             'scalar' => ScalarAttributeValueId::class,
-            'uuid' => UuidInfra\AttributeValueUuid::class,
+            'uuid' => UuidInfrastructure\AttributeValueUuid::class,
         ],
     ];
     private const COMMAND_MAPPING = [

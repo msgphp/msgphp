@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle\DependencyInjection\Compiler;
 
-use MsgPhp\Domain\Infra\DependencyInjection\ContainerHelper;
+use MsgPhp\Domain\Infrastructure\DependencyInjection\ContainerHelper;
 use MsgPhp\Eav\Command;
 use MsgPhp\Eav\Repository;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

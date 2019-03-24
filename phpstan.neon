@@ -21,24 +21,24 @@ parameters:
             path: src/Domain/Tests/GenericDomainCollectionTest.php
         # https://github.com/phpstan/phpstan-phpunit/issues/31
         -
-            message: '#Parameter \#1 \$encoder of class MsgPhp\\User\\Infra\\Security\\PasswordHashing constructor expects Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
-            path: src/User/Tests/Infra/Security/PasswordHashingTest.php
+            message: '#Parameter \#1 \$encoder of class MsgPhp\\User\\Infrastructure\\Security\\PasswordHashing constructor expects Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
+            path: src/User/Tests/Infrastructure/Security/PasswordHashingTest.php
 
         # deprecated
         -
             message: '#Call to deprecated method toString\(\) of class Ramsey\\Uuid\\UuidInterface\.#'
-            path: src/Domain/Infra/Uuid/DomainIdTrait.php
+            path: src/Domain/Infrastructure/Uuid/DomainIdTrait.php
         -
             message: '#Call to deprecated method getRoles\(\) of class Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface\.#'
-            path: src/User/Infra/Security/DataCollector.php
+            path: src/User/Infrastructure/Security/DataCollector.php
 
         # msgphp
-        - '#Method MsgPhp\\.+\\Infra\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\.+ but returns object\.#'
+        - '#Method MsgPhp\\.+\\Infrastructure\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\.+ but returns object\.#'
         - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Target)?\(\) expects MsgPhp\\.+\\Command\\.+Command, object given\.#'
-        - '#Return type \(MsgPhp\\Domain\\Infra\\Config\\ClassMappingNode\) of method MsgPhp\\Domain\\Infra\\Config\\ClassMappingNodeDefinition::instantiateNode\(\) should be compatible with return type \(Symfony\\Component\\Config\\Definition\\VariableNode\) of method Symfony\\Component\\Config\\Definition\\Builder\\VariableNodeDefinition::instantiateNode\(\)#'
+        - '#Return type \(MsgPhp\\Domain\\Infrastructure\\Config\\ClassMappingNode\) of method MsgPhp\\Domain\\Infrastructure\\Config\\ClassMappingNodeDefinition::instantiateNode\(\) should be compatible with return type \(Symfony\\Component\\Config\\Definition\\VariableNode\) of method Symfony\\Component\\Config\\Definition\\Builder\\VariableNodeDefinition::instantiateNode\(\)#'
         - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
-        - '#Method MsgPhp\\Domain\\Infra\\Elasticsearch\\ProjectionTypeRegistry::all\(\) should return array<string> but returns array<int\|string>.#'
-        - '#Property MsgPhp\\Domain\\Infra\\Elasticsearch\\ProjectionTypeRegistry::\$types \(array<string>\|null\) does not accept array<int, int\|string>.#'
+        - '#Method MsgPhp\\Domain\\Infrastructure\\Elasticsearch\\ProjectionTypeRegistry::all\(\) should return array<string> but returns array<int\|string>.#'
+        - '#Property MsgPhp\\Domain\\Infrastructure\\Elasticsearch\\ProjectionTypeRegistry::\$types \(array<string>\|null\) does not accept array<int, int\|string>.#'
 
         # msgphp tests
         - '#Class MsgPhp\\Domain\\Tests\\Factory\\TestUnknownObject not found\.#'

@@ -6,7 +6,7 @@ An overview of available infrastructural code when using Doctrine's [Object Rela
 
 ## Domain Repository
 
-A Doctrine tailored [repository trait](../ddd/repositories.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait`.
+A Doctrine tailored [repository trait](../ddd/repositories.md) is provided by `MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait`.
 
 ### Basic Example
 
@@ -15,7 +15,7 @@ A Doctrine tailored [repository trait](../ddd/repositories.md) is provided by `M
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\Infra\Doctrine\DomainEntityRepositoryTrait;
+use MsgPhp\Domain\Infrastructure\Doctrine\DomainEntityRepositoryTrait;
 
 // --- SETUP ---
 
@@ -61,7 +61,7 @@ if ($repository->exists($id = ['name' => ..., 'year' => ...])) {
 ## Domain Object Factory
 
 A Doctrine tailored [object factory](../ddd/object-factory.md) is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainObjectFactory`.
+`MsgPhp\Domain\Infrastructure\Doctrine\DomainObjectFactory`.
 
 When working with [ORM inheritance] the discriminator field can be provided to factorize a specific entity type.
 
@@ -73,7 +73,7 @@ When working with [ORM inheritance] the discriminator field can be provided to f
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
-use MsgPhp\Domain\Infra\Doctrine\DomainObjectFactory;
+use MsgPhp\Domain\Infrastructure\Doctrine\DomainObjectFactory;
 
 // --- SETUP ---
 
@@ -129,8 +129,8 @@ To overcome, two hydration modes are available to hydrate the primitive identifi
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\Infra\Doctrine\Hydration\ScalarHydrator;
-use MsgPhp\Domain\Infra\Doctrine\Hydration\SingleScalarHydrator;
+use MsgPhp\Domain\Infrastructure\Doctrine\Hydration\ScalarHydrator;
+use MsgPhp\Domain\Infrastructure\Doctrine\Hydration\SingleScalarHydrator;
 
 // --- SETUP ---
 

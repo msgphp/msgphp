@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\EavBundle;
 
-use MsgPhp\Domain\Infra\DependencyInjection\BundleHelper;
+use MsgPhp\Domain\Infrastructure\DependencyInjection\BundleHelper;
 use MsgPhp\EavBundle\DependencyInjection\Compiler\CleanupPass;
 use MsgPhp\EavBundle\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;

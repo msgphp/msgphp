@@ -163,7 +163,7 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
 
 A first class citizen paginated domain collection to transform any collection into a paginated collection.
 
-### `MsgPhp\Domain\Infra\Doctrine\DomainCollection`
+### `MsgPhp\Domain\Infrastructure\Doctrine\DomainCollection`
 
 A Doctrine tailored domain collection.
 

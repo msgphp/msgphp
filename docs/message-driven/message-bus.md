@@ -11,7 +11,7 @@ Dispatches the given message object.
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Messenger\DomainMessageBus`
+### `MsgPhp\Domain\Infrastructure\Messenger\DomainMessageBus`
 
 A Symfony Messenger tailored domain message bus.
 

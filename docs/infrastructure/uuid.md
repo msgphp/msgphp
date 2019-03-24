@@ -6,7 +6,7 @@ An overview of available infrastructural code when working with [UUIDs][uuid].
 
 ## Domain Identifier
 
-A UUID tailored [domain identifier](../ddd/identifiers.md) trait is provided by `MsgPhp\Domain\Infra\Uuid\DomainIdTrait`.
+A UUID tailored [domain identifier](../ddd/identifiers.md) trait is provided by `MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait`.
 
 ### Basic Example
 
@@ -14,7 +14,7 @@ A UUID tailored [domain identifier](../ddd/identifiers.md) trait is provided by 
 <?php
 
 use MsgPhp\Domain\DomainIdInterface;
-use MsgPhp\Domain\Infra\Uuid\DomainIdTrait;
+use MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait;
 use Ramsey\Uuid\Uuid;
 
 // --- SETUP ---

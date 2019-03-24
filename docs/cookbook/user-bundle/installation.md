@@ -135,7 +135,7 @@ msgphp_user:
         MsgPhp\User\UserIdInterface: uuid # uuid_binary, uuid_binary_ordered_time
 ```
 
-This changes the default implementation used by MsgPHP to `MsgPhp\User\Infra\Uuid\UserId`, a sub class of the default [UUID domain identifier](../../infrastructure/uuid.md#domain-identifier).
+This changes the default implementation used by MsgPHP to `MsgPhp\User\Infrastructure\Uuid\UserId`, a sub class of the default [UUID domain identifier](../../infrastructure/uuid.md#domain-identifier).
 
 [Composer]: https://getcomposer.org
 [Symfony Flex]: https://symfony.com/doc/current/setup/flex.html

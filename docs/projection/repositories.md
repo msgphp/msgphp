@@ -35,7 +35,7 @@ Deletes a projection document by type and ID. The document will be unavailable o
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Elasticsearch\ProjectionRepository`
+### `MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionRepository`
 
 An Elasticsearch tailored projection repository.
 

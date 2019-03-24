@@ -7,7 +7,7 @@ An overview of available infrastructural code when using Doctrine's [Database Ab
 ## Domain Identifier Type
 
 A translation between the database type and an [identifier](../ddd/identifiers.md) type in PHP is provided by
-`MsgPhp\Domain\Infra\Doctrine\DomainIdType`.
+`MsgPhp\Domain\Infrastructure\Doctrine\DomainIdType`.
 
 ### Basic Example
 
@@ -15,7 +15,7 @@ A translation between the database type and an [identifier](../ddd/identifiers.m
 <?php
 
 use Doctrine\DBAL\Types\Type;
-use MsgPhp\Domain\Infra\Doctrine\DomainIdType;
+use MsgPhp\Domain\Infrastructure\Doctrine\DomainIdType;
 
 // --- SETUP ---
 

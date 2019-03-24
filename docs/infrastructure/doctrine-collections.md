@@ -6,7 +6,7 @@ An overview of available infrastructural code when using Doctrine's [Collections
 
 ## Domain Collection
 
-A Doctrine tailored [domain collection](../ddd/collections.md) is provided by `MsgPhp\Domain\Infra\Doctrine\DomainCollection`.
+A Doctrine tailored [domain collection](../ddd/collections.md) is provided by `MsgPhp\Domain\Infrastructure\Doctrine\DomainCollection`.
 
 ### Basic Example
 
@@ -14,7 +14,7 @@ A Doctrine tailored [domain collection](../ddd/collections.md) is provided by `M
 <?php
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MsgPhp\Domain\Infra\Doctrine\DomainCollection;
+use MsgPhp\Domain\Infrastructure\Doctrine\DomainCollection;
 
 // --- SETUP ---
 

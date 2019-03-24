@@ -24,7 +24,7 @@ Destroys the type registry and thus requires to be re-initialized after.
 
 ## Implementations
 
-### `MsgPhp\Domain\Infra\Elasticsearch\ProjectionTypeRegistry`
+### `MsgPhp\Domain\Infrastructure\Elasticsearch\ProjectionTypeRegistry`
 
 An Elasticsearch tailored projection type registry.
 
