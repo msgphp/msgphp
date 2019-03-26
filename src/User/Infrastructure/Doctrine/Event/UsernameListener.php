@@ -6,10 +6,8 @@ namespace MsgPhp\User\Infrastructure\Doctrine\Event;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Mapping\MappingException;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\User;
 use MsgPhp\User\Username;
@@ -48,23 +46,6 @@ final class UsernameListener
         $this->mapping = $mapping;
     }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
-    {
-        $metadata = $event->getClassMetadata();
-
-        if (!isset($this->mapping[$metadata->getName()])) {
-            return;
-        }
-
-        try {
-            $metadata->addEntityListener('prePersist', self::class, 'add');
-            $metadata->addEntityListener('preUpdate', self::class, 'update');
-            $metadata->addEntityListener('preRemove', self::class, 'remove');
-        } catch (MappingException $e) {
-            // duplicate
-        }
-    }
-
     public function preFlush(PreFlushEventArgs $event): void
     {
         $em = $event->getEntityManager();
@@ -88,7 +69,7 @@ final class UsernameListener
     /**
      * @param object $entity
      */
-    public function add($entity, LifecycleEventArgs $event): void
+    public function prePersist($entity, LifecycleEventArgs $event): void
     {
         $em = $event->getEntityManager();
 
@@ -100,7 +81,7 @@ final class UsernameListener
     /**
      * @param object $entity
      */
-    public function update($entity, PreUpdateEventArgs $event): void
+    public function preUpdate($entity, PreUpdateEventArgs $event): void
     {
         $em = $event->getEntityManager();
 
@@ -129,7 +110,7 @@ final class UsernameListener
     /**
      * @param object $entity
      */
-    public function remove($entity, LifecycleEventArgs $event): void
+    public function preRemove($entity, LifecycleEventArgs $event): void
     {
         $em = $event->getEntityManager();
         $metadata = $em->getClassMetadata(\get_class($entity));
@@ -168,16 +149,19 @@ final class UsernameListener
      */
     private function getMapping($entity, EntityManagerInterface $em): array
     {
-        $metadata = $em->getClassMetadata(\get_class($entity));
-        $class = $metadata->getName();
-
-        if (isset($this->mapping[$class])) {
+        if (isset($this->mapping[$class = \get_class($entity)])) {
             return $this->mapping[$class];
         }
 
-        foreach ($metadata->parentClasses as $parent) {
-            if (isset($this->mapping[$parent])) {
-                return $this->mapping[$parent];
+        $metadata = $em->getClassMetadata($class);
+
+        if (isset($this->mapping[$realClass = $metadata->getName()])) {
+            return $this->mapping[$realClass];
+        }
+
+        foreach ($metadata->parentClasses as $parentClass) {
+            if (isset($this->mapping[$parentClass])) {
+                return $this->mapping[$parentClass];
             }
         }
 
