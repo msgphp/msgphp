@@ -42,12 +42,8 @@ final class DeleteRoleCommand extends RoleCommand
         $this->io = new SymfonyStyle($input, $output);
         $roleName = $this->getRole($input, $this->io)->getName();
 
-        if ($input->isInteractive()) {
-            $this->io->note('Deleting role '.$roleName);
-
-            if (!$this->io->confirm('Are you sure?')) {
-                return 0;
-            }
+        if ($input->isInteractive() && !$this->io->confirm('Are you sure you want to delete <comment>'.$roleName.'</comment>?')) {
+            return 0;
         }
 
         $this->dispatch(DeleteRole::class, compact('roleName'));

@@ -60,7 +60,7 @@ final class SynchronizeUsernamesCommand extends Command
                 $this->repository->save($username);
             }
 
-            $rows[] = sprintf('Added username <info>%s</info> for user <info>%s</info>', $usernameValue, $username->getUser()->getId()->toString());
+            $rows[] = 'Added username <info>'.$usernameValue.'</info> for user <info>'.$username->getUser()->getId()->toString().'</info>';
             ++$added;
         }
 
@@ -69,7 +69,7 @@ final class SynchronizeUsernamesCommand extends Command
                 $this->repository->delete($unknownUsername);
             }
 
-            $rows[] = sprintf('Deleted username <info>%s</info> from user <info>%s</info>', (string) $unknownUsername, $unknownUsername->getUser()->getId()->toString());
+            $rows[] = 'Deleted username <info>'.$unknownUsername.'</info> from user <info>'.$unknownUsername->getUser()->getId()->toString().'</info>';
             ++$deleted;
         }
 

@@ -14,10 +14,7 @@ abstract class User
 {
     abstract public function getId(): UserId;
 
-    /**
-     * @return Credential
-     */
-    public function getCredential()
+    public function getCredential(): Credential
     {
         return new Anonymous();
     }

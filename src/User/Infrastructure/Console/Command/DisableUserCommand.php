@@ -26,7 +26,7 @@ final class DisableUserCommand extends UserCommand
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserDisabled) {
-            $this->io->success('Disabled user '.$message->user->getCredential()->getUsername());
+            $this->io->success('Disabled user '.self::getUsername($message->user));
         }
     }
 

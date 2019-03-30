@@ -48,7 +48,7 @@ final class CreateUserCommand extends Command implements MessageReceiving
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserCreated) {
-            $this->io->success('Created user '.$message->user->getCredential()->getUsername());
+            $this->io->success('Created user '.UserCommand::getUsername($message->user));
         }
     }
 

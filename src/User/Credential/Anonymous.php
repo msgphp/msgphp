@@ -15,14 +15,4 @@ final class Anonymous implements Credential
     {
         throw new \BadMethodCallException('An anonymous credential cannot be changed.');
     }
-
-    public static function getUsernameField(): string
-    {
-        throw new \BadMethodCallException('An anonymous credential has no username field.');
-    }
-
-    public function getUsername(): string
-    {
-        throw new \BadMethodCallException('An anonymous credential has no username.');
-    }
 }

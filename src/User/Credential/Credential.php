@@ -12,8 +12,4 @@ use MsgPhp\User\Event\Domain\ChangeCredential;
 interface Credential
 {
     public function __invoke(ChangeCredential $event): bool;
-
-    public static function getUsernameField(): string;
-
-    public function getUsername(): string;
 }

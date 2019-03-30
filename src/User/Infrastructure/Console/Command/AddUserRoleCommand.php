@@ -49,7 +49,7 @@ final class AddUserRoleCommand extends UserRoleCommand
             $this->io->success('Created role '.$message->role->getName());
         }
         if ($message instanceof UserRoleAdded) {
-            $this->io->success(sprintf('Added role %s to user %s', $message->userRole->getRoleName(), $message->userRole->getUser()->getCredential()->getUsername()));
+            $this->io->success('Added role '.$message->userRole->getRoleName().' to user '.self::getUsername($message->userRole->getUser()));
         }
     }
 
@@ -75,7 +75,7 @@ final class AddUserRoleCommand extends UserRoleCommand
                 throw new \UnexpectedValueException('Role name must be a string.');
             }
 
-            if (!$input->isInteractive() || !$this->io->confirm(sprintf('Role "%s" does not exists. Create it now?', $roleName))) {
+            if (!$input->isInteractive() || !$this->io->confirm('Role <comment>'.$roleName.'</comment> does not exists. Create it now?')) {
                 throw $e;
             }
 
@@ -86,7 +86,7 @@ final class AddUserRoleCommand extends UserRoleCommand
             ]), $this->io);
 
             if (0 !== $result) {
-                throw new \RuntimeException(sprintf('Cannot create role "%s". Something went wrong.', $roleName));
+                throw new \RuntimeException('Cannot create role "'.$roleName.'". Something went wrong.');
             }
 
             $role = $this->getRole($input, $this->io);

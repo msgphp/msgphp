@@ -26,7 +26,7 @@ final class ConfirmUserCommand extends UserCommand
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserConfirmed) {
-            $this->io->success('Confirmed user '.$message->user->getCredential()->getUsername());
+            $this->io->success('Confirmed user '.self::getUsername($message->user));
         }
     }
 

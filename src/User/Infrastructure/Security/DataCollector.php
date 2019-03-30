@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\User\Credential\UsernameCredential;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\UserId;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector as BaseDataCollector;
@@ -80,9 +81,13 @@ final class DataCollector extends BaseDataCollector
         }
 
         try {
-            return $this->repository->find($id)->getCredential()->getUsername();
+            $credential = $this->repository->find($id)->getCredential();
+            if ($credential instanceof UsernameCredential) {
+                return $credential->getUsername();
+            }
         } catch (EntityNotFoundException $e) {
-            return $id->toString();
         }
+
+        return $id->toString();
     }
 }

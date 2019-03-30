@@ -9,7 +9,7 @@ use MsgPhp\User\Event\Domain\ChangeCredential;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class Token implements Credential
+final class Token implements UsernameCredential
 {
     /**
      * @var string

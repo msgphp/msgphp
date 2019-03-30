@@ -16,6 +16,11 @@ trait PasswordProtection
      */
     private $password;
 
+    public static function getPasswordField(): string
+    {
+        return 'password';
+    }
+
     public function getPassword(): string
     {
         return $this->password;

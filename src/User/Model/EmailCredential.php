@@ -18,11 +18,6 @@ trait EmailCredential
      */
     private $credential;
 
-    public function getCredential(): Email
-    {
-        return $this->credential;
-    }
-
     public function getEmail(): string
     {
         return $this->credential->getUsername();

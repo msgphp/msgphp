@@ -109,6 +109,7 @@ final class ObjectMappingListener
                 unset($info['type']);
                 $metadata->{$method}($info);
 
+                /** @see ClassMetadataFactory::doLoadMetadata() */
                 if ('mapEmbedded' === $method) {
                     $embeddableMetadata = $this->getMetadata($info['class']);
 

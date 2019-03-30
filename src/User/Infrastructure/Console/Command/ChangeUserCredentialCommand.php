@@ -48,7 +48,7 @@ final class ChangeUserCredentialCommand extends UserCommand
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserCredentialChanged) {
-            $this->io->success('Changed user credential for '.$message->user->getCredential()->getUsername());
+            $this->io->success('Changed user credential for '.self::getUsername($message->user));
 
             $rows = [];
             $changes = array_diff((array) $message->newCredential, $oldValues = (array) $message->oldCredential);

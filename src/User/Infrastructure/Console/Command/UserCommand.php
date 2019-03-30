@@ -8,6 +8,7 @@ use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\Domain\Message\MessageReceiving;
+use MsgPhp\User\Credential\UsernameCredential;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 use MsgPhp\User\UserId;
@@ -43,6 +44,13 @@ abstract class UserCommand extends Command implements MessageReceiving
 
     public function onMessageReceived($message): void
     {
+    }
+
+    final public static function getUsername(User $user): string
+    {
+        $credential = $user->getCredential();
+
+        return $credential instanceof UsernameCredential ? $credential->getUsername() : $user->getId()->toString();
     }
 
     protected function configure(): void

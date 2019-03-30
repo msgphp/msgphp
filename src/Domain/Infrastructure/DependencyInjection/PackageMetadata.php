@@ -42,7 +42,9 @@ final class PackageMetadata
             if (null !== $baseDir) {
                 $dir .= '/'.$baseDir;
             }
-            $finder->append(new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::CURRENT_AS_PATHNAME));
+            if (is_dir($dir)) {
+                $finder->append(new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::CURRENT_AS_PATHNAME));
+            }
         }
 
         return $finder;

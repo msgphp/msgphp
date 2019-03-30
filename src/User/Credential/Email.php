@@ -9,7 +9,7 @@ use MsgPhp\User\Event\Domain\ChangeCredential;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class Email implements Credential
+final class Email implements UsernameCredential
 {
     use EmailAsUsername;
 

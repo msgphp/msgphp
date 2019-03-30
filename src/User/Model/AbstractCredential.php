@@ -17,12 +17,13 @@ trait AbstractCredential
      */
     private $credential;
 
+    public function getCredential(): Credential
+    {
+        return $this->credential;
+    }
+
     private function onChangeCredentialEvent(ChangeCredential $event): bool
     {
-        if (!\is_callable($this->credential)) {
-            throw new \LogicException(sprintf('Credential "%s" must be an invokable to apply event "%s".', \get_class($this->credential), \get_class($event)));
-        }
-
         return ($this->credential)($event);
     }
 }

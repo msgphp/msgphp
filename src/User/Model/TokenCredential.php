@@ -18,11 +18,6 @@ trait TokenCredential
      */
     private $credential;
 
-    public function getCredential(): Token
-    {
-        return $this->credential;
-    }
-
     public function getToken(): string
     {
         return $this->credential->getUsername();

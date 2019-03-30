@@ -18,11 +18,6 @@ trait NicknameCredential
      */
     private $credential;
 
-    public function getCredential(): Nickname
-    {
-        return $this->credential;
-    }
-
     public function getNickname(): string
     {
         return $this->credential->getUsername();

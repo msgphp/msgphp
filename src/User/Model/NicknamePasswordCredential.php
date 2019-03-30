@@ -11,18 +11,15 @@ use MsgPhp\User\Credential\NicknamePassword;
  */
 trait NicknamePasswordCredential
 {
-    use AbstractPasswordCredential;
-    use NicknameCredential {
-        NicknameCredential::onChangeCredentialEvent insteadof AbstractPasswordCredential;
-    }
+    use NicknameCredential;
 
     /**
      * @var NicknamePassword
      */
     private $credential;
 
-    public function getCredential(): NicknamePassword
+    public function getPassword(): string
     {
-        return $this->credential;
+        return $this->credential->getPassword();
     }
 }

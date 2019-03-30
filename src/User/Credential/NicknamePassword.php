@@ -9,7 +9,7 @@ use MsgPhp\User\Event\Domain\ChangeCredential;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class NicknamePassword implements PasswordProtectedCredential
+final class NicknamePassword implements UsernameCredential, PasswordProtectedCredential
 {
     use NicknameAsUsername;
     use PasswordProtection;

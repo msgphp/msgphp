@@ -11,18 +11,15 @@ use MsgPhp\User\Credential\EmailPassword;
  */
 trait EmailPasswordCredential
 {
-    use AbstractPasswordCredential;
-    use EmailCredential {
-        EmailCredential::onChangeCredentialEvent insteadof AbstractPasswordCredential;
-    }
+    use EmailCredential;
 
     /**
      * @var EmailPassword
      */
     private $credential;
 
-    public function getCredential(): EmailPassword
+    public function getPassword(): string
     {
-        return $this->credential;
+        return $this->credential->getPassword();
     }
 }

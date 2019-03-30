@@ -26,7 +26,7 @@ final class DeleteUserCommand extends UserCommand
     public function onMessageReceived($message): void
     {
         if ($message instanceof UserDeleted) {
-            $this->io->success('Deleted user '.$message->user->getCredential()->getUsername());
+            $this->io->success('Deleted user '.self::getUsername($message->user));
         }
     }
 
@@ -43,12 +43,8 @@ final class DeleteUserCommand extends UserCommand
         $user = $this->getUser($input, $this->io);
         $userId = $user->getId();
 
-        if ($input->isInteractive()) {
-            $this->io->note('Deleting user '.$user->getCredential()->getUsername().' with ID '.$userId->toString());
-
-            if (!$this->io->confirm('Are you sure?')) {
-                return 0;
-            }
+        if ($input->isInteractive() && !$this->io->confirm('Are you sure you want to delete <comment>'.self::getUsername($user).'</comment>?')) {
+            return 0;
         }
 
         $this->dispatch(DeleteUser::class, compact('userId'));
