@@ -32,7 +32,7 @@ trait CanBeEnabled
         $this->enabled = false;
     }
 
-    private function handleEnableEvent(Enable $event): bool
+    private function onEnableEvent(Enable $event): bool
     {
         if (!$this->enabled) {
             $this->enable();
@@ -43,7 +43,7 @@ trait CanBeEnabled
         return false;
     }
 
-    private function handleDisableEvent(Disable $event): bool
+    private function onDisableEvent(Disable $event): bool
     {
         if ($this->enabled) {
             $this->disable();

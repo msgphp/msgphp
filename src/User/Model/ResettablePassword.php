@@ -43,7 +43,7 @@ trait ResettablePassword
         $this->passwordRequestedAt = null;
     }
 
-    private function handleRequestPasswordEvent(RequestPassword $event): bool
+    private function onRequestPasswordEvent(RequestPassword $event): bool
     {
         if (null === $event->token || $event->token !== $this->passwordResetToken) {
             $this->requestPassword($event->token);

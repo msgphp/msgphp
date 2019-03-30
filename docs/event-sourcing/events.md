@@ -42,5 +42,5 @@ $entity->isEnabled(); // true
 ```
 
 !!! note
-    Because `CanBeEnabled` defines `handleEnableEvent(EnableEvent $event)` it's detected in `DomainEventHandlerTrait::handleEvent()`
+    Because `CanBeEnabled` defines `onEnableEvent(Enable $event)` it's detected in `DomainEventHandlerTrait::handleEvent()`
     by convention

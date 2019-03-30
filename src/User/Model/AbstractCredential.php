@@ -17,7 +17,7 @@ trait AbstractCredential
      */
     private $credential;
 
-    private function handleChangeCredentialEvent(ChangeCredential $event): bool
+    private function onChangeCredentialEvent(ChangeCredential $event): bool
     {
         if (!\is_callable($this->credential)) {
             throw new \LogicException(sprintf('Credential "%s" must be an invokable to apply event "%s".', \get_class($this->credential), \get_class($event)));

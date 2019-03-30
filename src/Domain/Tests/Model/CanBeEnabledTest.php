@@ -37,9 +37,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(false);
 
-        self::assertTrue($object->handleEnableEvent(new Enable()));
+        self::assertTrue($object->onEnableEvent(new Enable()));
         self::assertTrue($object->isEnabled());
-        self::assertFalse($object->handleEnableEvent(new Enable()));
+        self::assertFalse($object->onEnableEvent(new Enable()));
         self::assertTrue($object->isEnabled());
     }
 
@@ -47,9 +47,9 @@ final class CanBeEnabledTest extends TestCase
     {
         $object = $this->getObject(true);
 
-        self::assertTrue($object->handleDisableEvent(new Disable()));
+        self::assertTrue($object->onDisableEvent(new Disable()));
         self::assertFalse($object->isEnabled());
-        self::assertFalse($object->handleDisableEvent(new Disable()));
+        self::assertFalse($object->onDisableEvent(new Disable()));
         self::assertFalse($object->isEnabled());
     }
 
@@ -60,8 +60,8 @@ final class CanBeEnabledTest extends TestCase
     {
         return new class($value) {
             use CanBeEnabled {
-                handleDisableEvent as public;
-                handleEnableEvent as public;
+                onDisableEvent as public;
+                onEnableEvent as public;
             }
 
             public function __construct($value)

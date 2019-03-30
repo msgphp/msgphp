@@ -21,8 +21,7 @@ yes or no.
 
 ### `MsgPhp\Domain\Event\DomainEventHandlerTrait`
 
-A utility trait implementing the event handler API. By convention it maps events to
-`handle<Event_Class_Name_Without_Event_Suffix>Event()` methods.
+A utility trait implementing the event handler API. By convention it maps events to methods named `on<EventClassName>Event()`.
 
 #### Basic Example
 
@@ -35,7 +34,7 @@ use MsgPhp\Domain\Event\DomainEventHandlerTrait;
 
 // --- SETUP ---
 
-class MyDomainEvent implements DomainEvent
+class ChangeValue implements DomainEvent
 {
     public $newValue;
     
@@ -51,14 +50,14 @@ class MyEntity implements DomainEventHandler
     
     public $value;
     
-    private function handleMyDomainEvent(MyDomainEvent $event): bool
+    private function onChangeValueEvent(ChangeValue $event): bool
     {
         if ($this->value === $event->newValue) {
             return false;
         }
 
         $this->value = $event->newValue;
-        
+
         return true;
     }
     
@@ -68,7 +67,7 @@ class MyEntity implements DomainEventHandler
 
 $entity = new MyEntity();
 
-if ($entity->handleEvent(new MyDomainEvent('new value'))) {
+if ($entity->handleEvent(new ChangeValue('new value'))) {
     // do something
 }
 ```

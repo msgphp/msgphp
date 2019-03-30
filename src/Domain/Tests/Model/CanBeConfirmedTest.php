@@ -25,15 +25,15 @@ final class CanBeConfirmedTest extends TestCase
         self::assertTrue($object->isConfirmed());
     }
 
-    public function testHandleConfirmEvent(): void
+    public function testOnConfirmEvent(): void
     {
         $object = $this->getObject('foo', null);
 
-        self::assertTrue($object->handleConfirmEvent(new Confirm()));
+        self::assertTrue($object->onConfirmEvent(new Confirm()));
         self::assertNull($prevToken = $object->getConfirmationToken());
         self::assertInstanceOf(\DateTimeImmutable::class, $object->getConfirmedAt());
         self::assertTrue($object->isConfirmed());
-        self::assertFalse($object->handleConfirmEvent(new Confirm()));
+        self::assertFalse($object->onConfirmEvent(new Confirm()));
         self::assertTrue($object->isConfirmed());
     }
 
@@ -44,7 +44,7 @@ final class CanBeConfirmedTest extends TestCase
     {
         return new class($confirmationToken, $confirmedAt) {
             use CanBeConfirmed {
-                handleConfirmEvent as public;
+                onConfirmEvent as public;
             }
 
             public function __construct($confirmationToken, $confirmedAt)
