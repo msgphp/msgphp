@@ -64,6 +64,7 @@
         <UndefinedClass>
             <errorLevel type="suppress">
                 <referencedClass name="MsgPhp\Domain\Tests\Factory\TestUnknownObject" />
+                <referencedClass name="MsgPhp_Test_Action" />
             </errorLevel>
         </UndefinedClass>
     </issueHandlers>

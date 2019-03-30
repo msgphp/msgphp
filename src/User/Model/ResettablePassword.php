@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Model;
 
+use MsgPhp\User\Event\Domain\CancelPasswordRequest;
 use MsgPhp\User\Event\Domain\RequestPassword;
 
 /**
@@ -37,7 +38,7 @@ trait ResettablePassword
         $this->passwordRequestedAt = new \DateTimeImmutable();
     }
 
-    public function clearPasswordRequest(): void
+    public function cancelPasswordRequest(): void
     {
         $this->passwordResetToken = null;
         $this->passwordRequestedAt = null;
@@ -45,12 +46,19 @@ trait ResettablePassword
 
     private function onRequestPasswordEvent(RequestPassword $event): bool
     {
-        if (null === $event->token || $event->token !== $this->passwordResetToken) {
-            $this->requestPassword($event->token);
+        $this->requestPassword($event->token);
 
-            return true;
+        return true;
+    }
+
+    private function onCancelPasswordRequestEvent(CancelPasswordRequest $event): bool
+    {
+        if (null === $this->passwordRequestedAt) {
+            return false;
         }
 
-        return false;
+        $this->cancelPasswordRequest();
+
+        return true;
     }
 }
