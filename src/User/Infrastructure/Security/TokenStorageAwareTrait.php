@@ -35,7 +35,7 @@ trait TokenStorageAwareTrait
     {
         $token = $this->tokenStorage->getToken();
 
-        return null !== $token && $token->getUser() instanceof SecurityUser;
+        return null !== $token && $token->getUser() instanceof UserIdentity;
     }
 
     private function toUser(): ?User
@@ -44,12 +44,12 @@ trait TokenStorageAwareTrait
             return null;
         }
 
-        $user = $token->getUser();
+        $identity = $token->getUser();
 
-        if (!$user instanceof SecurityUser) {
+        if (!$identity instanceof UserIdentity) {
             return null;
         }
 
-        return $this->repository->find($user->getUserId());
+        return $this->repository->find($identity->getUserId());
     }
 }

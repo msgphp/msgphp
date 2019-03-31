@@ -28,12 +28,12 @@ final class HashingFactory implements EncoderFactoryInterface
         $this->factory = $factory;
     }
 
-    public function getEncoder($user): PasswordEncoderInterface
+    public function getEncoder($identity): PasswordEncoderInterface
     {
         $algorithm = null;
 
-        if (SecurityUser::class === $user || ($user instanceof SecurityUser && null === $algorithm = $user->getPasswordAlgorithm())) {
-            $encoder = $this->factory->getEncoder($user);
+        if (UserIdentity::class === $identity || ($identity instanceof UserIdentity && null === $algorithm = $identity->getPasswordAlgorithm())) {
+            $encoder = $this->factory->getEncoder($identity);
 
             if (!$encoder instanceof SelfSaltingEncoderInterface) {
                 throw new \LogicException(sprintf('Only a self-salting password hashing method is supported, got "%s".', \get_class($encoder)));
@@ -43,7 +43,7 @@ final class HashingFactory implements EncoderFactoryInterface
         }
 
         if (null === $algorithm) {
-            return $this->factory->getEncoder($user);
+            return $this->factory->getEncoder($identity);
         }
 
         if ($algorithm->legacy) {

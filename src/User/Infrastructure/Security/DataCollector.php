@@ -52,25 +52,25 @@ final class DataCollector extends BaseDataCollector
 
         /** @var TokenInterface $token */
         $token = $this->data['token'];
-        $user = $token->getUser();
+        $identity = $token->getUser();
 
-        if ($user instanceof SecurityUser) {
-            $this->data['user'] = $this->getUsername($user->getUserId());
+        if ($identity instanceof UserIdentity) {
+            $this->data['user'] = $this->getUsername($identity->getUserId());
         }
 
         if ($token instanceof SwitchUserToken) {
-            $impersonatorUser = $token->getOriginalToken()->getUser();
+            $impersonatorIdentity = $token->getOriginalToken()->getUser();
         } else {
             // BC Symfony <4.3
-            $impersonatorUser = null;
+            $impersonatorIdentity = null;
             foreach ($token->getRoles() as $role) {
                 if ($role instanceof SwitchUserRole) {
-                    $impersonatorUser = $role->getSource()->getUser();
+                    $impersonatorIdentity = $role->getSource()->getUser();
                 }
             }
         }
-        if ($impersonatorUser instanceof SecurityUser) {
-            $this->data['impersonator_user'] = $this->getUsername($impersonatorUser->getUserId());
+        if ($impersonatorIdentity instanceof UserIdentity) {
+            $this->data['impersonator_user'] = $this->getUsername($impersonatorIdentity->getUserId());
         }
     }
 
