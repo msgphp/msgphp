@@ -64,7 +64,7 @@ ci-install:
 
 # misc
 clean:
-	rm -rf var/phpstan var/psalm var/php-cs-fixer.cache
+	rm -rf var/phpstan var/psalm var/php-cs-fixer.cache src/*/coverage.xml
 smoke-test: clean update update-standalone phpunit cs sa
 shell:
 	${qa} /bin/sh

@@ -6,8 +6,8 @@ namespace MsgPhp\User\Tests\Infrastructure\Security;
 
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\User\Credential\Credential;
-use MsgPhp\User\Infrastructure\Security\SecurityUserProvider;
 use MsgPhp\User\Infrastructure\Security\UserIdentity;
+use MsgPhp\User\Infrastructure\Security\UserIdentityProvider;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\Role\RoleProvider;
 use MsgPhp\User\ScalarUserId;
@@ -18,12 +18,12 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-final class SecurityUserProviderTest extends TestCase
+final class UserIdentityProviderTest extends TestCase
 {
     public function testLoadUserByUsername(): void
     {
         /** @var UserIdentity $identity */
-        $identity = (new SecurityUserProvider($this->createRepository($entity = $this->createUser())))->loadUserByUsername('username');
+        $identity = (new UserIdentityProvider($this->createRepository($entity = $this->createUser())))->loadUserByUsername('username');
 
         self::assertInstanceOf(UserIdentity::class, $identity);
         self::assertSame($entity->getId(), $identity->getUserId());
@@ -37,7 +37,7 @@ final class SecurityUserProviderTest extends TestCase
     public function testLoadUserByUsernameWithOriginUsername(): void
     {
         /** @var UserIdentity $identity */
-        $identity = (new SecurityUserProvider($this->createRepository($entity = $this->createUser())))->loadUserByUsername('origin-username');
+        $identity = (new UserIdentityProvider($this->createRepository($entity = $this->createUser())))->loadUserByUsername('origin-username');
 
         self::assertInstanceOf(UserIdentity::class, $identity);
         self::assertSame($entity->getId(), $identity->getUserId());
@@ -57,7 +57,7 @@ final class SecurityUserProviderTest extends TestCase
         ;
 
         /** @var UserIdentity $identity */
-        $identity = (new SecurityUserProvider($this->createRepository($entity = $this->createUser()), $roleProvider))->loadUserByUsername('username');
+        $identity = (new UserIdentityProvider($this->createRepository($entity = $this->createUser()), $roleProvider))->loadUserByUsername('username');
 
         self::assertInstanceOf(UserIdentity::class, $identity);
         self::assertSame($entity->getId(), $identity->getUserId());
@@ -71,7 +71,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameWithUnknownUsername(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository());
+        $provider = new UserIdentityProvider($this->createRepository());
 
         $this->expectException(UsernameNotFoundException::class);
 
@@ -80,7 +80,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUser(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository($this->createUser()));
+        $provider = new UserIdentityProvider($this->createRepository($this->createUser()));
 
         /** @var UserIdentity $refreshedIdentity */
         $refreshedIdentity = $provider->refreshUser($user = $provider->loadUserByUsername('username'));
@@ -93,7 +93,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithOriginUsername(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository($this->createUser()));
+        $provider = new UserIdentityProvider($this->createRepository($this->createUser()));
 
         /** @var UserIdentity $refreshedIdentity */
         $refreshedIdentity = $provider->refreshUser($user = $provider->loadUserByUsername('origin-username'));
@@ -106,7 +106,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithUnknownUser(): void
     {
-        $provider = new SecurityUserProvider($this->createRepository());
+        $provider = new UserIdentityProvider($this->createRepository());
 
         $this->expectException(UsernameNotFoundException::class);
 
@@ -115,7 +115,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testRefreshUserWithUnsupportedUser(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
+        $provider = new UserIdentityProvider($this->createMock(UserRepository::class));
 
         $this->expectException(UnsupportedUserException::class);
 
@@ -124,7 +124,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testSupportsClass(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
+        $provider = new UserIdentityProvider($this->createMock(UserRepository::class));
 
         self::assertTrue($provider->supportsClass(UserIdentity::class));
         self::assertFalse($provider->supportsClass(UserInterface::class));
@@ -138,7 +138,7 @@ final class SecurityUserProviderTest extends TestCase
             ->willReturn(['ROLE_FOO'])
         ;
 
-        $provider = new SecurityUserProvider($this->createMock(UserRepository::class), $roleProvider);
+        $provider = new UserIdentityProvider($this->createMock(UserRepository::class), $roleProvider);
         $identity = $provider->fromUser($user = $this->createUser());
 
         self::assertSame($user->getId(), $identity->getUserId());
@@ -152,7 +152,7 @@ final class SecurityUserProviderTest extends TestCase
 
     public function testFromUserWithOriginUsername(): void
     {
-        $provider = new SecurityUserProvider($this->createMock(UserRepository::class));
+        $provider = new UserIdentityProvider($this->createMock(UserRepository::class));
         $identity = $provider->fromUser($user = $this->createUser(), 'origin-username');
 
         self::assertSame('origin-username', $identity->getOriginUsername());

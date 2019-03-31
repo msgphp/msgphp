@@ -7,7 +7,7 @@ namespace MsgPhp\User\Infrastructure\Security\Jwt;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\User\Infrastructure\Security\SecurityUserProvider as BaseSecurityUserProvider;
+use MsgPhp\User\Infrastructure\Security\UserIdentityProvider as BaseUserIdentityProvider;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\UserId;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -16,10 +16,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @author Damien Merchier <damien.merchier@gmail.com>
  */
-final class SecurityUserProvider implements PayloadAwareUserProviderInterface
+final class UserIdentityProvider implements PayloadAwareUserProviderInterface
 {
     /**
-     * @var BaseSecurityUserProvider
+     * @var BaseUserIdentityProvider
      */
     private $provider;
 
@@ -33,7 +33,7 @@ final class SecurityUserProvider implements PayloadAwareUserProviderInterface
      */
     private $factory;
 
-    public function __construct(BaseSecurityUserProvider $provider, UserRepository $repository, DomainObjectFactory $factory)
+    public function __construct(BaseUserIdentityProvider $provider, UserRepository $repository, DomainObjectFactory $factory)
     {
         $this->provider = $provider;
         $this->repository = $repository;
