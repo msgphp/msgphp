@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
-use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
@@ -13,7 +12,6 @@ use MsgPhp\User\Command\CancelUserPasswordRequest;
 use MsgPhp\User\Event\Domain\CancelPasswordRequest;
 use MsgPhp\User\Event\UserPasswordRequestCanceled;
 use MsgPhp\User\Repository\UserRepository;
-use MsgPhp\User\User;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -37,19 +35,11 @@ final class CancelUserPasswordRequestHandler
 
     public function __invoke(CancelUserPasswordRequest $command): void
     {
-        $this->handle($command, function (User $user): void {
+        $user = $this->repository->find($command->userId);
+
+        if ($this->handleEvent($user, $this->factory->create(CancelPasswordRequest::class))) {
             $this->repository->save($user);
             $this->dispatch(UserPasswordRequestCanceled::class, compact('user'));
-        });
-    }
-
-    protected function getDomainEvent(CancelUserPasswordRequest $command): DomainEvent
-    {
-        return $this->factory->create(CancelPasswordRequest::class);
-    }
-
-    protected function getDomainEventTarget(CancelUserPasswordRequest $command): User
-    {
-        return $this->repository->find($command->userId);
+        }
     }
 }

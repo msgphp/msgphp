@@ -31,12 +31,6 @@
                 <file name="src/*/Infrastructure/Doctrine/Repository/*Repository.php" />
             </errorLevel>
         </LessSpecificReturnStatement>
-        <MethodSignatureMismatch>
-            <errorLevel type="suppress">
-                <!-- https://github.com/vimeo/psalm/issues/1499 -->
-                <directory name="src/User/Command/Handler" />
-            </errorLevel>
-        </MethodSignatureMismatch>
         <MissingClosureParamType errorLevel="info" />
         <MissingClosureReturnType errorLevel="info" />
         <MissingParamType>

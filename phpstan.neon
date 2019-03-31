@@ -34,7 +34,6 @@ parameters:
 
         # msgphp
         - '#Method MsgPhp\\.+\\Infrastructure\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\.+ but returns object\.#'
-        - '#Parameter \#1 \$command of method MsgPhp\\.+\\Command\\Handler\\.+Handler::getDomainEvent(Target)?\(\) expects MsgPhp\\.+\\Command\\.+, object given\.#'
         - '#Return type \(MsgPhp\\Domain\\Infrastructure\\Config\\ClassMappingNode\) of method MsgPhp\\Domain\\Infrastructure\\Config\\ClassMappingNodeDefinition::instantiateNode\(\) should be compatible with return type \(Symfony\\Component\\Config\\Definition\\VariableNode\) of method Symfony\\Component\\Config\\Definition\\Builder\\VariableNodeDefinition::instantiateNode\(\)#'
         - '#Cannot call method classMappingNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.#'
         - '#Method MsgPhp\\Domain\\Infrastructure\\Elasticsearch\\ProjectionTypeRegistry::all\(\) should return array<string> but returns array<int\|string>.#'

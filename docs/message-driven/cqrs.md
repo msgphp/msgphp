@@ -49,19 +49,12 @@ class MyCommandHandler
 
     public function __invoke(MyCommand $command): void
     {
-        $this->handle($command, function (MyEntity $entity): void {
-            // do something when $command is handled
-        });
-    }
+        $target = new MyEntity(); // usually queried by ID, provided by the command
+        $event = new MyDomainEvent();
 
-    protected function getDomainEvent(MyCommand $command): DomainEvent
-    {
-        return new MyDomainEvent();
-    }
-
-    protected function getDomainEventTarget(MyCommand $command): MyEntity
-    {
-        return new MyEntity();
+        if ($this->handleEvent($target, $event)) {
+            // do something when $event is handled
+        }
     }
 }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\Event\Confirm;
-use MsgPhp\Domain\Event\DomainEvent;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
@@ -13,7 +12,6 @@ use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\ConfirmUserEmail;
 use MsgPhp\User\Event\UserEmailConfirmed;
 use MsgPhp\User\Repository\UserEmailRepository;
-use MsgPhp\User\UserEmail;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -37,19 +35,11 @@ final class ConfirmUserEmailHandler
 
     public function __invoke(ConfirmUserEmail $command): void
     {
-        $this->handle($command, function (UserEmail $userEmail): void {
+        $userEmail = $this->repository->find($command->email);
+
+        if ($this->handleEvent($userEmail, $this->factory->create(Confirm::class))) {
             $this->repository->save($userEmail);
             $this->dispatch(UserEmailConfirmed::class, compact('userEmail'));
-        });
-    }
-
-    protected function getDomainEvent(ConfirmUserEmail $command): DomainEvent
-    {
-        return $this->factory->create(Confirm::class);
-    }
-
-    protected function getDomainEventTarget(ConfirmUserEmail $command): UserEmail
-    {
-        return $this->repository->find($command->email);
+        }
     }
 }

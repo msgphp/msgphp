@@ -10,33 +10,14 @@ namespace MsgPhp\Domain\Event;
 trait EventSourcingCommandHandlerTrait
 {
     /**
-     * @param object $command
+     * @param object $target
      */
-    abstract protected function getDomainEvent($command): DomainEvent;
-
-    /**
-     * @param object $command
-     *
-     * @return object
-     */
-    abstract protected function getDomainEventTarget($command);
-
-    /**
-     * @param object $command
-     */
-    private function handle($command, callable $onHandled = null): void
+    private function handleEvent($target, DomainEvent $event): bool
     {
-        /** @psalm-suppress TypeCoercion */
-        $event = $this->getDomainEvent($command);
-        /** @psalm-suppress TypeCoercion */
-        $target = $this->getDomainEventTarget($command);
-
         if (!$target instanceof DomainEventHandler) {
             throw new \LogicException(sprintf('Event target "%s" must be an instance of "%s" to handle event "%s".', \get_class($target), DomainEventHandler::class, \get_class($event)));
         }
 
-        if ($target->handleEvent($event) && null !== $onHandled) {
-            $onHandled($target);
-        }
+        return $target->handleEvent($event);
     }
 }

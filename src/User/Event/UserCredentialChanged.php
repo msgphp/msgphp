@@ -22,15 +22,9 @@ class UserCredentialChanged
      */
     public $oldCredential;
 
-    /**
-     * @var Credential
-     */
-    public $newCredential;
-
-    public function __construct(User $user, Credential $oldCredential, Credential $newCredential)
+    public function __construct(User $user, Credential $oldCredential)
     {
         $this->user = $user;
         $this->oldCredential = $oldCredential;
-        $this->newCredential = $newCredential;
     }
 }
