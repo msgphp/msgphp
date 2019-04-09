@@ -12,26 +12,9 @@ parameters:
     tmpDir: var/phpstan
 
     ignoreErrors:
-        # phpstan
-        - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
-        # https://github.com/phpstan/phpstan-phpunit/issues/43
-        -
-            message: '''
-            #Call to static method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(1, '2'\) and array\(1\) will always evaluate to false\.#
-            '''
-            path: src/Domain/Tests/GenericDomainCollectionTest.php
-        # https://github.com/phpstan/phpstan-phpunit/issues/31
-        -
-            message: '#Parameter \#1 \$encoder of class MsgPhp\\User\\Infrastructure\\Security\\PasswordHashing constructor expects Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
-            path: src/User/Tests/Infrastructure/Security/PasswordHashingTest.php
-        -
-            message: '#Parameter \#1 \$elements of class MsgPhp\\Domain\\GenericDomainCollection constructor expects iterable, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
-            path: src/Domain/Tests/GenericDomainCollectionTest.php
-
-        # deprecated
-        -
-            message: '#Call to deprecated method getRoles\(\) of class Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface\.#'
-            path: src/User/Infrastructure/Security/DataCollector.php
+        # forward compatibility
+        - '#Class Symfony\\Component\\Security\\Core\\Authentication\\Token\\SwitchUserToken not found\.#'
+        - '#Call to method getOriginalToken\(\) on an unknown class Symfony\\Component\\Security\\Core\\Authentication\\Token\\SwitchUserToken\.#'
 
         # msgphp
         - '#Method MsgPhp\\.+\\Infrastructure\\Doctrine\\Repository\\.+Repository::find.*\(\) should return MsgPhp\\.+\\.+ but returns object\.#'
@@ -56,6 +39,22 @@ parameters:
         -
             message: '#Constructor of class MsgPhp\\Domain\\Tests\\Factory\\TestClass has an unused parameter \$\w+\.#'
             path: src/Domain/Tests/Factory/ClassMethodResolverTest.php
+
+        # phpstan
+        - '#Cannot call method getName\(\) on ReflectionClass\|null\.#'
+        # https://github.com/phpstan/phpstan-phpunit/issues/43
+        -
+            message: '''
+            #Call to static method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(1, '2'\) and array\(1\) will always evaluate to false\.#
+            '''
+            path: src/Domain/Tests/GenericDomainCollectionTest.php
+        # https://github.com/phpstan/phpstan-phpunit/issues/31
+        -
+            message: '#Parameter \#1 \$encoder of class MsgPhp\\User\\Infrastructure\\Security\\PasswordHashing constructor expects Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
+            path: src/User/Tests/Infrastructure/Security/PasswordHashingTest.php
+        -
+            message: '#Parameter \#1 \$elements of class MsgPhp\\Domain\\GenericDomainCollection constructor expects iterable, PHPUnit\\Framework\\MockObject\\MockObject given\.#'
+            path: src/Domain/Tests/GenericDomainCollectionTest.php
 
     excludes_analyse:
         - */src/*/vendor/*

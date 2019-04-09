@@ -56,6 +56,9 @@
         <PropertyNotSetInConstructor errorLevel="suppress" />
         <RedundantConditionGivenDocblockType errorLevel="info" />
         <UndefinedClass>
+            <errorLevel type="info">
+                <referencedClass name="Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken" />
+            </errorLevel>
             <errorLevel type="suppress">
                 <referencedClass name="MsgPhp\Domain\Tests\Factory\TestUnknownObject" />
                 <referencedClass name="MsgPhp_Test_Action" />
