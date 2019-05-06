@@ -24,7 +24,7 @@ abstract class Username
         $this->username = $username;
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->username;
     }

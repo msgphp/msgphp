@@ -48,9 +48,9 @@ final class SynchronizeUsernamesCommand extends Command
         $added = $deleted = 0;
 
         foreach ($this->repository->lookup() as $username) {
-            if ($usernames->containsKey($usernameValue = (string) $username)) {
+            if ($usernames->containsKey($usernameValue = $username->toString())) {
                 $unknownUsernames = $unknownUsernames->filter(static function (Username $knownUsername) use ($usernameValue): bool {
-                    return $usernameValue !== (string) $knownUsername;
+                    return $usernameValue !== $knownUsername->toString();
                 });
 
                 continue;

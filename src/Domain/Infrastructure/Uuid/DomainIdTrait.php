@@ -23,6 +23,9 @@ trait DomainIdTrait
         $this->uuid = $uuid ?? Uuid::uuid4();
     }
 
+    /**
+     * @internal
+     */
     public function __toString(): string
     {
         return $this->uuid->toString();

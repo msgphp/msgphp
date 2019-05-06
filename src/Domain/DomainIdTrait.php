@@ -23,6 +23,9 @@ trait DomainIdTrait
         $this->id = $id;
     }
 
+    /**
+     * @internal
+     */
     public function __toString(): string
     {
         return $this->id ?? '';

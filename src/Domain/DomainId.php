@@ -9,6 +9,9 @@ namespace MsgPhp\Domain;
  */
 interface DomainId
 {
+    /**
+     * @internal
+     */
     public function __toString(): string;
 
     /**
