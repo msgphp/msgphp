@@ -7,8 +7,6 @@ namespace MsgPhp\User\Infrastructure\Console\Command;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\Domain\Message\MessageReceiving;
-use MsgPhp\User\Credential\UsernameCredential;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 use MsgPhp\User\UserId;
@@ -21,7 +19,7 @@ use Symfony\Component\Console\Style\StyleInterface;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-abstract class UserCommand extends Command implements MessageReceiving
+abstract class UserCommand extends Command
 {
     use MessageDispatchingTrait {
         __construct as private init;
@@ -38,17 +36,6 @@ abstract class UserCommand extends Command implements MessageReceiving
         $this->repository = $repository;
 
         parent::__construct();
-    }
-
-    public function onMessageReceived(object $message): void
-    {
-    }
-
-    final public static function getUsername(User $user): string
-    {
-        $credential = $user->getCredential();
-
-        return $credential instanceof UsernameCredential ? $credential->getUsername() : $user->getId()->toString();
     }
 
     protected function configure(): void

@@ -6,6 +6,7 @@ namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\User\Command\EnableUser;
 use MsgPhp\User\Event\UserEnabled;
+use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -24,7 +25,6 @@ final class EnableUserCommand extends UserCommand
     public function onMessageReceived(object $message): void
     {
         if ($message instanceof UserEnabled) {
-            $this->io->success('Enabled user '.self::getUsername($message->user));
         }
     }
 
@@ -37,10 +37,12 @@ final class EnableUserCommand extends UserCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
-        $userId = $this->getUser($input, $this->io)->getId();
+        $io = new SymfonyStyle($input, $output);
+        $user = $this->getUser($input, $io);
+        $userId = $user->getId();
 
         $this->dispatch(EnableUser::class, compact('userId'));
+        $io->success('Enabled user '.UserDefinition::getDisplayName($user));
 
         return 0;
     }

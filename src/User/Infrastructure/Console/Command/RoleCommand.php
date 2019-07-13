@@ -7,7 +7,6 @@ namespace MsgPhp\User\Infrastructure\Console\Command;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\Domain\Message\MessageReceiving;
 use MsgPhp\User\Repository\RoleRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-abstract class RoleCommand extends Command implements MessageReceiving
+abstract class RoleCommand extends Command
 {
     use RoleAwareTrait;
     use MessageDispatchingTrait {
@@ -29,10 +28,6 @@ abstract class RoleCommand extends Command implements MessageReceiving
         $this->repository = $repository;
 
         parent::__construct();
-    }
-
-    public function onMessageReceived(object $message): void
-    {
     }
 
     protected function configure(): void

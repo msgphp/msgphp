@@ -11,7 +11,6 @@ use MsgPhp\Domain\Infrastructure\Console as ConsoleInfrastructure;
 use MsgPhp\Domain\Infrastructure\Doctrine as DoctrineInfrastructure;
 use MsgPhp\Domain\Infrastructure\Messenger as MessengerInfrastructure;
 use MsgPhp\Domain\Message\DomainMessageBus;
-use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -99,12 +98,6 @@ final class BundleHelper
                 ->setArgument('$eventClasses', '%msgphp.domain.event_classes%')
             ;
             $container->setAlias(DomainMessageBus::class, new Alias(MessengerInfrastructure\DomainMessageBus::class, false));
-
-            if (FeatureDetection::isConsoleAvailable($container)) {
-                $container->autowire('msgphp.messenger.console_message_receiver', MessengerInfrastructure\Middleware\ConsoleMessageReceiverMiddleware::class)
-                    ->setPublic(false)
-                ;
-            }
         }
     }
 
@@ -167,12 +160,6 @@ final class BundleHelper
             ->setAbstract(true)
             ->setArgument('$method', '__construct')
             ->setArgument('$classMapping', '%msgphp.domain.class_mapping%')
-        ;
-
-        $container->register(ConsoleInfrastructure\MessageReceiver::class)
-            ->setPublic(false)
-            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::COMMAND, 'method' => 'onCommand'])
-            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate'])
         ;
     }
 

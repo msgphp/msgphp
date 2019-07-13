@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\User\Command\DisableUser;
-use MsgPhp\User\Event\UserDisabled;
+use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -17,16 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class DisableUserCommand extends UserCommand
 {
     protected static $defaultName = 'user:disable';
-
-    /** @var StyleInterface */
-    private $io;
-
-    public function onMessageReceived(object $message): void
-    {
-        if ($message instanceof UserDisabled) {
-            $this->io->success('Disabled user '.self::getUsername($message->user));
-        }
-    }
 
     protected function configure(): void
     {
@@ -37,10 +26,12 @@ final class DisableUserCommand extends UserCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
-        $userId = $this->getUser($input, $this->io)->getId();
+        $io = new SymfonyStyle($input, $output);
+        $user = $this->getUser($input, $io);
+        $userId = $user->getId();
 
         $this->dispatch(DisableUser::class, compact('userId'));
+        $io->success('Disabled user '.UserDefinition::getDisplayName($user));
 
         return 0;
     }

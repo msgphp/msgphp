@@ -8,12 +8,11 @@ use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\User\Command\ChangeUserCredential;
-use MsgPhp\User\Event\UserCredentialChanged;
+use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -23,8 +22,6 @@ final class ChangeUserCredentialCommand extends UserCommand
 {
     protected static $defaultName = 'user:change-credential';
 
-    /** @var StyleInterface */
-    private $io;
     /** @var ContextFactory */
     private $contextFactory;
     /** @var array<int, string> */
@@ -35,24 +32,6 @@ final class ChangeUserCredentialCommand extends UserCommand
         $this->contextFactory = $contextFactory;
 
         parent::__construct($factory, $bus, $repository);
-    }
-
-    public function onMessageReceived(object $message): void
-    {
-        if ($message instanceof UserCredentialChanged) {
-            $this->io->success('Changed user credential for '.self::getUsername($message->user));
-
-            $rows = [];
-            $changes = array_diff((array) $message->user->getCredential(), $oldValues = (array) $message->oldCredential);
-            foreach ($changes as $key => $value) {
-                $field = false === ($i = strrpos($key, "\00")) ? $key : substr($key, $i + 1);
-                $rows[] = [$field, json_encode($oldValues[$key] ?? null), json_encode($value)];
-            }
-
-            if ($rows) {
-                $this->io->table(['Field', 'Old Value', 'New Value'], $rows);
-            }
-        }
     }
 
     protected function configure(): void
@@ -70,12 +49,13 @@ final class ChangeUserCredentialCommand extends UserCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
-        $userId = $this->getUser($input, $this->io)->getId();
-        $fields = $this->contextFactory->getContext($input, $this->io);
+        $io = new SymfonyStyle($input, $output);
+        $user = $this->getUser($input, $io);
+        $userId = $user->getId();
+        $fields = $this->contextFactory->getContext($input, $io);
 
         if (!$fields) {
-            $field = $this->io->choice('Select a field to change', $this->fields);
+            $field = $io->choice('Select a field to change', $this->fields);
 
             return $this->run(new ArrayInput([
                 '--'.$field => null,
@@ -85,6 +65,7 @@ final class ChangeUserCredentialCommand extends UserCommand
         }
 
         $this->dispatch(ChangeUserCredential::class, compact('userId', 'fields'));
+        $io->success('Changed user credential for '.UserDefinition::getDisplayName($user));
 
         return 0;
     }

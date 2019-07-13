@@ -32,17 +32,10 @@ framework:
 
         default_bus: command_bus
         buses:
-            command_bus:
-                middleware:
-                    - msgphp.messenger.console_message_receiver
+            command_bus: ~
             event_bus:
                 default_middleware: allow_no_handlers
-                middleware:
-                    - msgphp.messenger.console_message_receiver
 ```
-
-By adding the `msgphp.messenger.console_message_receiver` middleware MsgPHP console commands are able to receive back a
-dispatched message. This is recommended to provide better output in CLI.
 
 ### Enable the Command and Event Bus
 

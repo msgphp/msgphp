@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\User\Command\DeleteUserRole;
-use MsgPhp\User\Event\UserRoleDeleted;
+use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -17,16 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class DeleteUserRoleCommand extends UserRoleCommand
 {
     protected static $defaultName = 'user:role:delete';
-
-    /** @var StyleInterface */
-    private $io;
-
-    public function onMessageReceived(object $message): void
-    {
-        if ($message instanceof UserRoleDeleted) {
-            $this->io->success('Deleted role '.$message->userRole->getRoleName().' from user '.self::getUsername($message->userRole->getUser()));
-        }
-    }
 
     protected function configure(): void
     {
@@ -37,11 +26,13 @@ final class DeleteUserRoleCommand extends UserRoleCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
-        $userId = $this->getUser($input, $this->io)->getId();
-        $roleName = $this->getRole($input, $this->io)->getName();
+        $io = new SymfonyStyle($input, $output);
+        $user = $this->getUser($input, $io);
+        $userId = $user->getId();
+        $roleName = $this->getRole($input, $io)->getName();
 
         $this->dispatch(DeleteUserRole::class, compact('userId', 'roleName'));
+        $io->success('Deleted role '.$roleName.' from user '.UserDefinition::getDisplayName($user));
 
         return 0;
     }

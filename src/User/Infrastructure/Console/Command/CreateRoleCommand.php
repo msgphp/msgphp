@@ -8,19 +8,16 @@ use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Context\ContextFactory;
 use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\Domain\Message\MessageDispatchingTrait;
-use MsgPhp\Domain\Message\MessageReceiving;
 use MsgPhp\User\Command\CreateRole;
-use MsgPhp\User\Event\RoleCreated;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class CreateRoleCommand extends Command implements MessageReceiving
+final class CreateRoleCommand extends Command
 {
     use MessageDispatchingTrait;
 
@@ -28,8 +25,6 @@ final class CreateRoleCommand extends Command implements MessageReceiving
 
     /** @var ContextFactory */
     private $contextFactory;
-    /** @var StyleInterface */
-    private $io;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, ContextFactory $contextFactory)
     {
@@ -40,13 +35,6 @@ final class CreateRoleCommand extends Command implements MessageReceiving
         parent::__construct();
     }
 
-    public function onMessageReceived(object $message): void
-    {
-        if ($message instanceof RoleCreated) {
-            $this->io->success('Created role '.$message->role->getName());
-        }
-    }
-
     protected function configure(): void
     {
         $this->setDescription('Create a role');
@@ -55,10 +43,11 @@ final class CreateRoleCommand extends Command implements MessageReceiving
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
-        $context = $this->contextFactory->getContext($input, $this->io);
+        $io = new SymfonyStyle($input, $output);
+        $context = $this->contextFactory->getContext($input, $io);
 
         $this->dispatch(CreateRole::class, compact('context'));
+        $io->success('Role created');
 
         return 0;
     }
