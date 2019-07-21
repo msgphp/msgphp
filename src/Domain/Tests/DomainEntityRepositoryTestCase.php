@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollection;
-use MsgPhp\Domain\Exception\DuplicateEntityException;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\DuplicateEntity;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainEntityRepository;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
@@ -133,7 +133,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
             $repository->find($ids);
 
             self::fail();
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             $this->addToAssertionCount(1);
         }
 
@@ -155,7 +155,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
             $repository->findByFields($fields);
 
             self::fail();
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             $this->addToAssertionCount(1);
         }
 
@@ -326,7 +326,7 @@ abstract class DomainEntityRepositoryTestCase extends TestCase
 
         $repository->save(Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('999')]));
 
-        $this->expectException(DuplicateEntityException::class);
+        $this->expectException(DuplicateEntity::class);
 
         $repository->save(Entities\TestPrimitiveEntity::create(['id' => new TestDomainId('999')]));
     }

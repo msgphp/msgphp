@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain;
 
-use MsgPhp\Domain\Exception\EmptyCollectionException;
-use MsgPhp\Domain\Exception\UnknownCollectionElementException;
+use MsgPhp\Domain\Exception\EmptyCollection;
+use MsgPhp\Domain\Exception\UnknownCollectionElement;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -112,11 +112,11 @@ final class GenericDomainCollection implements DomainCollection
                 return $element;
             }
 
-            throw EmptyCollectionException::create();
+            throw EmptyCollection::create();
         }
 
         if ([] === $this->elements) {
-            throw EmptyCollectionException::create();
+            throw EmptyCollection::create();
         }
 
         return reset($this->elements);
@@ -136,14 +136,14 @@ final class GenericDomainCollection implements DomainCollection
             }
 
             if ($empty) {
-                throw EmptyCollectionException::create();
+                throw EmptyCollection::create();
             }
 
             return $element;
         }
 
         if ([] === $this->elements) {
-            throw EmptyCollectionException::create();
+            throw EmptyCollection::create();
         }
 
         return end($this->elements);
@@ -162,14 +162,14 @@ final class GenericDomainCollection implements DomainCollection
                 }
             }
 
-            throw UnknownCollectionElementException::createForKey($key);
+            throw UnknownCollectionElement::createForKey($key);
         }
 
         if (isset($this->elements[$key]) || \array_key_exists($key, $this->elements)) {
             return $this->elements[$key];
         }
 
-        throw UnknownCollectionElementException::createForKey($key);
+        throw UnknownCollectionElement::createForKey($key);
     }
 
     public function filter(callable $filter): DomainCollection

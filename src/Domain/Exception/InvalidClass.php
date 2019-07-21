@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Exception;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class InvalidClassException extends \LogicException implements DomainException
+final class InvalidClass extends \LogicException implements DomainException
 {
     public static function create(string $class): self
     {

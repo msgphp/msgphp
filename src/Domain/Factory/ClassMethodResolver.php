@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -31,7 +31,7 @@ final class ClassMethodResolver
             $reflection = new \ReflectionClass($class);
             $reflection = '__construct' === $method ? $reflection->getConstructor() : $reflection->getMethod($method);
         } catch (\ReflectionException $e) {
-            throw InvalidClassException::createForMethod($class, $method);
+            throw InvalidClass::createForMethod($class, $method);
         }
 
         if (null === $reflection || !$reflection->getNumberOfParameters()) {

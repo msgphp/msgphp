@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infrastructure\Form\Extension;
 
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\User\Infrastructure\Form\Extension\UserExtension;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
@@ -55,7 +55,7 @@ final class UserExtensionTest extends FormIntegrationTestCase
             ->method('findByUsername')
             ->willReturnCallback(function (string $username): User {
                 if ('unknown' === $username) {
-                    throw EntityNotFoundException::createForFields(User::class, ['username' => $username]);
+                    throw EntityNotFound::createForFields(User::class, ['username' => $username]);
                 }
 
                 return $this->getMockForAbstractClass(User::class);

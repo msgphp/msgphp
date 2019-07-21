@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\Domain\DomainMessageBus;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Definition\DomainContextDefinition;
 use MsgPhp\User\Command\AddUserRole;
@@ -49,7 +49,7 @@ final class AddUserRoleCommand extends UserRoleCommand
 
         try {
             $role = $this->getRole($input, $io);
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             $roleName = $input->getArgument('role');
 
             if (!\is_string($roleName)) {

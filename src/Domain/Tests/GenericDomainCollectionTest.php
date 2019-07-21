@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollection;
-use MsgPhp\Domain\Exception\EmptyCollectionException;
-use MsgPhp\Domain\Exception\UnknownCollectionElementException;
+use MsgPhp\Domain\Exception\EmptyCollection;
+use MsgPhp\Domain\Exception\UnknownCollectionElement;
 use MsgPhp\Domain\GenericDomainCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -129,7 +129,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
     {
         $collection = self::createLazyCollection([]);
 
-        $this->expectException(EmptyCollectionException::class);
+        $this->expectException(EmptyCollection::class);
 
         $collection->first();
     }
@@ -159,7 +159,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
     {
         $collection = self::createLazyCollection([]);
 
-        $this->expectException(EmptyCollectionException::class);
+        $this->expectException(EmptyCollection::class);
 
         $collection->last();
     }
@@ -191,7 +191,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
     {
         $collection = self::createLazyCollection([]);
 
-        $this->expectException(UnknownCollectionElementException::class);
+        $this->expectException(UnknownCollectionElement::class);
 
         $collection->get('foo');
     }
@@ -200,7 +200,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
     {
         $collection = self::createLazyCollection(['bar' => 'foo', 1]);
 
-        $this->expectException(UnknownCollectionElementException::class);
+        $this->expectException(UnknownCollectionElement::class);
 
         $collection->get('foo');
     }

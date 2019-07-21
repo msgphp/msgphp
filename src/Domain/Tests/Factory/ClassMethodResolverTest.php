@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 use MsgPhp\Domain\Factory\ClassMethodResolver;
 use PHPUnit\Framework\TestCase;
 
@@ -37,7 +37,7 @@ final class ClassMethodResolverTest extends TestCase
 
     public function testResolveWithUnknownClass(): void
     {
-        $this->expectException(InvalidClassException::class);
+        $this->expectException(InvalidClass::class);
 
         /** @psalm-suppress UndefinedClass */
         ClassMethodResolver::resolve(TestUnknownObject::class, 'bar');
@@ -45,7 +45,7 @@ final class ClassMethodResolverTest extends TestCase
 
     public function testResolveWithUnknownMethod(): void
     {
-        $this->expectException(InvalidClassException::class);
+        $this->expectException(InvalidClass::class);
 
         ClassMethodResolver::resolve(\stdClass::class, 'bar');
     }

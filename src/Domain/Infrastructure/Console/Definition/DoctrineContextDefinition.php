@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Infrastructure\Console\Definition;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -80,7 +80,7 @@ final class DoctrineContextDefinition implements DomainContextDefinition
     private function getMetadata(): ClassMetadata
     {
         if (!class_exists($this->class) || $this->em->getMetadataFactory()->isTransient($this->class)) {
-            throw InvalidClassException::create($this->class);
+            throw InvalidClass::create($this->class);
         }
 
         return $this->em->getClassMetadata($this->class);

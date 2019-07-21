@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Factory;
 
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\GenericDomainCollection;
@@ -63,7 +63,7 @@ final class GenericDomainObjectFactoryTest extends TestCase
     {
         $factory = new GenericDomainObjectFactory();
 
-        $this->expectException(InvalidClassException::class);
+        $this->expectException(InvalidClass::class);
 
         /** @psalm-suppress UndefinedClass */
         $factory->create(TestUnknownObject::class);
@@ -161,7 +161,7 @@ final class GenericDomainObjectFactoryTest extends TestCase
     {
         $factory = new GenericDomainObjectFactory();
 
-        $this->expectException(InvalidClassException::class);
+        $this->expectException(InvalidClass::class);
 
         /** @psalm-suppress UndefinedClass */
         $factory->reference(TestUnknownObject::class);

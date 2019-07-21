@@ -6,7 +6,7 @@ namespace MsgPhp\Domain\Factory;
 
 use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Instantiator;
 
@@ -43,7 +43,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactory
 
         /** @psalm-suppress DocblockTypeContradiction */
         if (!class_exists($class)) {
-            throw InvalidClassException::create($class);
+            throw InvalidClass::create($class);
         }
 
         /** @var T */
@@ -69,7 +69,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactory
             /** @var T */
             return Instantiator::instantiate($class, $properties);
         } catch (ClassNotFoundException $e) {
-            throw InvalidClassException::create($class);
+            throw InvalidClass::create($class);
         }
     }
 

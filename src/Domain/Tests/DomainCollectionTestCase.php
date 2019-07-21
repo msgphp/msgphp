@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainCollection;
-use MsgPhp\Domain\Exception\EmptyCollectionException;
-use MsgPhp\Domain\Exception\UnknownCollectionElementException;
+use MsgPhp\Domain\Exception\EmptyCollection;
+use MsgPhp\Domain\Exception\UnknownCollectionElement;
 use PHPUnit\Framework\TestCase;
 
 abstract class DomainCollectionTestCase extends TestCase
@@ -70,7 +70,7 @@ abstract class DomainCollectionTestCase extends TestCase
     {
         $collection = static::createCollection([]);
 
-        $this->expectException(EmptyCollectionException::class);
+        $this->expectException(EmptyCollection::class);
 
         $collection->first();
     }
@@ -86,7 +86,7 @@ abstract class DomainCollectionTestCase extends TestCase
     {
         $collection = static::createCollection([]);
 
-        $this->expectException(EmptyCollectionException::class);
+        $this->expectException(EmptyCollection::class);
 
         $collection->last();
     }
@@ -103,7 +103,7 @@ abstract class DomainCollectionTestCase extends TestCase
     {
         $collection = static::createCollection([]);
 
-        $this->expectException(UnknownCollectionElementException::class);
+        $this->expectException(UnknownCollectionElement::class);
 
         $collection->get(0);
     }
@@ -112,7 +112,7 @@ abstract class DomainCollectionTestCase extends TestCase
     {
         $collection = static::createCollection(['bar' => 'foo', 1]);
 
-        $this->expectException(UnknownCollectionElementException::class);
+        $this->expectException(UnknownCollectionElement::class);
 
         $collection->get('foo');
     }

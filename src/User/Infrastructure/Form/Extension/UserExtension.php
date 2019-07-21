@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Form\Extension;
 
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -50,7 +50,7 @@ final class UserExtension extends AbstractTypeExtension
                     }
                     try {
                         $data[$targetField] = $this->repository->findByUsername($data[$sourceField]);
-                    } catch (EntityNotFoundException $e) {
+                    } catch (EntityNotFound $e) {
                         $data[$targetField] = null;
                     }
                 }

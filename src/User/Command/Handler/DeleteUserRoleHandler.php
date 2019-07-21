@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Command\Handler;
 
 use MsgPhp\Domain\DomainMessageBus;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\Command\DeleteUserRole;
 use MsgPhp\User\Event\UserRoleDeleted;
@@ -31,7 +31,7 @@ final class DeleteUserRoleHandler
     {
         try {
             $userRole = $this->repository->find($command->userId, $command->roleName);
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             return;
         }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
-use MsgPhp\Domain\Exception\InvalidClassException;
+use MsgPhp\Domain\Exception\InvalidClass;
 use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
 
 /**
@@ -38,7 +38,7 @@ final class DomainObjectFactory implements BaseDomainObjectFactory
         }
 
         if (null === $ref = $this->em->getReference($class, $context)) {
-            throw InvalidClassException::create($class);
+            throw InvalidClass::create($class);
         }
 
         /** @var T */

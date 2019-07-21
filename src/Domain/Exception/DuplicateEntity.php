@@ -7,7 +7,7 @@ namespace MsgPhp\Domain\Exception;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DuplicateEntityException extends \RuntimeException implements DomainException
+final class DuplicateEntity extends \RuntimeException implements DomainException
 {
     /**
      * @param mixed $id

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security\Jwt;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\Infrastructure\Security\UserIdentity;
 use MsgPhp\User\Infrastructure\Security\UserIdentityProvider as BaseUserIdentityProvider;
@@ -39,7 +39,7 @@ final class UserIdentityProvider implements PayloadAwareUserProviderInterface
     {
         try {
             $user = $this->repository->find($this->factory->create(UserId::class, ['value' => $username]));
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
 

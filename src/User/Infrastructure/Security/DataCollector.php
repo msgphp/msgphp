@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Security;
 
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\User\Credential\UsernameCredential;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\UserId;
@@ -83,7 +83,7 @@ final class DataCollector extends BaseDataCollector
             if ($credential instanceof UsernameCredential) {
                 return $credential->getUsername();
             }
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
         }
 
         return $id->toString();

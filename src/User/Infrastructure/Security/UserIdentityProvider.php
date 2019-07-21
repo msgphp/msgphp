@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Security;
 
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\Role\RoleProvider;
 use MsgPhp\User\User;
@@ -36,7 +36,7 @@ final class UserIdentityProvider implements UserProviderInterface
     {
         try {
             $user = $this->repository->findByUsername($username);
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
 
@@ -56,7 +56,7 @@ final class UserIdentityProvider implements UserProviderInterface
 
         try {
             $user = $this->repository->find($identity->getUserId());
-        } catch (EntityNotFoundException $e) {
+        } catch (EntityNotFound $e) {
             throw new UsernameNotFoundException($e->getMessage());
         }
 

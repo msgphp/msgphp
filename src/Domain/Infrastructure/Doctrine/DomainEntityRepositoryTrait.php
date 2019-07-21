@@ -11,8 +11,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Exception\DuplicateEntityException;
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\DuplicateEntity;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\Domain\GenericDomainCollection;
 
 /**
@@ -81,7 +81,7 @@ trait DomainEntityRepositoryTrait
         $entity = null === $id ? null : $this->em->find($this->class, $id);
 
         if (null === $entity) {
-            throw EntityNotFoundException::createForId($this->class, $id);
+            throw EntityNotFound::createForId($this->class, $id);
         }
 
         return $entity;
@@ -103,7 +103,7 @@ trait DomainEntityRepositoryTrait
         $qb->setMaxResults(1);
 
         if (null === $entity = $qb->getQuery()->getOneOrNullResult()) {
-            throw EntityNotFoundException::createForFields($this->class, $fields);
+            throw EntityNotFound::createForFields($this->class, $fields);
         }
 
         return $entity;
@@ -145,7 +145,7 @@ trait DomainEntityRepositoryTrait
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
-            throw DuplicateEntityException::createForId(\get_class($entity), $this->em->getMetadataFactory()->getMetadataFor($this->class)->getIdentifierValues($entity));
+            throw DuplicateEntity::createForId(\get_class($entity), $this->em->getMetadataFactory()->getMetadataFor($this->class)->getIdentifierValues($entity));
         }
     }
 

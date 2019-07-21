@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Infrastructure\Security;
 
-use MsgPhp\Domain\Exception\EntityNotFoundException;
+use MsgPhp\Domain\Exception\EntityNotFound;
 use MsgPhp\User\Credential\Credential;
 use MsgPhp\User\Infrastructure\Security\UserIdentity;
 use MsgPhp\User\Infrastructure\Security\UserIdentityProvider;
@@ -152,7 +152,7 @@ final class UserIdentityProviderTest extends TestCase
             ->method('find')
             ->willReturnCallback(static function (UserId $id) use ($user) {
                 if (null === $user || $id->toString() !== $user->getId()->toString()) {
-                    throw EntityNotFoundException::createForId(User::class, $id->toString());
+                    throw EntityNotFound::createForId(User::class, $id->toString());
                 }
 
                 return $user;
@@ -165,7 +165,7 @@ final class UserIdentityProviderTest extends TestCase
                     return $user;
                 }
 
-                throw EntityNotFoundException::createForFields(User::class, ['username' => $username]);
+                throw EntityNotFound::createForFields(User::class, ['username' => $username]);
             })
         ;
 
