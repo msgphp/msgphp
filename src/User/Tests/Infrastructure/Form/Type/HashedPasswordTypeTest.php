@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MsgPhp\User\Tests\Infrastructure\Form\Type;
 
 use MsgPhp\User\Infrastructure\Form\Type\HashedPasswordType;
-use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashing;
+use MsgPhp\User\Infrastructure\Security\UserIdentity;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
@@ -77,31 +78,14 @@ final class HashedPasswordTypeTest extends TypeTestCase
         yield [['plain' => new \stdClass()]];
     }
 
-    /**
-     * @dataProvider provideAlgorithms
-     *
-     * @param mixed $algorithm
-     * @param mixed $type
-     */
-    public function testSubmitValid($algorithm, $type): void
+    public function testSubmitValid(): void
     {
-        $form = $this->createForm(null === $algorithm ? [] : ['password_algorithm' => $algorithm]);
+        $form = $this->createForm();
         $form->submit(['plain' => 'secret']);
 
-        self::assertSame('["secret",'.json_encode($type).']', $form->getData());
+        self::assertSame('["secret",null]', $form->getData());
         self::assertNull($form->getViewData());
         self::assertTrue($form->isSynchronized());
-    }
-
-    public function provideAlgorithms(): iterable
-    {
-        yield [null, null];
-        yield [\PASSWORD_BCRYPT, 1];
-        yield ['md5', 'md5'];
-        yield [PasswordAlgorithm::createLegacy('md2'), 'md2'];
-        yield [static function (): PasswordAlgorithm {
-            return PasswordAlgorithm::create(2);
-        }, 2];
     }
 
     public function testDefaultConfirmation(): void
@@ -152,17 +136,10 @@ final class HashedPasswordTypeTest extends TypeTestCase
 
     public function testCustomHashing(): void
     {
-        $hashing = $this->createMock(PasswordHashing::class);
-        $hashing->expects(self::once())
-            ->method('hash')
-            ->with('secret', $algorithm = PasswordAlgorithm::create())
-            ->willReturn('custom hash')
-        ;
-
-        $form = $this->createForm(['password_hashing' => $hashing, 'password_algorithm' => $algorithm]);
+        $form = $this->createForm(['hashing' => 'alternative']);
         $form->submit(['plain' => 'secret']);
 
-        self::assertSame('custom hash', $form->getData());
+        self::assertSame('secret', $form->getData());
         self::assertNull($form->getViewData());
         self::assertTrue($form->isSynchronized());
     }
@@ -184,23 +161,24 @@ final class HashedPasswordTypeTest extends TypeTestCase
 
     protected function getExtensions(): array
     {
-        $hashing = $this->createMock(PasswordHashing::class);
-        $hashing->expects(self::any())
-            ->method('hash')
-            ->willReturnCallback($hasher = static function (string $plainPassword, ?PasswordAlgorithm $algorithm): string {
-                return (string) json_encode([$plainPassword, null === $algorithm ? null : $algorithm->type]);
-            })
-        ;
-        $hashing->expects(self::any())
-            ->method('isValid')
-            ->willReturnCallback(static function (string $hashedPassword, string $plainPassword, ?PasswordAlgorithm $algorithm) use ($hasher) {
-                return $hashedPassword === $hasher($plainPassword, $algorithm);
-            })
-        ;
+        $hashing = new class() implements PasswordEncoderInterface {
+            public function encodePassword($raw, $salt)
+            {
+                return (string) json_encode([$raw, $salt]);
+            }
+
+            public function isPasswordValid($encoded, $raw, $salt)
+            {
+                return $encoded === $this->encodePassword($raw, $salt);
+            }
+        };
 
         return [
             new ValidatorExtension(Validation::createValidator()),
-            new PreloadedExtension([new HashedPasswordType($hashing)], []),
+            new PreloadedExtension([new HashedPasswordType(new EncoderFactory([
+                UserIdentity::class => $hashing,
+                'alternative' => ['algorithm' => 'plaintext', 'ignore_case' => false],
+            ]))], []),
         ];
     }
 

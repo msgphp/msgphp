@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Security;
 
 use MsgPhp\User\Credential\PasswordProtectedCredential;
-use MsgPhp\User\Password\PasswordAlgorithm;
 use MsgPhp\User\User;
 use MsgPhp\User\UserId;
+use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class UserIdentity implements UserInterface, EquatableInterface
+final class UserIdentity implements UserInterface, EquatableInterface, EncoderAwareInterface
 {
     /** @var UserId */
     private $id;
@@ -24,13 +24,13 @@ final class UserIdentity implements UserInterface, EquatableInterface
     private $roles;
     /** @var string|null */
     private $password;
-    /** @var PasswordAlgorithm|null */
-    private $passwordAlgorithm;
+    /** @var string */
+    private $hashing;
 
     /**
      * @param array<int, string> $roles
      */
-    public function __construct(User $user, string $originUsername = null, array $roles = [])
+    public function __construct(User $user, string $originUsername = null, array $roles = [], string $hashing = null)
     {
         $this->id = $user->getId();
 
@@ -38,15 +38,15 @@ final class UserIdentity implements UserInterface, EquatableInterface
             throw new \LogicException('The user ID cannot be empty.');
         }
 
-        $this->originUsername = $originUsername;
-        $this->roles = $roles;
-
         $credential = $user->getCredential();
 
         if ($credential instanceof PasswordProtectedCredential) {
             $this->password = $credential->getPassword();
-            $this->passwordAlgorithm = $credential->getPasswordAlgorithm();
         }
+
+        $this->originUsername = $originUsername;
+        $this->roles = $roles;
+        $this->hashing = $hashing ?? self::class;
     }
 
     public function getUserId(): UserId
@@ -77,23 +77,23 @@ final class UserIdentity implements UserInterface, EquatableInterface
         return $this->password ?? '';
     }
 
-    public function getPasswordAlgorithm(): ?PasswordAlgorithm
-    {
-        return $this->passwordAlgorithm;
-    }
-
     public function getSalt(): ?string
     {
-        return $this->passwordAlgorithm->salt->token ?? null;
+        return null;
     }
 
     public function eraseCredentials(): void
     {
-        $this->password = $this->passwordAlgorithm = null;
+        $this->password = null;
     }
 
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
         return $user instanceof self && $user->getUserId()->equals($this->id);
+    }
+
+    public function getEncoderName(): string
+    {
+        return $this->hashing;
     }
 }

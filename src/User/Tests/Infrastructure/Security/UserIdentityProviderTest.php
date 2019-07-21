@@ -30,6 +30,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame([], $identity->getRoles());
         self::assertSame('', $identity->getPassword());
         self::assertNull($identity->getSalt());
+        self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
 
     public function testLoadUserByUsernameWithOriginUsername(): void
@@ -42,6 +43,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame([], $identity->getRoles());
         self::assertSame('', $identity->getPassword());
         self::assertNull($identity->getSalt());
+        self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
 
     public function testLoadUserByUsernameWithRoles(): void
@@ -58,8 +60,8 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame('username', $identity->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $identity->getRoles());
         self::assertSame('', $identity->getPassword());
-        self::assertNull($identity->getPasswordAlgorithm());
         self::assertNull($identity->getSalt());
+        self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
 
     public function testLoadUserByUsernameWithUnknownUsername(): void
@@ -133,8 +135,8 @@ final class UserIdentityProviderTest extends TestCase
         self::assertNull($identity->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $identity->getRoles());
         self::assertSame('', $identity->getPassword());
-        self::assertNull($identity->getPasswordAlgorithm());
         self::assertNull($identity->getSalt());
+        self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
 
     public function testFromUserWithOriginUsername(): void

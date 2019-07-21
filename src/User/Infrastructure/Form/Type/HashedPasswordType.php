@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Form\Type;
 
-use MsgPhp\User\Password\GenericPasswordHashing;
-use MsgPhp\User\Password\PasswordAlgorithm;
-use MsgPhp\User\Password\PasswordHashing;
+use MsgPhp\User\Infrastructure\Security\UserIdentity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -14,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -23,16 +23,16 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 final class HashedPasswordType extends AbstractType
 {
-    private $hashing;
+    private $hashingFactory;
 
-    public function __construct(PasswordHashing $hashing = null)
+    public function __construct(EncoderFactoryInterface $hashingFactory)
     {
-        $this->hashing = $hashing;
+        $this->hashingFactory = $hashingFactory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $password = new Password($options['password_hashing'] ?? $this->hashing ?? new GenericPasswordHashing(), $this->createAlgorithm($options['password_algorithm']));
+        $password = new Password($this->hashingFactory->getEncoder($options['hashing']));
         $fieldOptions = [
             'required' => $options['required'],
             'translation_domain' => $options['translation_domain'],
@@ -62,7 +62,7 @@ final class HashedPasswordType extends AbstractType
                     throw new TransformationFailedException();
                 }
 
-                $password->hash = $password->hashing->hash($value['plain'], $password->algorithm);
+                $password->hash = $password->hashing->encodePassword($value['plain'], null);
 
                 if (\function_exists('sodium_memzero')) {
                     sodium_memzero($value['plain']);
@@ -86,7 +86,7 @@ final class HashedPasswordType extends AbstractType
 
                 $valid = false;
                 if (\is_string($value)) {
-                    $valid = null === $password->hash ? false : $password->hashing->isValid($password->hash, $value, $password->algorithm);
+                    $valid = null === $password->hash ? false : $password->hashing->isPasswordValid($password->hash, $value, null);
                     if (\function_exists('sodium_memzero')) {
                         sodium_memzero($value);
                     }
@@ -110,8 +110,7 @@ final class HashedPasswordType extends AbstractType
     {
         $resolver->setDefaults([
             'label' => false,
-            'password_hashing' => null,
-            'password_algorithm' => null,
+            'hashing' => UserIdentity::class,
             'password_options' => [],
             'password_confirm' => false,
             'password_confirm_options' => static function (Options $options, $value) {
@@ -119,11 +118,10 @@ final class HashedPasswordType extends AbstractType
             },
         ]);
 
-        $resolver->setAllowedTypes('password_hashing', ['null', PasswordHashing::class]);
-        $resolver->setAllowedTypes('password_algorithm', ['null', 'callable', 'int', 'string', PasswordAlgorithm::class]);
+        $resolver->setAllowedTypes('hashing', ['string']);
+        $resolver->setAllowedTypes('password_options', ['array']);
         $resolver->setAllowedTypes('password_confirm', ['bool']);
         $resolver->setAllowedTypes('password_confirm_options', ['null', 'array']);
-        $resolver->setAllowedTypes('password_options', ['array']);
     }
 
     private static function withConstraint(array $options, Constraint $constraint): array
@@ -138,26 +136,6 @@ final class HashedPasswordType extends AbstractType
 
         return $options;
     }
-
-    /**
-     * @param callable|int|string|PasswordAlgorithm|null $algorithm
-     */
-    private function createAlgorithm($algorithm): ?PasswordAlgorithm
-    {
-        if ($algorithm instanceof PasswordAlgorithm) {
-            return $algorithm;
-        }
-
-        if (\is_int($algorithm)) {
-            return PasswordAlgorithm::create($algorithm);
-        }
-
-        if (\is_string($algorithm)) {
-            return PasswordAlgorithm::createLegacy($algorithm);
-        }
-
-        return \is_callable($algorithm) ? $algorithm() : null;
-    }
 }
 
 /**
@@ -166,13 +144,11 @@ final class HashedPasswordType extends AbstractType
 final class Password
 {
     public $hashing;
-    public $algorithm;
     /** @var string|null */
     public $hash;
 
-    public function __construct(PasswordHashing $hashing, ?PasswordAlgorithm $algorithm)
+    public function __construct(PasswordEncoderInterface $hashing)
     {
         $this->hashing = $hashing;
-        $this->algorithm = $algorithm;
     }
 }
