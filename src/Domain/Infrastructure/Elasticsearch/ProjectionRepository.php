@@ -6,9 +6,6 @@ namespace MsgPhp\Domain\Infrastructure\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use MsgPhp\Domain\GenericPaginatedDomainCollection;
-use MsgPhp\Domain\PaginatedDomainCollection;
-use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionRepository as BaseProjectionRepository;
 
 /**
@@ -17,89 +14,90 @@ use MsgPhp\Domain\Projection\ProjectionRepository as BaseProjectionRepository;
 final class ProjectionRepository implements BaseProjectionRepository
 {
     private $client;
-    private $index;
+    private $prefix;
+    /** @var array<string, string> */
+    private $lookup;
+    private $bulkLimit;
 
-    public function __construct(Client $client, string $index)
+    /**
+     * @param array<string, string> $lookup
+     */
+    public function __construct(Client $client, string $prefix, array $lookup = [], int $bulkLimit = 1000)
     {
         $this->client = $client;
-        $this->index = $index;
+        $this->prefix = $prefix;
+        $this->lookup = $lookup;
+        $this->bulkLimit = $bulkLimit;
     }
 
-    public function findAll(string $type, int $offset = 0, int $limit = 0): PaginatedDomainCollection
-    {
-        $params = [
-            'index' => $this->index,
-            'type' => $type,
-            'body' => [
-                'from' => $offset,
-                'query' => ['match_all' => new \stdClass()],
-            ],
-        ];
-
-        if ($limit) {
-            $params['body']['size'] = $limit;
-        }
-
-        $result = $this->client->search($params);
-        $documents = $result['hits']['hits'] ?? [];
-        $count = \count($documents);
-        $totalCount = $result['hits']['total'] ?? $count;
-
-        /** @var PaginatedDomainCollection<ProjectionDocument> */
-        return new GenericPaginatedDomainCollection((function () use ($documents): iterable {
-            foreach ($documents as $document) {
-                yield $this->createDocument($document);
-            }
-        })(), (float) $offset, (float) $limit, (float) $count, (float) $totalCount);
-    }
-
-    public function find(string $type, string $id): ?ProjectionDocument
+    public function find(string $type, string $id): ?array
     {
         try {
+            /** @var array $document */
             $document = $this->client->get([
-                'index' => $this->index,
-                'type' => $type,
+                'index' => $this->getType($type),
                 'id' => $id,
             ]);
         } catch (Missing404Exception $e) {
             return null;
         }
 
-        return $this->createDocument($document);
+        return $document['_source'] ?? null;
     }
 
-    public function clear(string $type): void
+    public function save(string $type, array $document): void
     {
-        $this->client->deleteByQuery([
-            'index' => $this->index,
-            'type' => $type,
-            'body' => [
-                'query' => ['match_all' => new \stdClass()],
-            ],
+        $this->client->index([
+            'index' => $this->getType($type),
+            'id' => $document['id'] ?? null,
+            'body' => $document,
         ]);
     }
 
-    public function save(ProjectionDocument $document): void
+    public function saveAll(string $type, iterable $documents): void
     {
-        $params = ['index' => $this->index, 'type' => $document->getType(), 'body' => $document->getBody()];
-        if (null !== $id = $document->getId()) {
-            $params['id'] = $id;
+        $params = $defaultParams = ['refresh' => true];
+        $i = 0;
+
+        foreach ($documents as $document) {
+            ++$i;
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $this->getType($type),
+                    '_id' => $document['id'] ?? null,
+                ],
+            ];
+
+            $params['body'][] = $document;
+
+            if (0 === $i % $this->bulkLimit) {
+                $this->client->bulk($params);
+                $params = $defaultParams;
+            }
         }
 
-        $this->client->index($params);
+        if (isset($params['body'])) {
+            $this->client->bulk($params);
+        }
     }
 
-    public function delete(string $type, string $id): void
+    public function delete(string $type, string $id): bool
     {
-        $this->client->delete([
-            'index' => $this->index,
-            'type' => $type,
-            'id' => $id,
-        ]);
+        try {
+            $this->client->delete([
+                'index' => $this->getType($type),
+                'id' => $id,
+            ]);
+
+            return true;
+        } catch (Missing404Exception $e) {
+            return false;
+        }
     }
 
-    private function createDocument(array $data): ProjectionDocument
+    private function getType(string $name): string
     {
-        return new ProjectionDocument($data['_type'] ?? null, $data['_id'] ?? null, $data['_source'] ?? []);
+        return $this->prefix.($this->lookup[$name] ?? $name);
     }
 }

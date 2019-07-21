@@ -1,20 +1,19 @@
 # Projection Synchronization
 
 `MsgPhp\Domain\Projection\ProjectionSynchronization` is a utility domain service. Its purpose is to ease synchronizing
-[projection documents](documents.md) from source objects.
+projection documents from source objects.
 
 ## API
 
-### `synchronize(): iterable`
+### `synchronize(): int`
 
-Yields all projection documents attempted to be synchronized. The actual document status can be read from [`ProjectionDocument::$status`][api-projection-document-status].
+Synchronizes all projections. Returns the no. of projections synchronized.
 
 ## Basic example
 
 ```php
 <?php
 
-use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionDocumentProvider;
 use MsgPhp\Domain\Projection\ProjectionDocumentTransformer;
 use MsgPhp\Domain\Projection\ProjectionRepository;
@@ -49,19 +48,7 @@ $synchronization = new ProjectionSynchronization($typeRegistry, $repository, $pr
 
 // --- USAGE ---
 
-foreach ($synchronization->synchronize() as $document) {
-    if (ProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
-        echo 'Synchronized projection for '.get_class($document->source).' with ID '.$document->source->id.PHP_EOL;
-        continue;
-    }
-
-    echo 'Invalid projection for '.get_class($document->source).' with ID '.$document->source->id.PHP_EOL;
-
-    if (null !== $document->error) {
-        echo 'An error occurred for '.get_class($document->source).' with ID '.$document->source->id.PHP_EOL;
-        echo $document->error->getMessage().' in '.$document->error->getFile().' at '.$document->error->getLine().PHP_EOL;
-    }
-}
+$numProjections = $synchronization->synchronize();
 ```
 
 ## Command Line Interface
@@ -69,5 +56,3 @@ foreach ($synchronization->synchronize() as $document) {
 A synchronization can be ran using the CLI when working with Symfony Console.
 
 - [Read more](../infrastructure/symfony-console.md#synchronizeprojectionscommand)
-
-[api-projection-document-status]: https://msgphp.github.io/api/MsgPhp/Domain/Projection/ProjectionDocument.html#property_status

@@ -9,9 +9,6 @@ considered read-only and disposable, as they can be re-created / synchronized at
 A practical use case for projections are APIs, where each API resource is a so called projection from a corresponding
 entity. It enables decoupling and thus optimized API responses.
 
-!!! info
-    For integration with [API Platform] see the [projection data provider](../infrastructure/api-platform.md#projection-data-provider)
-
 ## API
 
 ### `static fromDocument(array $document): Projection`
@@ -46,5 +43,3 @@ $projection = MyProjection::fromDocument([
     'some_field' => 'value',
 ]);
 ```
-
-[API Platform]: https://api-platform.com/

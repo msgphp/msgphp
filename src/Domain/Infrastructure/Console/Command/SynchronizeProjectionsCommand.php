@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Console\Command;
 
-use MsgPhp\Domain\Projection\ProjectionDocument;
 use MsgPhp\Domain\Projection\ProjectionSynchronization;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -42,25 +41,9 @@ final class SynchronizeProjectionsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $succeed = $failed = 0;
+        $synchronized = $this->synchronization->synchronize();
 
-        foreach ($this->synchronization->synchronize() as $document) {
-            if (ProjectionDocument::STATUS_SYNCHRONIZED === $document->status) {
-                ++$succeed;
-            } else {
-                ++$failed;
-            }
-
-            if (null !== $document->error && null !== $this->logger) {
-                $this->logger->error($document->error->getMessage(), ['exception' => $document->error]);
-            }
-        }
-
-        $io->success($succeed.' projection '.(1 === $succeed ? 'document' : 'documents').' synchronized');
-
-        if ($failed) {
-            $io->error($failed.' projection '.(1 === $failed ? 'document' : 'documents').' failed');
-        }
+        $io->success($synchronized.' projections are synchronized');
 
         return 0;
     }

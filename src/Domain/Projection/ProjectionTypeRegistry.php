@@ -9,12 +9,9 @@ namespace MsgPhp\Domain\Projection;
  */
 interface ProjectionTypeRegistry
 {
-    /**
-     * @return array<int, string>
-     */
-    public function all(): array;
+    public function initialize(string ...$type): void;
 
-    public function initialize(): void;
+    public function destroy(string ...$type): void;
 
-    public function destroy(): void;
+    public function lookup(string $name): string;
 }

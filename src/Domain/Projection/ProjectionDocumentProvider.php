@@ -22,20 +22,14 @@ final class ProjectionDocumentProvider implements \IteratorAggregate
         $this->dataProviders = $dataProviders;
     }
 
+    /**
+     * @return \Traversable<object, array>
+     */
     public function getIterator(): \Traversable
     {
         foreach ($this->dataProviders as $dataProvider) {
             foreach ($dataProvider() as $object) {
-                try {
-                    $document = $this->transformer->transform($object);
-                } catch (\Throwable $e) {
-                    $document = new ProjectionDocument();
-                    $document->status = ProjectionDocument::STATUS_FAILED_TRANSFORMATION;
-                    $document->source = $object;
-                    $document->error = $e;
-                }
-
-                yield $document;
+                yield $object => $this->transformer->transform($object);
             }
         }
     }

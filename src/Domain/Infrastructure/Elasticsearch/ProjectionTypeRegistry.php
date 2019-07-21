@@ -16,76 +16,51 @@ final class ProjectionTypeRegistry implements BaseProjectionTypeRegistry
     private const DEFAULT_PROPERTY_TYPE = 'text';
 
     private $client;
-    private $index;
-    /** @var array<string, class-string<DocumentMappingProvider>|array> */
+    private $prefix;
+    /** @var array<string, array> */
     private $mappings;
     private $settings;
+    /** @var array<string, string> */
+    private $lookup;
     private $logger;
-    /** @var array<int, string>|null */
-    private $types;
-    /** @var array|null */
-    private $indexParams;
 
     /**
-     * @param array<string, class-string<DocumentMappingProvider>|array> $mappings
+     * @param array<string, array>  $mappings
+     * @param array<string, string> $lookup
      */
-    public function __construct(Client $client, string $index, array $mappings, array $settings = [], LoggerInterface $logger = null)
+    public function __construct(Client $client, string $prefix, array $mappings, array $settings = [], array $lookup = [], LoggerInterface $logger = null)
     {
         $this->client = $client;
-        $this->index = $index;
+        $this->prefix = $prefix;
         $this->mappings = $mappings;
         $this->settings = $settings;
+        $this->lookup = $lookup;
         $this->logger = $logger;
     }
 
-    public function all(): array
+    public function initialize(string ...$type): void
     {
-        return $this->types ?? ($this->types = array_keys($this->getIndexParams()['body']['mappings'] ?? []));
-    }
-
-    public function initialize(): void
-    {
+        $defaultSettings = $this->settings['*'] ?? [];
         $indices = $this->client->indices();
 
-        if ($indices->exists($params = ['index' => $this->index])) {
-            return;
-        }
+        foreach ($type ?: array_keys($this->mappings) as $type) {
+            if (null === $mapping = $this->mappings[$type] ?? null) {
+                throw new \LogicException('Unknown projection type "'.$type.'".');
+            }
 
-        $indices->create($params + $this->getIndexParams());
+            $index = $this->prefix.$type;
 
-        if (null !== $this->logger) {
-            $this->logger->info('Initialized Elasticsearch index "{index}".', ['index' => $this->index]);
-        }
-    }
+            if ($indices->exists($params = ['index' => $index])) {
+                continue;
+            }
 
-    public function destroy(): void
-    {
-        $indices = $this->client->indices();
+            $settings = $this->settings[$type] ?? [];
+            $settings += $defaultSettings;
 
-        if (!$indices->exists($params = ['index' => $this->index])) {
-            return;
-        }
+            if ($settings) {
+                $params['body']['settings'] = $settings;
+            }
 
-        $indices->delete($params);
-
-        if (null !== $this->logger) {
-            $this->logger->info('Destroyed Elasticsearch index "{index}".', ['index' => $this->index]);
-        }
-    }
-
-    private function getIndexParams(): array
-    {
-        if (null !== $this->indexParams) {
-            return $this->indexParams;
-        }
-
-        $params = [];
-
-        if ($this->settings) {
-            $params['body']['settings'] = $this->settings;
-        }
-
-        foreach ($this->provideMappings() as $type => $mapping) {
             foreach ($mapping as $property => $propertyMapping) {
                 if (!\is_array($propertyMapping)) {
                     $propertyMapping = ['type' => $propertyMapping];
@@ -93,21 +68,49 @@ final class ProjectionTypeRegistry implements BaseProjectionTypeRegistry
                     $propertyMapping['type'] = self::DEFAULT_PROPERTY_TYPE;
                 }
 
-                $params['body']['mappings'][$type]['properties'][$property] = $propertyMapping;
+                $params['body']['mappings']['properties'][$property] = $propertyMapping;
+            }
+
+            $indices->create($params);
+
+            if (null !== $this->logger) {
+                $this->logger->info('Initialized Elasticsearch index "'.$index.'".');
             }
         }
-
-        return $this->indexParams = $params;
     }
 
-    private function provideMappings(): iterable
+    public function destroy(string ...$type): void
     {
-        foreach ($this->mappings as $type => $mapping) {
-            if (\is_string($mapping)) {
-                yield from $mapping::provideDocumentMappings();
-            } else {
-                yield $type => $mapping;
+        $indices = $this->client->indices();
+
+        foreach ($type ?: array_keys($this->mappings) as $type) {
+            if (!isset($this->mappings[$type])) {
+                throw new \LogicException('Unknown projection type "'.$type.'".');
+            }
+
+            $index = $this->prefix.$type;
+
+            if (!$indices->exists($params = ['index' => $index])) {
+                continue;
+            }
+
+            $indices->delete($params);
+
+            if (null !== $this->logger) {
+                $this->logger->info('Destroyed Elasticsearch index "'.$index.'".');
             }
         }
+    }
+
+    public function lookup(string $name): string
+    {
+        if (isset($this->mappings[$name])) {
+            return $name;
+        }
+        if (isset($this->lookup[$name])) {
+            return $this->lookup[$name];
+        }
+
+        throw new \LogicException('Cannot lookup type for "'.$name.'".');
     }
 }

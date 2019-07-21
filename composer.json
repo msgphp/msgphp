@@ -2,10 +2,9 @@
     "name": "msgphp/msgphp",
     "description": "Combined MsgPHP package for CI purposes",
     "require": {
-        "api-platform/core": "^2.4",
         "doctrine/doctrine-bundle": "^1.11",
         "doctrine/orm": "^2.6",
-        "elasticsearch/elasticsearch": "^6.7",
+        "elasticsearch/elasticsearch": "^7.1",
         "lexik/jwt-authentication-bundle": "^2.6",
         "psr/container": "^1.0",
         "ramsey/uuid": "^3.8",

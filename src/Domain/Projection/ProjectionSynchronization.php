@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Projection;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
@@ -11,39 +13,37 @@ final class ProjectionSynchronization
 {
     private $typeRegistry;
     private $repository;
-    /** @var iterable<int, ProjectionDocument> */
+    /** @var iterable<object, array> */
     private $documentProvider;
+    private $logger;
 
     /**
-     * @param iterable<int, ProjectionDocument> $documentProvider
+     * @param iterable<object, array> $documentProvider
      */
-    public function __construct(ProjectionTypeRegistry $typeRegistry, ProjectionRepository $repository, iterable $documentProvider)
+    public function __construct(ProjectionTypeRegistry $typeRegistry, ProjectionRepository $repository, iterable $documentProvider, LoggerInterface $logger = null)
     {
         $this->typeRegistry = $typeRegistry;
         $this->repository = $repository;
         $this->documentProvider = $documentProvider;
+        $this->logger = $logger;
     }
 
-    /**
-     * @return iterable<int, ProjectionDocument>
-     */
-    public function synchronize(): iterable
+    public function synchronize(): int
     {
-        foreach ($this->typeRegistry->all() as $type) {
-            $this->repository->clear($type);
+        $this->typeRegistry->destroy();
+        $this->typeRegistry->initialize();
+
+        $grouped = [];
+        $synchronized = 0;
+
+        foreach ($this->documentProvider as $object => $document) {
+            $grouped[$this->typeRegistry->lookup(\get_class($object))][] = $document;
+            ++$synchronized;
+        }
+        foreach ($grouped as $type => $documents) {
+            $this->repository->saveAll($type, $documents);
         }
 
-        foreach ($this->documentProvider as $document) {
-            try {
-                $document->status = ProjectionDocument::STATUS_SYNCHRONIZED;
-
-                $this->repository->save($document);
-            } catch (\Throwable $e) {
-                $document->status = ProjectionDocument::STATUS_FAILED_SAVING;
-                $document->error = $e;
-            }
-
-            yield $document;
-        }
+        return $synchronized;
     }
 }

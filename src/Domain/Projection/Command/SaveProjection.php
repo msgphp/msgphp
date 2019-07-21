@@ -7,14 +7,14 @@ namespace MsgPhp\Domain\Projection\Command;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-class DeleteProjectionDocument
+class SaveProjection
 {
     public $type;
-    public $id;
+    public $document;
 
-    public function __construct(string $type, string $id)
+    public function __construct(string $type, array $document)
     {
         $this->type = $type;
-        $this->id = $id;
+        $this->document = $document;
     }
 }
