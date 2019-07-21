@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Definition\DomainContextDefinition;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\User\Command\ChangeUserCredential;
 use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use MsgPhp\User\Repository\UserRepository;
@@ -64,7 +64,7 @@ final class ChangeUserCredentialCommand extends UserCommand
             ]), $output);
         }
 
-        $this->dispatch(ChangeUserCredential::class, compact('userId', 'fields'));
+        $this->bus->dispatch($this->factory->create(ChangeUserCredential::class, compact('userId', 'fields')));
         $io->success('Changed user credential for '.UserDefinition::getDisplayName($user));
 
         return 0;

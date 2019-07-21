@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Event\Enable;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\EnableUser;
 use MsgPhp\User\Event\UserEnabled;
 use MsgPhp\User\Repository\UserRepository;
@@ -19,9 +18,9 @@ use MsgPhp\User\Repository\UserRepository;
 final class EnableUserHandler
 {
     use EventSourcingCommandHandlerTrait;
-    use MessageDispatchingTrait;
 
-    /** @var UserRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
@@ -37,7 +36,7 @@ final class EnableUserHandler
 
         if ($this->handleEvent($user, $this->factory->create(Enable::class))) {
             $this->repository->save($user);
-            $this->dispatch(UserEnabled::class, compact('user'));
+            $this->bus->dispatch($this->factory->create(UserEnabled::class, compact('user')));
         }
     }
 }

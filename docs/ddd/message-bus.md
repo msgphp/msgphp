@@ -1,7 +1,7 @@
 # Message Bus
 
-A domain message bus is bound to `MsgPhp\Domain\Message\DomainMessageBus`. Its purpose is to dispatch any type of
-message object either synchronously or asynchronously.
+A domain message bus is bound to `MsgPhp\Domain\DomainMessageBus`. Its purpose is to dispatch any type of message object
+either synchronously or asynchronously.
 
 A message object is considered [domain-specific language] (DSL) and can be listened for using so called "message
 handlers" (a [PHP callable]).

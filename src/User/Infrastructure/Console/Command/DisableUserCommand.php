@@ -30,7 +30,7 @@ final class DisableUserCommand extends UserCommand
         $user = $this->getUser($input, $io);
         $userId = $user->getId();
 
-        $this->dispatch(DisableUser::class, compact('userId'));
+        $this->bus->dispatch($this->factory->create(DisableUser::class, compact('userId')));
         $io->success('Disabled user '.UserDefinition::getDisplayName($user));
 
         return 0;

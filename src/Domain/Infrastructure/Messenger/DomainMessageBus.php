@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Messenger;
 
-use MsgPhp\Domain\Message\DomainMessageBus as BaseDomainMessageBus;
+use MsgPhp\Domain\DomainMessageBus as BaseDomainMessageBus;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 

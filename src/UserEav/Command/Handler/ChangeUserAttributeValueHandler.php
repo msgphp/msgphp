@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\ChangeUserAttributeValue;
 use MsgPhp\User\Event\UserAttributeValueChanged;
 use MsgPhp\User\Repository\UserAttributeValueRepository;
@@ -16,9 +15,8 @@ use MsgPhp\User\Repository\UserAttributeValueRepository;
  */
 final class ChangeUserAttributeValueHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var UserAttributeValueRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserAttributeValueRepository $repository)
@@ -40,6 +38,6 @@ final class ChangeUserAttributeValueHandler
 
         $userAttributeValue->changeValue($command->value);
         $this->repository->save($userAttributeValue);
-        $this->dispatch(UserAttributeValueChanged::class, compact('userAttributeValue', 'oldValue', 'newValue'));
+        $this->bus->dispatch($this->factory->create(UserAttributeValueChanged::class, compact('userAttributeValue', 'oldValue', 'newValue')));
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Tests\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\User\Command\CreateUser;
 use MsgPhp\User\Command\Handler\CreateUserHandler;
 use MsgPhp\User\Event\UserCreated;

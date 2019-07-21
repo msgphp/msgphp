@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Event\Confirm;
 use MsgPhp\Domain\Event\EventSourcingCommandHandlerTrait;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\ConfirmUserEmail;
 use MsgPhp\User\Event\UserEmailConfirmed;
 use MsgPhp\User\Repository\UserEmailRepository;
@@ -19,9 +18,9 @@ use MsgPhp\User\Repository\UserEmailRepository;
 final class ConfirmUserEmailHandler
 {
     use EventSourcingCommandHandlerTrait;
-    use MessageDispatchingTrait;
 
-    /** @var UserEmailRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserEmailRepository $repository)
@@ -37,7 +36,7 @@ final class ConfirmUserEmailHandler
 
         if ($this->handleEvent($userEmail, $this->factory->create(Confirm::class))) {
             $this->repository->save($userEmail);
-            $this->dispatch(UserEmailConfirmed::class, compact('userEmail'));
+            $this->bus->dispatch($this->factory->create(UserEmailConfirmed::class, compact('userEmail')));
         }
     }
 }

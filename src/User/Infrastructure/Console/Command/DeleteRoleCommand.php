@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
+use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\User\Command\DeleteRole;
+use MsgPhp\User\Repository\RoleRepository;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -12,15 +17,34 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class DeleteRoleCommand extends RoleCommand
+final class DeleteRoleCommand extends Command
 {
+    use RoleAwareTrait;
+
     protected static $defaultName = 'role:delete';
+
+    /** @var DomainObjectFactory */
+    private $factory;
+    /** @var DomainMessageBus */
+    private $bus;
+
+    public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, RoleRepository $repository)
+    {
+        $this->factory = $factory;
+        $this->bus = $bus;
+        $this->repository = $repository;
+
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
         parent::configure();
 
-        $this->setDescription('Delete a role');
+        $this
+            ->setDescription('Delete a role')
+            ->addArgument('role', InputArgument::OPTIONAL, 'The role name')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -32,7 +56,7 @@ final class DeleteRoleCommand extends RoleCommand
             return 0;
         }
 
-        $this->dispatch(DeleteRole::class, compact('roleName'));
+        $this->bus->dispatch($this->factory->create(DeleteRole::class, compact('roleName')));
         $io->success('Deleted role '.$roleName);
 
         return 0;

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\Eav\Attribute;
 use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\User\Command\AddUserAttributeValue;
@@ -20,9 +19,8 @@ use MsgPhp\User\UserAttributeValue;
  */
 final class AddUserAttributeValueHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var UserAttributeValueRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserAttributeValueRepository $repository)
@@ -43,6 +41,6 @@ final class AddUserAttributeValueHandler
         $userAttributeValue = $this->factory->create(UserAttributeValue::class, $context);
 
         $this->repository->save($userAttributeValue);
-        $this->dispatch(UserAttributeValueAdded::class, compact('userAttributeValue', 'context'));
+        $this->bus->dispatch($this->factory->create(UserAttributeValueAdded::class, compact('userAttributeValue', 'context')));
     }
 }

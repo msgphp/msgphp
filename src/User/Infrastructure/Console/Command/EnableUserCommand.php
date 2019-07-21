@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
 use MsgPhp\User\Command\EnableUser;
-use MsgPhp\User\Event\UserEnabled;
 use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -18,15 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class EnableUserCommand extends UserCommand
 {
     protected static $defaultName = 'user:enable';
-
-    /** @var StyleInterface */
-    private $io;
-
-    public function onMessageReceived(object $message): void
-    {
-        if ($message instanceof UserEnabled) {
-        }
-    }
 
     protected function configure(): void
     {
@@ -41,7 +30,7 @@ final class EnableUserCommand extends UserCommand
         $user = $this->getUser($input, $io);
         $userId = $user->getId();
 
-        $this->dispatch(EnableUser::class, compact('userId'));
+        $this->bus->dispatch($this->factory->create(EnableUser::class, compact('userId')));
         $io->success('Enabled user '.UserDefinition::getDisplayName($user));
 
         return 0;

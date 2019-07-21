@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\AddUserEmail;
 use MsgPhp\User\Event\UserEmailAdded;
 use MsgPhp\User\Repository\UserEmailRepository;
@@ -18,9 +17,8 @@ use MsgPhp\User\UserEmail;
  */
 final class AddUserEmailHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var UserEmailRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserEmailRepository $repository)
@@ -38,6 +36,6 @@ final class AddUserEmailHandler
         $userEmail = $this->factory->create(UserEmail::class, $context);
 
         $this->repository->save($userEmail);
-        $this->dispatch(UserEmailAdded::class, compact('userEmail', 'context'));
+        $this->bus->dispatch($this->factory->create(UserEmailAdded::class, compact('userEmail', 'context')));
     }
 }

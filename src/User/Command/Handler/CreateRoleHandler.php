@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\CreateRole;
 use MsgPhp\User\Event\RoleCreated;
 use MsgPhp\User\Repository\RoleRepository;
@@ -17,9 +16,8 @@ use MsgPhp\User\Role;
  */
 final class CreateRoleHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var RoleRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, RoleRepository $repository)
@@ -33,7 +31,8 @@ final class CreateRoleHandler
     {
         $context = $command->context;
         $role = $this->factory->create(Role::class, $context);
+
         $this->repository->save($role);
-        $this->dispatch(RoleCreated::class, compact('role', 'context'));
+        $this->bus->dispatch($this->factory->create(RoleCreated::class, compact('role', 'context')));
     }
 }

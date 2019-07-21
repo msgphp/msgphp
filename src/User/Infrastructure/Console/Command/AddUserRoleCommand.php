@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Definition\DomainContextDefinition;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\User\Command\AddUserRole;
 use MsgPhp\User\Infrastructure\Console\UserDefinition;
 use MsgPhp\User\Repository\RoleRepository;
@@ -77,7 +77,7 @@ final class AddUserRoleCommand extends UserRoleCommand
         $roleName = $role->getName();
         $context = $this->definition->getContext($input, $io, compact('user', 'role'));
 
-        $this->dispatch(AddUserRole::class, compact('userId', 'roleName', 'context'));
+        $this->bus->dispatch($this->factory->create(AddUserRole::class, compact('userId', 'roleName', 'context')));
         $io->success('Added role '.$roleName.' to user '.UserDefinition::getDisplayName($user));
 
         return 0;

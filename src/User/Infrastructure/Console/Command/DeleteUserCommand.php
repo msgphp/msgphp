@@ -34,7 +34,7 @@ final class DeleteUserCommand extends UserCommand
             return 0;
         }
 
-        $this->dispatch(DeleteUser::class, compact('userId'));
+        $this->bus->dispatch($this->factory->create(DeleteUser::class, compact('userId')));
         $io->success('Deleted user '.UserDefinition::getDisplayName($user));
 
         return 0;

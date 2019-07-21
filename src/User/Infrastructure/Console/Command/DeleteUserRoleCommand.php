@@ -31,7 +31,7 @@ final class DeleteUserRoleCommand extends UserRoleCommand
         $userId = $user->getId();
         $roleName = $this->getRole($input, $io)->getName();
 
-        $this->dispatch(DeleteUserRole::class, compact('userId', 'roleName'));
+        $this->bus->dispatch($this->factory->create(DeleteUserRole::class, compact('userId', 'roleName')));
         $io->success('Deleted role '.$roleName.' from user '.UserDefinition::getDisplayName($user));
 
         return 0;

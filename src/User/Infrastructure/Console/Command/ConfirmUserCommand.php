@@ -30,7 +30,7 @@ final class ConfirmUserCommand extends UserCommand
         $user = $this->getUser($input, $io);
         $userId = $user->getId();
 
-        $this->dispatch(ConfirmUser::class, compact('userId'));
+        $this->bus->dispatch($this->factory->create(ConfirmUser::class, compact('userId')));
         $io->success('Confirmed user '.UserDefinition::getDisplayName($user));
 
         return 0;

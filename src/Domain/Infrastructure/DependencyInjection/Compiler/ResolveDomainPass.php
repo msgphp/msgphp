@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection\Compiler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\ContainerHelper;
 use MsgPhp\Domain\Infrastructure\DependencyInjection\FeatureDetection;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

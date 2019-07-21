@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\CreateUser;
 use MsgPhp\User\Event\UserCreated;
 use MsgPhp\User\Repository\UserRepository;
@@ -18,9 +17,8 @@ use MsgPhp\User\UserId;
  */
 final class CreateUserHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var UserRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
@@ -37,6 +35,6 @@ final class CreateUserHandler
         $user = $this->factory->create(User::class, $context);
 
         $this->repository->save($user);
-        $this->dispatch(UserCreated::class, compact('user', 'context'));
+        $this->bus->dispatch($this->factory->create(UserCreated::class, compact('user', 'context')));
     }
 }

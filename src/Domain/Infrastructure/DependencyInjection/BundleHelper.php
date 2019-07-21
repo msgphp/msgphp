@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection;
 
 use Doctrine\ORM\Events as DoctrineOrmEvents;
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console as ConsoleInfrastructure;
 use MsgPhp\Domain\Infrastructure\Doctrine as DoctrineInfrastructure;
 use MsgPhp\Domain\Infrastructure\Messenger as MessengerInfrastructure;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;

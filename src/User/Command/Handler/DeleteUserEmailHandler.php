@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Command\Handler;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Exception\EntityNotFoundException;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\DeleteUserEmail;
 use MsgPhp\User\Event\UserEmailDeleted;
 use MsgPhp\User\Repository\UserEmailRepository;
@@ -17,9 +16,8 @@ use MsgPhp\User\Repository\UserEmailRepository;
  */
 final class DeleteUserEmailHandler
 {
-    use MessageDispatchingTrait;
-
-    /** @var UserEmailRepository */
+    private $factory;
+    private $bus;
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserEmailRepository $repository)
@@ -38,6 +36,6 @@ final class DeleteUserEmailHandler
         }
 
         $this->repository->delete($userEmail);
-        $this->dispatch(UserEmailDeleted::class, compact('userEmail'));
+        $this->bus->dispatch($this->factory->create(UserEmailDeleted::class, compact('userEmail')));
     }
 }

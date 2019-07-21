@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Console\Definition\DomainContextDefinition;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Command\CreateRole;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,10 +18,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class CreateRoleCommand extends Command
 {
-    use MessageDispatchingTrait;
-
     protected static $defaultName = 'role:create';
 
+    /** @var DomainObjectFactory */
+    private $factory;
+    /** @var DomainMessageBus */
+    private $bus;
     /** @var DomainContextDefinition */
     private $definition;
 
@@ -46,7 +47,7 @@ final class CreateRoleCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $context = $this->definition->getContext($input, $io);
 
-        $this->dispatch(CreateRole::class, compact('context'));
+        $this->bus->dispatch($this->factory->create(CreateRole::class, compact('context')));
         $io->success('Role created');
 
         return 0;

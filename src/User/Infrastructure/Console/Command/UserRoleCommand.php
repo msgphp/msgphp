@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
 use MsgPhp\User\Repository\RoleRepository;
 use MsgPhp\User\Repository\UserRepository;
 use Symfony\Component\Console\Input\InputArgument;

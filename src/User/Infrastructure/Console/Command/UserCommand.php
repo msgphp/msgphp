@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace MsgPhp\User\Infrastructure\Console\Command;
 
+use MsgPhp\Domain\DomainMessageBus;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
-use MsgPhp\Domain\Message\DomainMessageBus;
-use MsgPhp\Domain\Message\MessageDispatchingTrait;
 use MsgPhp\User\Repository\UserRepository;
 use MsgPhp\User\User;
 use MsgPhp\User\UserId;
@@ -21,18 +20,17 @@ use Symfony\Component\Console\Style\StyleInterface;
  */
 abstract class UserCommand extends Command
 {
-    use MessageDispatchingTrait {
-        __construct as private init;
-        dispatch as protected;
-    }
-
+    /** @var DomainObjectFactory */
+    protected $factory;
+    /** @var DomainMessageBus */
+    protected $bus;
     /** @var UserRepository */
     private $repository;
 
     public function __construct(DomainObjectFactory $factory, DomainMessageBus $bus, UserRepository $repository)
     {
-        $this->init($factory, $bus);
-
+        $this->factory = $factory;
+        $this->bus = $bus;
         $this->repository = $repository;
 
         parent::__construct();
