@@ -88,8 +88,8 @@ final class BundleHelper
     private static function initMessageBus(ContainerBuilder $container): void
     {
         if (FeatureDetection::isMessengerAvailable($container)) {
-            $container->setAlias('msgphp.messenger.command_bus', new Alias('message_bus', false));
-            $container->setAlias('msgphp.messenger.event_bus', new Alias('message_bus', false));
+            $container->setAlias('msgphp.messenger.command_bus', new Alias('messenger.default_bus', false));
+            $container->setAlias('msgphp.messenger.event_bus', new Alias('messenger.default_bus', false));
             $container->setAlias('msgphp.command_bus', new Alias('msgphp.messenger.command_bus', false));
             $container->register(MessengerInfrastructure\DomainMessageBus::class)
                 ->setPublic(false)
