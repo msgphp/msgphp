@@ -157,12 +157,12 @@ final class UserMaker implements MakerInterface
                 } else {
                     $io->writeln($differ->diff($exist ? file_get_contents($file) : '', $contents));
                 }
-            } while ('r' === $choice = $io->choice('Write changes and continue reviewing?', $choices, $choices['r']));
+            } while ( !$input->getOption('no-interaction') || ('r' === $choice = $io->choice('Write changes and continue reviewing?', $choices, $choices['r'])) );
 
-            if ('y' === $choice) {
+            if ( $input->getOption('no-interaction') || ('y' === $choice) ) {
                 $writer($file, $contents);
             }
-        }
+       }
 
         $io->success('Done!');
 
