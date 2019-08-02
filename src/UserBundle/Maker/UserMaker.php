@@ -86,7 +86,7 @@ final class UserMaker implements MakerInterface
         $this->configs = $this->services = $this->routes = $this->writes = [];
         $this->interactive = $input->isInteractive();
 
-        if (!$this->applicationPrerequisitesMet($io)) {
+        if (!$this->applicationPrerequisitesMet($io, $input)) {
             return;
         }
 
@@ -120,7 +120,7 @@ final class UserMaker implements MakerInterface
         $io->success('All questions have been answered!');
         $io->note(\count($this->writes).' file(s) are about to be written');
 
-        $review = $io->confirm('Review changes? All changes will be written otherwise!');
+        $review = $io->confirm('Review changes? All changes will be written otherwise!', $input->isInteractive());
         $written = [];
         $writer = static function (string $file, string $contents) use ($io, &$written): void {
             if (!file_put_contents($file, $contents)) {
@@ -157,12 +157,12 @@ final class UserMaker implements MakerInterface
                 } else {
                     $io->writeln($differ->diff($exist ? file_get_contents($file) : '', $contents));
                 }
-            } while ( !$input->getOption('no-interaction') || ('r' === $choice = $io->choice('Write changes and continue reviewing?', $choices, $choices['r'])) );
+            } while ('r' === $choice = $io->choice('Write changes and continue reviewing?', $choices, $choices['r']));
 
-            if ( $input->getOption('no-interaction') || ('y' === $choice) ) {
+            if ('y' === $choice) {
                 $writer($file, $contents);
             }
-       }
+        }
 
         $io->success('Done!');
 
@@ -215,7 +215,7 @@ final class UserMaker implements MakerInterface
         return [$ns, $class];
     }
 
-    private function applicationPrerequisitesMet(ConsoleStyle $io): bool
+    private function applicationPrerequisitesMet(ConsoleStyle $io, InputInterface $input): bool
     {
         if (!isset($this->classMapping[User::class]) || !isset($this->classMapping[Credential::class])) {
             throw new \LogicException('User class not configured. Did you install the bundle using Symfony Recipes?');
@@ -225,7 +225,7 @@ final class UserMaker implements MakerInterface
         }
 
         $met = true;
-        if (!class_exists(Differ::class)) {
+        if (!class_exists(Differ::class) && $input->isInteractive()) {
             $io->note(['It\'s recommended to (temporarily) enable the Diff implementation for better reviewing changes, run:', 'composer require --dev sebastian/diff']);
             $met = false;
         }
