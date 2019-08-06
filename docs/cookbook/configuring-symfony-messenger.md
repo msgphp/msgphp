@@ -8,10 +8,10 @@ In this article is explained how to setup [Symfony Messenger infrastructure](../
 ## Installation
 
 ```bash
-composer install symfony/messenger
+composer require symfony/messenger
 
 # with Symfony Flex
-composer install messenger
+composer require messenger
 ```
 
 ## Configuration
