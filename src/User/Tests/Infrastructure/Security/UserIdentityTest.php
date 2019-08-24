@@ -22,7 +22,7 @@ final class UserIdentityTest extends TestCase
         self::assertSame('id', $identity->getUsername());
         self::assertNull($identity->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $identity->getRoles());
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
         self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
@@ -45,7 +45,7 @@ final class UserIdentityTest extends TestCase
         $identity = new UserIdentity($this->createUser('password'));
         $identity->eraseCredentials();
 
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
     }
 
