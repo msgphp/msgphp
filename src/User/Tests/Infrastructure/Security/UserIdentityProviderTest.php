@@ -28,7 +28,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame('id', $identity->getUsername());
         self::assertSame('username', $identity->getOriginUsername());
         self::assertSame([], $identity->getRoles());
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
         self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
@@ -41,7 +41,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame('id', $identity->getUsername());
         self::assertSame('origin-username', $identity->getOriginUsername());
         self::assertSame([], $identity->getRoles());
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
         self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
@@ -59,7 +59,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame('id', $identity->getUsername());
         self::assertSame('username', $identity->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $identity->getRoles());
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
         self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
@@ -134,7 +134,7 @@ final class UserIdentityProviderTest extends TestCase
         self::assertSame('id', $identity->getUsername());
         self::assertNull($identity->getOriginUsername());
         self::assertSame(['ROLE_FOO'], $identity->getRoles());
-        self::assertSame('', $identity->getPassword());
+        self::assertNull($identity->getPassword());
         self::assertNull($identity->getSalt());
         self::assertSame(UserIdentity::class, $identity->getEncoderName());
     }
