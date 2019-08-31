@@ -558,9 +558,9 @@ PHP
 
         $formNs = trim($io->ask('Provide the form namespace', 'App\\Form\\'), '\\');
         $controllerNs = trim($io->ask('Provide the controller namespace', 'App\\Controller\\'), '\\');
-        $templateDir = trim($io->ask('Provide the base template directory', 'user/'), '/');
         $baseTemplate = ltrim($io->ask('Provide the base template file', 'base.html.twig'), '/');
-        $baseTemplateBlock = $io->ask('Provide the base template block name', 'body');
+        $baseTemplateBlock = $io->ask('Provide the template content block name', 'main');
+        $templateDir = trim($io->ask('Provide the user template directory', 'user/'), '/');
 
         if ('' !== $templateDir) {
             $templateDir .= '/';
@@ -574,6 +574,9 @@ PHP
             'base_template_block' => $baseTemplateBlock,
             'controllers' => $controllers,
         ];
+
+        $this->writes[] = [$this->projectDir.'/translations/messages+intl-icu.en.xlf', file_get_contents(\dirname(__DIR__).'/Resources/skeleton/translations/messages+intl-icu.en.xlf')];
+        $this->writes[] = [$this->getTemplateFileName($baseTemplate), $this->getSkeleton('template/base.tpl.php', $vars)];
 
         if ($controllers['registration']) {
             $this->writes[] = [$this->getClassFileName($formNs.'\\RegisterType'), $this->getSkeleton('form/RegisterType.tpl.php', $vars)];
