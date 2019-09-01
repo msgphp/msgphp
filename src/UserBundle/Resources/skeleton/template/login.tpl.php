@@ -3,6 +3,10 @@
 {% block <?= $base_template_block ?> %}
     <h1>{{ 'title.login'|trans }}</h1>
 
+    {% if error %}
+        <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+    {% endif %}
+
     {{ form_start(form) }}
         {{ form_errors(form) }}
         {{ form_row(form.<?= $username_field ?>) }}

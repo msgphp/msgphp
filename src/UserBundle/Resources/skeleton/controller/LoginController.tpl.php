@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace <?= $controller_ns ?>;
 
 use <?= $form_ns ?>\LoginType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,12 +25,9 @@ final class LoginController
             '<?= $username_field ?>' => $authenticationUtils->getLastUsername(),
         ]);
 
-        if (null !== $error = $authenticationUtils->getLastAuthenticationError(true)) {
-            $form->addError(new FormError($error->getMessage(), $error->getMessageKey(), $error->getMessageData()));
-        }
-
         return new Response($twig->render('<?= $template_dir ?>login.html.twig', [
             'form' => $form->createView(),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
         ]));
     }
 }
