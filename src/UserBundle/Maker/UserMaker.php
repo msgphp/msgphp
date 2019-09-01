@@ -541,7 +541,10 @@ PHP
             $prerequisites['security'] = FeatureDetection::hasSecurityBundle($container);
         }
 
-        if (\in_array(false, $prerequisites, true)) {
+        $prerequisites = array_filter($prerequisites, static function (bool $met): bool {
+            return !$met;
+        });
+        if ($prerequisites) {
             $io->warning(['Not all controller dependencies are met, run:', 'composer require '.implode(' ', array_keys($prerequisites))]);
 
             return $io->confirm('Continue anyway?', !$input->isInteractive());
