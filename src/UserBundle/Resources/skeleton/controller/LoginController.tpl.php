@@ -26,8 +26,8 @@ final class LoginController
         ]);
 
         return new Response($twig->render('<?= $template_dir ?>login.html.twig', [
-            'form' => $form->createView(),
             'error' => $authenticationUtils->getLastAuthenticationError(),
+            'form' => $form->createView(),
         ]));
     }
 }

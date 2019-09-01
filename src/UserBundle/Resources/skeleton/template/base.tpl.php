@@ -9,6 +9,7 @@
     <body>
         {% block header %}{% endblock %}
         {% block body %}
+            {{ include('partials/flash-messages.html.twig') }}
             {% block <?= $base_template_block ?> %}{% endblock %}
         {% endblock %}
         {% block javascripts %}{% endblock %}
