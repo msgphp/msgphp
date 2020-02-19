@@ -8,10 +8,10 @@ In this article is explained how to setup [Doctrine ORM infrastructure](../infra
 ## Installation
 
 ```bash
-composer install doctrine/orm doctrine/doctrine-bundle
+composer require doctrine/orm doctrine/doctrine-bundle
 
 # with Symfony Flex
-composer install orm
+composer require orm
 ```
 
 ## Configuration
