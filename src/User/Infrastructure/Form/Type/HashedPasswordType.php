@@ -96,7 +96,6 @@ final class HashedPasswordType extends AbstractType
                     $context->buildViolation($passwordConfirmOptions['invalid_message'], $passwordConfirmOptions['invalid_message_parameters'])
                         ->setCause($this)
                         ->setInvalidValue($value)
-                        ->setTranslationDomain($passwordConfirmOptions['translation_domain'])
                         ->addViolation()
                     ;
                 }
