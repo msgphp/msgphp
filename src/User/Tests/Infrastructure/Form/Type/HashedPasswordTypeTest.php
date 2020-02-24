@@ -165,12 +165,12 @@ final class HashedPasswordTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $hashing = new class() implements PasswordEncoderInterface {
-            public function encodePassword(string $raw, ?string $salt): string
+            public function encodePassword($raw, $salt)
             {
                 return (string) json_encode([$raw, $salt]);
             }
 
-            public function isPasswordValid(string $encoded, string $raw, ?string $salt): bool
+            public function isPasswordValid($encoded, $raw, $salt)
             {
                 return $encoded === $this->encodePassword($raw, $salt);
             }
