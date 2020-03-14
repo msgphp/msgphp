@@ -35,7 +35,7 @@ final class CreateUserTest extends TestCase
 
         self::assertSame('bar', $event->context['foo'] ?? null);
         self::assertInstanceOf(UserId::class, $event->context['id'] ?? null);
-        self::assertTrue($event->context['id']->isEmpty());
+        self::assertTrue($event->context['id']->isNil());
         self::assertCount(1, $repository->findAll());
         self::assertSame($user, $repository->find($user->getId()));
         self::assertSame($user, $repository->findByUsername('user@localhost'));
@@ -58,7 +58,7 @@ final class CreateUserTest extends TestCase
         $repository = self::createUserRepository();
 
         self::assertSame($id, $event->context['id'] ?? null);
-        self::assertFalse($event->user->getId()->isEmpty());
+        self::assertFalse($event->user->getId()->isNil());
         self::assertTrue($repository->exists($event->user->getId()));
         self::assertTrue($repository->usernameExists('user@localhost'));
     }

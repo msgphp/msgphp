@@ -37,7 +37,7 @@ abstract class BaseTestEntity
             $ids[$field] = $id = method_exists($entity, $method = 'get'.ucfirst($field)) ? $entity->{$method}() : $entity->{$field};
 
             if ($id instanceof DomainId) {
-                $primitives[$field] = $id->isEmpty() ? null : $id->toString();
+                $primitives[$field] = $id->isNil() ? null : $id->toString();
             } elseif ($id instanceof self) {
                 $nestedPrimitiveIds = [];
                 self::getPrimaryIds($id, $nestedPrimitiveIds);

@@ -46,9 +46,9 @@ trait DomainIdTrait
         throw new \LogicException('Raw UUID value must be of type string, got "'.\gettype($value).'".');
     }
 
-    public function isEmpty(): bool
+    public function isNil(): bool
     {
-        return false;
+        return $this->uuid->equals(Uuid::fromString(Uuid::NIL));
     }
 
     /**

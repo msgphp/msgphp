@@ -11,9 +11,9 @@ Returns a factorized identifier from any primitive value. Using `null` might imp
 
 ---
 
-### `isEmpty(): bool`
+### `isNil(): bool`
 
-Tells if an identifier value is considered empty, thus has no known primitive value.
+Tells if an identifier value is nil, thus is considered empty/unknown.
 
 ---
 
@@ -25,8 +25,7 @@ Tells if an identifier strictly equals another identifier.
 
 ### `toString(): string`
 
-Returns the identifier its primitive string value. If the identifier is empty (see `isEmpty()`) an empty string should
-be returned.
+Returns the identifier its primitive string value.
 
 ## Implementations
 
@@ -54,8 +53,8 @@ $emptyId = new MyDomainId();
 
 // --- USAGE ---
 
-$id->isEmpty(); // false
-$emptyId->isEmpty(); // true
+$id->isNil(); // false
+$emptyId->isNil(); // true
 
 $id->toString(); // "1"
 $emptyId->toString(); // ""

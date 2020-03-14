@@ -9,16 +9,12 @@ namespace MsgPhp\Domain;
  */
 trait DomainIdTrait
 {
-    /** @var null|string */
+    /** @var string */
     private $id;
 
     public function __construct(?string $id = null)
     {
-        if ('' === $id) {
-            throw new \LogicException('A domain ID cannot be empty.');
-        }
-
-        $this->id = $id;
+        $this->id = $id ?? '';
     }
 
     /**
@@ -26,7 +22,7 @@ trait DomainIdTrait
      */
     public function __toString(): string
     {
-        return $this->id ?? '';
+        return $this->id;
     }
 
     /**
@@ -46,9 +42,9 @@ trait DomainIdTrait
         throw new \LogicException('Raw ID value must be of type string or number, got "'.\gettype($value).'".');
     }
 
-    public function isEmpty(): bool
+    public function isNil(): bool
     {
-        return null === $this->id;
+        return '' === $this->id;
     }
 
     /**
@@ -65,6 +61,6 @@ trait DomainIdTrait
 
     public function toString(): string
     {
-        return $this->id ?? '';
+        return $this->id;
     }
 }

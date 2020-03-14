@@ -21,7 +21,7 @@ interface DomainId
      */
     public static function fromValue($value): self;
 
-    public function isEmpty(): bool;
+    public function isNil(): bool;
 
     /**
      * @param mixed $other

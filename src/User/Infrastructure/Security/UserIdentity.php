@@ -34,8 +34,8 @@ final class UserIdentity implements UserInterface, EquatableInterface, EncoderAw
     {
         $this->id = $user->getId();
 
-        if ($this->id->isEmpty()) {
-            throw new \LogicException('The user ID cannot be empty.');
+        if ($this->id->isNil()) {
+            throw new \LogicException('The user ID cannot be nil.');
         }
 
         $credential = $user->getCredential();

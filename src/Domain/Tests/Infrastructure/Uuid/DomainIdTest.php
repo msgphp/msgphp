@@ -8,7 +8,6 @@ use MsgPhp\Domain\Tests\Fixtures\TestDomainUuid;
 use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainUuid;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * @internal
@@ -17,22 +16,21 @@ final class DomainIdTest extends TestCase
 {
     public function testFromValue(): void
     {
-        $uuid = Uuid::fromString('00000000-0000-0000-0000-000000000000');
+        $uuid = Uuid::fromString(Uuid::NIL);
 
         self::assertInstanceOf(TestDomainUuid::class, TestDomainUuid::fromValue(null));
-        self::assertInstanceOf(TestDomainUuid::class, TestDomainUuid::fromValue('00000000-0000-0000-0000-000000000000'));
+        self::assertInstanceOf(TestOtherDomainUuid::class, TestOtherDomainUuid::fromValue(Uuid::NIL));
+        self::assertSame((array) new TestDomainUuid($uuid), (array) TestDomainUuid::fromValue($uuid));
         self::assertNotSame((array) new TestDomainUuid(), (array) TestDomainUuid::fromValue(null));
         self::assertNotSame((array) new TestDomainUuid(null), (array) TestDomainUuid::fromValue(null));
         self::assertNotSame((array) new TestDomainUuid($uuid), (array) TestDomainUuid::fromValue(null));
-        self::assertSame((array) new TestDomainUuid($uuid), (array) TestDomainUuid::fromValue($uuid));
-        self::assertInstanceOf(TestOtherDomainUuid::class, TestOtherDomainUuid::fromValue(null));
     }
 
     public function testFromValueWithInvalidUuid(): void
     {
         $this->expectException(\LogicException::class);
 
-        TestDomainUuid::fromValue('00000000-0000-0000-0000-00000000000');
+        TestDomainUuid::fromValue('foo');
     }
 
     public function testFromInvalidValue(): void
@@ -42,21 +40,21 @@ final class DomainIdTest extends TestCase
         TestDomainUuid::fromValue(true);
     }
 
-    public function testIsEmpty(): void
+    public function testIsNil(): void
     {
-        self::assertFalse((new TestDomainUuid())->isEmpty());
-        self::assertFalse((new TestDomainUuid($this->createMock(UuidInterface::class)))->isEmpty());
+        self::assertFalse((new TestDomainUuid())->isNil());
+        self::assertTrue((new TestDomainUuid(Uuid::fromString(Uuid::NIL)))->isNil());
     }
 
     public function testEquals(): void
     {
-        $id = new TestDomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'));
+        $id = new TestDomainUuid(Uuid::fromString(Uuid::NIL));
 
         self::assertTrue($id->equals($id));
-        self::assertTrue($id->equals(new TestDomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'))));
+        self::assertTrue($id->equals(new TestDomainUuid(Uuid::fromString(Uuid::NIL))));
         self::assertFalse($id->equals(new TestDomainUuid()));
-        self::assertFalse($id->equals(new TestOtherDomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'))));
-        self::assertFalse($id->equals('00000000-0000-0000-0000-000000000000'));
+        self::assertFalse($id->equals(new TestOtherDomainUuid(Uuid::fromString(Uuid::NIL))));
+        self::assertFalse($id->equals(Uuid::NIL));
         self::assertFalse($id->equals(new \stdClass()));
     }
 

@@ -106,7 +106,7 @@ abstract class DomainIdType extends Type
                 }
             }
 
-            return self::getType($type)->convertToPHPValue($value->isEmpty() ? null : $value->toString(), $platform);
+            return self::getType($type)->convertToPHPValue($value->isNil() ? null : $value->toString(), $platform);
         }
 
         return $value;
@@ -125,7 +125,7 @@ abstract class DomainIdType extends Type
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if ($value instanceof DomainId) {
-            $value = $value->isEmpty() ? null : $value->toString();
+            $value = $value->isNil() ? null : $value->toString();
         }
 
         try {

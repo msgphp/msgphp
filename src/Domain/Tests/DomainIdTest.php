@@ -16,13 +16,14 @@ final class DomainIdTest extends TestCase
 {
     public function testFromValue(): void
     {
+        self::assertInstanceOf(TestDomainId::class, TestDomainId::fromValue(null));
+        self::assertInstanceOf(TestOtherDomainId::class, TestOtherDomainId::fromValue(''));
         self::assertSame((array) new TestDomainId(), (array) TestDomainId::fromValue(null));
         self::assertSame((array) new TestDomainId(null), (array) TestDomainId::fromValue(null));
+        self::assertSame((array) new TestDomainId(''), (array) TestDomainId::fromValue(null));
         self::assertSame((array) new TestDomainId('foo'), (array) TestDomainId::fromValue('foo'));
         self::assertSame((array) new TestDomainId('1'), (array) TestDomainId::fromValue(1));
         self::assertSame((array) new TestDomainId(' '), (array) TestDomainId::fromValue(' '));
-        self::assertNotSame(TestDomainId::fromValue('1'), TestDomainId::fromValue('1'));
-        self::assertInstanceOf(TestOtherDomainId::class, TestOtherDomainId::fromValue(null));
     }
 
     public function testFromInvalidValue(): void
@@ -32,37 +33,31 @@ final class DomainIdTest extends TestCase
         TestDomainId::fromValue(true);
     }
 
-    public function testEmptyIdValue(): void
+    public function testIsNil(): void
     {
-        $this->expectException(\LogicException::class);
-
-        new TestDomainId('');
-    }
-
-    public function testIsEmpty(): void
-    {
-        self::assertTrue((new TestDomainId())->isEmpty());
-        self::assertTrue((new TestDomainId(null))->isEmpty());
-        self::assertFalse((new TestDomainId('foo'))->isEmpty());
-        self::assertFalse((new TestDomainId(' '))->isEmpty());
+        self::assertTrue((new TestDomainId())->isNil());
+        self::assertTrue((new TestDomainId(null))->isNil());
+        self::assertTrue((new TestDomainId(''))->isNil());
+        self::assertFalse((new TestDomainId(' '))->isNil());
+        self::assertFalse((new TestDomainId('foo'))->isNil());
     }
 
     public function testEquals(): void
     {
         $id = new TestDomainId('foo');
-        $emptyId = new TestDomainId();
+        $nilId = new TestDomainId();
 
         self::assertTrue($id->equals($id));
         self::assertTrue($id->equals(new TestDomainId('foo')));
-        self::assertFalse($id->equals($emptyId));
+        self::assertFalse($id->equals($nilId));
         self::assertFalse($id->equals(new TestOtherDomainId('foo')));
         self::assertFalse($id->equals('foo'));
         self::assertFalse($id->equals(new \stdClass()));
-        self::assertTrue($emptyId->equals($emptyId));
-        self::assertTrue($emptyId->equals(new TestDomainId()));
-        self::assertFalse($emptyId->equals(new TestOtherDomainId()));
-        self::assertFalse($emptyId->equals(''));
-        self::assertFalse($emptyId->equals(new \stdClass()));
+        self::assertTrue($nilId->equals($nilId));
+        self::assertTrue($nilId->equals(new TestDomainId()));
+        self::assertFalse($nilId->equals(new TestOtherDomainId()));
+        self::assertFalse($nilId->equals(''));
+        self::assertFalse($nilId->equals(new \stdClass()));
     }
 
     /**
