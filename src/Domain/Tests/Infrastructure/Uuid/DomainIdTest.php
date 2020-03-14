@@ -7,7 +7,6 @@ namespace MsgPhp\Domain\Tests\Infrastructure\Uuid;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainUuid;
 use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainUuid;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -31,9 +30,16 @@ final class DomainIdTest extends TestCase
 
     public function testFromValueWithInvalidUuid(): void
     {
-        $this->expectException(InvalidUuidStringException::class);
+        $this->expectException(\LogicException::class);
 
         TestDomainUuid::fromValue('00000000-0000-0000-0000-00000000000');
+    }
+
+    public function testFromInvalidValue(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        TestDomainUuid::fromValue(true);
     }
 
     public function testIsEmpty(): void
@@ -50,6 +56,8 @@ final class DomainIdTest extends TestCase
         self::assertTrue($id->equals(new TestDomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'))));
         self::assertFalse($id->equals(new TestDomainUuid()));
         self::assertFalse($id->equals(new TestOtherDomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'))));
+        self::assertFalse($id->equals('00000000-0000-0000-0000-000000000000'));
+        self::assertFalse($id->equals(new \stdClass()));
     }
 
     public function testToString(): void

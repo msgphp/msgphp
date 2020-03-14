@@ -36,11 +36,14 @@ trait DomainIdTrait
      */
     public static function fromValue($value): DomainId
     {
-        if (null !== $value && !$value instanceof UuidInterface) {
-            $value = Uuid::fromString((string) $value);
+        if (null === $value || $value instanceof UuidInterface) {
+            return new static($value);
+        }
+        if (\is_string($value)) {
+            return new static(Uuid::fromString($value));
         }
 
-        return new static($value);
+        throw new \LogicException('Raw UUID value must be of type string, got "'.\gettype($value).'".');
     }
 
     public function isEmpty(): bool
@@ -48,17 +51,16 @@ trait DomainIdTrait
         return false;
     }
 
-    public function equals(DomainId $id): bool
+    /**
+     * @param mixed $other
+     */
+    public function equals($other): bool
     {
-        if ($id === $this) {
-            return true;
-        }
-
-        if (static::class !== \get_class($id)) {
+        if (!$other instanceof self || static::class !== \get_class($other)) {
             return false;
         }
 
-        return $this->uuid->equals(Uuid::fromString($id->toString()));
+        return $this->uuid->equals($other->uuid);
     }
 
     public function toString(): string

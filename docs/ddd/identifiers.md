@@ -17,7 +17,7 @@ Tells if an identifier value is considered empty, thus has no known primitive va
 
 ---
 
-### `equals(DomainId $id): bool`
+### `equals($other): bool`
 
 Tells if an identifier strictly equals another identifier.
 
@@ -32,7 +32,7 @@ be returned.
 
 ### `MsgPhp\Domain\DomainIdTrait`
 
-A first-class citizen domain identifier trait compatible with any `scalar` value.
+A first-class citizen domain identifier trait compatible with any string or numeric value.
 
 #### Basic Example
 
@@ -57,12 +57,12 @@ $emptyId = new MyDomainId();
 $id->isEmpty(); // false
 $emptyId->isEmpty(); // true
 
-$id->equals(new MyDomainId('1')); // true
-$emptyId->equals(new MyDomainId()); // false
-$emptyId->equals($emptyId); // true
-
 $id->toString(); // "1"
 $emptyId->toString(); // ""
+
+$id->equals(new MyDomainId('1')); // true
+$id->equals('1'); // false
+$id->equals(new MyDomainId('2')); // false
 ```
 
 ### `MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait`

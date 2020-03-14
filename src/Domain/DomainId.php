@@ -23,7 +23,10 @@ interface DomainId
 
     public function isEmpty(): bool;
 
-    public function equals(self $id): bool;
+    /**
+     * @param mixed $other
+     */
+    public function equals($other): bool;
 
     public function toString(): string;
 }

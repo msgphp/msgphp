@@ -36,11 +36,14 @@ trait DomainIdTrait
      */
     public static function fromValue($value): DomainId
     {
-        if (null !== $value && !\is_string($value)) {
-            $value = (string) $value;
+        if (null === $value || \is_string($value)) {
+            return new static($value);
+        }
+        if (is_numeric($value)) {
+            return new static((string) $value);
         }
 
-        return new static($value);
+        throw new \LogicException('Raw ID value must be of type string or number, got "'.\gettype($value).'".');
     }
 
     public function isEmpty(): bool
@@ -48,17 +51,16 @@ trait DomainIdTrait
         return null === $this->id;
     }
 
-    public function equals(DomainId $id): bool
+    /**
+     * @param mixed $other
+     */
+    public function equals($other): bool
     {
-        if ($id === $this) {
-            return true;
-        }
-
-        if (null === $this->id || $id->isEmpty() || static::class !== \get_class($id)) {
+        if (!$other instanceof self || static::class !== \get_class($other)) {
             return false;
         }
 
-        return $this->id === $id->toString();
+        return $this->id === $other->id;
     }
 
     public function toString(): string
