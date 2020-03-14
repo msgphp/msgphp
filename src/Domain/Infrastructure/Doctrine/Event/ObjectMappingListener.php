@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\Doctrine\Event;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use MsgPhp\Domain\Infrastructure\Doctrine\MappingConfig;
@@ -87,6 +88,15 @@ final class ObjectMappingListener
         foreach ($mapping as $field => $info) {
             if ($metadata->hasField($field) || $metadata->hasAssociation($field)) {
                 continue;
+            }
+
+            if (null !== $idGenerator = $info['id_generator'] ?? null) {
+                if ($idGenerator instanceof AbstractIdGenerator) {
+                    $metadata->setIdGenerator($idGenerator);
+                } else {
+                    $metadata->setIdGeneratorType($idGenerator);
+                }
+                unset($info['id_generator']);
             }
 
             $info = ['fieldName' => $field] + $info;
