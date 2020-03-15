@@ -7,21 +7,16 @@ identifier value, usually used to identity an entity with.
 
 ### `static fromValue(mixed $value): DomainId`
 
-Returns a factorized identifier from any primitive value. Using `null` might imply an empty identifier.
-
----
+Returns a factorized identifier from any primitive value. Using `null` might either imply an nil/empty identifier or a
+self-generated identifier value.
 
 ### `isNil(): bool`
 
 Tells if an identifier value is nil, thus is considered empty/unknown.
 
----
-
 ### `equals($other): bool`
 
 Tells if an identifier strictly equals another identifier.
-
----
 
 ### `toString(): string`
 
@@ -29,42 +24,38 @@ Returns the identifier its primitive string value.
 
 ## Implementations
 
-### `MsgPhp\Domain\DomainIdTrait`
+### `MsgPhp\Domain\GenericDomainId`
 
-A first-class citizen domain identifier trait compatible with any string or numeric value.
+A first-class citizen domain identifier compatible with any string or numeric value.
 
 #### Basic Example
 
 ```php
 <?php
 
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\DomainIdTrait;
+use MsgPhp\Domain\GenericDomainId;
 
-// --- SETUP ---
+// SETUP
 
-class MyDomainId implements DomainId
-{
-    use DomainIdTrait;
-}
+$id = new GenericDomainId('1');
+$id = GenericDomainId::fromValue(1);
+$nilId = new GenericDomainId();
 
-$id = new MyDomainId('1');
-$emptyId = new MyDomainId();
-
-// --- USAGE ---
+// USAGE
 
 $id->isNil(); // false
-$emptyId->isNil(); // true
+$nilId->isNil(); // true
 
 $id->toString(); // "1"
-$emptyId->toString(); // ""
+$nilId->toString(); // ""
 
-$id->equals(new MyDomainId('1')); // true
+$id->equals(new GenericDomainId('1')); // true
 $id->equals('1'); // false
-$id->equals(new MyDomainId('2')); // false
+$id->equals(new GenericDomainId('2')); // false
+$id->equals(new GenericDomainId()); // false
 ```
 
-### `MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait`
+### `MsgPhp\Domain\Infrastructure\Uuid\DomainUuid`
 
 A UUID tailored domain identifier trait.
 
