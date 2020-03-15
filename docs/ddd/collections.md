@@ -87,7 +87,7 @@ Get the total no. of items in the full result set.
 
 ### `MsgPhp\Domain\GenericDomainCollection`
 
-A first-class citizen domain collection compatible with any `iterable` value.
+A generic collection compatible with any `iterable` value.
 
 #### Basic Example
 
@@ -131,7 +131,7 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
 
 ### `MsgPhp\Domain\GenericPaginatedDomainCollection`
 
-A first-class citizen paginated domain collection compatible with any `iterable` value.
+A generic paginated collection compatible with any `iterable` value.
 
 ### Infrastructural
 

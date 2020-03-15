@@ -26,7 +26,7 @@ Returns the identifier its primitive string value.
 
 ### `MsgPhp\Domain\GenericDomainId`
 
-A first-class citizen domain identifier compatible with any string or numeric value.
+A generic identifier compatible with any `string` or `numeric` value.
 
 #### Basic Example
 
@@ -53,6 +53,35 @@ $id->equals(new GenericDomainId('1')); // true
 $id->equals('1'); // false
 $id->equals(new GenericDomainId('2')); // false
 $id->equals(new GenericDomainId()); // false
+```
+
+### `MsgPhp\Domain\AbstractDomainId`
+
+A decorating identifier to built custom/concrete identifiers upon.
+
+#### Basic Example
+
+```php
+<?php
+
+use MsgPhp\Domain\AbstractDomainId;use MsgPhp\Domain\DomainId;
+
+// SETUP
+
+class MyDomainId extends AbstractDomainId
+{
+}
+
+class MyOtherDomainId extends AbstractDomainId
+{
+}
+
+$id = MyDomainId::fromValue(1);
+$otherId = MyOtherDomainId::fromValue(1);
+
+// USAGE
+
+$id->equals($otherId); // false
 ```
 
 ### Infrastructural
