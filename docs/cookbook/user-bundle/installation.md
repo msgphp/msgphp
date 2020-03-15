@@ -9,7 +9,7 @@ composer require msgphp/user-bundle
 !!! info
     When using [Symfony Flex] to manage your application the minimal bundle [recipe configuration] is applied
     automatically upon installation
-    
+
 ## Configure the User Entity
 
 ```php
@@ -64,7 +64,7 @@ not have to be queried for it after. To disable it, use:
 public function __construct()
 {
     $this->id = new \MsgPhp\User\ScalarUserId();
-    //$this->id = new \MsgPhp\User\Infrastructure\Uuid\UserUuid();
+    //$this->id = new \MsgPhp\User\Infrastructure\Uid\UserUuid();
 }
 ```
 
@@ -96,7 +96,7 @@ If, for some reason, the default mapping needs to be customized, create the file
 ```xml
 <doctrine-mapping>
     <mapped-superclass name="MsgPhp\User\User">
-        <!-- ... -->    
+        <!-- ... -->
     </mapped-superclass>
 </doctrine-mapping>
 ```

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\User\Infrastructure\Uuid;
+namespace MsgPhp\User\Infrastructure\Uid;
 
-use MsgPhp\Domain\Infrastructure\Uuid\DomainIdTrait;
+use MsgPhp\Domain\Infrastructure\Uid\DomainIdTrait;
 use MsgPhp\User\UserId;
 
 /**

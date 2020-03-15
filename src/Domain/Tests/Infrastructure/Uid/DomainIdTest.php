@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Infrastructure\Uuid;
+namespace MsgPhp\Domain\Tests\Infrastructure\Uid;
 
 use MsgPhp\Domain\Tests\Fixtures\TestDomainUuid;
 use MsgPhp\Domain\Tests\Fixtures\TestOtherDomainUuid;

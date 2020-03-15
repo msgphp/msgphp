@@ -55,8 +55,6 @@ $id->equals(new GenericDomainId('2')); // false
 $id->equals(new GenericDomainId()); // false
 ```
 
-### `MsgPhp\Domain\Infrastructure\Uuid\DomainUuid`
+### Infrastructural
 
-A UUID tailored domain identifier trait.
-
-- [Read more](../infrastructure/uuid.md#domain-identifier)
+- [Unique Identifier](../infrastructure/uid.md#domain-identifier) (UUID, ULID, etc.)

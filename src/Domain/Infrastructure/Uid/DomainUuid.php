@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Infrastructure\Uuid;
+namespace MsgPhp\Domain\Infrastructure\Uid;
 
 use MsgPhp\Domain\DomainId;
 use Ramsey\Uuid\Uuid;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MsgPhp\Domain\Tests\Infrastructure\Uuid;
+namespace MsgPhp\Domain\Tests\Infrastructure\Uid;
 
 use MsgPhp\Domain\GenericDomainId;
-use MsgPhp\Domain\Infrastructure\Uuid\DomainUuid;
+use MsgPhp\Domain\Infrastructure\Uid\DomainUuid;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

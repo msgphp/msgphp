@@ -32,7 +32,7 @@ MyDomainIdType::setDataType(Type::GUID);
 Type::addType(MyDomainIdType::NAME, MyDomainIdType::class);
 ```
 
-To leverage a tailored [UUID identifier](../infrastructure/uuid.md#domain-identifier) use one of the UUID data types
+To leverage a tailored [UUID identifier](../infrastructure/uid.md#domain-identifier) use one of the UUID data types
 provided by [ramsey/uuid-doctrine].
 
 ```php

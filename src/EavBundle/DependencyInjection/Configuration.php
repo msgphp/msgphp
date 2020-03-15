@@ -15,7 +15,7 @@ use MsgPhp\Eav\AttributeValue;
 use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\Eav\Command;
 use MsgPhp\Eav\Infrastructure\Doctrine as DoctrineInfrastructure;
-use MsgPhp\Eav\Infrastructure\Uuid as UuidInfrastructure;
+use MsgPhp\Eav\Infrastructure\Uid as UidInfrastructure;
 use MsgPhp\Eav\ScalarAttributeId;
 use MsgPhp\Eav\ScalarAttributeValueId;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -39,11 +39,11 @@ final class Configuration implements ConfigurationInterface
     private const ID_TYPE_MAPPING = [
         AttributeId::class => [
             'scalar' => ScalarAttributeId::class,
-            'uuid' => UuidInfrastructure\AttributeUuid::class,
+            'uuid' => UidInfrastructure\AttributeUuid::class,
         ],
         AttributeValueId::class => [
             'scalar' => ScalarAttributeValueId::class,
-            'uuid' => UuidInfrastructure\AttributeValueUuid::class,
+            'uuid' => UidInfrastructure\AttributeValueUuid::class,
         ],
     ];
     private const COMMAND_MAPPING = [

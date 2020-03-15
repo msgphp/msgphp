@@ -43,4 +43,4 @@ nav:
           - Elasticsearch: infrastructure/elasticsearch.md
           - Symfony Console: infrastructure/symfony-console.md
           - Symfony Messenger: infrastructure/symfony-messenger.md
-          - UUID: infrastructure/uuid.md
+          - UID: infrastructure/uid.md
