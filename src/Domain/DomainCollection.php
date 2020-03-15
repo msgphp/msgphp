@@ -13,16 +13,6 @@ namespace MsgPhp\Domain;
  */
 interface DomainCollection extends \Countable, \IteratorAggregate
 {
-    /**
-     * @template T2Key of array-key
-     * @template T2
-     *
-     * @param null|iterable<T2Key, T2> $value
-     *
-     * @return self<T2Key, T2>
-     */
-    public static function fromValue(?iterable $value): self;
-
     public function isEmpty(): bool;
 
     /**

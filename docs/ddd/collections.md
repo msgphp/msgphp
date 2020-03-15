@@ -10,10 +10,6 @@ primitive iterable value. It may hold any type of element values.
 - [`\Countable`][countable]
 - [`\IteratorAggregate`][iterator-aggregate]
 
-### `static fromValue(?iterable $value): DomainCollection`
-
-Returns a factorized collection from any primitive iterable. Using `null` implies an empty collection.
-
 ### `isEmpty(): bool`
 
 Tells if a collection is considered empty, i.e. contains zero elements.
@@ -87,7 +83,7 @@ Get the total no. of items in the full result set.
 
 ### `MsgPhp\Domain\GenericDomainCollection`
 
-A generic collection compatible with any `iterable` value.
+A generic paginated collection compatible with any `iterable` value.
 
 #### Basic Example
 
@@ -128,10 +124,6 @@ $firstTwoIntsPlussed = $firstTwoInts->map(function (int $value): int {
     return ++$value;
 });
 ```
-
-### `MsgPhp\Domain\GenericPaginatedDomainCollection`
-
-A generic paginated collection compatible with any `iterable` value.
 
 ### Infrastructural
 

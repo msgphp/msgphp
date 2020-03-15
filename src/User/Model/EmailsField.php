@@ -21,6 +21,6 @@ trait EmailsField
      */
     public function getEmails(): DomainCollection
     {
-        return GenericDomainCollection::fromValue($this->emails);
+        return new GenericDomainCollection($this->emails);
     }
 }

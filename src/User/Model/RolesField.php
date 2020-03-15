@@ -21,6 +21,6 @@ trait RolesField
      */
     public function getRoles(): DomainCollection
     {
-        return GenericDomainCollection::fromValue($this->roles);
+        return new GenericDomainCollection($this->roles);
     }
 }

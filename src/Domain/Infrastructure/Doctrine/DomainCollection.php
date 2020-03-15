@@ -23,20 +23,11 @@ final class DomainCollection implements BaseDomainCollection
     private $collection;
 
     /**
-     * @param Collection<TKey, T> $collection
+     * @param null|Collection<TKey, T> $collection
      */
-    public function __construct(Collection $collection)
+    public function __construct(?Collection $collection = null)
     {
-        $this->collection = $collection;
-    }
-
-    public static function fromValue(?iterable $value): BaseDomainCollection
-    {
-        if (!$value instanceof Collection) {
-            $value = new ArrayCollection($value instanceof \Traversable ? iterator_to_array($value) : $value ?? []);
-        }
-
-        return new self($value);
+        $this->collection = $collection ?? new ArrayCollection();
     }
 
     public function getIterator(): \Traversable
@@ -88,17 +79,17 @@ final class DomainCollection implements BaseDomainCollection
 
     public function filter(callable $filter): BaseDomainCollection
     {
-        return self::fromValue($this->collection->filter(\Closure::fromCallable($filter)));
+        return new self($this->collection->filter(\Closure::fromCallable($filter)));
     }
 
     public function slice(int $offset, int $limit = 0): BaseDomainCollection
     {
-        return self::fromValue(new ArrayCollection($this->collection->slice($offset, $limit ?: null)));
+        return new self(new ArrayCollection($this->collection->slice($offset, $limit ?: null)));
     }
 
     public function map(callable $mapper): BaseDomainCollection
     {
-        return self::fromValue($this->collection->map(\Closure::fromCallable($mapper)));
+        return new self($this->collection->map(\Closure::fromCallable($mapper)));
     }
 
     public function count(): int

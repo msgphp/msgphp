@@ -57,7 +57,7 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
     public function testCreateWithDomainCollection(): void
     {
-        $collection = (new GenericDomainObjectFactory())->create(GenericDomainCollection::class, ['value' => [1, 2, 3]]);
+        $collection = (new GenericDomainObjectFactory())->create(GenericDomainCollection::class, ['elements' => [1, 2, 3]]);
 
         self::assertSame([1, 2, 3], iterator_to_array($collection));
     }

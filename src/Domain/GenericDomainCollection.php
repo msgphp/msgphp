@@ -12,24 +12,31 @@ use MsgPhp\Domain\Exception\UnknownCollectionElement;
  *
  * @template TKey of array-key
  * @template T
- * @implements DomainCollection<TKey,T>
+ * @implements PaginatedDomainCollection<TKey,T>
  */
-final class GenericDomainCollection implements DomainCollection
+final class GenericDomainCollection implements PaginatedDomainCollection
 {
     /** @var iterable<TKey, T> */
     private $elements;
+    /** @var float */
+    private $offset;
+    /** @var float */
+    private $limit;
+    /** @var null|float */
+    private $count;
+    /** @var null|float */
+    private $totalCount;
 
     /**
-     * @param iterable<TKey, T> $elements
+     * @param null|iterable<TKey, T> $elements
      */
-    public function __construct(iterable $elements)
+    public function __construct(?iterable $elements = null, float $offset = .0, float $limit = .0, ?float $count = null, ?float $totalCount = null)
     {
-        $this->elements = $elements;
-    }
-
-    public static function fromValue(?iterable $value): DomainCollection
-    {
-        return new self($value ?? []);
+        $this->elements = $elements ?? [];
+        $this->offset = $offset;
+        $this->limit = $limit;
+        $this->count = $count;
+        $this->totalCount = $totalCount;
     }
 
     public function getIterator(): \Traversable
@@ -51,10 +58,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function isEmpty(): bool
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->isEmpty();
-        }
-
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $element) {
                 return false;
@@ -68,10 +71,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function contains($element): bool
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->contains($element);
-        }
-
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $key => $knownElement) {
                 if ($element === $knownElement) {
@@ -87,10 +86,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function containsKey($key): bool
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->containsKey($key);
-        }
-
         if ($this->elements instanceof \Traversable) {
             /** @psalm-suppress InvalidCast */
             $key = \is_int($key) ? (string) $key : $key;
@@ -109,10 +104,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function first()
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->first();
-        }
-
         if ($this->elements instanceof \Traversable) {
             foreach ($this->elements as $element) {
                 return $element;
@@ -130,10 +121,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function last()
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->last();
-        }
-
         if ($this->elements instanceof \Traversable) {
             $empty = true;
             $element = null;
@@ -157,10 +144,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function get($key)
     {
-        if ($this->elements instanceof DomainCollection) {
-            return $this->elements->get($key);
-        }
-
         if ($this->elements instanceof \Traversable) {
             /** @psalm-suppress InvalidCast */
             $key = \is_int($key) ? (string) $key : $key;
@@ -183,11 +166,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function filter(callable $filter): DomainCollection
     {
-        if ($this->elements instanceof DomainCollection) {
-            /** @var DomainCollection<TKey, T> */
-            return $this->elements->filter($filter);
-        }
-
         if ($this->elements instanceof \Traversable) {
             return new self((/** @return \Generator<TKey, T> */function () use ($filter): iterable {
                 foreach ($this->elements as $key => $element) {
@@ -203,11 +181,6 @@ final class GenericDomainCollection implements DomainCollection
 
     public function slice(int $offset, int $limit = 0): DomainCollection
     {
-        if ($this->elements instanceof DomainCollection) {
-            /** @var DomainCollection<TKey, T> */
-            return $this->elements->slice($offset, $limit);
-        }
-
         if ($this->elements instanceof \Traversable) {
             return new self((/** @return \Generator<TKey, T> */function () use ($offset, $limit): iterable {
                 $i = -1;
@@ -233,11 +206,6 @@ final class GenericDomainCollection implements DomainCollection
      */
     public function map(callable $mapper): DomainCollection
     {
-        if ($this->elements instanceof DomainCollection) {
-            /** @var DomainCollection<TKey, T2> */
-            return $this->elements->map($mapper);
-        }
-
         if ($this->elements instanceof \Traversable) {
             return new self((/** @return \Generator<TKey, T2> */function () use ($mapper): iterable {
                 foreach ($this->elements as $key => $element) {
@@ -251,10 +219,47 @@ final class GenericDomainCollection implements DomainCollection
 
     public function count(): int
     {
+        if (null !== $this->count) {
+            return (int) $this->count;
+        }
+
         if ($this->elements instanceof \Countable) {
             return $this->elements->count();
         }
 
         return $this->elements instanceof \Traversable ? iterator_count($this->elements) : \count($this->elements);
+    }
+
+    public function getOffset(): float
+    {
+        return $this->offset;
+    }
+
+    public function getLimit(): float
+    {
+        return $this->limit;
+    }
+
+    public function getCurrentPage(): float
+    {
+        if (0 >= $this->limit) {
+            return 1.;
+        }
+
+        return floor($this->offset / $this->limit) + 1.;
+    }
+
+    public function getLastPage(): float
+    {
+        if (0 >= $this->limit) {
+            return 1.;
+        }
+
+        return ceil($this->getTotalCount() / $this->limit) ?: 1.;
+    }
+
+    public function getTotalCount(): float
+    {
+        return $this->totalCount ?? (float) \count($this);
     }
 }

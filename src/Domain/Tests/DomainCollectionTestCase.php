@@ -11,20 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 abstract class DomainCollectionTestCase extends TestCase
 {
-    public function testFromValue(): void
-    {
-        $class = \get_class(static::createCollection([]));
-
-        self::assertSame([], iterator_to_array($class::fromValue(null)));
-        self::assertSame([1], iterator_to_array($class::fromValue([1])));
-        self::assertSame([1, 'k' => '2'], iterator_to_array($class::fromValue([1, 'k' => '2'])));
-        self::assertSame([1, 2, 3], iterator_to_array($class::fromValue(new \ArrayIterator([1, 2, 3]))));
-        self::assertSame(['k' => 1, 2, '3' => 'v'], iterator_to_array($class::fromValue((static function () {
-            yield from ['k' => 1, 2];
-            yield '3' => 'v';
-        })())));
-    }
-
     public function testGetIterator(): void
     {
         self::assertSame([], iterator_to_array(static::createCollection([])));

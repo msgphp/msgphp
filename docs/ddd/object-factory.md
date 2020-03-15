@@ -25,8 +25,7 @@ Returns the actual class name the factory uses for a given class name.
 
 ### `MsgPhp\Domain\Factory\GenericDomainObjectFactory`
 
-A generic object factory. It initializes a class by reading its [constructor] arguments. If the class is a sub class
-of `MsgPhp\Domain\DomainId` or `MsgPhp\Domain\DomainCollection` its static `fromValue` constructor will be used instead.
+A generic object factory. It initializes a class by reading its [constructor] arguments.
 
 Context elements mapped by argument name will be used as argument value. In case of a type-hinted object argument a
 nested context may be provided to initialize the object with.

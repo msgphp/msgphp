@@ -21,6 +21,6 @@ trait AttributeValuesField
      */
     public function getAttributeValues(): DomainCollection
     {
-        return GenericDomainCollection::fromValue($this->attributeValues);
+        return new GenericDomainCollection($this->attributeValues);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Factory;
 
-use MsgPhp\Domain\DomainCollection;
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Exception\InvalidClass;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
@@ -37,7 +36,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactory
     {
         $class = $this->getClass($class, $context);
 
-        if (is_subclass_of($class, DomainId::class) || is_subclass_of($class, DomainCollection::class)) {
+        if (is_subclass_of($class, DomainId::class)) {
             return $class::fromValue(...$this->resolveArguments($class, 'fromValue', $context));
         }
 
