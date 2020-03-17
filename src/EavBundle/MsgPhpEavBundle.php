@@ -17,11 +17,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 final class MsgPhpEavBundle extends Bundle
 {
-    public function boot(): void
-    {
-        BundleHelper::boot($this->container);
-    }
-
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new CleanupPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);

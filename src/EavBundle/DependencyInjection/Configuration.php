@@ -29,22 +29,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     public const PACKAGE_NS = 'MsgPhp\\Eav\\';
-    public const DOCTRINE_TYPE_MAPPING = [
-        AttributeId::class => DoctrineInfrastructure\Type\AttributeIdType::class,
-        AttributeValueId::class => DoctrineInfrastructure\Type\AttributeValueIdType::class,
-    ];
     public const DOCTRINE_REPOSITORY_MAPPING = [
         Attribute::class => DoctrineInfrastructure\Repository\AttributeRepository::class,
-    ];
-    private const ID_TYPE_MAPPING = [
-        AttributeId::class => [
-            'scalar' => ScalarAttributeId::class,
-            'uuid' => UidInfrastructure\AttributeUuid::class,
-        ],
-        AttributeValueId::class => [
-            'scalar' => ScalarAttributeValueId::class,
-            'uuid' => UidInfrastructure\AttributeValueUuid::class,
-        ],
     ];
     private const COMMAND_MAPPING = [
         Attribute::class => [
@@ -90,9 +76,6 @@ final class Configuration implements ConfigurationInterface
                 ->defaultValue(ConfigHelper::DEFAULT_ID_TYPE)
                 ->cannotBeEmpty()
             ->end()
-        ->end()
-        ->validate()
-            ->always(ConfigHelper::defaultBundleConfig(self::ID_TYPE_MAPPING))
         ->end()
         ->validate()
             ->always(static function (array $config): array {
