@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
 use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\GenericDomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
@@ -13,9 +14,9 @@ use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 class TestCompositeEntity extends BaseTestEntity
 {
     /**
-     * @var DomainId
+     * @var string
      * @Doctrine\ORM\Mapping\Id()
-     * @Doctrine\ORM\Mapping\Column(type="domain_id")
+     * @Doctrine\ORM\Mapping\Column(type="string")
      */
     public $idA;
     /**
@@ -33,7 +34,7 @@ class TestCompositeEntity extends BaseTestEntity
     public static function getFieldValues(): array
     {
         return [
-            'idA' => [new TestDomainId('-1'), new TestDomainId('0'), new TestDomainId('1')],
+            'idA' => ['-1', '0', '1'],
             'idB' => ['', 'foo'],
         ];
     }

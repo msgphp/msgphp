@@ -12,7 +12,6 @@ use MsgPhp\Domain\Tests\Fixtures\Entities;
 use MsgPhp\Domain\Tests\Fixtures\T;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainEntityRepository;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
-use MsgPhp\Domain\Tests\Fixtures\TestDomainIdType;
 
 /**
  * @internal
@@ -53,7 +52,7 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
         /** @psalm-suppress PossiblyNullReference */
         self::assertSame(\PDO::PARAM_STR, $parameters->get(1)->getType());
         /** @psalm-suppress PossiblyNullReference */
-        self::assertSame(TestDomainIdType::NAME, $parameters->get(2)->getType());
+        self::assertSame(Type::INTEGER, $parameters->get(2)->getType());
     }
 
     public function testToIdentity(): void
@@ -78,7 +77,6 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
 
     protected static function createRepository(string $class): TestDomainEntityRepository
     {
-        /** @var TestDomainEntityRepository<T> */
         return new TestEntityRepository($class, self::$em);
     }
 

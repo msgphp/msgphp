@@ -111,63 +111,6 @@ $otherEntity = $factory->create(MyEntity::class, [
 ]);
 ```
 
-## Domain Identifier Hydration
-
-When working with [domain identifiers](../ddd/identifiers.md) and its corresponding [type](doctrine-dbal.md#domain-identifier-type)
-a problem can occur when hydrating scalar values, e.g. with `Query::getScalarResult()`.
-
-It would use instances of `MsgPhp\Domain\DomainId` that can only be casted to string as its (true) scalar value (due to
-`__toString()`). In case the underlying data type is e.g. `integer` it will be lost.
-
-To overcome, two hydration modes are available to hydrate the primitive identifier value instead.
-
-### Basic Example
-
-```php
-<?php
-
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping as ORM;
-use MsgPhp\Domain\Infrastructure\Doctrine\Hydration\ScalarHydrator;
-use MsgPhp\Domain\Infrastructure\Doctrine\Hydration\SingleScalarHydrator;
-
-// SETUP
-
-/**
- * @ORM\Entity()
- */
-class MyEntity
-{
-    /**
-     * @var MyDomainId|null
-     * @ORM\Id() @ORM\Column(type="my_domain_id")
-     */
-    public $id;
-}
-
-MyDomainIdType::setClass(MyDomainId::class);
-MyDomainIdType::setDataType(Type::INTEGER);
-Type::addType(MyDomainIdType::NAME, MyDomainIdType::class);
-
-/** @var EntityManagerInterface $em */
-
-$config = $em->getConfiguration();
-
-$config->addCustomHydrationMode(ScalarHydrator::NAME, ScalarHydrator::class);
-$config->addCustomHydrationMode(SingleScalarHydrator::NAME, SingleScalarHydrator::class);
-
-// USAGE
-
-$query = $em->createQuery('SELECT entity.id FROM MyEntity entity');
-
-$query->getScalarResult()[0]['id']; // "1"
-$query->getResult(ScalarHydrator::NAME)[0]['id']; // int(1)
-
-$query->getSingleScalarResult(); // "1"
-$query->getSingleResult(SingleScalarHydrator::NAME); // int(1)
-```
-
 [orm-project]: http://www.doctrine-project.org/projects/orm.html
 [ORM inheritance]: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html
 [doctrine/orm]: https://packagist.org/packages/doctrine/orm

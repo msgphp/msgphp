@@ -8,7 +8,6 @@ use Doctrine\ORM\Proxy\Proxy;
 use MsgPhp\Domain\Factory\DomainObjectFactory as BaseDomainObjectFactory;
 use MsgPhp\Domain\Infrastructure\Doctrine\DomainObjectFactory;
 use MsgPhp\Domain\Tests\Fixtures\Entities;
-use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -96,7 +95,7 @@ final class DomainObjectFactoryTest extends TestCase
 
     public function testReference(): void
     {
-        self::$em->persist($entity = Entities\TestEntity::create(['intField' => 1, 'boolField' => false]));
+        self::$em->persist($entity = Entities\TestEntity::create(['intField' => 123, 'boolField' => false]));
         self::$em->flush();
         self::$em->clear();
 
@@ -107,9 +106,9 @@ final class DomainObjectFactoryTest extends TestCase
         ;
         $factory = new DomainObjectFactory($innerFactory, self::$em);
 
-        self::assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, ['id' => $id = new TestDomainId('1')]));
+        self::assertInstanceOf(Proxy::class, $ref = $factory->reference(Entities\TestEntity::class, ['id' => 1]));
         self::assertSame('1', $ref->getId()->toString());
-        self::assertSame(1, $ref->intField);
+        self::assertSame(123, $ref->intField);
         self::assertFalse($ref->boolField);
     }
 

@@ -6,6 +6,7 @@ namespace MsgPhp\Domain\Infrastructure\Doctrine;
 
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -224,7 +225,7 @@ trait DomainEntityRepositoryTrait
     /**
      * @param mixed $value
      */
-    private function addFieldParameter(QueryBuilder $qb, string $field, $value, ?string $type = null): string
+    private function addFieldParameter(QueryBuilder $qb, string $field, $value): string
     {
         $name = $base = str_replace('.', '_', $field);
         $counter = 0;
@@ -233,8 +234,7 @@ trait DomainEntityRepositoryTrait
             $name = $base.++$counter;
         }
 
-        /** @psalm-suppress InternalMethod */
-        $qb->setParameter($name, $value, $type ?? DomainIdType::resolveName($value));
+        $qb->setParameter($name, $this->castFieldValue($field, $this->castFieldValue($field, $value)));
 
         return ':'.$name;
     }
@@ -244,7 +244,8 @@ trait DomainEntityRepositoryTrait
      */
     private function toIdentity($id): ?array
     {
-        $fields = $this->em->getClassMetadata($this->class)->getIdentifierFieldNames();
+        $metadata = $this->em->getClassMetadata($this->class);
+        $fields = $metadata->getIdentifierFieldNames();
 
         if (!\is_array($id)) {
             if (1 !== \count($fields)) {
@@ -255,15 +256,16 @@ trait DomainEntityRepositoryTrait
         }
 
         foreach ($id as $field => $value) {
-            if (\is_object($value) && !$value instanceof DomainId) {
+            $value = $this->castFieldValue((string) $field, $value);
+
+            if (\is_object($value)) {
                 try {
                     $value = $this->em->getUnitOfWork()->getSingleIdentifierValue($value);
                 } catch (MappingException $e) {
                 }
             }
 
-            /** @psalm-suppress InternalMethod */
-            $id[$field] = DomainIdType::resolveValue($value, $this->em->getConnection()->getDatabasePlatform());
+            $id[$field] = $value;
         }
 
         $identity = [];
@@ -277,5 +279,25 @@ trait DomainEntityRepositoryTrait
         }
 
         return !$id && $identity ? $identity : null;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function castFieldValue(string $field, $value)
+    {
+        if (!$value instanceof DomainId) {
+            return $value;
+        }
+
+        $value = $value->isNil() ? null : $value->toString();
+
+        if (null === $type = $this->em->getClassMetadata($this->class)->getTypeOfField($field)) {
+            return $value;
+        }
+
+        return Type::getType($type)->convertToPHPValue($value, $this->em->getConnection()->getDatabasePlatform());
     }
 }

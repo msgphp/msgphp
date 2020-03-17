@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\DependencyInjection;
 
-use Doctrine\DBAL\Types\Type as DoctrineType;
 use MsgPhp\Domain\Infrastructure\Console as ConsoleInfrastructure;
-use Ramsey\Uuid\Doctrine as DoctrineUuid;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,47 +22,11 @@ final class ExtensionHelper
         $container->setParameter($param = 'msgphp.domain.class_mapping', $container->hasParameter($param) ? $classMapping + $container->getParameter($param) : $classMapping);
     }
 
-    public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $idTypeMapping, array $typeClassMapping, array $mappingFiles): void
+    public static function configureDoctrineOrm(ContainerBuilder $container, array $classMapping, array $mappingFiles): void
     {
-        $dbalTypes = $dbalMappingTypes = $typeConfig = [];
-        $uuidMapping = [
-            'uuid' => DoctrineUuid\UuidType::class,
-            'uuid_binary' => DoctrineUuid\UuidBinaryType::class,
-            'uuid_binary_ordered_time' => DoctrineUuid\UuidBinaryOrderedTimeType::class,
-        ];
-
-        foreach ($typeClassMapping as $idClass => $typeClass) {
-            /** @psalm-suppress DeprecatedConstant */
-            $type = $idTypeMapping[$idClass] ?? DoctrineType::INTEGER;
-
-            if (isset($uuidMapping[$type])) {
-                if (!class_exists($uuidClass = $uuidMapping[$type])) {
-                    throw new \LogicException('Type "'.$type.'" for identifier "'.$idClass.'" requires "ramsey/uuid-doctrine".');
-                }
-
-                $dbalTypes[$uuidClass::NAME] = $uuidClass;
-
-                if ('uuid_binary' === $type || 'uuid_binary_ordered_time' === $type) {
-                    $dbalMappingTypes[$type] = 'binary';
-                }
-            }
-
-            if (!\defined($typeClass.'::NAME')) {
-                throw new \LogicException('Type class "'.$typeClass.'" for identifier "'.$idClass.'" requires a "NAME" constant.');
-            }
-
-            $dbalTypes[$typeClass::NAME] = $typeClass;
-            $typeConfig[$typeClass::NAME] = ['class' => $classMapping[$idClass] ?? $idClass, 'type' => $type, 'type_class' => $typeClass];
-        }
-
-        $container->setParameter($param = 'msgphp.doctrine.type_config', $container->hasParameter($param) ? $typeConfig + $container->getParameter($param) : $typeConfig);
         $container->setParameter($param = 'msgphp.doctrine.mapping_files', $container->hasParameter($param) ? array_merge($container->getParameter($param), $mappingFiles) : $mappingFiles);
 
         $container->prependExtensionConfig('doctrine', [
-            'dbal' => [
-                'types' => $dbalTypes,
-                'mapping_types' => $dbalMappingTypes,
-            ],
             'orm' => [
                 'resolve_target_entities' => $classMapping,
             ],

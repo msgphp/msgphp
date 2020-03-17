@@ -13,9 +13,9 @@ use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 class TestPrimitiveEntity extends BaseTestEntity
 {
     /**
-     * @var DomainId
+     * @var string
      * @Doctrine\ORM\Mapping\Id()
-     * @Doctrine\ORM\Mapping\Column(type="domain_id")
+     * @Doctrine\ORM\Mapping\Column(type="string")
      */
     public $id;
 
@@ -27,7 +27,7 @@ class TestPrimitiveEntity extends BaseTestEntity
     public static function getFieldValues(): array
     {
         return [
-            'id' => [new TestDomainId('-1'), new TestDomainId('0'), new TestDomainId('1')],
+            'id' => ['-1', '0', '1'],
         ];
     }
 }

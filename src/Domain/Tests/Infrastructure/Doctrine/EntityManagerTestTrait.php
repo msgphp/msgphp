@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Infrastructure\Doctrine;
 
 use MsgPhp\Domain\Infrastructure\Doctrine\Test\EntityManagerTestTrait as BaseEntityManagerTestTrait;
-use MsgPhp\Domain\Tests\Fixtures;
 
 trait EntityManagerTestTrait
 {
@@ -30,7 +29,6 @@ trait EntityManagerTestTrait
 
     protected static function getEntityIdTypes(): iterable
     {
-        yield Fixtures\TestDomainIdType::class => Fixtures\TestDomainId::class;
-        yield Fixtures\TestOtherDomainIdType::class => Fixtures\TestOtherDomainId::class;
+        return [];
     }
 }

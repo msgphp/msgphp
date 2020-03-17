@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
 use MsgPhp\Domain\DomainId;
+use MsgPhp\Domain\GenericDomainId;
 use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
 
 /**
@@ -33,10 +34,10 @@ class TestEntity extends BaseTestEntity
      */
     public $boolField;
     /**
-     * @var null|DomainId
+     * @var null|int
      * @Doctrine\ORM\Mapping\Id()
      * @Doctrine\ORM\Mapping\GeneratedValue()
-     * @Doctrine\ORM\Mapping\Column(type="domain_id")
+     * @Doctrine\ORM\Mapping\Column(type="integer")
      */
     private $id;
 
@@ -57,11 +58,11 @@ class TestEntity extends BaseTestEntity
 
     public function setId(DomainId $id): void
     {
-        $this->id = $id;
+        $this->id = $id->isNil() ? null : (int) $id->toString();
     }
 
     public function getId(): DomainId
     {
-        return $this->id ?? ($this->id = new TestDomainId());
+        return GenericDomainId::fromInt($this->id);
     }
 }

@@ -49,22 +49,6 @@ final class BundleHelper
         $initialized = true;
     }
 
-    public static function boot(ContainerInterface $container): void
-    {
-        if ($initialized = &self::getInitialized($container, __FUNCTION__)) {
-            return;
-        }
-
-        if ($container->hasParameter($param = 'msgphp.doctrine.type_config')) {
-            foreach ($container->getParameter($param) as $config) {
-                $config['type_class']::setClass($config['class']);
-                $config['type_class']::setDataType($config['type']);
-            }
-        }
-
-        $initialized = true;
-    }
-
     private static function initObjectFactory(ContainerBuilder $container): void
     {
         $container->register(GenericDomainObjectFactory::class)
@@ -106,10 +90,6 @@ final class BundleHelper
         @mkdir($mappingDir = $container->getParameterBag()->resolveValue('%kernel.cache_dir%/msgphp/doctrine-mapping'), 0777, true);
 
         $container->prependExtensionConfig('doctrine', ['orm' => [
-            'hydrators' => [
-                DoctrineInfrastructure\Hydration\ScalarHydrator::NAME => DoctrineInfrastructure\Hydration\ScalarHydrator::class,
-                DoctrineInfrastructure\Hydration\SingleScalarHydrator::NAME => DoctrineInfrastructure\Hydration\SingleScalarHydrator::class,
-            ],
             'mappings' => [
                 'msgphp' => [
                     'dir' => $mappingDir,
