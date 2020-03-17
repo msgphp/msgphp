@@ -25,21 +25,21 @@ class TestUser extends User implements DomainEventHandler
     use CanBeEnabled;
 
     /**
-     * @var UserId
+     * @var null|int
      * @Doctrine\ORM\Mapping\Id()
      * @Doctrine\ORM\Mapping\GeneratedValue()
-     * @Doctrine\ORM\Mapping\Column(type="msgphp_user_id")
+     * @Doctrine\ORM\Mapping\Column(type="integer")
      */
     private $id;
 
     public function __construct(string $email, string $password, ?UserId $id = null)
     {
         $this->credential = new EmailPassword($email, $password);
-        $this->id = $id ?? new ScalarUserId();
+        $this->id = null === $id || $id->isNil() ? null : (int) $id->toString();
     }
 
     public function getId(): UserId
     {
-        return $this->id;
+        return new ScalarUserId(null === $this->id ? null : (string) $this->id);
     }
 }

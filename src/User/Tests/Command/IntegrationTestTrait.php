@@ -13,7 +13,6 @@ use MsgPhp\Domain\Infrastructure\Doctrine\Test\EntityManagerTestTrait;
 use MsgPhp\Domain\Infrastructure\Messenger\Test\MessageBusTestTrait;
 use MsgPhp\User\Command;
 use MsgPhp\User\Infrastructure\Doctrine\Repository;
-use MsgPhp\User\Infrastructure\Doctrine\Type;
 use MsgPhp\User\Infrastructure\Doctrine\UserObjectMappings;
 use MsgPhp\User\Role;
 use MsgPhp\User\ScalarUserId;
@@ -83,7 +82,7 @@ trait IntegrationTestTrait
 
     protected static function getEntityIdTypes(): iterable
     {
-        yield Type\UserIdType::class => ScalarUserId::class;
+        return [];
     }
 
     private static function createDomainFactory(): DomainObjectFactory
