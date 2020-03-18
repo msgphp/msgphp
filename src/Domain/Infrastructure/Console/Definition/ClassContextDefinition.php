@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Infrastructure\Console\Definition;
 
-use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\Factory\ClassMethodResolver;
 use MsgPhp\Domain\Infrastructure\Console\Context\ClassContextElementFactory;
 use MsgPhp\Domain\Infrastructure\Console\Context\ContextElement;
 use MsgPhp\Domain\Infrastructure\Console\Context\GenericClassContextElementFactory;
+use MsgPhp\Domain\Infrastructure\Uid\DomainUuid;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -244,7 +244,7 @@ final class ClassContextDefinition implements DomainContextDefinition
      */
     private function resolveNested(string $class, array $parentValue, ContextElement $parentElement): array
     {
-        $method = is_subclass_of($class, DomainId::class) ? 'fromValue' : '__construct';
+        $method = is_subclass_of($class, DomainUuid::class) ? 'fromString' : '__construct';
         $resolved = [];
 
         foreach (ClassMethodResolver::resolve($class, $method) as $argument => $metadata) {

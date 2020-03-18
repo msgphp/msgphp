@@ -26,22 +26,9 @@ final class DomainUuid implements DomainId
         return $this->uuid->toString();
     }
 
-    public static function fromValue($value): DomainId
+    public static function fromString(?string $value): self
     {
-        if ($value instanceof UuidInterface) {
-            return new self($value);
-        }
-        if (null === $value) {
-            return new self(Uuid::fromString(Uuid::NIL));
-        }
-        if (\is_object($value) && method_exists($value, '__toString')) {
-            return new self(Uuid::fromString((string) $value));
-        }
-        if (\is_string($value)) {
-            return new self(Uuid::fromString($value));
-        }
-
-        throw new \LogicException('Raw UUID value must be of type string, got "'.\gettype($value).'".');
+        return new self(Uuid::fromString($value ?? Uuid::NIL));
     }
 
     public function isNil(): bool

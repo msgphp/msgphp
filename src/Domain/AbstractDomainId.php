@@ -10,7 +10,7 @@ namespace MsgPhp\Domain;
 abstract class AbstractDomainId implements DomainId
 {
     /** @var DomainId */
-    private $id;
+    protected $id;
 
     public function __construct(?DomainId $id = null)
     {
@@ -22,16 +22,12 @@ abstract class AbstractDomainId implements DomainId
         return $this->id->toString();
     }
 
-    public static function fromValue($value): DomainId
+    /**
+     * @return static
+     */
+    public static function fromInt(?int $value): self
     {
-        if ($value instanceof static) {
-            return $value;
-        }
-        if (null === $value || $value instanceof DomainId) {
-            return new static($value);
-        }
-
-        return new static(GenericDomainId::fromValue($value));
+        return new static(GenericDomainId::fromInt($value));
     }
 
     public function isNil(): bool

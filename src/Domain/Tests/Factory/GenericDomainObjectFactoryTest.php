@@ -7,9 +7,9 @@ namespace MsgPhp\Domain\Tests\Factory;
 use MsgPhp\Domain\Exception\InvalidClass;
 use MsgPhp\Domain\Factory\DomainObjectFactory;
 use MsgPhp\Domain\Factory\GenericDomainObjectFactory;
-use MsgPhp\Domain\GenericDomainCollection;
-use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
+use MsgPhp\Domain\Infrastructure\Uid\DomainUuid;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @internal
@@ -46,20 +46,6 @@ final class GenericDomainObjectFactoryTest extends TestCase
         ]))->create(TestEmptyObject::class);
 
         self::assertInstanceOf(TestExtendedEmptyObject::class, $object);
-    }
-
-    public function testCreateWithDomainId(): void
-    {
-        $id = (new GenericDomainObjectFactory())->create(TestDomainId::class, ['value' => 123]);
-
-        self::assertSame('123', $id->toString());
-    }
-
-    public function testCreateWithDomainCollection(): void
-    {
-        $collection = (new GenericDomainObjectFactory())->create(GenericDomainCollection::class, ['elements' => [1, 2, 3]]);
-
-        self::assertSame([1, 2, 3], iterator_to_array($collection));
     }
 
     public function testCreateWithUnknownObject(): void
@@ -151,6 +137,12 @@ final class GenericDomainObjectFactoryTest extends TestCase
         $this->expectException(\RuntimeException::class);
 
         $factory->create(TestNestedObject::class, ['test' => ['irrelevant']]);
+    }
+
+    public function testCreateSupportsDomainUuid(): void
+    {
+        self::assertSame(Uuid::NIL, (new GenericDomainObjectFactory())->create(DomainUuid::class, ['value' => null])->toString());
+        self::assertSame(Uuid::NIL, (new GenericDomainObjectFactory())->create(DomainUuid::class, ['value' => Uuid::NIL])->toString());
     }
 
     public function testReference(): void

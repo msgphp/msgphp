@@ -24,8 +24,7 @@ use Ramsey\Uuid\Uuid;
 
 $id = new DomainUuid(); // a new UUID version 4 value
 $id = new DomainUuid(Uuid::uuid1());
-$id = new DomainUuid(Uuid::fromString('00000000-0000-0000-0000-000000000000'));
-$id = DomainUuid::fromValue('00000000-0000-0000-0000-000000000000');
+$id = DomainUuid::fromstring('00000000-0000-0000-0000-000000000000');
 ```
 
 [UID]: https://en.wikipedia.org/wiki/Unique_identifier

@@ -5,11 +5,6 @@ identifier value, usually used to identity an entity with.
 
 ## API
 
-### `static fromValue(mixed $value): DomainId`
-
-Returns a factorized identifier from any primitive value. Using `null` might either imply an nil/empty identifier or a
-self-generated identifier value.
-
 ### `isNil(): bool`
 
 Tells if an identifier value is nil, thus is considered empty/unknown.
@@ -26,7 +21,7 @@ Returns the identifier its primitive string value.
 
 ### `MsgPhp\Domain\GenericDomainId`
 
-A generic identifier compatible with any `string` or `numeric` value.
+A generic identifier compatible with any `string` value.
 
 #### Basic Example
 
@@ -38,7 +33,7 @@ use MsgPhp\Domain\GenericDomainId;
 // SETUP
 
 $id = new GenericDomainId('1');
-$id = GenericDomainId::fromValue(1);
+$id = GenericDomainId::fromInt(1);
 $nilId = new GenericDomainId();
 
 // USAGE
@@ -76,8 +71,8 @@ class MyOtherDomainId extends AbstractDomainId
 {
 }
 
-$id = MyDomainId::fromValue(1);
-$otherId = MyOtherDomainId::fromValue(1);
+$id = MyDomainId::fromInt(1);
+$otherId = MyOtherDomainId::fromInt(1);
 
 // USAGE
 

@@ -14,13 +14,6 @@ interface DomainId
      */
     public function __toString(): string;
 
-    /**
-     * @param mixed $value
-     *
-     * @return static
-     */
-    public static function fromValue($value): self;
-
     public function isNil(): bool;
 
     /**

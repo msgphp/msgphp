@@ -22,16 +22,9 @@ final class GenericDomainId implements DomainId
         return $this->id;
     }
 
-    public static function fromValue($value): DomainId
+    public static function fromInt(?int $value): self
     {
-        if (null === $value || \is_string($value)) {
-            return new self($value);
-        }
-        if (is_numeric($value) || (\is_object($value) && method_exists($value, '__toString'))) {
-            return new self((string) $value);
-        }
-
-        throw new \LogicException('Raw ID value must be of type string or number, got "'.\gettype($value).'".');
+        return new self(0 === ($value ?? 0) ? null : (string) $value);
     }
 
     public function isNil(): bool

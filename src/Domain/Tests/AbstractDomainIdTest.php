@@ -14,23 +14,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractDomainIdTest extends TestCase
 {
-    public function testFromValue(): void
+    public function testFromInt(): void
     {
-        self::assertInstanceOf(TestAbstractDomainId::class, TestAbstractDomainId::fromValue(null));
-        self::assertInstanceOf(TestSubAbstractDomainId::class, TestSubAbstractDomainId::fromValue(null));
-        self::assertInstanceOf(TestAbstractDomainId::class, TestAbstractDomainId::fromValue($this->createMock(DomainId::class)));
-        self::assertInstanceOf(TestSubAbstractDomainId::class, TestAbstractDomainId::fromValue(new TestSubAbstractDomainId()));
-        self::assertInstanceOf(TestAbstractDomainId::class, TestAbstractDomainId::fromValue(new TestOtherAbstractDomainId()));
-        self::assertSame($id = TestAbstractDomainId::fromValue(null), TestAbstractDomainId::fromValue($id));
-        self::assertSame((array) new TestAbstractDomainId($id = $this->createMock(DomainId::class)), (array) TestAbstractDomainId::fromValue($id));
-        self::assertSame((new TestAbstractDomainId())->isNil(), TestAbstractDomainId::fromValue(null)->isNil());
-    }
-
-    public function testFromInvalidValue(): void
-    {
-        $this->expectException(\LogicException::class);
-
-        TestAbstractDomainId::fromValue(true);
+        self::assertTrue(TestAbstractDomainId::fromInt(null)->isNil());
+        self::assertFalse(TestAbstractDomainId::fromInt(-123)->isNil());
+        self::assertSame('-123', TestAbstractDomainId::fromInt(-123)->toString());
+        self::assertTrue(TestAbstractDomainId::fromInt(0)->isNil());
+        self::assertSame('123', TestAbstractDomainId::fromInt(123)->toString());
+        self::assertFalse(TestAbstractDomainId::fromInt(123)->isNil());
     }
 
     public function testIsNil(): void

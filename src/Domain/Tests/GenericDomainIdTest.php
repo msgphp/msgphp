@@ -6,7 +6,6 @@ namespace MsgPhp\Domain\Tests;
 
 use MsgPhp\Domain\DomainId;
 use MsgPhp\Domain\GenericDomainId;
-use MsgPhp\Domain\Tests\Fixtures\StringableValue;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,23 +13,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class GenericDomainIdTest extends TestCase
 {
-    public function testFromValue(): void
+    public function testFromInt(): void
     {
-        self::assertInstanceOf(GenericDomainId::class, GenericDomainId::fromValue(null));
-        self::assertSame((array) new GenericDomainId(), (array) GenericDomainId::fromValue(null));
-        self::assertSame((array) new GenericDomainId(null), (array) GenericDomainId::fromValue(null));
-        self::assertSame((array) new GenericDomainId(''), (array) GenericDomainId::fromValue(null));
-        self::assertSame((array) new GenericDomainId('foo'), (array) GenericDomainId::fromValue('foo'));
-        self::assertSame((array) new GenericDomainId('foo'), (array) GenericDomainId::fromValue(new StringableValue('foo')));
-        self::assertSame((array) new GenericDomainId('1'), (array) GenericDomainId::fromValue(1));
-        self::assertSame((array) new GenericDomainId(' '), (array) GenericDomainId::fromValue(' '));
-    }
-
-    public function testFromInvalidValue(): void
-    {
-        $this->expectException(\LogicException::class);
-
-        GenericDomainId::fromValue(true);
+        self::assertSame((array) new GenericDomainId(null), (array) GenericDomainId::fromInt(null));
+        self::assertSame((array) new GenericDomainId('-123'), (array) GenericDomainId::fromInt(-123));
+        self::assertSame((array) new GenericDomainId(null), (array) GenericDomainId::fromInt(0));
+        self::assertSame((array) new GenericDomainId('123'), (array) GenericDomainId::fromInt(123));
     }
 
     /**

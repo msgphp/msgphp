@@ -52,27 +52,35 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
 
     public function testLazyContains(): void
     {
+        /** @psalm-suppress InvalidArgument */
         self::assertFalse(self::createLazyCollection([])->contains(1));
+        /** @psalm-suppress InvalidArgument */
         self::assertTrue(self::createLazyCollection([null], $visited)->contains(null));
         self::assertSame([null], $visited);
+        /** @psalm-suppress InvalidArgument */
         self::assertTrue(($collection = self::createLazyCollection([1, '2'], $visited))->contains(1));
         self::assertSame([1], $visited);
+        /** @psalm-suppress InvalidArgument */
         self::assertFalse($collection->contains(2));
         self::assertSame([1, '2'], $visited);
 
         $this->assertClosedGenerator();
 
+        /** @psalm-suppress InvalidArgument */
         $collection->contains(null);
     }
 
     public function testLazyContainsKey(): void
     {
+        /** @psalm-suppress InvalidArgument */
         self::assertFalse(self::createLazyCollection([])->containsKey(1));
+        /** @psalm-suppress InvalidArgument */
         self::assertTrue(($collection = self::createLazyCollection([1, 'k' => 'v', '2' => null], $visited))->containsKey(2));
         self::assertSame([1, 'k' => 'v', '2' => null], $visited);
 
         $this->assertUnrewindableGenerator();
 
+        /** @psalm-suppress InvalidArgument */
         $collection->containsKey(0);
     }
 
@@ -118,13 +126,17 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
 
     public function testLazyGet(): void
     {
+        /** @psalm-suppress InvalidArgument */
         self::assertSame(1, ($collection = self::createLazyCollection([1, 2], $visited))->get(0));
         self::assertSame([1], $visited);
+        /** @psalm-suppress InvalidArgument */
         self::assertSame(1, $collection->get('0'));
+        /** @psalm-suppress InvalidArgument */
         self::assertSame(2, $collection->get(1));
 
         $this->assertUnrewindableGenerator();
 
+        /** @psalm-suppress InvalidArgument */
         $collection->get(1);
     }
 
@@ -134,6 +146,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
 
         $this->expectException(UnknownCollectionElement::class);
 
+        /** @psalm-suppress InvalidArgument */
         $collection->get('foo');
     }
 
@@ -143,6 +156,7 @@ final class GenericDomainCollectionTest extends DomainCollectionTestCase
 
         $this->expectException(UnknownCollectionElement::class);
 
+        /** @psalm-suppress InvalidArgument */
         $collection->get('foo');
     }
 

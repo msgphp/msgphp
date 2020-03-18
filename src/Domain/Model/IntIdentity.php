@@ -17,6 +17,6 @@ trait IntIdentity
 
     public function getId(): DomainId
     {
-        return GenericDomainId::fromValue($this->id);
+        return GenericDomainId::fromInt($this->id);
     }
 }

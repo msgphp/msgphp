@@ -6,7 +6,6 @@ namespace MsgPhp\Domain\Tests\Infrastructure\Uid;
 
 use MsgPhp\Domain\GenericDomainId;
 use MsgPhp\Domain\Infrastructure\Uid\DomainUuid;
-use MsgPhp\Domain\Tests\Fixtures\StringableValue;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -15,29 +14,17 @@ use Ramsey\Uuid\Uuid;
  */
 final class DomainUuidTest extends TestCase
 {
-    public function testFromValue(): void
+    public function testFromString(): void
     {
-        $uuid = Uuid::fromString(Uuid::NIL);
-
-        self::assertInstanceOf(DomainUuid::class, DomainUuid::fromValue(null));
-        self::assertSame((array) new DomainUuid($uuid), (array) DomainUuid::fromValue($uuid));
-        self::assertSame(Uuid::NAMESPACE_DNS, DomainUuid::fromValue(Uuid::NAMESPACE_DNS)->toString());
-        self::assertSame(Uuid::NIL, DomainUuid::fromValue(new StringableValue(Uuid::NIL))->toString());
-        self::assertSame(Uuid::NIL, DomainUuid::fromValue(null)->toString());
+        self::assertSame(Uuid::NIL, DomainUuid::fromString(null)->toString());
+        self::assertSame(Uuid::NIL, DomainUuid::fromString(Uuid::NIL)->toString());
     }
 
-    public function testFromValueWithInvalidUuid(): void
+    public function testFromStringWithInvalidUuid(): void
     {
         $this->expectException(\LogicException::class);
 
-        DomainUuid::fromValue('');
-    }
-
-    public function testFromInvalidValue(): void
-    {
-        $this->expectException(\LogicException::class);
-
-        DomainUuid::fromValue(true);
+        DomainUuid::fromString('');
     }
 
     public function testIsNil(): void
