@@ -14,7 +14,7 @@ use Symfony\Component\VarExporter\Instantiator;
  */
 final class GenericDomainObjectFactory implements DomainObjectFactory
 {
-    /** @var array<class-string, class-string> $classMapping */
+    /** @var array<class-string, class-string> */
     private $classMapping;
     /** @var null|DomainObjectFactory */
     private $factory;
