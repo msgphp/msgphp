@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace MsgPhp\Domain\Infrastructure\Doctrine\Test;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
-use Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain as LegacyMappingDriverChain;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator as LegacySymfonyFileLocator;
+use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -43,12 +45,18 @@ trait EntityManagerTestTrait
             }
         }
 
-        $driver = new MappingDriverChain();
+        $driver = class_exists(MappingDriverChain::class)
+            ? new MappingDriverChain()
+            : new LegacyMappingDriverChain();
+
         foreach (self::getEntityMappings() as $type => $paths) {
             foreach ($paths as $ns => $path) {
                 switch ($type) {
                     case 'xml':
-                        $driver->addDriver($xml = new XmlDriver(new SymfonyFileLocator([$path => $ns], '.orm.xml')), $ns);
+                        $fileLocator = class_exists(SymfonyFileLocator::class)
+                            ? new SymfonyFileLocator([$path => $ns], '.orm.xml')
+                            : new LegacySymfonyFileLocator([$path => $ns], '.orm.xml');
+                        $driver->addDriver(new XmlDriver($fileLocator), $ns);
 
                         break;
                     case 'annot':
