@@ -13,7 +13,7 @@ use MsgPhp\Domain\Exception\InvalidClass;
  */
 final class ClassMethodResolver
 {
-    /** @var array<string, array> */
+    /** @var array<string, array<string, array>> */
     private static $cache = [];
 
     /**
@@ -45,11 +45,11 @@ final class ClassMethodResolver
                 /** @psalm-suppress PossiblyNullReference */
                 $type = $param->getClass()->getName();
             } elseif ($type->isBuiltin()) {
-                /** @psalm-suppress UndefinedVariable */
+                /** @psalm-suppress PossiblyUndefinedVariable */
                 $type = $name;
             } else {
+                /** @psalm-suppress PossiblyUndefinedVariable */
                 try {
-                    /** @psalm-suppress TypeCoercion */
                     $type = (new \ReflectionClass($name))->getName();
                 } catch (\ReflectionException $e) {
                     $type = $name;

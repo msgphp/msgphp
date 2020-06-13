@@ -62,7 +62,6 @@ trait EntityManagerTestTrait
         }
 
         $config = new Configuration();
-        /** @psalm-suppress InvalidArgument */
         $config->setMetadataDriverImpl($driver);
         $config->setProxyDir(sys_get_temp_dir().'/msgphp_'.md5(static::class).'/proxy');
         $config->setProxyNamespace(static::class);

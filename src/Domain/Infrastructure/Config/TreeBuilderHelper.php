@@ -9,16 +9,18 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @internal
  */
 final class TreeBuilderHelper
 {
-    /**
-     * @param mixed $treeBuilder
-     */
-    public static function root(string $name, &$treeBuilder = null): ArrayNodeDefinition
+    public static function create(string $name): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder($name, 'array', $builder = new NodeBuilder());
+        return new TreeBuilder($name, 'array', new NodeBuilder());
+    }
 
+    public static function root(TreeBuilder $treeBuilder, string $name): ArrayNodeDefinition
+    {
         /**
          * @psalm-suppress UndefinedMethod
          *
@@ -26,6 +28,6 @@ final class TreeBuilderHelper
          */
         return method_exists($treeBuilder, 'getRootNode')
             ? $treeBuilder->getRootNode()
-            : $treeBuilder->root($name, 'array', $builder);
+            : $treeBuilder->root($name, 'array', new NodeBuilder());
     }
 }

@@ -56,6 +56,7 @@ final class DomainCollection implements BaseDomainCollection
             throw EmptyCollection::create();
         }
 
+        /** @psalm-suppress FalsableReturnStatement */
         return $this->collection->first();
     }
 
@@ -65,6 +66,7 @@ final class DomainCollection implements BaseDomainCollection
             throw EmptyCollection::create();
         }
 
+        /** @psalm-suppress FalsableReturnStatement */
         return $this->collection->last();
     }
 

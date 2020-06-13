@@ -31,7 +31,7 @@ final class MappingCacheWarmer implements CacheWarmerInterface
     /**
      * @param string $cacheDir
      */
-    public function warmUp($cacheDir): void
+    public function warmUp($cacheDir): array
     {
         $filesystem = new Filesystem();
         $filesystem->mkdir($target = $cacheDir.'/'.$this->dirName);
@@ -45,5 +45,7 @@ final class MappingCacheWarmer implements CacheWarmerInterface
                 $filesystem->dumpFile($target.'/'.basename($file), $this->mappingConfig->interpolate((string) file_get_contents($file)));
             }
         }
+
+        return [];
     }
 }

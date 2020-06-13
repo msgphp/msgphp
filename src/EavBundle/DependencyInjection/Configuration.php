@@ -12,12 +12,8 @@ use MsgPhp\Domain\Infrastructure\DependencyInjection\PackageMetadata;
 use MsgPhp\Eav\Attribute;
 use MsgPhp\Eav\AttributeId;
 use MsgPhp\Eav\AttributeValue;
-use MsgPhp\Eav\AttributeValueId;
 use MsgPhp\Eav\Command;
 use MsgPhp\Eav\Infrastructure\Doctrine as DoctrineInfrastructure;
-use MsgPhp\Eav\Infrastructure\Uid as UidInfrastructure;
-use MsgPhp\Eav\ScalarAttributeId;
-use MsgPhp\Eav\ScalarAttributeValueId;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -55,8 +51,10 @@ final class Configuration implements ConfigurationInterface
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
+        $treeBuilder = TreeBuilderHelper::create(Extension::ALIAS);
         /** @var NodeBuilder $children */
-        $children = TreeBuilderHelper::root(Extension::ALIAS, $treeBuilder)->children();
+        $children = TreeBuilderHelper::root($treeBuilder, Extension::ALIAS)->children();
+
         /**
          * @psalm-suppress PossiblyNullReference
          * @psalm-suppress PossiblyUndefinedMethod
