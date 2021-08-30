@@ -11,6 +11,8 @@ jobs:
       env: CC=true
     - env: DEPS=low
     - env: PHP=7.3
+    - env: PHP=7.4
+    - env: PHP=8.0
     - stage: Code quality
       script: make cs psalm
 
