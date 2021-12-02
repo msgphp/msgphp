@@ -1,4 +1,0 @@
-comment: 'off'
-ignore:
-    - src/*/Tests/
-    - src/*/Resources/
