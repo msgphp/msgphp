@@ -154,8 +154,6 @@ trait DomainEntityRepositoryTrait
 
     /**
      * @param int|string $hydrate
-     *
-     * @return DomainCollection
      */
     private function createResultSet(Query $query, ?int $offset = null, ?int $limit = null, $hydrate = Query::HYDRATE_OBJECT): DomainCollection
     {
