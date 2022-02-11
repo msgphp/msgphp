@@ -52,7 +52,7 @@ jobs:
         uses: "ramsey/composer-install@v2"
 
       - name: "Statically analyze code (PHPStan)"
-        run: "composer dev:analyze:phpstan -- -l 1"
+        run: "composer dev:analyze:phpstan -- --level=0"
 
       - name: "Statically analyze code (Psalm)"
         run: "composer dev:analyze:psalm -- --shepherd"
@@ -120,10 +120,6 @@ jobs:
           - "lowest"
           - "highest"
         include:
-          - php-version: "8.0"
-            operating-system: "ubuntu-latest"
-            dependencies: "lowest"
-            composer-options: "--ignore-platform-req=php"
           - php-version: "8.0"
             operating-system: "ubuntu-latest"
             dependencies: "highest"
