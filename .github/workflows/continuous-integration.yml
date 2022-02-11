@@ -2,7 +2,7 @@
 
 name: "build"
 
-on: ["pull_request", "push", "workflow_dispatch"]
+on: ["pull_request", "push"]
 
 env:
   COMPOSER_ROOT_VERSION: "1.99.99"
@@ -24,6 +24,8 @@ jobs:
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v1"
+        with:
+            ignore-cache: "yes"
 
       - name: "Check syntax (php-parallel-lint)"
         run: "composer dev:lint:syntax"
@@ -49,6 +51,8 @@ jobs:
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v1"
+        with:
+            ignore-cache: "yes"
 
       - name: "Statically analyze code (PHPStan)"
         run: "composer dev:analyze:phpstan"
@@ -71,6 +75,8 @@ jobs:
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v1"
+        with:
+            ignore-cache: "yes"
 
       - name: "Analyze security of code (Psalm)"
         run: "./vendor/bin/psalm --taint-analysis --report=build/logs/psalm.sarif"
@@ -96,6 +102,8 @@ jobs:
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v1"
+        with:
+            ignore-cache: "yes"
 
       - name: "Run unit tests (PHPUnit)"
         run: "composer dev:test:coverage:ci"
@@ -143,6 +151,7 @@ jobs:
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v1"
         with:
+          ignore-cache: "yes"
           dependency-versions: "${{ matrix.dependencies }}"
           composer-options: "${{ matrix.composer-options }}"
 
