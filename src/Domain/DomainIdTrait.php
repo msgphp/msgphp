@@ -12,7 +12,7 @@ trait DomainIdTrait
     /** @var string */
     private $id;
 
-    public function __construct(?string $id = null)
+    final public function __construct(?string $id = null)
     {
         $this->id = $id ?? '';
     }
