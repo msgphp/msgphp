@@ -16,7 +16,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "latest"
-          tools: "php-cs-fixer"
+          tools: "composer:v2.1", "php-cs-fixer"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -45,6 +45,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "latest"
+          tools: "composer:v2.1"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -70,6 +71,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "latest"
+          tools: "composer:v2.1"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -97,6 +99,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "latest"
+          tools: "composer:v2.1"
           coverage: "pcov"
           ini-values: "memory_limit=-1"
 
@@ -149,6 +152,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "${{ matrix.php-version }}"
+          tools: "composer:v2.1"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
