@@ -24,7 +24,7 @@ $rules = [
 
 return (new Config())
     ->setUsingCache(true)
-    ->setCacheFile(__DIR__.'/var/php-cs-fixer.cache')
+    ->setCacheFile(__DIR__.'/build/php-cs-fixer.cache')
     ->setRules($rules)
     ->setRiskyAllowed(true)
     ->setFinder(
