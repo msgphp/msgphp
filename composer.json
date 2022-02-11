@@ -13,15 +13,16 @@
         "sensio/framework-extra-bundle": "^5.5",
         "symfony/config": "^3.4 || ^4.4 || ^5.0",
         "symfony/dependency-injection": "^3.4 || ^4.4 || ^5.0",
-        "symfony/form": "^3.4.24 || ^4.4 || ^5.0",
+        "symfony/form": "^3.4 || ^4.4 || ^5.0",
         "symfony/http-kernel": "^3.4 || ^4.4 || ^5.0",
         "symfony/maker-bundle": "^1.19",
-        "symfony/messenger": "^4.4 || ^5.0",
-        "symfony/security-bundle": "^5.1",
+        "symfony/messenger": "^3.4 || ^4.4 || ^5.0",
+        "symfony/security-bundle": "^3.4 || ^4.4 || ^5.0",
         "symfony/security-core": "^3.4 || ^4.4 || ^5.0",
-        "symfony/twig-bundle": "^5.1",
+        "symfony/serializer": "^3.4 || ^4.4 || ^5.0",
+        "symfony/twig-bundle": "^3.4 || ^4.4 || ^5.0",
         "symfony/validator": "^3.4 || ^4.4 || ^5.0",
-        "symfony/var-exporter": "^4.4 || ^5.0"
+        "symfony/var-exporter": "^3.4 || ^4.4 || ^5.0"
     },
     "require-dev": {
         "ramsey/devtools": "^1.7",
