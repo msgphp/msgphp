@@ -18,7 +18,7 @@ jobs:
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "latest"
+          php-version: "7.4"
           tools: composer:v2.1, php-cs-fixer:3
           coverage: "none"
 
@@ -44,7 +44,7 @@ jobs:
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "latest"
+          php-version: "7.4"
           tools: composer:v2.1
           coverage: "none"
 
@@ -67,8 +67,7 @@ jobs:
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "latest"
-          tools: composer:v2.1
+          php-version: "7.4"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -92,7 +91,7 @@ jobs:
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "latest"
+          php-version: "7.4"
           tools: composer:v2.1
           coverage: "pcov"
           ini-values: "memory_limit=-1"
@@ -115,13 +114,20 @@ jobs:
       matrix:
         php-version:
           - "7.4"
-          - "8.0"
         operating-system:
           - "ubuntu-latest"
         dependencies:
           - "lowest"
           - "highest"
         include:
+          - php-version: "8.0"
+            operating-system: "ubuntu-latest"
+            dependencies: "lowest"
+            composer-options: "--ignore-platform-req=php"
+          - php-version: "8.0"
+            operating-system: "ubuntu-latest"
+            dependencies: "highest"
+            composer-options: "--ignore-platform-req=php"
           - php-version: "8.1"
             operating-system: "ubuntu-latest"
             dependencies: "highest"
@@ -147,7 +153,6 @@ jobs:
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v2"
         with:
-          ignore-cache: "yes"
           dependency-versions: "${{ matrix.dependencies }}"
           composer-options: "${{ matrix.composer-options }}"
 
