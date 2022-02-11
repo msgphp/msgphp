@@ -18,12 +18,16 @@ final class GenericDomainCollection implements PaginatedDomainCollection
 {
     /** @var iterable<TKey, T> */
     private $elements;
+
     /** @var float */
     private $offset;
+
     /** @var float */
     private $limit;
+
     /** @var null|float */
     private $count;
+
     /** @var null|float */
     private $totalCount;
 
@@ -166,7 +170,7 @@ final class GenericDomainCollection implements PaginatedDomainCollection
     public function filter(callable $filter): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
-            return new self((/** @return \Generator<TKey, T> */function () use ($filter): iterable {
+            return new self((/** @return \Generator<TKey, T> */ function () use ($filter): iterable {
                 foreach ($this->elements as $key => $element) {
                     if ($filter($element)) {
                         yield $key => $element;
@@ -181,7 +185,7 @@ final class GenericDomainCollection implements PaginatedDomainCollection
     public function slice(int $offset, int $limit = 0): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
-            return new self((/** @return \Generator<TKey, T> */function () use ($offset, $limit): iterable {
+            return new self((/** @return \Generator<TKey, T> */ function () use ($offset, $limit): iterable {
                 $i = -1;
                 foreach ($this->elements as $key => $element) {
                     if (++$i < $offset) {
@@ -210,7 +214,7 @@ final class GenericDomainCollection implements PaginatedDomainCollection
     public function map(callable $mapper): DomainCollection
     {
         if ($this->elements instanceof \Traversable) {
-            return new self((/** @return \Generator<TKey, T2> */function () use ($mapper): iterable {
+            return new self((/** @return \Generator<TKey, T2> */ function () use ($mapper): iterable {
                 foreach ($this->elements as $key => $element) {
                     yield $key => $mapper($element);
                 }

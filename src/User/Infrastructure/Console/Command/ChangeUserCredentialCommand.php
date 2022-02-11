@@ -24,12 +24,16 @@ final class ChangeUserCredentialCommand extends Command
 
     /** @var DomainObjectFactory */
     private $factory;
+
     /** @var DomainMessageBus */
     private $bus;
+
     /** @var UserDefinition */
     private $definition;
+
     /** @var DomainContextDefinition */
     private $contextDefinition;
+
     /** @var array<int, string> */
     private $fields = [];
 

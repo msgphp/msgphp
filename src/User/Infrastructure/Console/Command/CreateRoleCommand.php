@@ -22,8 +22,10 @@ final class CreateRoleCommand extends Command
 
     /** @var DomainObjectFactory */
     private $factory;
+
     /** @var DomainMessageBus */
     private $bus;
+
     /** @var DomainContextDefinition */
     private $contextDefinition;
 

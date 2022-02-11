@@ -22,8 +22,10 @@ final class DeleteRoleCommand extends Command
 
     /** @var DomainObjectFactory */
     private $factory;
+
     /** @var DomainMessageBus */
     private $bus;
+
     /** @var RoleDefinition */
     private $definition;
 

@@ -49,8 +49,10 @@ final class DomainEntityRepositoryTraitTest extends DomainEntityRepositoryTestCa
 
         /** @psalm-suppress PossiblyNullReference */
         self::assertSame(Type::INTEGER, $parameters->get(0)->getType());
+
         /** @psalm-suppress PossiblyNullReference */
         self::assertSame(\PDO::PARAM_STR, $parameters->get(1)->getType());
+
         /** @psalm-suppress PossiblyNullReference */
         self::assertSame(Type::INTEGER, $parameters->get(2)->getType());
     }

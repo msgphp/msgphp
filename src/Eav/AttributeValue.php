@@ -15,18 +15,25 @@ abstract class AttributeValue
 
     /** @var null|bool */
     private $boolValue;
+
     /** @var null|int */
     private $intValue;
+
     /** @var null|float */
     private $floatValue;
+
     /** @var null|string */
     private $stringValue;
+
     /** @var null|\DateTimeInterface */
     private $dateTimeValue;
+
     /** @var string */
     private $checksum;
+
     /** @var bool */
     private $isNull;
+
     /** @var mixed */
     private $value;
 

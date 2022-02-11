@@ -22,10 +22,13 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
 
     /** @var null|BaseNodeBuilder */
     private $builder;
+
     /** @var null|NodeDefinition */
     private $prototype;
+
     /** @var string */
     private $type = 'scalar';
+
     /** @var array<class-string, string> */
     private $hints = [];
 
@@ -129,7 +132,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
     }
 
     /**
-     * @param class-string|array<int, class-string> $class
+     * @param array<int, class-string>|class-string $class
      */
     public function hint($class, string $hint): self
     {
@@ -184,6 +187,7 @@ final class ClassMappingNodeDefinition extends VariableNodeDefinition implements
         $node->setHints($this->hints);
 
         $prototype = $this->getPrototype();
+
         /** @psalm-suppress InvalidPropertyAssignmentValue */
         $prototype->parent = $node;
         $prototypedNode = $prototype->getNode();

@@ -26,12 +26,16 @@ final class AddUserRoleCommand extends Command
 
     /** @var DomainObjectFactory */
     private $factory;
+
     /** @var DomainMessageBus */
     private $bus;
+
     /** @var UserDefinition */
     private $userDefinition;
+
     /** @var RoleDefinition */
     private $roleDefinition;
+
     /** @var DomainContextDefinition */
     private $contextDefinition;
 

@@ -143,6 +143,7 @@ final class HashedPasswordType extends AbstractType
 final class Password
 {
     public $hashing;
+
     /** @var null|string */
     public $hash;
 

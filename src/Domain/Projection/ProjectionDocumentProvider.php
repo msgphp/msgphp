@@ -13,8 +13,10 @@ final class ProjectionDocumentProvider implements \IteratorAggregate
 {
     /** @var iterable<int, callable():T> */
     private $dataProviders;
+
     /** @var callable(T):array */
     private $transformer;
+
     /** @var callable(T):string */
     private $typeResolver;
 

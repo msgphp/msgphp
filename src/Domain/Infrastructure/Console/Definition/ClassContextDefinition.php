@@ -25,18 +25,25 @@ final class ClassContextDefinition implements DomainContextDefinition
 
     /** @var class-string */
     private $class;
+
     /** @var string */
     private $method;
+
     /** @var array<class-string, class-string> */
     private $classMapping;
+
     /** @var int */
     private $flags;
+
     /** @var ClassContextElementFactory */
     private $elementFactory;
+
     /** @var null|array<string, array> */
     private $resolved;
+
     /** @var array<string, array{0:string,1:bool}> */
     private $fieldMapping = [];
+
     /** @var array<int, array{0:string,1:string}> */
     private $generatedValues = [];
 
@@ -113,7 +120,7 @@ final class ClassContextDefinition implements DomainContextDefinition
     }
 
     /**
-     * @param array<string, array{index:int,required:bool,default:mixed,type:string|class-string,element:ContextElement,value:mixed}>|null $resolved
+     * @param null|array<string, array{index:int,required:bool,default:mixed,type:class-string|string,element:ContextElement,value:mixed}> $resolved
      */
     public function getContext(InputInterface $input, StyleInterface $io, array $values = [], ?array $resolved = null): array
     {
@@ -218,7 +225,7 @@ final class ClassContextDefinition implements DomainContextDefinition
     }
 
     /**
-     * @return array<string, array{index:int,required:bool,default:mixed,type:string|class-string,element:ContextElement}>
+     * @return array<string, array{index:int,required:bool,default:mixed,type:class-string|string,element:ContextElement}>
      */
     private function resolve(): array
     {
@@ -239,7 +246,7 @@ final class ClassContextDefinition implements DomainContextDefinition
     /**
      * @param class-string $class
      *
-     * @return array<string, array{index:int,required:bool,default:mixed,type:string|class-string,element:ContextElement,value:mixed}>
+     * @return array<string, array{index:int,required:bool,default:mixed,type:class-string|string,element:ContextElement,value:mixed}>
      */
     private function resolveNested(string $class, array $parentValue, ContextElement $parentElement): array
     {

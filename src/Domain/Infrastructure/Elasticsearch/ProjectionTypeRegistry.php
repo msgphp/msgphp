@@ -17,6 +17,7 @@ final class ProjectionTypeRegistry implements BaseProjectionTypeRegistry
 
     private $client;
     private $prefix;
+
     /** @var array<string, array> */
     private $mappings;
     private $settings;

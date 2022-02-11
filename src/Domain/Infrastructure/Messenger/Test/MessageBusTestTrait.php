@@ -18,6 +18,7 @@ trait MessageBusTestTrait
 {
     /** @var MessageBusInterface */
     private static $bus;
+
     /** @var array<class-string, array<int, object>> */
     private static $dispatchedMessages = [];
 

@@ -14,6 +14,6 @@ use MsgPhp\User\UserEmail;
  */
 class TestUserEmail extends UserEmail implements DomainEventHandler
 {
-    use DomainEventHandlerTrait;
     use CanBeConfirmed;
+    use DomainEventHandlerTrait;
 }

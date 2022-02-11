@@ -16,6 +16,7 @@ final class GenericDomainObjectFactory implements DomainObjectFactory
 {
     /** @var array<class-string, class-string> */
     private $classMapping;
+
     /** @var null|DomainObjectFactory */
     private $factory;
 

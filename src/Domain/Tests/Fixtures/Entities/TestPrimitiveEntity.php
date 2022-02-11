@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace MsgPhp\Domain\Tests\Fixtures\Entities;
 
-use MsgPhp\Domain\DomainId;
-use MsgPhp\Domain\Tests\Fixtures\TestDomainId;
-
 /**
  * @Doctrine\ORM\Mapping\Entity()
  */

@@ -20,6 +20,7 @@ final class SynchronizeProjectionsCommand extends Command
 
     /** @var ProjectionSynchronization */
     private $synchronization;
+
     /** @var null|LoggerInterface */
     private $logger;
 

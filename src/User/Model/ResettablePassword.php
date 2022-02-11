@@ -15,6 +15,7 @@ trait ResettablePassword
 {
     /** @var null|string */
     private $passwordResetToken;
+
     /** @var null|\DateTimeInterface */
     private $passwordRequestedAt;
 

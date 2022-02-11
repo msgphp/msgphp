@@ -13,6 +13,7 @@ trait CanBeConfirmed
 {
     /** @var null|string */
     private $confirmationToken;
+
     /** @var null|\DateTimeInterface */
     private $confirmedAt;
 

@@ -177,6 +177,7 @@ class TestObject
 {
     /** @var mixed */
     public $a = 'default-a';
+
     /** @var mixed */
     public $b;
 
@@ -234,6 +235,7 @@ class TestReferenceObject
 {
     /** @var mixed */
     private $fieldA;
+
     /** @var mixed */
     private $fieldB = 'default B';
 

@@ -18,12 +18,16 @@ final class UserIdentity implements UserInterface, EquatableInterface, EncoderAw
 {
     /** @var UserId */
     private $id;
+
     /** @var null|string */
     private $originUsername;
+
     /** @var array<int, string> */
     private $roles;
+
     /** @var null|string */
     private $password;
+
     /** @var string */
     private $hashing;
 

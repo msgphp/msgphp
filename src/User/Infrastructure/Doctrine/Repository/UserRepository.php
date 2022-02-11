@@ -26,6 +26,7 @@ final class UserRepository implements BaseUserRepository
 
     /** @var null|string */
     private $usernameField;
+
     /** @var null|UsernameRepository<Username<T>> */
     private $usernameRepository;
 

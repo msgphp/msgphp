@@ -13,10 +13,13 @@ final class ContextElement
 {
     public $label;
     public $description;
+
     /** @var bool */
     private $hide = false;
+
     /** @var null|callable */
     private $generator;
+
     /** @var null|callable */
     private $normalizer;
 

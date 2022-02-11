@@ -19,7 +19,7 @@ final class ClassMethodResolver
     /**
      * @param class-string $class
      *
-     * @return array<string, array{index:int,required:bool,default:mixed,type:string|class-string}>
+     * @return array<string, array{index:int,required:bool,default:mixed,type:class-string|string}>
      */
     public static function resolve(string $class, string $method): array
     {

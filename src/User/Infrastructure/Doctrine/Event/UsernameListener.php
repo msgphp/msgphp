@@ -18,10 +18,13 @@ use MsgPhp\User\Username;
 final class UsernameListener
 {
     private $factory;
+
     /** @var array<class-string, array<string, string>> */
     private $mapping;
+
     /** @var array<int, null|string> */
     private $removals = [];
+
     /** @var array<int, array{0:User,1:string}> */
     private $insertions = [];
 
@@ -73,6 +76,7 @@ final class UsernameListener
 
             /** @var null|string $oldUsername */
             $oldUsername = $event->getOldValue($field);
+
             /** @var null|string $newUsername */
             $newUsername = $event->getNewValue($field);
 

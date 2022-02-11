@@ -22,8 +22,10 @@ final class DisableUserCommand extends Command
 
     /** @var DomainObjectFactory */
     private $factory;
+
     /** @var DomainMessageBus */
     private $bus;
+
     /** @var UserDefinition */
     private $definition;
 

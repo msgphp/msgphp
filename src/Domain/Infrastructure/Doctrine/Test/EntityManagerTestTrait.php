@@ -59,10 +59,12 @@ trait EntityManagerTestTrait
                         $driver->addDriver(new XmlDriver($fileLocator), $ns);
 
                         break;
+
                     case 'annot':
                         $driver->addDriver(new AnnotationDriver(new AnnotationReader(), $path), $ns);
 
                         break;
+
                     default:
                         throw new \LogicException('Unknown driver type.');
                 }

@@ -29,6 +29,7 @@ final class CreateUserTest extends TestCase
 
         /** @var Event\UserCreated $event */
         $event = self::$dispatchedMessages[Event\UserCreated::class][0];
+
         /** @var TestUser $user */
         $user = $event->user;
         $repository = self::createUserRepository();

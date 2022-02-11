@@ -13,6 +13,7 @@ final class ProjectionSynchronization
 {
     private $typeRegistry;
     private $repository;
+
     /** @var iterable<string, array> */
     private $documentProvider;
     private $logger;

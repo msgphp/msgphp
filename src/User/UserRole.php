@@ -12,8 +12,8 @@ use MsgPhp\User\Model\UserField;
  */
 abstract class UserRole
 {
-    use UserField;
     use RoleField;
+    use UserField;
 
     public function __construct(User $user, Role $role)
     {

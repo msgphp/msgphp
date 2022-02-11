@@ -18,6 +18,7 @@ class TestParentEntity extends BaseTestEntity
      * @Doctrine\ORM\Mapping\Column()
      */
     public $id;
+
     /**
      * @var null|string
      * @Doctrine\ORM\Mapping\Column(nullable=true)

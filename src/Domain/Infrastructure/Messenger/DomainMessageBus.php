@@ -15,9 +15,11 @@ final class DomainMessageBus implements BaseDomainMessageBus
 {
     private $commandBus;
     private $eventBus;
+
     /** @var array<int, class-string> */
     private $eventClasses;
-    /** @var array<class-string, int>|null */
+
+    /** @var null|array<class-string, int> */
     private $eventClassMap;
 
     /**

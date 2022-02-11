@@ -13,8 +13,8 @@ use MsgPhp\User\Model\UserField;
  */
 abstract class UserAttributeValue
 {
-    use UserField;
     use EntityAttributeValue;
+    use UserField;
 
     public function __construct(User $user, AttributeValue $attributeValue)
     {

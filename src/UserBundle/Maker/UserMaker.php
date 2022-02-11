@@ -300,8 +300,8 @@ final class UserMaker implements MakerInterface
                 }
             }
 
-            if (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT, \T_WHITESPACE], true)) {
-                if (\T_WHITESPACE === $token[0]) {
+            if (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT, T_WHITESPACE], true)) {
+                if (T_WHITESPACE === $token[0]) {
                     if (!$nl) {
                         $nl = \in_array($nl = trim($token[1], ' '), ["\n", "\r", "\r\n"], true) ? $nl : null;
                     }
@@ -314,11 +314,11 @@ final class UserMaker implements MakerInterface
                 continue;
             }
 
-            if (\T_NAMESPACE === $token[0] && !$useLine) {
+            if (T_NAMESPACE === $token[0] && !$useLine) {
                 $useLine = $token[2];
-            } elseif (\T_CLASS === $token[0] && !$inClass) {
+            } elseif (T_CLASS === $token[0] && !$inClass) {
                 $inClass = true;
-            } elseif (\T_USE === $token[0]) {
+            } elseif (T_USE === $token[0]) {
                 if (!$inClass) {
                     $useLine = $token[2];
                     $hasUses = true;
@@ -326,30 +326,30 @@ final class UserMaker implements MakerInterface
                     $traitUseLine = $token[2];
                     $hasTraitUses = true;
                 }
-            } elseif (\T_EXTENDS === $token[0] && $inClass) {
+            } elseif (T_EXTENDS === $token[0] && $inClass) {
                 $implementsLine = $tokens[2];
                 $j = $i + 1;
                 while (isset($tokens[$j])) {
-                    if (isset($tokens[$j][0]) && \T_STRING === $tokens[$j][0]) {
+                    if (isset($tokens[$j][0]) && T_STRING === $tokens[$j][0]) {
                         $implementsLine = $tokens[$j][2];
-                    } elseif ('{' === $tokens[$j] || (isset($tokens[$j][0]) && \T_IMPLEMENTS === $tokens[$j][0])) {
+                    } elseif ('{' === $tokens[$j] || (isset($tokens[$j][0]) && T_IMPLEMENTS === $tokens[$j][0])) {
                         break;
                     }
                     ++$j;
                 }
-            } elseif (\T_IMPLEMENTS === $token[0] && $inClass) {
+            } elseif (T_IMPLEMENTS === $token[0] && $inClass) {
                 $hasImplements = true;
                 $implementsLine = $token[2];
                 $j = $i + 1;
                 while (isset($tokens[$j])) {
-                    if (\is_array($tokens[$j]) && \T_STRING === $tokens[$j][0]) {
+                    if (\is_array($tokens[$j]) && T_STRING === $tokens[$j][0]) {
                         $implementsLine = $tokens[$j][2];
                     } elseif ('{' === $tokens[$j]) {
                         break;
                     }
                     ++$j;
                 }
-            } elseif (\T_FUNCTION === $token[0]) {
+            } elseif (T_FUNCTION === $token[0]) {
                 $constructorLine = $token[2];
                 $j = $i - 1;
                 while (isset($tokens[$j])) {
@@ -366,7 +366,7 @@ final class UserMaker implements MakerInterface
             $constructorLine = $traitUseLine;
         }
 
-        $nl = $nl ?? \PHP_EOL;
+        $nl = $nl ?? PHP_EOL;
         $addUses = $addTraitUses = $addImplementors = [];
         $write = false;
         $enableEventHandler = static function () use ($implementors, $traits, &$addUses, &$addImplementors, &$addTraitUses): void {
@@ -406,7 +406,7 @@ final class UserMaker implements MakerInterface
 
                         return $signature.')';
                     },
-                    '~\s*+}\s*+$~s' => static function ($match) use ($nl, $indent, $credential, $credentialInit): string {
+                    '~\s*+}\s*+$~s' => static function ($match) use ($nl, $indent , $credentialInit): string {
                         $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
 
                         return $nl.$indent.$credentialInit.$match[0];
@@ -633,9 +633,10 @@ PHP;
     private function getSkeleton(string $path, array $vars = []): \Closure
     {
         return function () use ($path, $vars): string {
-            extract($vars + $this->getDefaultTemplateVars(), \EXTR_OVERWRITE);
+            extract($vars + $this->getDefaultTemplateVars(), EXTR_OVERWRITE);
 
             ob_start();
+
             require \dirname(__DIR__).'/Resources/skeleton/'.$path;
 
             return ob_get_clean();

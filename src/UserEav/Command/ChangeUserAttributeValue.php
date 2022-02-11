@@ -12,6 +12,7 @@ use MsgPhp\Eav\AttributeValueId;
 class ChangeUserAttributeValue
 {
     public $attributeValueId;
+
     /** @var mixed */
     public $value;
 

@@ -18,11 +18,12 @@ final class UsernameLookup
 {
     private $factory;
     private $em;
-    /** @var array<class-string, array<string, string|null>> */
+
+    /** @var array<class-string, array<string, null|string>> */
     private $mapping;
 
     /**
-     * @param array<class-string, array<string, string|null>> $mapping
+     * @param array<class-string, array<string, null|string>> $mapping
      */
     public function __construct(DomainObjectFactory $factory, EntityManagerInterface $em, array $mapping)
     {

@@ -19,11 +19,14 @@ final class ObjectMappingListener
     /** @var iterable<int, ObjectMappingProvider> */
     private $providers;
     private $mappingConfig;
+
     /** @var array<class-string, class-string> */
     private $classMapping;
+
     /** @var null|ClassMetadataFactory */
     private $metadataFactory;
-    /** @var array<class-string, array>|null */
+
+    /** @var null|array<class-string, array> */
     private $mappings;
 
     /**

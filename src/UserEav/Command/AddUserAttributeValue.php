@@ -14,6 +14,7 @@ class AddUserAttributeValue
 {
     public $userId;
     public $attributeId;
+
     /** @var mixed */
     public $value;
     public $context;

@@ -19,10 +19,10 @@ use MsgPhp\User\UserId;
  */
 class TestUser extends User implements DomainEventHandler
 {
-    use DomainEventHandlerTrait;
-    use EmailPasswordCredential;
     use CanBeConfirmed;
     use CanBeEnabled;
+    use DomainEventHandlerTrait;
+    use EmailPasswordCredential;
 
     /**
      * @var null|int
