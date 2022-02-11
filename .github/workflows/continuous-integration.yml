@@ -114,9 +114,7 @@ jobs:
           - "7.4"
           - "8.0"
         operating-system:
-          - "macos-latest"
           - "ubuntu-latest"
-          - "windows-latest"
         dependencies:
           - "lowest"
           - "highest"
