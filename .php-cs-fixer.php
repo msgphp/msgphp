@@ -22,7 +22,7 @@ $rules = [
     'self_static_accessor' => true,
 ];
 
-return Config::create()
+return (new Config())
     ->setUsingCache(true)
     ->setCacheFile(__DIR__.'/var/php-cs-fixer.cache')
     ->setRules($rules)
