@@ -56,6 +56,7 @@ class TestDomainEventHandler implements DomainEventHandler
 
     /**
      * @psalm-suppress UndefinedClass
+     * @phpstan-ignore-next-line
      */
     private function onMsgPhp_Test_ActionEvent(\MsgPhp_Test_Action $event): bool
     {

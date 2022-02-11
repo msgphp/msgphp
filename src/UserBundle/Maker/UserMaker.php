@@ -406,7 +406,7 @@ final class UserMaker implements MakerInterface
 
                         return $signature.')';
                     },
-                    '~\s*+}\s*+$~s' => static function ($match) use ($nl, $indent , $credentialInit): string {
+                    '~\s*+}\s*+$~s' => static function ($match) use ($nl, $indent, $credentialInit): string {
                         $indent = ltrim(substr($match[0], 0, strpos($match[0], '}')), "\r\n").'    ';
 
                         return $nl.$indent.$credentialInit.$match[0];

@@ -153,12 +153,9 @@ trait DomainEntityRepositoryTrait
     }
 
     /**
-     * @template T2Key of array-key
-     * @template T2 of object
-     *
      * @param int|string $hydrate
      *
-     * @return DomainCollection<T2Key, T2>
+     * @return DomainCollection
      */
     private function createResultSet(Query $query, ?int $offset = null, ?int $limit = null, $hydrate = Query::HYDRATE_OBJECT): DomainCollection
     {
@@ -170,7 +167,6 @@ trait DomainEntityRepositoryTrait
             $query->setMaxResults(0 === $limit ? null : $limit);
         }
 
-        /** @var DomainCollection<T2Key, T2> */
         return new GenericDomainCollection($query->getResult($hydrate));
     }
 

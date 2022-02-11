@@ -54,7 +54,8 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
         $this->expectException(InvalidClass::class);
 
-        /** @psalm-suppress UndefinedClass */
+        /* @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore-next-line */
         $factory->create(TestUnknownObject::class);
     }
 
@@ -158,7 +159,8 @@ final class GenericDomainObjectFactoryTest extends TestCase
 
         $this->expectException(InvalidClass::class);
 
-        /** @psalm-suppress UndefinedClass */
+        /* @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore-next-line */
         $factory->reference(TestUnknownObject::class);
     }
 
@@ -225,6 +227,7 @@ class TestKnownObject
 {
     /**
      * @psalm-suppress UndefinedClass
+     * @phpstan-ignore-next-line
      */
     public function __construct(?TestUnknownObject $arg = null)
     {

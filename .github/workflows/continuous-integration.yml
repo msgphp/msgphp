@@ -19,7 +19,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "7.4"
-          tools: composer:v2.1, php-cs-fixer:3
+          tools: php-cs-fixer:3
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -45,7 +45,6 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "7.4"
-          tools: composer:v2.1
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
@@ -55,7 +54,7 @@ jobs:
         run: "composer dev:analyze:phpstan -- --level=0"
 
       - name: "Statically analyze code (Psalm)"
-        run: "composer dev:analyze:psalm -- --shepherd"
+        run: "composer dev:analyze:psalm -- --shepherd --find-unused-psalm-suppress --show-info=false"
 
   security-analysis:
     name: "Security analysis"
@@ -92,7 +91,6 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "7.4"
-          tools: composer:v2.1
           coverage: "pcov"
           ini-values: "memory_limit=-1"
 
@@ -143,7 +141,6 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           php-version: "${{ matrix.php-version }}"
-          tools: composer:v2.1
           coverage: "none"
 
       - name: "Install dependencies (Composer)"

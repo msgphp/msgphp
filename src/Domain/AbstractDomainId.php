@@ -12,7 +12,7 @@ abstract class AbstractDomainId implements DomainId
     /** @var DomainId */
     protected $id;
 
-    public function __construct(?DomainId $id = null)
+    final public function __construct(?DomainId $id = null)
     {
         $this->id = $id ?? new GenericDomainId();
     }

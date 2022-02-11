@@ -13,6 +13,7 @@ abstract class BaseTestEntity
      */
     final public static function create(array $fields = []): self
     {
+        /* @phpstan-ignore-next-line */
         $entity = new static();
 
         foreach ($fields as $field => $value) {

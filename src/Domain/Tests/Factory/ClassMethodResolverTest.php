@@ -42,7 +42,8 @@ final class ClassMethodResolverTest extends TestCase
     {
         $this->expectException(InvalidClass::class);
 
-        /** @psalm-suppress UndefinedClass */
+        /* @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore-next-line */
         ClassMethodResolver::resolve(TestUnknownObject::class, 'bar');
     }
 
