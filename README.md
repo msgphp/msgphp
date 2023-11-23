@@ -1,9 +1,10 @@
 # NOT ACTIVELY SUPPORTED ANY MORE!!
 
 msgphp/* repositories are not actively developed/supported anymore.
-Use in production on your own risks.
 
-If you want to do some hotfixes - please do them directly in target repository instead of this monorepository.
+**Use in production on your own risks.**
+
+If you want to do some hotfixes - please do PR directly in target repository instead of this monorepository.
 
 # Message Driven PHP
 
